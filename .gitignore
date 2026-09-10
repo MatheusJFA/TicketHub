@@ -1,0 +1,7 @@
+.idea/
+.vscode/
+.DS_Store
+server/target/
+server/.settings/
+server/.classpath
+server/.project
