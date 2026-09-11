@@ -14,13 +14,15 @@ public final class SectionValidator extends Validator {
 
     @Override
     public void validate() {
+        final ValidationHandler handler = validationHandler();
+
         if (section.getName() == null)
-            validationHandler().append(new Error("'name' should not be null"));
+            handler.append(new Error("'name' should not be null"));
         if (section.getPrice() == null)
-            validationHandler().append(new Error("'price' should not be null"));
+            handler.append(new Error("'price' should not be null"));
         if (section.getTotalSpots() < 0)
-            validationHandler().append(new Error("'totalSpots' should not be negative"));
+            handler.append(new Error("'totalSpots' should not be negative"));
         if (section.getTotalSpotsSold() < 0)
-            validationHandler().append(new Error("'totalSpotsSold' should not be negative"));
+            handler.append(new Error("'totalSpotsSold' should not be negative"));
     }
 }

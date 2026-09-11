@@ -8,7 +8,9 @@ public final class PartnerValidator extends Validator {
     private final Partner partner;
     public PartnerValidator(final Partner partner, final ValidationHandler handler) { super(handler); this.partner = partner; }
     @Override public void validate() {
-        if (partner.getName() == null) validationHandler().append(new Error("'name' should not be null"));
-        if (partner.getCnpj() == null) validationHandler().append(new Error("'cnpj' should not be null"));
+        final ValidationHandler handler = validationHandler();
+
+        if (partner.getName() == null) handler.append(new Error("'name' should not be null"));
+        if (partner.getCnpj() == null) handler.append(new Error("'cnpj' should not be null"));
     }
 }

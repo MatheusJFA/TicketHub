@@ -8,7 +8,9 @@ public final class CustomerValidator extends Validator {
     private final Customer customer;
     public CustomerValidator(final Customer customer, final ValidationHandler handler) { super(handler); this.customer = customer; }
     @Override public void validate() {
-        if (customer.getCpf() == null) validationHandler().append(new Error("'cpf' should not be null"));
-        if (customer.getName() == null) validationHandler().append(new Error("'name' should not be null"));
+        final ValidationHandler handler = validationHandler();
+
+        if (customer.getCpf() == null) handler.append(new Error("'cpf' should not be null"));
+        if (customer.getName() == null) handler.append(new Error("'name' should not be null"));
     }
 }
