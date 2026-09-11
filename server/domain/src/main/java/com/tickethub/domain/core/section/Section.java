@@ -2,6 +2,8 @@ package com.tickethub.domain.core.section;
 
 import java.util.HashSet;
 import static java.util.Objects.isNull;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.tickethub.domain.Entity;
 import com.tickethub.domain.core.spot.Spot;
@@ -9,7 +11,6 @@ import com.tickethub.domain.shared.Money;
 import com.tickethub.domain.shared.Name;
 import com.tickethub.domain.shared.Text;
 import com.tickethub.domain.validation.ValidationHandler;
-
 
 public class Section extends Entity<SectionID> {
     private Name name;
@@ -20,7 +21,8 @@ public class Section extends Entity<SectionID> {
     private Money price;
     private HashSet<Spot> spots;
 
-    private Section(SectionID id, Name name, Text description, boolean isPublished, long totalSpots, long totalSpotsSold, Money price, HashSet<Spot> spots) {
+    private Section(SectionID id, Name name, Text description, boolean isPublished, long totalSpots,
+            long totalSpotsSold, Money price, HashSet<Spot> spots) {
         super(id);
         this.name = name;
         this.description = description;
@@ -31,16 +33,38 @@ public class Section extends Entity<SectionID> {
         this.spots = spots;
     }
 
-    public static Section create(String name, String description, boolean isPublished, long totalSpots, long totalSpotsSold, Money price, HashSet<Spot> spots) {
+    public static Section create(String name, String description, boolean isPublished, long totalSpots,
+            long totalSpotsSold, Money price, HashSet<Spot> spots) {
         final SectionID id = SectionID.generate();
         final HashSet<Spot> spotList = isNull(spots) ? new HashSet<>() : new HashSet<>(spots);
-        return new Section(id, Name.create(name), Text.create(description), isPublished, totalSpots, totalSpotsSold, price, spotList);
+        return new Section(id, Name.create(name), Text.create(description), isPublished, totalSpots, totalSpotsSold,
+                price, spotList);
     }
 
-    public static Section create(String name, String description, long totalSpots, Money price, HashSet<Spot> spots) {
+    public static Section create(String name, String description, long totalSpots, Money price) {
         final SectionID id = SectionID.generate();
-        final HashSet<Spot> spotList = isNull(spots) ? new HashSet<>() : new HashSet<>(spots);
-        return new Section(id, Name.create(name), Text.create(description), false, totalSpots, 0, price, spotList);
+        final HashSet<Spot> spots = generateSpots(totalSpots);
+        final Section section = new Section(id, Name.create(name), Text.create(description), false, totalSpots, 0,
+                price, spots);
+
+        return section;
+    }
+
+    private static HashSet<Spot> generateSpots(long totalSpots) {
+        return Stream.iterate(0, i -> i + 1)
+                .limit(totalSpots)
+                .map(i -> Spot.create())
+                .collect(Collectors.toCollection(HashSet::new));
+    }
+
+    public void publish() {
+        this.isPublished = true;
+        this.markAsUpdated();
+    }
+
+    public void unpublish() {
+        this.isPublished = false;
+        this.markAsUpdated();
     }
 
     public Name getName() {

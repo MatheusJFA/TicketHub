@@ -2,7 +2,6 @@ package com.tickethub.domain.core.spot;
 
 import com.tickethub.domain.Entity;
 import com.tickethub.domain.shared.Location;
-import com.tickethub.domain.validation.ValidationHandler;
 
 public class Spot extends Entity<SpotID> implements Cloneable {
     private Location location;
@@ -26,6 +25,21 @@ public class Spot extends Entity<SpotID> implements Cloneable {
         return new Spot(id, location, true, false);
     }
 
+    public static Spot create() {
+        final SpotID id = SpotID.generate();
+        return new Spot(id, null, true, false);
+    }
+
+    public void publish() {
+        this.isPublished = true;
+        this.markAsUpdated();
+    }
+
+    public void unpublish() {
+        this.isPublished = false;
+        this.markAsUpdated();
+    }
+
     public Location getLocation() {
         return location;
     }
@@ -36,12 +50,6 @@ public class Spot extends Entity<SpotID> implements Cloneable {
 
     public boolean isPublished() {
         return isPublished;
-    }
-
-    @Override
-    public void validate(final ValidationHandler handler) {
-        final var validator = new SpotValidator(this, handler);
-        validator.validate();
     }
 
     @Override
