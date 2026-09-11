@@ -7,16 +7,82 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Currency;
 import java.util.HashSet;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
+import com.tickethub.domain.Entity;
 import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.shared.Money;
 
 class SectionTest {
+
+    @ParameterizedTest
+    @ValueSource(longs = {0, 1, 3})
+    void givenSpotsWithMixedPublication_whenPublishAll_thenPublishSectionAndEverySpot(long capacity) throws Exception {
+        final var price = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
+        final var section = Section.create("VIP", "Description", capacity, price);
+        if (capacity > 0) section.getSpots().iterator().next().publish();
+        final var entities = new ArrayList<Entity<?>>();
+        entities.add(section);
+        entities.addAll(section.getSpots());
+        final var createdDates = entities.stream().map(Entity::getCreatedAt).toList();
+        for (final var entity : entities) resetUpdatedAt(entity);
+
+        section.publishAll();
+
+        assertTrue(section.isPublished());
+        assertEquals(capacity, section.getSpots().size());
+        assertEquals(capacity, section.getTotalSpots());
+        assertEquals(0, section.getTotalSpotsSold());
+        assertEquals(price, section.getPrice());
+        for (final var spot : section.getSpots()) {
+            assertTrue(spot.isPublished());
+            assertTrue(spot.isAvailable());
+        }
+        entities.forEach(entity -> assertTrue(entity.getUpdatedAt().isAfter(Instant.EPOCH)));
+        assertEquals(createdDates, entities.stream().map(Entity::getCreatedAt).toList());
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {0, 1, 3})
+    void givenPublishedSection_whenUnpublishAll_thenUnpublishSectionAndEverySpot(long capacity) throws Exception {
+        final var price = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
+        final var section = Section.create("VIP", "Description", capacity, price);
+        section.publish();
+        section.getSpots().forEach(Spot::publish);
+        final var entities = new ArrayList<Entity<?>>();
+        entities.add(section);
+        entities.addAll(section.getSpots());
+        final var createdDates = entities.stream().map(Entity::getCreatedAt).toList();
+        for (final var entity : entities) resetUpdatedAt(entity);
+
+        section.unpublishAll();
+
+        assertFalse(section.isPublished());
+        assertEquals(capacity, section.getSpots().size());
+        assertEquals(capacity, section.getTotalSpots());
+        assertEquals(0, section.getTotalSpotsSold());
+        assertEquals(price, section.getPrice());
+        for (final var spot : section.getSpots()) {
+            assertFalse(spot.isPublished());
+            assertTrue(spot.isAvailable());
+        }
+        entities.forEach(entity -> assertTrue(entity.getUpdatedAt().isAfter(Instant.EPOCH)));
+        assertEquals(createdDates, entities.stream().map(Entity::getCreatedAt).toList());
+    }
+
+    private static void resetUpdatedAt(Entity<?> entity) throws Exception {
+        final var field = Entity.class.getDeclaredField("updatedAt");
+        field.setAccessible(true);
+        field.set(entity, Instant.EPOCH);
+    }
 
     @Test
     void givenValidParams_whenCreate_thenInstantiateSection() {

@@ -74,6 +74,16 @@ public class Show extends AggregateRoot<ShowID> implements Cloneable {
         this.markAsUpdated();
     }
 
+    public void publishAll() {
+        this.publish();
+        this.sections.forEach(Section::publishAll);
+    }
+
+    public void unpublishAll() {
+        this.unpublish();
+        this.sections.forEach(Section::unpublishAll);
+    }
+
     public void publish() {
         this.isPublished = true;
         this.markAsUpdated();
@@ -90,6 +100,10 @@ public class Show extends AggregateRoot<ShowID> implements Cloneable {
 
     public Text getDescription() {
         return description;
+    }
+
+    public OffsetDateTime getDate() {
+        return date;
     }
 
     public boolean isPublished() {

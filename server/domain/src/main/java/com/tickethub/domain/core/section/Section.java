@@ -1,7 +1,8 @@
 package com.tickethub.domain.core.section;
 
-import java.util.HashSet;
 import static java.util.Objects.isNull;
+
+import java.util.HashSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -55,6 +56,16 @@ public class Section extends Entity<SectionID> {
                 .limit(totalSpots)
                 .map(i -> Spot.create())
                 .collect(Collectors.toCollection(HashSet::new));
+    }
+
+    public void publishAll() {
+        this.publish();
+        this.spots.forEach(Spot::publish);
+    }
+
+    public void unpublishAll() {
+        this.unpublish();
+        this.spots.forEach(Spot::unpublish);
     }
 
     public void publish() {
