@@ -2,7 +2,8 @@ package com.tickethub.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import java.util.HashSet;
+
+import java.time.OffsetDateTime;
 
 import org.junit.jupiter.api.Test;
 
@@ -30,23 +31,24 @@ class DomainValidatorsTest {
     }
 
     @Test
-    void givenSpotWithoutLocation_whenValidate_thenReportError() {
+    void givenSpotWithoutLocation_whenValidate_thenHaveNoErrors() {
         final var notification = Notification.create();
         Spot.create(null).validate(notification);
-        assertEquals("'location' should not be null", notification.firstError().message());
+        assertFalse(notification.hasError());
     }
 
     @Test
     void givenSectionWithoutPrice_whenValidate_thenReportError() {
         final var notification = Notification.create();
-        Section.create("VIP", "Description", 10, null, new HashSet<>()).validate(notification);
+        Section.create("VIP", "Description", 10, null).validate(notification);
         assertEquals("'price' should not be null", notification.firstError().message());
     }
 
     @Test
     void givenShowWithoutPartner_whenValidate_thenReportError() {
         final var notification = Notification.create();
-        Show.create("Concert", "Description", 10, null, new HashSet<>()).validate(notification);
+        Show.create("Concert", "Description", OffsetDateTime.parse("2027-01-15T20:00:00-03:00"), 10, null)
+                .validate(notification);
         assertEquals("'partnerId' should not be null", notification.firstError().message());
     }
 

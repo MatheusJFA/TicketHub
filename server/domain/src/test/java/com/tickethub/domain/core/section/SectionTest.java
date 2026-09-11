@@ -56,7 +56,7 @@ class SectionTest {
         final var expectedPrice = Money.create(new BigDecimal("20.00"), Currency.getInstance("BRL"));
         final var expectedSpots = new HashSet<Spot>();
 
-        final var actualSection = Section.create(expectedName, expectedDescription, expectedTotalSpots, expectedPrice, expectedSpots);
+        final var actualSection = Section.create(expectedName, expectedDescription, expectedTotalSpots, expectedPrice);
 
         assertNotNull(actualSection);
         assertNotNull(actualSection.getId());

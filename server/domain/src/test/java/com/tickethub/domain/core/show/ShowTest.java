@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashSet;
+import java.time.OffsetDateTime;
 
 import org.junit.jupiter.api.Test;
 
@@ -15,6 +16,7 @@ import com.tickethub.domain.core.section.Section;
 import com.tickethub.domain.exception.DomainException;
 
 class ShowTest {
+    private static final OffsetDateTime DATE = OffsetDateTime.parse("2027-01-15T20:00:00-03:00");
 
     @Test
     void givenValidParams_whenCreate_thenInstantiateShow() {
@@ -28,7 +30,7 @@ class ShowTest {
 
         final var actualShow = Show.create(
                 expectedName,
-                expectedDescription,
+                expectedDescription, DATE,
                 expectedPublished,
                 expectedTotalSpots,
                 expectedTotalSpotsSold,
@@ -54,7 +56,7 @@ class ShowTest {
         final var expectedPartnerId = PartnerID.generate();
         final var expectedSections = new HashSet<Section>();
 
-        final var actualShow = Show.create(expectedName, expectedDescription, expectedTotalSpots, expectedPartnerId, expectedSections);
+        final var actualShow = Show.create(expectedName, expectedDescription, DATE, expectedTotalSpots, expectedPartnerId, expectedSections);
 
         assertNotNull(actualShow);
         assertNotNull(actualShow.getId());
@@ -69,7 +71,7 @@ class ShowTest {
     @Test
     void givenValidShow_whenPublish_thenChangeToPublished() {
         final var expectedPartnerId = PartnerID.generate();
-        final var actualShow = Show.create("O Rei Leão", "Uma grande apresentação", false, 50L, 0L, expectedPartnerId, new HashSet<Section>());
+        final var actualShow = Show.create("O Rei Leão", "Uma grande apresentação", DATE, false, 50L, 0L, expectedPartnerId, new HashSet<Section>());
 
         assertFalse(actualShow.isPublished());
 
@@ -81,7 +83,7 @@ class ShowTest {
     @Test
     void givenValidShow_whenUnpublish_thenChangeToUnpublished() {
         final var expectedPartnerId = PartnerID.generate();
-        final var actualShow = Show.create("O Rei Leão", "Uma grande apresentação", true, 50L, 0L, expectedPartnerId, new HashSet<Section>());
+        final var actualShow = Show.create("O Rei Leão", "Uma grande apresentação", DATE, true, 50L, 0L, expectedPartnerId, new HashSet<Section>());
 
         assertTrue(actualShow.isPublished());
 
@@ -104,7 +106,7 @@ class ShowTest {
                 DomainException.class,
                 () -> Show.create(
                         expectedName,
-                        expectedDescription,
+                        expectedDescription, DATE,
                         expectedPublished,
                         expectedTotalSpots,
                         expectedTotalSpotsSold,
