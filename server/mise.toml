@@ -1,0 +1,31 @@
+[tools]
+java = "25.0.2"
+maven = "3.9.16"
+
+[tasks.application]
+description = "Build and run the Spring Boot application (skip tests)"
+run = [
+  "mvn -B -ntp -pl infrastructure -am package -DskipTests",
+  "java -jar infrastructure/target/infrastructure-0.0.1-SNAPSHOT.jar",
+]
+
+[tasks.test]
+description = "Run tests in every module, including architecture tests"
+run = "mvn -B -ntp test"
+
+[tasks.build]
+description = "Build every module and run all verification checks"
+alias = "verify"
+run = "mvn -B -ntp verify"
+
+[tasks.install]
+description = "Verify and install every module in the local Maven repository"
+run = "mvn -B -ntp install"
+
+[tasks.clean]
+description = "Remove module build outputs, preserving root recovery backups"
+run = "mvn -B -ntp -pl domain,application,infrastructure clean"
+
+[tasks.versions]
+description = "Show the Java and Maven versions used by mise"
+run = "mvn --version"
