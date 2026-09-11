@@ -1,0 +1,14 @@
+package com.tickethub.domain.core.partner;
+
+import com.tickethub.domain.validation.Error;
+import com.tickethub.domain.validation.ValidationHandler;
+import com.tickethub.domain.validation.Validator;
+
+public final class PartnerValidator extends Validator {
+    private final Partner partner;
+    public PartnerValidator(final Partner partner, final ValidationHandler handler) { super(handler); this.partner = partner; }
+    @Override public void validate() {
+        if (partner.getName() == null) validationHandler().append(new Error("'name' should not be null"));
+        if (partner.getCnpj() == null) validationHandler().append(new Error("'cnpj' should not be null"));
+    }
+}
