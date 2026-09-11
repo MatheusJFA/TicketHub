@@ -12,6 +12,7 @@ import com.tickethub.domain.core.partner.Partner;
 import com.tickethub.domain.core.section.Section;
 import com.tickethub.domain.core.show.Show;
 import com.tickethub.domain.core.spot.Spot;
+import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.validation.Notification;
 
 class DomainValidatorsTest {
@@ -47,7 +48,7 @@ class DomainValidatorsTest {
     @Test
     void givenShowWithoutPartner_whenValidate_thenReportError() {
         final var notification = Notification.create();
-        Show.create("Concert", "Description", OffsetDateTime.parse("2027-01-15T20:00:00-03:00"), 10, null)
+        Show.create("Concert", "Description", OffsetDateTime.parse("2027-01-15T20:00:00-03:00"), Address.create("Rua Augusta", "100", null, "Centro", "São Paulo", "SP", "Brasil", "01305-000"), 10, null)
                 .validate(notification);
         assertEquals("'partnerId' should not be null", notification.firstError().message());
     }

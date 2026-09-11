@@ -25,10 +25,12 @@ import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.core.section.Section;
 import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.exception.DomainException;
+import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.shared.Money;
 import com.tickethub.domain.validation.Notification;
 
 class ShowTest {
+    private static final Address ADDRESS = Address.create("Rua Augusta", "100", null, "Centro", "São Paulo", "SP", "Brasil", "01305-000");
     private static final OffsetDateTime DATE = OffsetDateTime.parse("2027-01-15T20:00:00-03:00");
     private static final Money PRICE = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
 
@@ -44,7 +46,7 @@ class ShowTest {
 
         final var actualShow = Show.create(
                 expectedName,
-                expectedDescription, DATE,
+                expectedDescription, DATE, ADDRESS,
                 expectedPublished,
                 expectedTotalSpots,
                 expectedTotalSpotsSold,
@@ -54,6 +56,7 @@ class ShowTest {
 
         assertNotNull(actualShow);
         assertNotNull(actualShow.getId());
+        assertEquals(ADDRESS, actualShow.getAddress());
         assertEquals(expectedName, actualShow.getName().getValue());
         assertEquals(expectedDescription, actualShow.getDescription().getValue());
         assertTrue(actualShow.isPublished());
@@ -70,10 +73,11 @@ class ShowTest {
         final var expectedPartnerId = PartnerID.generate();
         final var expectedSections = new HashSet<Section>();
 
-        final var actualShow = Show.create(expectedName, expectedDescription, DATE, expectedTotalSpots, expectedPartnerId, expectedSections);
+        final var actualShow = Show.create(expectedName, expectedDescription, DATE, ADDRESS, expectedTotalSpots, expectedPartnerId, expectedSections);
 
         assertNotNull(actualShow);
         assertNotNull(actualShow.getId());
+        assertEquals(ADDRESS, actualShow.getAddress());
         assertEquals(expectedName, actualShow.getName().getValue());
         assertEquals(expectedDescription, actualShow.getDescription().getValue());
         assertFalse(actualShow.isPublished());
@@ -85,7 +89,7 @@ class ShowTest {
     @Test
     void givenValidShow_whenPublish_thenChangeToPublished() {
         final var expectedPartnerId = PartnerID.generate();
-        final var actualShow = Show.create("O Rei Leão", "Uma grande apresentação", DATE, false, 50L, 0L, expectedPartnerId, new HashSet<Section>());
+        final var actualShow = Show.create("O Rei Leão", "Uma grande apresentação", DATE, ADDRESS, false, 50L, 0L, expectedPartnerId, new HashSet<Section>());
 
         assertFalse(actualShow.isPublished());
 
@@ -97,7 +101,7 @@ class ShowTest {
     @Test
     void givenValidShow_whenUnpublish_thenChangeToUnpublished() {
         final var expectedPartnerId = PartnerID.generate();
-        final var actualShow = Show.create("O Rei Leão", "Uma grande apresentação", DATE, true, 50L, 0L, expectedPartnerId, new HashSet<Section>());
+        final var actualShow = Show.create("O Rei Leão", "Uma grande apresentação", DATE, ADDRESS, true, 50L, 0L, expectedPartnerId, new HashSet<Section>());
 
         assertTrue(actualShow.isPublished());
 
@@ -120,7 +124,7 @@ class ShowTest {
                 DomainException.class,
                 () -> Show.create(
                         expectedName,
-                        expectedDescription, DATE,
+                        expectedDescription, DATE, ADDRESS,
                         expectedPublished,
                         expectedTotalSpots,
                         expectedTotalSpotsSold,
@@ -137,9 +141,10 @@ class ShowTest {
     @Test
     void givenPartner_whenCreateShow_thenAssociatePartnerAndInitializeDefaults() {
         final var partner = Partner.create("Cinema Nova", "11222333000181");
-        final var show = partner.createShow("Concert", "Description", DATE, 10);
+        final var show = partner.createShow("Concert", "Description", DATE, ADDRESS, 10);
 
         assertNotNull(show.getId());
+        assertEquals(ADDRESS, show.getAddress());
         assertEquals(partner.getId(), show.getPartnerId());
         assertEquals("Concert", show.getName().getValue());
         assertEquals("Description", show.getDescription().getValue());
@@ -185,7 +190,7 @@ class ShowTest {
 
     @Test
     void givenShow_whenAddSections_thenAccumulateCapacityAndGenerateSpots() throws Exception {
-        final var show = Show.create("Concert", "Description", DATE, 10, PartnerID.generate());
+        final var show = Show.create("Concert", "Description", DATE, ADDRESS, 10, PartnerID.generate());
         final var createdAt = show.getCreatedAt();
         resetUpdatedAt(show);
 
@@ -212,7 +217,7 @@ class ShowTest {
 
     @Test
     void givenInvalidSectionName_whenAddSection_thenLeaveShowUnchanged() {
-        final var show = Show.create("Concert", "Description", DATE, 10, PartnerID.generate());
+        final var show = Show.create("Concert", "Description", DATE, ADDRESS, 10, PartnerID.generate());
         final var updatedAt = show.getUpdatedAt();
 
         final var exception = assertThrows(DomainException.class,
@@ -226,7 +231,7 @@ class ShowTest {
 
     @Test
     void givenShow_whenPublishAndUnpublish_thenUpdateStateAndAudit() throws Exception {
-        final var show = Show.create("Concert", "Description", DATE, 0, PartnerID.generate());
+        final var show = Show.create("Concert", "Description", DATE, ADDRESS, 0, PartnerID.generate());
         final var createdAt = show.getCreatedAt();
         resetUpdatedAt(show);
         show.publish();
@@ -271,8 +276,19 @@ class ShowTest {
     }
 
     @Test
+    void givenNoAddress_whenValidate_thenReportRequiredAddress() {
+        final var show = Show.create("Concert", "Description", DATE, null, 10, PartnerID.generate());
+        final var notification = Notification.create();
+
+        show.validate(notification);
+
+        assertEquals(List.of("'address' should not be null"),
+                notification.getErrors().stream().map(error -> error.message()).toList());
+    }
+
+    @Test
     void givenInvalidShow_whenValidate_thenAccumulateErrors() {
-        final var show = Show.create("Concert", "Description", DATE, false, -1, -1, null, null);
+        final var show = Show.create("Concert", "Description", DATE, ADDRESS, false, -1, -1, null, null);
         final var notification = Notification.create();
         show.validate(notification);
         assertEquals(List.of("'partnerId' should not be null", "'totalSpots' should not be negative",
@@ -293,7 +309,7 @@ class ShowTest {
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 3})
     void givenSectionsWithMixedPublication_whenPublishAll_thenPublishEntireShow(int sectionCount) throws Exception {
-        final var show = Show.create("Concert", "Description", DATE, 0, PartnerID.generate());
+        final var show = Show.create("Concert", "Description", DATE, ADDRESS, 0, PartnerID.generate());
         for (int i = 0; i < sectionCount; i++) {
             show.addSection("VIP", "Description", i + 1, PRICE);
         }
@@ -329,7 +345,7 @@ class ShowTest {
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 3})
     void givenPublishedShow_whenUnpublishAll_thenUnpublishEntireShow(int sectionCount) throws Exception {
-        final var show = Show.create("Concert", "Description", DATE, 0, PartnerID.generate());
+        final var show = Show.create("Concert", "Description", DATE, ADDRESS, 0, PartnerID.generate());
         for (int i = 0; i < sectionCount; i++) {
             show.addSection("VIP", "Description", i + 1, PRICE);
         }

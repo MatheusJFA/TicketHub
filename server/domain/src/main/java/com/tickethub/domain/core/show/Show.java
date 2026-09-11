@@ -8,6 +8,7 @@ import java.util.HashSet;
 import com.tickethub.domain.AggregateRoot;
 import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.core.section.Section;
+import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.shared.Money;
 import com.tickethub.domain.shared.Name;
 import com.tickethub.domain.shared.Text;
@@ -18,6 +19,7 @@ public class Show extends AggregateRoot<ShowID> implements Cloneable {
     private Text description;
 
     private OffsetDateTime date;
+    private final Address address;
 
     private boolean isPublished;
 
@@ -28,13 +30,14 @@ public class Show extends AggregateRoot<ShowID> implements Cloneable {
 
     private HashSet<Section> sections;
 
-    private Show(ShowID id, Name name, Text description, OffsetDateTime date, boolean isPublished, long totalSpots,
+    private Show(ShowID id, Name name, Text description, OffsetDateTime date, Address address, boolean isPublished, long totalSpots,
             long totalSpotsSold,
             PartnerID partnerId, HashSet<Section> sections) {
         super(id);
         this.name = name;
         this.description = description;
         this.date = date;
+        this.address = address;
         this.isPublished = isPublished;
         this.totalSpots = totalSpots;
         this.totalSpotsSold = totalSpotsSold;
@@ -42,28 +45,28 @@ public class Show extends AggregateRoot<ShowID> implements Cloneable {
         this.sections = sections;
     }
 
-    public static Show create(String name, String description, OffsetDateTime date, boolean isPublished,
+    public static Show create(String name, String description, OffsetDateTime date, Address address, boolean isPublished,
             long totalSpots,
             long totalSpotsSold, PartnerID partnerId, HashSet<Section> sections) {
         final ShowID id = ShowID.generate();
         final HashSet<Section> sectionList = isNull(sections) ? new HashSet<>() : new HashSet<>(sections);
-        return new Show(id, Name.create(name), Text.create(description), date, isPublished, totalSpots, totalSpotsSold,
+        return new Show(id, Name.create(name), Text.create(description), date, address, isPublished, totalSpots, totalSpotsSold,
                 partnerId, sectionList);
     }
 
-    public static Show create(String name, String description, OffsetDateTime date, long totalSpots,
+    public static Show create(String name, String description, OffsetDateTime date, Address address, long totalSpots,
             PartnerID partnerId,
             HashSet<Section> sections) {
         final ShowID id = ShowID.generate();
         final HashSet<Section> sectionList = isNull(sections) ? new HashSet<>() : new HashSet<>(sections);
-        return new Show(id, Name.create(name), Text.create(description), date, false, totalSpots, 0, partnerId,
+        return new Show(id, Name.create(name), Text.create(description), date, address, false, totalSpots, 0, partnerId,
                 sectionList);
     }
 
-    public static Show create(String name, String description, OffsetDateTime date, long totalSpots,
+    public static Show create(String name, String description, OffsetDateTime date, Address address, long totalSpots,
             PartnerID partnerId) {
         final ShowID id = ShowID.generate();
-        return new Show(id, Name.create(name), Text.create(description), date, false, totalSpots, 0, partnerId,
+        return new Show(id, Name.create(name), Text.create(description), date, address, false, totalSpots, 0, partnerId,
                 new HashSet<>());
     }
 
@@ -100,6 +103,10 @@ public class Show extends AggregateRoot<ShowID> implements Cloneable {
 
     public Text getDescription() {
         return description;
+    }
+
+    public Address getAddress() {
+        return address;
     }
 
     public OffsetDateTime getDate() {

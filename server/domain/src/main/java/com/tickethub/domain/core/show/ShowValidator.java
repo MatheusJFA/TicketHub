@@ -20,6 +20,8 @@ public final class ShowValidator extends Validator {
             handler.append(new Error("'name' should not be null"));
         if (show.getPartnerId() == null)
             handler.append(new Error("'partnerId' should not be null"));
+        if (show.getAddress() == null)
+            handler.append(new Error("'address' should not be null"));
         if (show.getTotalSpots() < 0)
             handler.append(new Error("'totalSpots' should not be negative"));
         if (show.getTotalSpotsSold() < 0)
