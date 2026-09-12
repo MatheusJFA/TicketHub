@@ -36,9 +36,11 @@ public final class Address extends ValueObject {
 
     private static String required(String value, String field) {
         final String normalized = normalize(value);
+
         if (isNull(normalized) || normalized.isBlank()) {
             throw new DomainException("'" + field + "' should not be null or blank");
         }
+
         return normalized;
     }
 
@@ -92,8 +94,10 @@ public final class Address extends ValueObject {
     public boolean equals(Object other) {
         if (this == other)
             return true;
+
         if (!(other instanceof Address address))
             return false;
+
         return street.equals(address.street)
                 && number.equals(address.number)
                 && Objects.equals(complement, address.complement)
