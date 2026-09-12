@@ -26,7 +26,7 @@ public class Show extends AggregateRoot<ShowID> implements Cloneable {
     private long totalSpots;
     private long totalSpotsSold;
 
-    private PartnerID partnerId;
+    private final PartnerID partnerId;
 
     private HashSet<Section> sections;
 
@@ -95,6 +95,27 @@ public class Show extends AggregateRoot<ShowID> implements Cloneable {
     public void unpublish() {
         this.isPublished = false;
         this.markAsUpdated();
+    }
+
+    public Show changeName(final String name) {
+        this.name = Name.create(name);
+        markAsUpdated();
+        return this;
+    }
+
+    public Show changeDescription(final String description) {
+        this.description = Text.create(description);
+        markAsUpdated();
+        return this;
+    }
+
+    public Show reschedule(final OffsetDateTime date) {
+        if (date == null) {
+            throw new com.tickethub.domain.exception.DomainException("'date' should not be null");
+        }
+        this.date = date;
+        markAsUpdated();
+        return this;
     }
 
     public Name getName() {
