@@ -27,7 +27,7 @@ class DomainValidatorsTest {
     @Test
     void givenValidPartner_whenValidate_thenHaveNoErrors() {
         final var notification = Notification.create();
-        Partner.create("Cinema Nova", "11222333000181").validate(notification);
+        Partner.create("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000")).validate(notification);
         assertFalse(notification.hasError());
     }
 

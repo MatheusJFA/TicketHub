@@ -17,7 +17,7 @@ class PartnerTest {
     @ValueSource(strings = {" ", "J"})
     void givenInvalidName_whenCreate_thenThrowDomainExceptionForNullAndBlank(String name) {
         assertEquals("Invalid name " + name, assertThrows(DomainException.class,
-                () -> Partner.create(name, "11222333000181")).getMessage());
+                () -> Partner.create(name, "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"))).getMessage());
     }
 
     @ParameterizedTest
@@ -25,7 +25,7 @@ class PartnerTest {
     @ValueSource(strings = {" ", "123"})
     void givenInvalidCnpj_whenCreate_thenThrowDomainExceptionForNullAndBlank(String cnpj) {
         assertEquals("Invalid CNPJ", assertThrows(DomainException.class,
-                () -> Partner.create("Cinema Nova", cnpj)).getMessage());
+                () -> Partner.create("Cinema Nova", cnpj, com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"))).getMessage());
     }
 
     @Test
@@ -33,7 +33,7 @@ class PartnerTest {
         final var expectedName = "Cinema Nova";
         final var expectedCnpj = "11222333000181";
 
-        final var actualPartner = Partner.create(expectedName, expectedCnpj);
+        final var actualPartner = Partner.create(expectedName, expectedCnpj, com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"));
 
         assertNotNull(actualPartner);
         assertNotNull(actualPartner.getId());
@@ -48,7 +48,7 @@ class PartnerTest {
 
         DomainException exception = assertThrows(
                 DomainException.class,
-                () -> Partner.create(expectedName, expectedCnpj)
+                () -> Partner.create(expectedName, expectedCnpj, com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"))
         );
 
         assertEquals("Invalid name " + expectedName, exception.getMessage());
@@ -61,7 +61,7 @@ class PartnerTest {
 
         DomainException exception = assertThrows(
                 DomainException.class,
-                () -> Partner.create(expectedName, expectedCnpj)
+                () -> Partner.create(expectedName, expectedCnpj, com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"))
         );
 
         assertEquals("Invalid CNPJ", exception.getMessage());

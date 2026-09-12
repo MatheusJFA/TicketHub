@@ -11,21 +11,46 @@ import com.tickethub.domain.validation.ValidationHandler;
 
 public class Partner extends AggregateRoot<PartnerID> implements Cloneable {
     private Name name;
-    private CNPJ cnpj;
+    private final CNPJ cnpj;
+    private Address address;
 
-    private Partner(PartnerID id, Name name, CNPJ cnpj) {
+    private Partner(PartnerID id, Name name, CNPJ cnpj, Address address) {
         super(id);
         this.name = name;
         this.cnpj = cnpj;
+        this.address = requireAddress(address);
     }
 
-    public static Partner create(String name, String cnpj) {
+    public static Partner create(String name, String cnpj, Address address) {
         final PartnerID id = PartnerID.generate();
-        return new Partner(id, Name.create(name), CNPJ.create(cnpj));
+        return new Partner(id, Name.create(name), CNPJ.create(cnpj), address);
     }
 
     public Show createShow(String name, String description, OffsetDateTime date, Address address, long totalSpots) {
         return Show.create(name, description, date, address, totalSpots, this.getId());
+    }
+
+    public Partner changeName(final String name) {
+        this.name = Name.create(name);
+        markAsUpdated();
+        return this;
+    }
+
+    public Partner changeAddress(final Address address) {
+        this.address = requireAddress(address);
+        markAsUpdated();
+        return this;
+    }
+
+    private static Address requireAddress(final Address address) {
+        if (address == null) {
+            throw new com.tickethub.domain.exception.DomainException("'address' should not be null");
+        }
+        return address;
+    }
+
+    public Address getAddress() {
+        return address;
     }
 
     public Name getName() {

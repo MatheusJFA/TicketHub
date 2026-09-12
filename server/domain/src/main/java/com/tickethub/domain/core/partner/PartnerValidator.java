@@ -10,6 +10,7 @@ public final class PartnerValidator extends Validator {
     @Override public void validate() {
         final ValidationHandler handler = validationHandler();
 
+        if (partner.getAddress() == null) handler.append(new Error("'address' should not be null"));
         if (partner.getName() == null) handler.append(new Error("'name' should not be null"));
         if (partner.getCnpj() == null) handler.append(new Error("'cnpj' should not be null"));
     }

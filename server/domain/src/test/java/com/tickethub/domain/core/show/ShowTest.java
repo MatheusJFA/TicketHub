@@ -140,7 +140,7 @@ class ShowTest {
 
     @Test
     void givenPartner_whenCreateShow_thenAssociatePartnerAndInitializeDefaults() {
-        final var partner = Partner.create("Cinema Nova", "11222333000181");
+        final var partner = Partner.create("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"));
         final var show = partner.createShow("Concert", "Description", DATE, ADDRESS, 10);
 
         assertNotNull(show.getId());
