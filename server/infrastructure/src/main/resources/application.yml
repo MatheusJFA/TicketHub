@@ -1,3 +1,22 @@
 spring:
   application:
     name: tickethub-server
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:${KAFKA_PORT:9092}}
+  data:
+    mongodb:
+      host: ${MONGO_HOST:localhost}
+      port: ${MONGO_PORT:27017}
+      database: tickethub
+      username: ${MONGO_USERNAME:tickethub}
+      password: ${MONGO_PASSWORD:tickethub-local}
+      authentication-database: admin
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
