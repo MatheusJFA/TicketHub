@@ -6,7 +6,7 @@ import com.tickethub.domain.shared.Name;
 import com.tickethub.domain.validation.ValidationHandler;
 
 public class Customer extends AggregateRoot<CustomerID> implements Cloneable {
-    private CPF cpf;
+    private final CPF cpf;
     private Name name;
 
     private Customer(CustomerID id, CPF cpf, Name name) {
@@ -18,10 +18,15 @@ public class Customer extends AggregateRoot<CustomerID> implements Cloneable {
     public static Customer create(String cpf, String name) {
         final CustomerID id = CustomerID.generate();
         return new Customer(
-            id,
-            CPF.create(cpf),
-            Name.create(name)
-        );
+                id,
+                CPF.create(cpf),
+                Name.create(name));
+    }
+
+    public Customer changeName(final String name) {
+        this.name = Name.create(name);
+        markAsUpdated();
+        return this;
     }
 
     public CPF getCpf() {
