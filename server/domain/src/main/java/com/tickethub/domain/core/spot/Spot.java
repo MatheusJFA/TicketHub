@@ -40,6 +40,15 @@ public class Spot extends Entity<SpotID> implements Cloneable {
         this.markAsUpdated();
     }
 
+    public Spot changeLocation(final Location location) {
+        if (location == null) {
+            throw new com.tickethub.domain.exception.DomainException("'location' should not be null");
+        }
+        this.location = location;
+        markAsUpdated();
+        return this;
+    }
+
     public Location getLocation() {
         return location;
     }
