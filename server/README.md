@@ -8,6 +8,18 @@ Projeto Maven com três módulos, usando Java 25.
 
 As dependências apontam para dentro: `infrastructure → application → domain`. As interfaces de gateways ficam no domínio; suas implementações ficam na infraestrutura.
 
+Todos os recursos possuem casos de uso de criação, busca por ID, listagem paginada e exclusão. As alterações são expressas por ações específicas:
+
+| Recurso | Ações adicionais |
+| --- | --- |
+| Customer | Alterar nome. CPF imutável. |
+| Partner | Alterar nome e endereço. CNPJ imutável. |
+| Show | Alterar nome e descrição, reagendar, adicionar seção, publicar e despublicar (individualmente ou com suas seções). Partner imutável. |
+| Section | Alterar nome, descrição e preço, publicar e despublicar (individualmente ou com seus spots). |
+| Spot | Alterar localização, publicar e despublicar. |
+
+As consultas recebem `SearchQuery` ou um ID e devolvem DTOs, com paginação na listagem. Os casos de uso retornam `Either<Notification, Output>` para representar erros e resultados. A exclusão delega a `deleteById` do gateway, seguindo o contrato existente. Os adaptadores de persistência e endpoints HTTP de negócio ainda estão pendentes.
+
 O POM raiz agrega os módulos e centraliza versões. Apenas `infrastructure` gera um JAR executável Spring Boot. Cada módulo mantém seus próprios testes; os testes de arquitetura ficam em `infrastructure`, onde as três camadas estão disponíveis.
 
 O [mise](https://mise.jdx.dev/) gerencia Java 25.0.2 e Maven 3.9.16. Com o mise instalado, execute na pasta `server`:
@@ -31,7 +43,7 @@ Os comandos usam automaticamente o Java e o Maven configurados em `mise.toml`, s
 | `mise run versions` | Mostra as versões e o caminho do Java e Maven em uso. |
 | `mise tasks ls` | Lista os comandos disponíveis. |
 
-A aplicação atual contém apenas a inicialização do Spring Boot, sem servidor HTTP; ela pode encerrar normalmente após iniciar. O comando `application` executa o JAR gerado em `infrastructure/target`.
+A aplicação inicia o servidor HTTP na porta 8080 e disponibiliza `/actuator/health`. O comando `application` executa o JAR gerado em `infrastructure/target`. Para compilar e iniciar tudo pelo Docker, execute `docker-compose up -d` na raiz do repositório; veja o [guia do Docker Compose](../README.md).
 
 Para usar o mesmo JDK no editor, execute `mise where java` e configure o caminho retornado como JDK do projeto nas extensões Java do VS Code. As tarefas do mise não alteram automaticamente o JDK do editor.
 
