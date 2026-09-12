@@ -78,6 +78,27 @@ public class Section extends Entity<SectionID> {
         this.markAsUpdated();
     }
 
+    public Section changeName(final String name) {
+        this.name = Name.create(name);
+        markAsUpdated();
+        return this;
+    }
+
+    public Section changeDescription(final String description) {
+        this.description = Text.create(description);
+        markAsUpdated();
+        return this;
+    }
+
+    public Section changePrice(final Money price) {
+        if (price == null) {
+            throw new com.tickethub.domain.exception.DomainException("'price' should not be null");
+        }
+        this.price = price;
+        markAsUpdated();
+        return this;
+    }
+
     public Name getName() {
         return name;
     }
