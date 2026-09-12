@@ -1,33 +1,18 @@
 package com.tickethub.application;
 
-import org.junit.jupiter.api.Test;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-class UseCaseTest {
+@ExtendWith(MockitoExtension.class)
+public abstract class UseCaseTest {
+    protected abstract List<Object> getMocks();
 
-    static class UppercaseUseCase extends UseCase<String, String> {
-        @Override
-        public String execute(final String input) {
-            return input.toUpperCase();
-        }
-    }
-
-    @Test
-    void executesWithTypedInputAndOutput() {
-        assertEquals("HI", new UppercaseUseCase().execute("hi"));
-    }
-
-    @Test
-    void stubCanReturnNullWithoutChangingTheGenericContract() {
-        final UseCase<String, String> useCase = new UseCase<>() {
-            @Override
-            public String execute(final String input) {
-                return null;
-            }
-        };
-
-        assertNull(useCase.execute("input"));
+    @AfterEach
+    void verifyNoUnexpectedInteractions() {
+        Mockito.verifyNoMoreInteractions(getMocks().toArray());
     }
 }
