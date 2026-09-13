@@ -18,6 +18,10 @@ description = "Build every module and run all verification checks"
 alias = "verify"
 run = "mvn -B -ntp verify"
 
+[tasks.integration]
+description = "Verify all modules and test real MongoDB and Kafka connections (start Compose dependencies first)"
+run = "mvn -B -ntp -Pintegration verify"
+
 [tasks.install]
 description = "Verify and install every module in the local Maven repository"
 run = "mvn -B -ntp install"

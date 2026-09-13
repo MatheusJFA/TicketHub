@@ -70,6 +70,8 @@ docker-compose ps kafka
 docker-compose exec kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:19092 --list
 ```
 
-A dependência `spring-kafka` e o endereço do broker estão configurados no módulo `infrastructure`. Tópicos e produtores/consumidores de eventos de negócio ainda não foram implementados. O healthcheck do Compose verifica o broker; `/actuator/health` não verifica Kafka. A configuração é para desenvolvimento local, com conexão PLAINTEXT sem autenticação e porta exposta apenas em loopback.
+O módulo `infrastructure` configura o produtor, a fábrica de consumidores e cria o tópico `tickethub.events` na inicialização, com três partições e uma réplica. O backend falha na inicialização se o Kafka estiver indisponível. Produtores e consumidores de eventos de negócio ainda não foram implementados. O healthcheck do Compose verifica o broker; `/actuator/health` não verifica Kafka. A configuração é para desenvolvimento local, com conexão PLAINTEXT sem autenticação e porta exposta apenas em loopback.
+
+Defina `KAFKA_TOPIC`, `KAFKA_TOPIC_PARTITIONS`, `KAFKA_TOPIC_REPLICAS` e `KAFKA_CONSUMER_GROUP` para personalizar a configuração. O ambiente local possui um único broker e usa uma réplica. Veja os clientes disponíveis e os testes de integração no [guia do servidor](server/README.md).
 
 O build da imagem não executa testes. Para desenvolvimento local e execução da suíte, consulte [server/README.md](server/README.md).

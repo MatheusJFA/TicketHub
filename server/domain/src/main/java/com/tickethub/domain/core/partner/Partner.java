@@ -1,6 +1,7 @@
 package com.tickethub.domain.core.partner;
 
 import java.time.OffsetDateTime;
+import static java.util.Objects.isNull;
 
 import com.tickethub.domain.AggregateRoot;
 import com.tickethub.domain.core.show.Show;
@@ -43,7 +44,7 @@ public class Partner extends AggregateRoot<PartnerID> implements Cloneable {
     }
 
     private static Address requireAddress(final Address address) {
-        if (address == null) {
+        if (isNull(address)) {
             throw new com.tickethub.domain.exception.DomainException("'address' should not be null");
         }
         return address;
