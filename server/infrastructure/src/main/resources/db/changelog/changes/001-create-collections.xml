@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd
+                   http://www.liquibase.org/xml/ns/dbchangelog-ext https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <changeSet id="001-1-create-customers" author="tickethub">
+        <ext:createCollection collectionName="customers"/>
+    </changeSet>
+    <changeSet id="001-2-create-partners" author="tickethub">
+        <ext:createCollection collectionName="partners"/>
+    </changeSet>
+    <changeSet id="001-3-create-shows" author="tickethub">
+        <ext:createCollection collectionName="shows"/>
+    </changeSet>
+    <changeSet id="001-4-create-sections" author="tickethub">
+        <ext:createCollection collectionName="sections"/>
+    </changeSet>
+    <changeSet id="001-5-create-spots" author="tickethub">
+        <ext:createCollection collectionName="spots"/>
+    </changeSet>
+</databaseChangeLog>
