@@ -2,6 +2,7 @@ services:
   server:
     build:
       context: ./server
+      target: runtime
     pull_policy: build
     depends_on:
       mongo:
@@ -10,6 +11,7 @@ services:
         condition: service_healthy
     environment:
       MONGO_HOST: mongo
+      LIQUIBASE_ENABLED: ${LIQUIBASE_ENABLED:-true}
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
       KAFKA_CONSUMER_GROUP: ${KAFKA_CONSUMER_GROUP:-tickethub}
       KAFKA_TOPIC: ${KAFKA_TOPIC:-tickethub.events}

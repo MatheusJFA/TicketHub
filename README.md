@@ -10,7 +10,9 @@ docker-compose up -d
 
 O Compose compila os três módulos Maven dentro do Docker e inicia o backend em http://localhost:8080. Não é necessário instalar Java, Maven ou mise no computador. A primeira execução baixa as imagens e dependências; as próximas reutilizam o cache. O mesmo comando reconstrói a imagem quando os fontes mudam.
 
-Verifique a saúde da aplicação em http://localhost:8080/actuator/health. A resposta esperada é `{"status":"UP"}`. As rotas de negócio ainda não foram implementadas; `/` retorna 404.
+O [Dockerfile](server/Dockerfile) usa build em múltiplos estágios: `build` compila com Maven e JDK 25, reutilizando o cache de dependências; `runtime` recebe apenas o JAR da aplicação e executa com JRE 25 e usuário sem privilégios de root. O Compose seleciona o estágio `runtime`, mantendo Maven e os fontes fora da imagem final.
+
+Verifique a saúde da aplicação em http://localhost:8080/actuator/health. A resposta esperada é `{"status":"UP"}`. A documentação interativa está em http://localhost:8080/swagger-ui/index.html e o contrato OpenAPI em http://localhost:8080/v3/api-docs. As rotas de negócio estão definidas, mas retornam `503` enquanto os gateways de persistência não forem implementados; `/` retorna 404.
 
 ```shell
 docker-compose ps
@@ -41,7 +43,7 @@ mongodb://tickethub:tickethub-local@localhost:27017/tickethub?authSource=admin
 
 Essas são credenciais padrão de desenvolvimento local. Você pode definir `MONGO_USERNAME`, `MONGO_PASSWORD` e `MONGO_PORT` no terminal antes da primeira inicialização. As credenciais de inicialização só são aplicadas quando o volume está vazio; mudar essas variáveis não altera usuários de um banco existente.
 
-O Spring Boot já está conectado ao banco `tickethub`, e `/actuator/health` também verifica a conexão com o MongoDB. As implementações dos gateways para persistir as entidades ainda não foram criadas. O banco aparecerá no Compass quando receber a primeira coleção ou gravação.
+O Spring Boot 4 está conectado ao banco `tickethub`, e `/actuator/health` também verifica a conexão com o MongoDB. O Liquibase cria as coleções iniciais e registra as migrações ao iniciar a aplicação. As implementações dos gateways para persistir as entidades ainda não foram criadas. `LIQUIBASE_ENABLED=false` desabilita as migrações; o padrão é `true`. Veja o [guia de migrações](server/README.md#migrações-com-liquibase).
 
 Para iniciar apenas o banco e executar o backend localmente com mise:
 
@@ -74,4 +76,4 @@ O módulo `infrastructure` configura o produtor, a fábrica de consumidores e cr
 
 Defina `KAFKA_TOPIC`, `KAFKA_TOPIC_PARTITIONS`, `KAFKA_TOPIC_REPLICAS` e `KAFKA_CONSUMER_GROUP` para personalizar a configuração. O ambiente local possui um único broker e usa uma réplica. Veja os clientes disponíveis e os testes de integração no [guia do servidor](server/README.md).
 
-O build da imagem não executa testes. Para desenvolvimento local e execução da suíte, consulte [server/README.md](server/README.md).
+O build da imagem não executa testes por padrão. Para incluí-los, execute `docker compose build --build-arg SKIP_TESTS=false server`. Para desenvolvimento local e execução da suíte, consulte [server/README.md](server/README.md).

@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1
 FROM maven:3.9.16-eclipse-temurin-25-alpine AS build
+ARG SKIP_TESTS=true
 WORKDIR /workspace
 
 COPY pom.xml ./
@@ -11,9 +12,9 @@ COPY application/src application/src
 COPY infrastructure/src infrastructure/src
 
 RUN --mount=type=cache,target=/root/.m2 \
-    mvn -B -ntp -DskipTests package
+    mvn -B -ntp -DskipTests=${SKIP_TESTS} package
 
-FROM eclipse-temurin:25-jre-alpine
+FROM eclipse-temurin:25-jre-alpine AS runtime
 WORKDIR /app
 
 RUN addgroup -S tickethub && adduser -S -G tickethub tickethub
