@@ -1,4 +1,8 @@
 spring:
+  jackson:
+    datatype:
+      datetime:
+        adjust-dates-to-context-time-zone: false
   application:
     name: tickethub-server
   kafka:
@@ -24,16 +28,18 @@ spring:
       enable-auto-commit: false
     listener:
       ack-mode: record
-  data:
-    mongodb:
-      host: ${MONGO_HOST:localhost}
-      port: ${MONGO_PORT:27017}
-      database: ${MONGO_DATABASE:tickethub}
-      username: ${MONGO_USERNAME:tickethub}
-      password: ${MONGO_PASSWORD:tickethub-local}
-      authentication-database: ${MONGO_AUTH_DATABASE:admin}
+  mongodb:
+    host: ${MONGO_HOST:localhost}
+    port: ${MONGO_PORT:27017}
+    database: ${MONGO_DATABASE:tickethub}
+    username: ${MONGO_USERNAME:tickethub}
+    password: ${MONGO_PASSWORD:tickethub-local}
+    authentication-database: ${MONGO_AUTH_DATABASE:admin}
 
 tickethub:
+  liquibase:
+    enabled: ${LIQUIBASE_ENABLED:true}
+    change-log: db/changelog/db.changelog-master.xml
   mongo:
     connect-timeout: ${MONGO_CONNECT_TIMEOUT:5s}
     read-timeout: ${MONGO_READ_TIMEOUT:5s}

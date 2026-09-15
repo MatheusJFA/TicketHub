@@ -10,6 +10,7 @@ import java.util.Objects;
 public class Notification implements ValidationHandler {
 
     private final List<Error> errors;
+    private Throwable cause;
 
     private Notification(final List<Error> errors) {
         this.errors = errors;
@@ -24,7 +25,13 @@ public class Notification implements ValidationHandler {
     }
 
     public static Notification create(final Throwable throwable) {
-        return create(new Error(Objects.requireNonNullElse(throwable.getMessage(), throwable.getClass().getSimpleName())));
+        final var notification = create(new Error(Objects.requireNonNullElse(throwable.getMessage(), throwable.getClass().getSimpleName())));
+        notification.cause = throwable;
+        return notification;
+    }
+
+    public Throwable getCause() {
+        return cause;
     }
 
     @Override

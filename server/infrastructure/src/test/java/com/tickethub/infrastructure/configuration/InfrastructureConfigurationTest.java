@@ -5,9 +5,9 @@ import java.util.concurrent.TimeUnit;
 import com.mongodb.MongoClientSettings;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
-import org.springframework.boot.autoconfigure.mongo.MongoClientSettingsBuilderCustomizer;
-import org.springframework.boot.autoconfigure.mongo.MongoProperties;
+import org.springframework.boot.kafka.autoconfigure.KafkaProperties;
+import org.springframework.boot.mongodb.autoconfigure.MongoClientSettingsBuilderCustomizer;
+import org.springframework.boot.mongodb.autoconfigure.MongoProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.ConfigDataApplicationContextInitializer;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -29,7 +29,7 @@ class InfrastructureConfigurationTest {
     @Test
     void loadsMongoDatabaseAndBoundedTimeouts() {
         contextRunner.withPropertyValues(
-                "spring.data.mongodb.database=config-test",
+                "spring.mongodb.database=config-test",
                 "tickethub.mongo.connect-timeout=2s",
                 "tickethub.mongo.read-timeout=3s",
                 "tickethub.mongo.server-selection-timeout=4s").run(context -> {

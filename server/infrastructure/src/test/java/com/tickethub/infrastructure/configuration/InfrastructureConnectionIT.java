@@ -25,7 +25,8 @@ import com.tickethub.infrastructure.Main;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(classes = Main.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@SpringBootTest(classes = Main.class, webEnvironment = SpringBootTest.WebEnvironment.NONE,
+        properties = "tickethub.liquibase.enabled=false")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class InfrastructureConnectionIT {
 
