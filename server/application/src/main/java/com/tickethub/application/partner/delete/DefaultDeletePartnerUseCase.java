@@ -16,12 +16,15 @@ public final class DefaultDeletePartnerUseCase extends DeletePartnerUseCase {
 
     @Override
     public Either<Notification, DeletePartnerOutput> execute(final String input) {
-        Objects.requireNonNull(input);
         try {
-            partnerGateway.deleteById(PartnerID.from(input));
-            return Either.right(new DeletePartnerOutput(input));
+            final PartnerID id = PartnerID.from(input);
+            partnerGateway.deleteById(id);
+
+            final DeletePartnerOutput output = DeletePartnerOutput.from(input);
+            return Either.right(output);
         } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+            final Notification notification = Notification.create(exception);
+            return Either.left(notification);
         }
     }
 }

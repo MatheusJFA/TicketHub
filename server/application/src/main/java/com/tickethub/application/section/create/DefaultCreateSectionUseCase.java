@@ -17,17 +17,27 @@ public final class DefaultCreateSectionUseCase extends CreateSectionUseCase {
 
     @Override
     public Either<Notification, CreateSectionOutput> execute(final CreateSectionCommand command) {
-        Objects.requireNonNull(command);
         try {
-            final var entity = Section.create(command.name(), command.description(), command.totalSpots(), command.price());
-            final var notification = Notification.create();
+            final Section entity = Section.create(
+                command.name(), 
+                command.description(), 
+                command.totalSpots(), 
+                command.price()
+            );
+
+            final Notification notification = Notification.create();
+           
             entity.validate(notification);
             if (notification.hasError()) {
                 return Either.left(notification);
             }
-            return Either.right(CreateSectionOutput.from(sectionGateway.create(entity)));
+
+            final Section savedSection = sectionGateway.create(entity);
+            final CreateSectionOutput output = CreateSectionOutput.from(savedSection);
+            return Either.right(output);
         } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+            final Notification notification = Notification.create(exception);
+            return Either.left(notification);
         }
     }
 }

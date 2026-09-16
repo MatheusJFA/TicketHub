@@ -1,6 +1,9 @@
 package com.tickethub.application.section.changeprice;
 
+import com.tickethub.domain.core.section.Section;
+
 import java.util.Objects;
+import java.util.Optional;
 import com.tickethub.application.Either;
 import com.tickethub.domain.validation.Notification;
 
@@ -17,25 +20,31 @@ public final class DefaultChangeSectionPriceUseCase extends ChangeSectionPriceUs
 
     @Override
     public Either<Notification, ChangeSectionPriceOutput> execute(final ChangeSectionPriceCommand input) {
-        Objects.requireNonNull(input);
         try {
-            final var id = SectionID.from(input.id());
-            final var found = sectionGateway.findById(id);
-            if (found.isEmpty()) {
-                return Either.left(Notification.create(new Error("Section not found: " + input.id())));
+            final SectionID id = SectionID.from(input.id());
+
+            final Optional<Section> found = sectionGateway.findById(id);
+            if (!found.isPresent()) {
+                return Either.left(notFound("Section", input.id()));
             }
-            final var entity = found.get();
+            
+            final Section entity = found.get();
             entity.changePrice(input.price());
-            final var notification = Notification.create();
+
+            final Notification notification = Notification.create();
             entity.validate(notification);
+
             if (notification.hasError()) {
                 return Either.left(notification);
             }
-            final var saved = sectionGateway.update(entity);
-            final var output = new ChangeSectionPriceOutput(saved.getId().getValue());
+            
+            final Section saved = sectionGateway.update(entity);
+            final ChangeSectionPriceOutput output = ChangeSectionPriceOutput.from(saved);
             return Either.right(output);
         } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+            final Notification notification = Notification.create(exception);
+            return Either.left(notification);
         }
     }
+
 }

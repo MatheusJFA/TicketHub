@@ -1,6 +1,9 @@
 package com.tickethub.application.customer.retrieve.get;
 
+import com.tickethub.domain.core.customer.Customer;
+
 import java.util.Objects;
+import java.util.Optional;
 import com.tickethub.application.Either;
 import com.tickethub.domain.validation.Notification;
 
@@ -17,18 +20,21 @@ public final class DefaultGetCustomerUseCase extends GetCustomerUseCase {
 
     @Override
     public Either<Notification, GetCustomerOutput> execute(final String input) {
-        Objects.requireNonNull(input);
         try {
-            final var id = CustomerID.from(input);
-            final var found = customerGateway.findById(id);
-            if (found.isEmpty()) {
-                return Either.left(Notification.create(new Error("Customer not found: " + input)));
+            final CustomerID id = CustomerID.from(input);
+
+            final Optional<Customer> found = customerGateway.findById(id);
+            if (!found.isPresent()) {
+                return Either.left(notFound("Customer", input));
             }
-            final var entity = found.get();
-            final var output = GetCustomerOutput.from(entity);
+            
+            final Customer entity = found.get();
+            final GetCustomerOutput output = GetCustomerOutput.from(entity);
             return Either.right(output);
-        } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+        } catch (final RuntimeException exception) {           
+            final Notification notification = Notification.create(exception);
+            return Either.left(notification);
         }
     }
+
 }

@@ -1,6 +1,9 @@
 package com.tickethub.application.section.unpublishall;
 
+import com.tickethub.domain.core.section.Section;
+
 import java.util.Objects;
+import java.util.Optional;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.section.SectionGateway;
@@ -17,16 +20,15 @@ public final class DefaultUnpublishAllSectionUseCase extends UnpublishAllSection
 
     @Override
     public Either<Notification, UnpublishAllSectionOutput> execute(final UnpublishAllSectionCommand command) {
-        Objects.requireNonNull(command);
         try {
-            final var found = sectionGateway.findById(SectionID.from(command.id()));
+            final Optional<Section> found = sectionGateway.findById(SectionID.from(command.id()));
 
             if (!found.isPresent()) {
-                return Either.left(Notification.create(new Error("Section not found: " + command.id())));
+                return Either.left(notFound("Section", command.id()));
             }
 
-            final var entity = found.get();
-            final var notification = Notification.create();
+            final Section entity = found.get();
+            final Notification notification = Notification.create();
 
             entity.validate(notification);
 
@@ -38,7 +40,9 @@ public final class DefaultUnpublishAllSectionUseCase extends UnpublishAllSection
 
             return Either.right(UnpublishAllSectionOutput.from(sectionGateway.update(entity)));
         } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+            final Notification notification = Notification.create(exception);
+            return Either.left(notification);
         }
     }
+
 }

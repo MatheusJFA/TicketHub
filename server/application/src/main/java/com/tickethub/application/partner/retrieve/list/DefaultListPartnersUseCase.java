@@ -5,6 +5,7 @@ import com.tickethub.domain.validation.Notification;
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.domain.pagination.SearchQuery;
 import com.tickethub.domain.core.partner.PartnerGateway;
+import com.tickethub.domain.core.partner.Partner;
 
 
 
@@ -17,11 +18,13 @@ public final class DefaultListPartnersUseCase extends ListPartnersUseCase {
 
     @Override
     public Either<Notification, Pagination<ListPartnersOutput>> execute(final SearchQuery input) {
-        Objects.requireNonNull(input);
         try {
-            return Either.right(partnerGateway.findAll(input).map(ListPartnersOutput::from));
+            final Pagination<Partner> page = partnerGateway.findAll(input);
+            final Pagination<ListPartnersOutput> output = page.map(ListPartnersOutput::from);
+            return Either.right(output);
         } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+            final Notification notification = Notification.create(exception);
+            return Either.left(notification);
         }
     }
 }

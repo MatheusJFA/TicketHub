@@ -1,6 +1,7 @@
 package com.tickethub.application.section.unpublish;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.section.Section;
@@ -18,22 +19,31 @@ public final class DefaultUnpublishSectionUseCase extends UnpublishSectionUseCas
 
     @Override
     public Either<Notification, UnpublishSectionOutput> execute(final UnpublishSectionCommand command) {
-        Objects.requireNonNull(command);
         try {
-            final var found = sectionGateway.findById(SectionID.from(command.id()));
-            if (found.isEmpty()) {
-                return Either.left(Notification.create(new Error("Section not found: " + command.id())));
+            final SectionID id = SectionID.from(command.id());
+
+            final Optional<Section> found = sectionGateway.findById(id);
+            if (!found.isPresent()) {
+                return Either.left(notFound("Section", command.id()));
             }
-            final var entity = found.get();
-            final var notification = Notification.create();
+
+            final Section entity = found.get();
+            
+            final Notification notification = Notification.create();
             entity.validate(notification);
             if (notification.hasError()) {
                 return Either.left(notification);
             }
+            
             entity.unpublish();
-            return Either.right(UnpublishSectionOutput.from(sectionGateway.update(entity)));
+            
+            final Section updatedSection = sectionGateway.update(entity);
+            final UnpublishSectionOutput output = UnpublishSectionOutput.from(updatedSection);
+            return Either.right(output);
         } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+            final Notification notification = Notification.create(exception); 
+            return Either.left(notification);
         }
     }
+
 }

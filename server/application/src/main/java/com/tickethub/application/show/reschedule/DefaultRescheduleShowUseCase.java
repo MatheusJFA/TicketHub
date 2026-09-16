@@ -1,6 +1,9 @@
 package com.tickethub.application.show.reschedule;
 
+import com.tickethub.domain.core.show.Show;
+
 import java.util.Objects;
+import java.util.Optional;
 import com.tickethub.application.Either;
 import com.tickethub.domain.validation.Notification;
 
@@ -17,25 +20,32 @@ public final class DefaultRescheduleShowUseCase extends RescheduleShowUseCase {
 
     @Override
     public Either<Notification, RescheduleShowOutput> execute(final RescheduleShowCommand input) {
-        Objects.requireNonNull(input);
         try {
-            final var id = ShowID.from(input.id());
-            final var found = showGateway.findById(id);
-            if (found.isEmpty()) {
-                return Either.left(Notification.create(new Error("Show not found: " + input.id())));
+            final ShowID id = ShowID.from(input.id());
+            final Optional<Show> found = showGateway.findById(id);
+
+            if (!found.isPresent()) {
+                return Either.left(notFound("Show", input.id()));
             }
-            final var entity = found.get();
-            entity.reschedule(input.date());
-            final var notification = Notification.create();
+            
+            final Show entity = found.get();
+            final java.time.OffsetDateTime date = input.date();
+            
+            entity.reschedule(date);
+            
+            final Notification notification = Notification.create();
             entity.validate(notification);
+
             if (notification.hasError()) {
                 return Either.left(notification);
             }
-            final var saved = showGateway.update(entity);
-            final var output = new RescheduleShowOutput(saved.getId().getValue());
+            
+            final Show saved = showGateway.update(entity);
+            final RescheduleShowOutput output = new RescheduleShowOutput(saved.getId().getValue());
             return Either.right(output);
         } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+            final Notification notification = Notification.create(exception);
+            return Either.left(notification);
         }
     }
 }

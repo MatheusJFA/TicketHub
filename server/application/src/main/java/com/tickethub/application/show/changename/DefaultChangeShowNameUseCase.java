@@ -1,6 +1,9 @@
 package com.tickethub.application.show.changename;
 
+import com.tickethub.domain.core.show.Show;
+
 import java.util.Objects;
+import java.util.Optional;
 import com.tickethub.application.Either;
 import com.tickethub.domain.validation.Notification;
 
@@ -17,25 +20,28 @@ public final class DefaultChangeShowNameUseCase extends ChangeShowNameUseCase {
 
     @Override
     public Either<Notification, ChangeShowNameOutput> execute(final ChangeShowNameCommand input) {
-        Objects.requireNonNull(input);
         try {
-            final var id = ShowID.from(input.id());
-            final var found = showGateway.findById(id);
-            if (found.isEmpty()) {
-                return Either.left(Notification.create(new Error("Show not found: " + input.id())));
+            final ShowID id = ShowID.from(input.id());
+            final Optional<Show> found = showGateway.findById(id);
+            if (!found.isPresent()) {
+                return Either.left(notFound("Show", input.id()));
             }
-            final var entity = found.get();
+
+            final Show entity = found.get();
             entity.changeName(input.name());
-            final var notification = Notification.create();
+            final Notification notification = Notification.create();
             entity.validate(notification);
             if (notification.hasError()) {
                 return Either.left(notification);
             }
-            final var saved = showGateway.update(entity);
-            final var output = new ChangeShowNameOutput(saved.getId().getValue());
+            final Show saved = showGateway.update(entity);
+            final ChangeShowNameOutput output = ChangeShowNameOutput.from(saved);
             return Either.right(output);
         } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+            final Notification notification = Notification.create(exception);
+            return Either.left(notification);
         }
     }
+
+    
 }

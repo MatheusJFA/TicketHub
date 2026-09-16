@@ -17,13 +17,15 @@ public final class DefaultDeleteShowUseCase extends DeleteShowUseCase {
 
     @Override
     public Either<Notification, DeleteShowOutput> execute(final String input) {
-        Objects.requireNonNull(input);
         try {
-            final var id = ShowID.from(input);
+            final ShowID id = ShowID.from(input);
             showGateway.deleteById(id);
-            return Either.right(new DeleteShowOutput(input));
+
+            final DeleteShowOutput output = DeleteShowOutput.from(input);
+            return Either.right(output);
         } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+            final Notification notification = Notification.create(exception);
+            return Either.left(notification);
         }
     }
 }

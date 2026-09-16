@@ -16,10 +16,9 @@ public final class DefaultCreateCustomerUseCase extends CreateCustomerUseCase {
 
     @Override
     public Either<Notification, CreateCustomerOutput> execute(final CreateCustomerCommand command) {
-        Objects.requireNonNull(command);
         try {
-            final var entity = Customer.create(command.cpf(), command.name());
-            final var notification = Notification.create();
+            final Customer entity = Customer.create(command.cpf(), command.name());
+            final Notification notification = Notification.create();
 
             entity.validate(notification);
 
@@ -29,7 +28,8 @@ public final class DefaultCreateCustomerUseCase extends CreateCustomerUseCase {
 
             return Either.right(CreateCustomerOutput.from(customerGateway.create(entity)));
         } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+            final Notification notification = Notification.create(exception);
+            return Either.left(notification);
         }
     }
 }

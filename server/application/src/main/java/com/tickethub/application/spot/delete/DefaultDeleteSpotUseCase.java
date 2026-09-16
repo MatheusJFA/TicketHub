@@ -17,13 +17,14 @@ public final class DefaultDeleteSpotUseCase extends DeleteSpotUseCase {
 
     @Override
     public Either<Notification, DeleteSpotOutput> execute(final String input) {
-        Objects.requireNonNull(input);
         try {
-            final var id = SpotID.from(input);
+            final SpotID id = SpotID.from(input);
             spotGateway.deleteById(id);
-            return Either.right(new DeleteSpotOutput(input));
+            final DeleteSpotOutput output = DeleteSpotOutput.from(input);
+            return Either.right(output);
         } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+            final Notification notification = Notification.create(exception);
+            return Either.left(notification);
         }
     }
 }

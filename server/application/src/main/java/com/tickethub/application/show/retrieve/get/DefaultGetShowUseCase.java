@@ -1,6 +1,9 @@
 package com.tickethub.application.show.retrieve.get;
 
+import com.tickethub.domain.core.show.Show;
+
 import java.util.Objects;
+import java.util.Optional;
 import com.tickethub.application.Either;
 import com.tickethub.domain.validation.Notification;
 
@@ -17,18 +20,22 @@ public final class DefaultGetShowUseCase extends GetShowUseCase {
 
     @Override
     public Either<Notification, GetShowOutput> execute(final String input) {
-        Objects.requireNonNull(input);
         try {
-            final var id = ShowID.from(input);
-            final var found = showGateway.findById(id);
-            if (found.isEmpty()) {
-                return Either.left(Notification.create(new Error("Show not found: " + input)));
+            final ShowID id = ShowID.from(input);
+            final Optional<Show> found = showGateway.findById(id);
+
+            if (!found.isPresent()) {
+                return Either.left(notFound("Show", input));
             }
-            final var entity = found.get();
-            final var output = GetShowOutput.from(entity);
+            
+            final Show entity = found.get();
+            final GetShowOutput output = GetShowOutput.from(entity);
             return Either.right(output);
         } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+            final Notification notification = Notification.create(exception);
+            return Either.left(notification);
         }
     }
+
+
 }

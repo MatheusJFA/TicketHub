@@ -17,17 +17,19 @@ public final class DefaultCreateSpotUseCase extends CreateSpotUseCase {
 
     @Override
     public Either<Notification, CreateSpotOutput> execute(final CreateSpotCommand command) {
-        Objects.requireNonNull(command);
         try {
-            final var entity = Spot.create(command.location());
-            final var notification = Notification.create();
+            final Spot entity = Spot.create(command.location());
+            final Notification notification = Notification.create();
             entity.validate(notification);
+
             if (notification.hasError()) {
                 return Either.left(notification);
             }
+
             return Either.right(CreateSpotOutput.from(spotGateway.create(entity)));
         } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+            final Notification notification = Notification.create(exception);
+            return Either.left(notification);
         }
     }
 }

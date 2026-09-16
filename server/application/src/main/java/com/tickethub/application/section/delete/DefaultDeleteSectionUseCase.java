@@ -17,13 +17,16 @@ public final class DefaultDeleteSectionUseCase extends DeleteSectionUseCase {
 
     @Override
     public Either<Notification, DeleteSectionOutput> execute(final String input) {
-        Objects.requireNonNull(input);
         try {
-            final var id = SectionID.from(input);
+            final SectionID id = SectionID.from(input);
+            
             sectionGateway.deleteById(id);
-            return Either.right(new DeleteSectionOutput(input));
+
+            final DeleteSectionOutput output = DeleteSectionOutput.from(input);
+            return Either.right(output);
         } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+            final Notification notification = Notification.create(exception);
+            return Either.left(notification);
         }
     }
 }

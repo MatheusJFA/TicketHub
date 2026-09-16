@@ -1,6 +1,10 @@
 package com.tickethub.application.show.create;
 
+import com.tickethub.domain.core.show.Show;
+
+import com.tickethub.domain.core.partner.Partner;
 import java.util.Objects;
+import java.util.Optional;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.partner.PartnerGateway;
@@ -20,32 +24,37 @@ public final class DefaultCreateShowUseCase extends CreateShowUseCase {
 
     @Override
     public Either<Notification, CreateShowOutput> execute(final CreateShowCommand command) {
-        Objects.requireNonNull(command);
         try {
-            final var entity = partnerGateway.findById(PartnerID.from(command.partnerId()));
+            final PartnerID partnerId = PartnerID.from(command.partnerId());
+
+            final Optional<Partner> entity = partnerGateway.findById(partnerId);
 
             if (!entity.isPresent()) {
-                return Either.left(Notification.create(new Error("Partner not found: " + command.partnerId())));
+                return Either.left(notFound("Partner", command.partnerId()));
             }
 
-            final var partner = entity.get();
-            final var show = partner.createShow(
+            final Partner partner = entity.get();
+            final Show show = partner.createShow(
                     command.name(),
                     command.description(),
                     command.date(),
                     command.address(),
                     command.totalSpots());
 
-            final var notification = Notification.create();
+            final Notification notification = Notification.create();
             show.validate(notification);
 
             if (notification.hasError()) {
                 return Either.left(notification);
             }
 
-            return Either.right(CreateShowOutput.from(showGateway.create(show)));
+            final Show savedEntity = showGateway.create(show);
+            final CreateShowOutput output = CreateShowOutput.from(savedEntity);
+            return Either.right(output);
         } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+            final Notification notification = Notification.create(exception);
+            return Either.left(notification);
         }
     }
+
 }

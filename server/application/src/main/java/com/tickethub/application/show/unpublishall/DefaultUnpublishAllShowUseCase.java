@@ -1,6 +1,7 @@
 package com.tickethub.application.show.unpublishall;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.show.Show;
@@ -18,22 +19,32 @@ public final class DefaultUnpublishAllShowUseCase extends UnpublishAllShowUseCas
 
     @Override
     public Either<Notification, UnpublishAllShowOutput> execute(final UnpublishAllShowCommand command) {
-        Objects.requireNonNull(command);
         try {
-            final var found = showGateway.findById(ShowID.from(command.id()));
-            if (found.isEmpty()) {
-                return Either.left(Notification.create(new Error("Show not found: " + command.id())));
+            final ShowID id = ShowID.from(command.id());
+            final Optional<Show> found = showGateway.findById(id);
+
+            if (!found.isPresent()) {
+                return Either.left(notFound("Show", command.id()));
             }
-            final var entity = found.get();
-            final var notification = Notification.create();
+            
+            final Show entity = found.get();
+            
+            final Notification notification = Notification.create();
             entity.validate(notification);
+            
             if (notification.hasError()) {
                 return Either.left(notification);
             }
+            
             entity.unpublishAll();
-            return Either.right(UnpublishAllShowOutput.from(showGateway.update(entity)));
+
+            final Show updatedShow = showGateway.update(entity);
+            final UnpublishAllShowOutput output = UnpublishAllShowOutput.from(updatedShow);
+            return Either.right(output);
         } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+            final Notification notification = Notification.create(exception);
+            return Either.left(notification);
         }
     }
+
 }

@@ -17,17 +17,26 @@ public final class DefaultCreatePartnerUseCase extends CreatePartnerUseCase {
 
     @Override
     public Either<Notification, CreatePartnerOutput> execute(final CreatePartnerCommand command) {
-        Objects.requireNonNull(command);
         try {
-            final var entity = Partner.create(command.name(), command.cnpj(), command.address());
-            final var notification = Notification.create();
+            final Partner entity = Partner.create(
+                command.name(), 
+                command.cnpj(), 
+                command.address()
+            );
+            
+            final Notification notification = Notification.create();
             entity.validate(notification);
+
             if (notification.hasError()) {
                 return Either.left(notification);
             }
-            return Either.right(CreatePartnerOutput.from(partnerGateway.create(entity)));
+
+            final Partner createdPartner = partnerGateway.create(entity);
+            final CreatePartnerOutput output = CreatePartnerOutput.from(createdPartner);
+            return Either.right(output);
         } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+            final Notification notification = Notification.create(exception);
+            return Either.left(notification);
         }
     }
 }

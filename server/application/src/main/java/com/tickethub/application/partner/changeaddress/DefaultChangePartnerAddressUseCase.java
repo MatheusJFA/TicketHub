@@ -1,10 +1,12 @@
 package com.tickethub.application.partner.changeaddress;
 import java.util.Objects;
+import java.util.Optional;
 import com.tickethub.application.Either;
 import com.tickethub.domain.validation.Notification;
 
 import com.tickethub.domain.core.partner.PartnerGateway;
 import com.tickethub.domain.core.partner.PartnerID;
+import com.tickethub.domain.core.partner.Partner;
 import com.tickethub.domain.validation.Error;
 
 public final class DefaultChangePartnerAddressUseCase extends ChangePartnerAddressUseCase {
@@ -16,18 +18,31 @@ public final class DefaultChangePartnerAddressUseCase extends ChangePartnerAddre
 
     @Override
     public Either<Notification, ChangePartnerAddressOutput> execute(final ChangePartnerAddressCommand input) {
-        Objects.requireNonNull(input);
         try {
-            final var found = partnerGateway.findById(PartnerID.from(input.id()));
-            if (found.isEmpty()) return Either.left(Notification.create(new Error("Partner not found: " + input.id())));
-            final var entity = found.get();
+            final PartnerID id = PartnerID.from(input.id());
+
+            final Optional<Partner> found = partnerGateway.findById(id);
+            if (!found.isPresent()) {
+                return Either.left(notFound("Partner", input.id()));
+            }
+
+            final Partner entity = found.get();
             entity.changeAddress(input.address());
-            final var notification = Notification.create();
+
+            final Notification notification = Notification.create();
             entity.validate(notification);
-            if (notification.hasError()) return Either.left(notification);
-            return Either.right(ChangePartnerAddressOutput.from(partnerGateway.update(entity)));
+
+            if (notification.hasError()) {
+                return Either.left(notification);
+            }
+
+            final Partner updatedCategory = partnerGateway.update(entity);
+            final ChangePartnerAddressOutput output = ChangePartnerAddressOutput.from(updatedCategory);
+            return Either.right(output);
         } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+            final Notification notification = Notification.create(exception);
+            return Either.left(notification);
         }
     }
+
 }

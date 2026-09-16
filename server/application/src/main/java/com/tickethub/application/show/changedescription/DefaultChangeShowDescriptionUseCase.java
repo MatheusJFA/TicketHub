@@ -1,6 +1,9 @@
 package com.tickethub.application.show.changedescription;
 
+import com.tickethub.domain.core.show.Show;
+
 import java.util.Objects;
+import java.util.Optional;
 import com.tickethub.application.Either;
 import com.tickethub.domain.validation.Notification;
 
@@ -17,25 +20,26 @@ public final class DefaultChangeShowDescriptionUseCase extends ChangeShowDescrip
 
     @Override
     public Either<Notification, ChangeShowDescriptionOutput> execute(final ChangeShowDescriptionCommand input) {
-        Objects.requireNonNull(input);
         try {
-            final var id = ShowID.from(input.id());
-            final var found = showGateway.findById(id);
-            if (found.isEmpty()) {
-                return Either.left(Notification.create(new Error("Show not found: " + input.id())));
+            final ShowID id = ShowID.from(input.id());
+            final Optional<Show> found = showGateway.findById(id);
+            if (!found.isPresent()) {
+                return Either.left(notFound("Show", input.id()));
             }
-            final var entity = found.get();
+            final Show entity = found.get();
             entity.changeDescription(input.description());
-            final var notification = Notification.create();
+            final Notification notification = Notification.create();
             entity.validate(notification);
             if (notification.hasError()) {
                 return Either.left(notification);
             }
-            final var saved = showGateway.update(entity);
-            final var output = new ChangeShowDescriptionOutput(saved.getId().getValue());
+            final Show saved = showGateway.update(entity);
+            final ChangeShowDescriptionOutput output = ChangeShowDescriptionOutput.from(saved);
             return Either.right(output);
         } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+            final Notification notification = Notification.create(exception);
+            return Either.left(notification);
         }
     }
+
 }

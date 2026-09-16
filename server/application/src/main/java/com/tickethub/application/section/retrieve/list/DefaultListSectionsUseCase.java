@@ -6,6 +6,7 @@ import com.tickethub.domain.validation.Notification;
 import com.tickethub.domain.pagination.SearchQuery;
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.domain.core.section.SectionGateway;
+import com.tickethub.domain.core.section.Section;
 
 
 
@@ -18,13 +19,13 @@ public final class DefaultListSectionsUseCase extends ListSectionsUseCase {
 
     @Override
     public Either<Notification, Pagination<ListSectionsOutput>> execute(final SearchQuery input) {
-        Objects.requireNonNull(input);
         try {
-            final var page = sectionGateway.findAll(input);
-            final var output = page.map(ListSectionsOutput::from);
+            final Pagination<Section> page = sectionGateway.findAll(input);
+            final Pagination<ListSectionsOutput> output = page.map(ListSectionsOutput::from);
             return Either.right(output);
         } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+            final Notification notification = Notification.create(exception);
+            return Either.left(notification);
         }
     }
 }

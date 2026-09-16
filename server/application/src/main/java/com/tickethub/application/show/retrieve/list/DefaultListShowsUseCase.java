@@ -1,5 +1,7 @@
 package com.tickethub.application.show.retrieve.list;
 
+import com.tickethub.domain.core.show.Show;
+
 import java.util.Objects;
 import com.tickethub.application.Either;
 import com.tickethub.domain.validation.Notification;
@@ -18,13 +20,13 @@ public final class DefaultListShowsUseCase extends ListShowsUseCase {
 
     @Override
     public Either<Notification, Pagination<ListShowsOutput>> execute(final SearchQuery input) {
-        Objects.requireNonNull(input);
         try {
-            final var page = showGateway.findAll(input);
-            final var output = page.map(ListShowsOutput::from);
+            final Pagination<Show> page = showGateway.findAll(input);
+            final Pagination<ListShowsOutput> output = page.map(ListShowsOutput::from);
             return Either.right(output);
         } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+            final Notification notification = Notification.create(exception);
+            return Either.left(notification);
         }
     }
 }

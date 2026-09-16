@@ -1,6 +1,9 @@
 package com.tickethub.application.customer.retrieve.list;
 
+import com.tickethub.domain.core.customer.Customer;
+
 import java.util.Objects;
+import java.util.Optional;
 import com.tickethub.application.Either;
 import com.tickethub.domain.validation.Notification;
 import com.tickethub.domain.pagination.SearchQuery;
@@ -18,13 +21,13 @@ public final class DefaultListCustomersUseCase extends ListCustomersUseCase {
 
     @Override
     public Either<Notification, Pagination<ListCustomersOutput>> execute(final SearchQuery input) {
-        Objects.requireNonNull(input);
         try {
-            final var page = customerGateway.findAll(input);
-            final var output = page.map(ListCustomersOutput::from);
+            final Pagination<Customer> page = customerGateway.findAll(input);
+            final Pagination<ListCustomersOutput> output = page.map(ListCustomersOutput::from);
             return Either.right(output);
         } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+            final Notification notification = Notification.create(exception);
+            return Either.left(notification);
         }
     }
 }

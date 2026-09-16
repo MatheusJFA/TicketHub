@@ -1,5 +1,7 @@
 package com.tickethub.application.spot.publish;
 
+import java.util.Optional;
+
 import java.util.Objects;
 
 import com.tickethub.application.Either;
@@ -18,22 +20,29 @@ public final class DefaultPublishSpotUseCase extends PublishSpotUseCase {
 
     @Override
     public Either<Notification, PublishSpotOutput> execute(final PublishSpotCommand command) {
-        Objects.requireNonNull(command);
         try {
-            final var found = spotGateway.findById(SpotID.from(command.id()));
-            if (found.isEmpty()) {
-                return Either.left(Notification.create(new Error("Spot not found: " + command.id())));
+            final SpotID id = SpotID.from(command.id());
+            final Optional<Spot> found = spotGateway.findById(id);
+
+            if (!found.isPresent()) {
+                return Either.left(notFound("Spot", command.id()));
             }
-            final var entity = found.get();
-            final var notification = Notification.create();
+            
+            final Spot entity = found.get();
+            final Notification notification = Notification.create();
+            
             entity.validate(notification);
             if (notification.hasError()) {
                 return Either.left(notification);
             }
+            
             entity.publish();
-            return Either.right(PublishSpotOutput.from(spotGateway.update(entity)));
+            final Spot updatedSpot = spotGateway.update(entity);
+            final PublishSpotOutput output = PublishSpotOutput.from(updatedSpot);
+            return Either.right(output);
         } catch (final RuntimeException exception) {
-            return Either.left(Notification.create(exception));
+            final Notification notification = Notification.create(exception);
+            return Either.left(notification);
         }
     }
 }
