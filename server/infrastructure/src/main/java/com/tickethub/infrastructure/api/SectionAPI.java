@@ -21,6 +21,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RequestMapping(value = "/sections", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Sections")
@@ -35,6 +36,7 @@ public interface SectionAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
+    @PreAuthorize("hasAuthority('section:write')")
     ResponseEntity<?> changeSectionDescription(@PathVariable("id") String id, @RequestBody ChangeSectionDescriptionRequest input);
 
     @PatchMapping(value = "/{id}/name", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -47,6 +49,7 @@ public interface SectionAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
+    @PreAuthorize("hasAuthority('section:write')")
     ResponseEntity<?> changeSectionName(@PathVariable("id") String id, @RequestBody ChangeSectionNameRequest input);
 
     @PatchMapping(value = "/{id}/price", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -59,6 +62,7 @@ public interface SectionAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
+    @PreAuthorize("hasAuthority('section:write')")
     ResponseEntity<?> changeSectionPrice(@PathVariable("id") String id, @RequestBody ChangeSectionPriceRequest input);
 
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -71,6 +75,7 @@ public interface SectionAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
+    @PreAuthorize("hasAuthority('section:write')")
     ResponseEntity<?> createSection(@RequestBody CreateSectionRequest input);
 
     @DeleteMapping("/{id}")
@@ -83,6 +88,7 @@ public interface SectionAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
+    @PreAuthorize("hasAuthority('section:delete')")
     ResponseEntity<?> deleteById(@PathVariable("id") String id);
 
     @PostMapping(value = "/{id}/publish")
@@ -95,6 +101,7 @@ public interface SectionAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
+    @PreAuthorize("hasAuthority('section:publish')")
     ResponseEntity<?> publishSection(@PathVariable("id") String id);
 
     @PostMapping(value = "/{id}/publish-all")
@@ -107,6 +114,7 @@ public interface SectionAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
+    @PreAuthorize("hasAuthority('section:publish')")
     ResponseEntity<?> publishAllSection(@PathVariable("id") String id);
 
     @GetMapping("/{id}")
@@ -148,6 +156,7 @@ public interface SectionAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
+    @PreAuthorize("hasAuthority('section:publish')")
     ResponseEntity<?> unpublishSection(@PathVariable("id") String id);
 
     @PostMapping(value = "/{id}/unpublish-all")
@@ -160,5 +169,6 @@ public interface SectionAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
+    @PreAuthorize("hasAuthority('section:publish')")
     ResponseEntity<?> unpublishAllSection(@PathVariable("id") String id);
 }

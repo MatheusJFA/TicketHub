@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RequestMapping(value = "/partners", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Partners")
@@ -30,6 +31,7 @@ public interface PartnerAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
+    @PreAuthorize("hasAuthority('partner:write')")
     ResponseEntity<?> changePartnerAddress(@PathVariable("id") String id, @RequestBody ChangePartnerAddressRequest input);
 
     @PatchMapping(value = "/{id}/name", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -42,6 +44,7 @@ public interface PartnerAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
+    @PreAuthorize("hasAuthority('partner:write')")
     ResponseEntity<?> changePartnerName(@PathVariable("id") String id, @RequestBody ChangePartnerNameRequest input);
 
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -66,6 +69,7 @@ public interface PartnerAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
+    @PreAuthorize("hasAuthority('partner:delete')")
     ResponseEntity<?> deleteById(@PathVariable("id") String id);
 
     @GetMapping("/{id}")
