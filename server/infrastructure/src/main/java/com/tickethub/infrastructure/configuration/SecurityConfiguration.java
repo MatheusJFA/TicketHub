@@ -30,7 +30,7 @@ import com.tickethub.infrastructure.security.SecurityProperties;
 
 @Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity(proxyTargetClass = true)
 @EnableConfigurationProperties(SecurityProperties.class)
 public class SecurityConfiguration {
 
