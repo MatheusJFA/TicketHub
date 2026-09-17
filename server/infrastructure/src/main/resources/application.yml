@@ -49,6 +49,15 @@ tickethub:
       name: ${KAFKA_TOPIC:tickethub.events}
       partitions: ${KAFKA_TOPIC_PARTITIONS:3}
       replicas: ${KAFKA_TOPIC_REPLICAS:1}
+  resilience:
+    retry:
+      max-attempts: ${RESILIENCE_RETRY_MAX_ATTEMPTS:3}
+      wait-ms: ${RESILIENCE_RETRY_WAIT_MS:200}
+    circuit-breaker:
+      failure-rate-threshold: ${RESILIENCE_CB_FAILURE_RATE:50}
+      wait-duration-ms: ${RESILIENCE_CB_WAIT_MS:10000}
+      sliding-window-size: ${RESILIENCE_CB_WINDOW:20}
+      minimum-calls: ${RESILIENCE_CB_MIN_CALLS:10}
 
 management:
   endpoints:
