@@ -144,6 +144,10 @@
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
               <groups>integrationTest,e2eTest</groups>
+              <includes>
+                <include>**/*IT.java</include>
+                <include>**/*E2ETest.java</include>
+              </includes>
             </configuration>
             <executions>
               <execution>

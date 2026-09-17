@@ -13,7 +13,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.tickethub.infrastructure.ContainerSupport;
 import com.tickethub.infrastructure.E2ETest;
 import com.tickethub.infrastructure.audit.MongoAuditTrail;
