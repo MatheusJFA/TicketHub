@@ -10,6 +10,7 @@ import com.tickethub.application.spot.retrieve.get.*;
 import com.tickethub.application.spot.retrieve.list.*;
 import com.tickethub.application.spot.unpublish.*;
 import com.tickethub.infrastructure.spot.models.*;
+import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import com.tickethub.infrastructure.api.SpotAPI;
 import com.tickethub.infrastructure.api.ApiSupport;
@@ -43,14 +44,16 @@ public class SpotController implements SpotAPI {
 
     @Override
     public ResponseEntity<IdResponse> changeSpotLocation(String id, ChangeSpotLocationRequest input) {
-        final var output = ApiSupport.execute(changeSpotLocation, new ChangeSpotLocationCommand(id, input.location() == null ? null : com.tickethub.domain.shared.Location.create(input.location())));
+        final var location = input.location() == null ? null : new LocationModel(input.location()).toDomain();
+        final var output = ApiSupport.execute(changeSpotLocation, new ChangeSpotLocationCommand(id, location));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
     public ResponseEntity<IdResponse> createSpot(CreateSpotRequest input) {
-        final var output = ApiSupport.execute(createSpot, new CreateSpotCommand(input.location() == null ? null : com.tickethub.domain.shared.Location.create(input.location())));
-        return ResponseEntity.created(java.net.URI.create("/spots/" + output.id())).body(new IdResponse(output.id()));
+        final var location = input.location() == null ? null : new LocationModel(input.location()).toDomain();
+        final var output = ApiSupport.execute(createSpot, new CreateSpotCommand(location));
+        return ResponseEntity.created(URI.create("/spots/" + output.id())).body(new IdResponse(output.id()));
     }
 
     @Override

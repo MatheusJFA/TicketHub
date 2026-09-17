@@ -14,6 +14,7 @@ import com.tickethub.application.section.retrieve.list.*;
 import com.tickethub.application.section.unpublish.*;
 import com.tickethub.application.section.unpublishall.*;
 import com.tickethub.infrastructure.section.models.*;
+import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import com.tickethub.infrastructure.api.SectionAPI;
 import com.tickethub.infrastructure.api.ApiSupport;
@@ -78,7 +79,7 @@ public class SectionController implements SectionAPI {
     @Override
     public ResponseEntity<IdResponse> createSection(CreateSectionRequest input) {
         final var output = ApiSupport.execute(createSection, new CreateSectionCommand(input.name(), input.description(), input.totalSpots(), input.price() == null ? null : input.price().toDomain()));
-        return ResponseEntity.created(java.net.URI.create("/sections/" + output.id())).body(new IdResponse(output.id()));
+        return ResponseEntity.created(URI.create("/sections/" + output.id())).body(new IdResponse(output.id()));
     }
 
     @Override

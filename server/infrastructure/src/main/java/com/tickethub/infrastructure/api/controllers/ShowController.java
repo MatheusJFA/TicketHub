@@ -15,6 +15,7 @@ import com.tickethub.application.show.retrieve.list.*;
 import com.tickethub.application.show.unpublish.*;
 import com.tickethub.application.show.unpublishall.*;
 import com.tickethub.infrastructure.show.models.*;
+import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import com.tickethub.infrastructure.api.ShowAPI;
 import com.tickethub.infrastructure.api.ApiSupport;
@@ -82,7 +83,7 @@ public class ShowController implements ShowAPI {
     @Override
     public ResponseEntity<IdResponse> createShow(CreateShowRequest input) {
         final var output = ApiSupport.execute(createShow, new CreateShowCommand(input.partnerId(), input.name(), input.description(), input.date(), input.address() == null ? null : input.address().toDomain(), input.totalSpots()));
-        return ResponseEntity.created(java.net.URI.create("/shows/" + output.id())).body(new IdResponse(output.id()));
+        return ResponseEntity.created(URI.create("/shows/" + output.id())).body(new IdResponse(output.id()));
     }
 
     @Override
