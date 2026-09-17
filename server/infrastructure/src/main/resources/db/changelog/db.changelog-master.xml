@@ -5,4 +5,5 @@
     <include file="changes/001-create-collections.xml" relativeToChangelogFile="true"/>
     <include file="changes/002-create-indexes.xml" relativeToChangelogFile="true"/>
     <include file="changes/003-create-audit-logs.xml" relativeToChangelogFile="true"/>
+    <include file="changes/004-ownership-links.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
