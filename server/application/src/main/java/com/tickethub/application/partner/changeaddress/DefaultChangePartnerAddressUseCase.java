@@ -22,7 +22,7 @@ public final class DefaultChangePartnerAddressUseCase extends ChangePartnerAddre
             final PartnerID id = PartnerID.from(input.id());
 
             final Optional<Partner> found = partnerGateway.findById(id);
-            if (!found.isPresent()) {
+            if (found.isEmpty()) {
                 return Either.left(notFound(Partner.class.getSimpleName(), id.getValue()));
             }
 
@@ -36,8 +36,8 @@ public final class DefaultChangePartnerAddressUseCase extends ChangePartnerAddre
                 return Either.left(notification);
             }
 
-            final Partner updatedCategory = partnerGateway.update(entity);
-            final ChangePartnerAddressOutput output = ChangePartnerAddressOutput.from(updatedCategory);
+            final Partner updatedPartner = partnerGateway.update(entity);
+            final ChangePartnerAddressOutput output = ChangePartnerAddressOutput.from(updatedPartner);
             return Either.right(output);
         } catch (final RuntimeException exception) {
             final Notification notification = Notification.create(exception);

@@ -2,6 +2,7 @@ package com.tickethub.application.show.reschedule;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.time.OffsetDateTime;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.show.Show;
@@ -22,12 +23,12 @@ public final class DefaultRescheduleShowUseCase extends RescheduleShowUseCase {
             final ShowID id = ShowID.from(input.id());
             final Optional<Show> found = showGateway.findById(id);
 
-            if (!found.isPresent()) {
+            if (found.isEmpty()) {
                 return Either.left(notFound(Show.class.getSimpleName(), id.getValue()));
             }
 
             final Show entity = found.get();
-            final java.time.OffsetDateTime date = input.date();
+            final OffsetDateTime date = input.date();
 
             entity.reschedule(date);
 
