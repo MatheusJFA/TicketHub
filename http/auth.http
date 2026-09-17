@@ -1,0 +1,41 @@
+@baseUrl = http://localhost:8080
+
+### Login as admin
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin-local"
+}
+
+### Login as partner
+# @name loginPartner
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "partner",
+  "password": "partner-local"
+}
+
+### Login as customer
+# @name loginCustomer
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "customer",
+  "password": "customer-local"
+}
+
+### Login with invalid credentials
+# @name loginInvalid
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "wrong"
+}
