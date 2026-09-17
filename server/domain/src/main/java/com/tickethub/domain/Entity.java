@@ -1,49 +1,36 @@
 package com.tickethub.domain;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.time.Instant;
-import static java.util.Objects.isNull;
-import static java.util.Objects.requireNonNull;
 
-import com.tickethub.domain.event.DomainEvent;
-import com.tickethub.domain.event.DomainEventPublisher;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.validation.ValidationHandler;
 
 public abstract class Entity<ID extends Identifier> {
 
     protected final ID id;
-    private final List<DomainEvent> domainEvents;
     private final Instant createdAt;
     private Instant updatedAt;
     private Instant deletedAt;
 
     protected Entity(final ID id) {
-        this(id, Instant.now(), Instant.now(), null, null);
-    }
-
-    protected Entity(final ID id, final List<DomainEvent> domainEvents) {
-        this(id, Instant.now(), Instant.now(), null, domainEvents);
+        final var now = Instant.now();
+        this(id, now, now, null);
     }
 
     protected Entity(
             final ID id,
             final Instant createdAt,
             final Instant updatedAt,
-            final Instant deletedAt,
-            final List<DomainEvent> domainEvents
+            final Instant deletedAt
     ) {
         if (id == null) {
             throw new DomainException("'id' should not be null");
         }
         this.id = id;
-        this.createdAt = requireNonNull(createdAt, "'createdAt' should not be null");
-        this.updatedAt = requireNonNull(updatedAt, "'updatedAt' should not be null");
+        this.createdAt = Objects.requireNonNull(createdAt, "'createdAt' should not be null");
+        this.updatedAt = Objects.requireNonNull(updatedAt, "'updatedAt' should not be null");
         this.deletedAt = deletedAt;
-        this.domainEvents = new ArrayList<>(Objects.isNull(domainEvents) ? Collections.emptyList() : domainEvents);
     }
 
     public ID getId() {
@@ -67,6 +54,9 @@ public abstract class Entity<ID extends Identifier> {
     }
 
     public void delete() {
+        if (isDeleted()) {
+            return;
+        }
         this.deletedAt = Instant.now();
         markAsUpdated();
     }
@@ -84,38 +74,17 @@ public abstract class Entity<ID extends Identifier> {
         // Entities without specific invariants do not need validation.
     }
 
-    public List<DomainEvent> getDomainEvents() {
-        return Collections.unmodifiableList(domainEvents);
-    }
-
-    public void publishDomainEvents(final DomainEventPublisher publisher) {
-        if (isNull(publisher)) {
-            return;
-        }
-
-        domainEvents.forEach(publisher::publish);
-        domainEvents.clear();
-    }
-
-    public void addDomainEvent(final DomainEvent event) {
-        if (isNull(event)) {
-            return;
-        }
-
-        domainEvents.add(event);
-    }
-
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
 
-        if (Objects.isNull(o) || getClass() != o.getClass()) {
+        if (!(o instanceof Entity<?> other)) {
             return false;
         }
 
-        return id.equals(((Entity<?>) o).id);
+        return id.equals(other.id);
     }
 
     @Override
