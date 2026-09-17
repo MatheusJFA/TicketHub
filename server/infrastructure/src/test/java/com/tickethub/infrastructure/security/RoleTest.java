@@ -17,32 +17,32 @@ class RoleTest {
     }
 
     @Test
-    void givenPartner_whenPermissions_thenManagesCatalogButCannotDeleteAccounts() {
+    void givenPartner_whenPermissions_thenManagesCatalogAndOwnAccount() {
         final var permissions = Role.PARTNER.permissions();
 
         assertTrue(permissions.contains(Permission.SHOW_CREATE));
         assertTrue(permissions.contains(Permission.SHOW_PUBLISH));
         assertTrue(permissions.contains(Permission.SECTION_WRITE));
         assertTrue(permissions.contains(Permission.SPOT_DELETE));
+        assertTrue(permissions.contains(Permission.PARTNER_DELETE));
         assertFalse(permissions.contains(Permission.CUSTOMER_DELETE));
-        assertFalse(permissions.contains(Permission.PARTNER_DELETE));
     }
 
     @Test
-    void givenCustomer_whenPermissions_thenCanOnlyWriteOwnProfile() {
-        assertEquals(Set.of(Permission.CUSTOMER_WRITE), Role.CUSTOMER.permissions());
+    void givenCustomer_whenPermissions_thenManagesOwnAccount() {
+        assertEquals(Set.of(Permission.CUSTOMER_WRITE, Permission.CUSTOMER_DELETE), Role.CUSTOMER.permissions());
     }
 
     @Test
     void givenUserWithoutRoles_whenCreate_thenDefaultsToCustomer() {
-        final var user = new SecurityUser("maria", "hash", null);
+        final var user = new SecurityUser("maria", "hash", null, null);
 
         assertEquals(Set.of(Role.CUSTOMER), user.roles());
     }
 
     @Test
     void givenPartnerUser_whenAuthorities_thenIncludesRoleAndPermissions() {
-        final var user = new SecurityUser("cinema", "hash", Set.of(Role.PARTNER));
+        final var user = new SecurityUser("cinema", "hash", Set.of(Role.PARTNER), "partner-1");
 
         assertTrue(user.authorities().contains("ROLE_PARTNER"));
         assertTrue(user.authorities().contains("show:create"));

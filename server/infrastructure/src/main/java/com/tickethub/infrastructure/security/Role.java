@@ -7,10 +7,12 @@ import java.util.Set;
 public enum Role {
 
     CUSTOMER(EnumSet.of(
-            Permission.CUSTOMER_WRITE)),
+            Permission.CUSTOMER_WRITE,
+            Permission.CUSTOMER_DELETE)),
 
     PARTNER(EnumSet.of(
             Permission.PARTNER_WRITE,
+            Permission.PARTNER_DELETE,
             Permission.SHOW_CREATE,
             Permission.SHOW_WRITE,
             Permission.SHOW_PUBLISH,

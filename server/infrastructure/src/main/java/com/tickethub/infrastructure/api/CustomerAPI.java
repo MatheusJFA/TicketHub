@@ -30,7 +30,7 @@ public interface CustomerAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
-    @PreAuthorize("hasAuthority('customer:write')")
+    @PreAuthorize("hasAuthority('customer:write') and @ownerAccess.isSelfOrAdmin(#id)")
     ResponseEntity<?> changeCustomerName(@PathVariable("id") String id, @RequestBody ChangeCustomerNameRequest input);
 
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -55,7 +55,7 @@ public interface CustomerAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
-    @PreAuthorize("hasAuthority('customer:delete')")
+    @PreAuthorize("hasAuthority('customer:delete') and @ownerAccess.isSelfOrAdmin(#id)")
     ResponseEntity<?> deleteById(@PathVariable("id") String id);
 
     @GetMapping("/{id}")
@@ -68,6 +68,7 @@ public interface CustomerAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
+    @PreAuthorize("@ownerAccess.isSelfOrAdmin(#id)")
     ResponseEntity<?> getById(@PathVariable("id") String id);
 
     @GetMapping
@@ -80,6 +81,7 @@ public interface CustomerAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
+    @PreAuthorize("hasRole('ADMIN')")
     ResponseEntity<?> list(
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
