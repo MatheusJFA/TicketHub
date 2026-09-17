@@ -1,16 +1,13 @@
 package com.tickethub.application.spot.retrieve.get;
 
+import java.util.Objects;
 import java.util.Optional;
 
-import com.tickethub.domain.core.spot.Spot;
-
-import java.util.Objects;
 import com.tickethub.application.Either;
-import com.tickethub.domain.validation.Notification;
-
+import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.core.spot.SpotGateway;
 import com.tickethub.domain.core.spot.SpotID;
-import com.tickethub.domain.validation.Error;
+import com.tickethub.domain.validation.Notification;
 
 public final class DefaultGetSpotUseCase extends GetSpotUseCase {
     private final SpotGateway spotGateway;
@@ -26,9 +23,9 @@ public final class DefaultGetSpotUseCase extends GetSpotUseCase {
             final Optional<Spot> found = spotGateway.findById(id);
 
             if (!found.isPresent()) {
-                return Either.left(notFound("Spot", input));
+                return Either.left(notFound(Spot.class.getSimpleName(), id.getValue()));
             }
-            
+
             final Spot entity = found.get();
             final GetSpotOutput output = GetSpotOutput.from(entity);
             return Either.right(output);

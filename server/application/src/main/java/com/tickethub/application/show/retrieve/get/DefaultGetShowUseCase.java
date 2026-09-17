@@ -1,15 +1,13 @@
 package com.tickethub.application.show.retrieve.get;
 
-import com.tickethub.domain.core.show.Show;
-
 import java.util.Objects;
 import java.util.Optional;
-import com.tickethub.application.Either;
-import com.tickethub.domain.validation.Notification;
 
+import com.tickethub.application.Either;
+import com.tickethub.domain.core.show.Show;
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.show.ShowID;
-import com.tickethub.domain.validation.Error;
+import com.tickethub.domain.validation.Notification;
 
 public final class DefaultGetShowUseCase extends GetShowUseCase {
     private final ShowGateway showGateway;
@@ -25,9 +23,9 @@ public final class DefaultGetShowUseCase extends GetShowUseCase {
             final Optional<Show> found = showGateway.findById(id);
 
             if (!found.isPresent()) {
-                return Either.left(notFound("Show", input));
+                return Either.left(notFound(Show.class.getSimpleName(), id.getValue()));
             }
-            
+
             final Show entity = found.get();
             final GetShowOutput output = GetShowOutput.from(entity);
             return Either.right(output);
@@ -36,6 +34,5 @@ public final class DefaultGetShowUseCase extends GetShowUseCase {
             return Either.left(notification);
         }
     }
-
 
 }

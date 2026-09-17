@@ -7,7 +7,6 @@ import com.tickethub.application.Either;
 import com.tickethub.domain.core.show.Show;
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.show.ShowID;
-import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.Notification;
 
 public final class DefaultUnpublishAllShowUseCase extends UnpublishAllShowUseCase {
@@ -24,18 +23,18 @@ public final class DefaultUnpublishAllShowUseCase extends UnpublishAllShowUseCas
             final Optional<Show> found = showGateway.findById(id);
 
             if (!found.isPresent()) {
-                return Either.left(notFound("Show", command.id()));
+                return Either.left(notFound(Show.class.getSimpleName(), id.getValue()));
             }
-            
+
             final Show entity = found.get();
-            
+
             final Notification notification = Notification.create();
             entity.validate(notification);
-            
+
             if (notification.hasError()) {
                 return Either.left(notification);
             }
-            
+
             entity.unpublishAll();
 
             final Show updatedShow = showGateway.update(entity);

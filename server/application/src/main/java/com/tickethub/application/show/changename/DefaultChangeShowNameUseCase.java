@@ -1,15 +1,13 @@
 package com.tickethub.application.show.changename;
 
-import com.tickethub.domain.core.show.Show;
-
 import java.util.Objects;
 import java.util.Optional;
-import com.tickethub.application.Either;
-import com.tickethub.domain.validation.Notification;
 
+import com.tickethub.application.Either;
+import com.tickethub.domain.core.show.Show;
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.show.ShowID;
-import com.tickethub.domain.validation.Error;
+import com.tickethub.domain.validation.Notification;
 
 public final class DefaultChangeShowNameUseCase extends ChangeShowNameUseCase {
     private final ShowGateway showGateway;
@@ -24,7 +22,7 @@ public final class DefaultChangeShowNameUseCase extends ChangeShowNameUseCase {
             final ShowID id = ShowID.from(input.id());
             final Optional<Show> found = showGateway.findById(id);
             if (!found.isPresent()) {
-                return Either.left(notFound("Show", input.id()));
+                return Either.left(notFound(Show.class.getSimpleName(), id.getValue()));
             }
 
             final Show entity = found.get();
@@ -43,5 +41,4 @@ public final class DefaultChangeShowNameUseCase extends ChangeShowNameUseCase {
         }
     }
 
-    
 }

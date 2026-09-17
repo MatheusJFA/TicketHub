@@ -1,16 +1,13 @@
 package com.tickethub.application.spot.changelocation;
 
+import java.util.Objects;
 import java.util.Optional;
 
-import com.tickethub.domain.core.spot.Spot;
-
-import java.util.Objects;
 import com.tickethub.application.Either;
-import com.tickethub.domain.validation.Notification;
-
+import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.core.spot.SpotGateway;
 import com.tickethub.domain.core.spot.SpotID;
-import com.tickethub.domain.validation.Error;
+import com.tickethub.domain.validation.Notification;
 
 public final class DefaultChangeSpotLocationUseCase extends ChangeSpotLocationUseCase {
     private final SpotGateway spotGateway;
@@ -26,7 +23,7 @@ public final class DefaultChangeSpotLocationUseCase extends ChangeSpotLocationUs
             final Optional<Spot> found = spotGateway.findById(id);
 
             if (!found.isPresent()) {
-                return Either.left(notFound("Spot", input.id()));
+                return Either.left(notFound(Spot.class.getSimpleName(), id.getValue()));
             }
 
             final Spot entity = found.get();
@@ -34,11 +31,11 @@ public final class DefaultChangeSpotLocationUseCase extends ChangeSpotLocationUs
 
             final Notification notification = Notification.create();
             entity.validate(notification);
-            
+
             if (notification.hasError()) {
                 return Either.left(notification);
             }
-            
+
             final Spot saved = spotGateway.update(entity);
             final ChangeSpotLocationOutput output = new ChangeSpotLocationOutput(saved.getId().getValue());
             return Either.right(output);

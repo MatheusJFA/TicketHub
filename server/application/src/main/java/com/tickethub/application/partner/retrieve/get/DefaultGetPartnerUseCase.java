@@ -1,14 +1,13 @@
 package com.tickethub.application.partner.retrieve.get;
 
-import com.tickethub.domain.core.partner.Partner;
 import java.util.Objects;
 import java.util.Optional;
-import com.tickethub.application.Either;
-import com.tickethub.domain.validation.Notification;
 
+import com.tickethub.application.Either;
+import com.tickethub.domain.core.partner.Partner;
 import com.tickethub.domain.core.partner.PartnerGateway;
 import com.tickethub.domain.core.partner.PartnerID;
-import com.tickethub.domain.validation.Error;
+import com.tickethub.domain.validation.Notification;
 
 public final class DefaultGetPartnerUseCase extends GetPartnerUseCase {
     private final PartnerGateway partnerGateway;
@@ -24,10 +23,12 @@ public final class DefaultGetPartnerUseCase extends GetPartnerUseCase {
             final Optional<Partner> entity = partnerGateway.findById(id);
 
             if (!entity.isPresent()) {
-                return Either.left(notFound("Partner", input));
+                return Either.left(notFound(Partner.class.getSimpleName(), id.getValue()));
             }
 
-            final GetPartnerOutput output = GetPartnerOutput.from(entity.get());
+            final Partner partner = entity.get();
+
+            final GetPartnerOutput output = GetPartnerOutput.from(partner);
             return Either.right(output);
         } catch (final RuntimeException exception) {
             final Notification notification = Notification.create(exception);
