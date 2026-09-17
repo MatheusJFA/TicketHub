@@ -1,8 +1,6 @@
 package com.tickethub.infrastructure.api.controllers;
 
 import com.tickethub.infrastructure.api.models.*;
-import com.tickethub.domain.pagination.Pagination;
-import com.tickethub.domain.pagination.SearchQuery;
 import com.tickethub.application.customer.changename.*;
 import com.tickethub.application.customer.create.*;
 import com.tickethub.application.customer.delete.*;
@@ -10,6 +8,7 @@ import com.tickethub.application.customer.retrieve.get.*;
 import com.tickethub.application.customer.retrieve.list.*;
 import com.tickethub.infrastructure.customer.models.*;
 import org.springframework.http.ResponseEntity;
+import com.tickethub.infrastructure.api.ApiSupport;
 import com.tickethub.infrastructure.api.CustomerAPI;
 
 import java.net.URI;
@@ -38,44 +37,33 @@ public class CustomerController implements CustomerAPI {
 
     @Override
     public ResponseEntity<?> changeCustomerName(String id, ChangeCustomerNameRequest input) {
-        final var command = new ChangeCustomerNameCommand(
-                id,
-                input.name()
-        );
-        return changeCustomerName.execute(command)
-                .<ResponseEntity<?>>fold(notification -> ResponseEntity.unprocessableEntity().body(notification),
-                        output -> ResponseEntity.ok(new IdResponse(output.id())));
+        final var output = ApiSupport.execute(changeCustomerName,
+                new ChangeCustomerNameCommand(id, input.name()));
+        return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
     public ResponseEntity<?> createCustomer(CreateCustomerRequest input) {
-        final var command = new CreateCustomerCommand(
-                input.cpf(),
-                input.name()
-        );
-        return createCustomer.execute(command)
-                .<ResponseEntity<?>>fold(notification -> ResponseEntity.unprocessableEntity().body(notification),
-                        output -> ResponseEntity.created(URI.create("/customers/" + output.id())).body(new IdResponse(output.id())));
+        final var output = ApiSupport.execute(createCustomer,
+                new CreateCustomerCommand(input.cpf(), input.name()));
+        return ResponseEntity.created(URI.create("/customers/" + output.id())).body(new IdResponse(output.id()));
     }
 
     @Override
     public ResponseEntity<?> deleteById(String id) {
-        return deleteCustomer.execute(id)
-                .<ResponseEntity<?>>fold(notification -> ResponseEntity.unprocessableEntity().body(notification),
-                        output -> ResponseEntity.noContent().build());
+        ApiSupport.execute(deleteCustomer, id);
+        return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<?> getById(String id) {
-        return getCustomer.execute(id)
-                .<ResponseEntity<?>>fold(notification -> ResponseEntity.unprocessableEntity().body(notification),
-                        output -> ResponseEntity.ok(CustomerResponse.from(output)));
+        return ResponseEntity.ok(CustomerResponse.from(ApiSupport.execute(getCustomer, id)));
     }
 
     @Override
     public ResponseEntity<?> list(String search, int page, int perPage, String sort, String direction) {
-        return listCustomers.execute(new SearchQuery(page, perPage, search, sort, direction))
-                .<ResponseEntity<?>>fold(notification -> ResponseEntity.unprocessableEntity().body(notification),
-                        output -> ResponseEntity.ok(output.map(CustomerListResponse::from)));
+        final var result = ApiSupport.execute(listCustomers, ApiSupport.query(search, page, perPage, sort, direction))
+                .map(CustomerListResponse::from);
+        return ResponseEntity.ok(result);
     }
 }
