@@ -32,7 +32,7 @@ public interface SpotAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
-    @PreAuthorize("hasAuthority('spot:write')")
+    @PreAuthorize("hasAuthority('spot:write') and @showAccess.canWriteSpot(#id)")
     ResponseEntity<?> changeSpotLocation(@PathVariable("id") String id, @RequestBody ChangeSpotLocationRequest input);
 
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -58,7 +58,7 @@ public interface SpotAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
-    @PreAuthorize("hasAuthority('spot:delete')")
+    @PreAuthorize("hasAuthority('spot:delete') and @showAccess.canDeleteSpot(#id)")
     ResponseEntity<?> deleteById(@PathVariable("id") String id);
 
     @PostMapping(value = "/{id}/publish")
@@ -71,7 +71,7 @@ public interface SpotAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
-    @PreAuthorize("hasAuthority('spot:publish')")
+    @PreAuthorize("hasAuthority('spot:publish') and @showAccess.canPublishSpot(#id)")
     ResponseEntity<?> publishSpot(@PathVariable("id") String id);
 
     @GetMapping("/{id}")
@@ -113,6 +113,6 @@ public interface SpotAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
-    @PreAuthorize("hasAuthority('spot:publish')")
+    @PreAuthorize("hasAuthority('spot:publish') and @showAccess.canPublishSpot(#id)")
     ResponseEntity<?> unpublishSpot(@PathVariable("id") String id);
 }
