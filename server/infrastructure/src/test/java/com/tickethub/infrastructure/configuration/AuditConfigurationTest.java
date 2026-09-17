@@ -52,7 +52,7 @@ class AuditConfigurationTest {
 
     @Test
     void givenMongoTemplate_whenRun_thenWiresMongoTrail() {
-        runner.withUserConfiguration(MongoAuditTrail.class)
+        runner.withUserConfiguration(AuditConfiguration.class, MongoAuditTrail.class)
                 .withBean(MongoTemplate.class, () -> mock(MongoTemplate.class))
                 .run(context -> {
                     assertThat(context).hasNotFailed();
@@ -62,10 +62,13 @@ class AuditConfigurationTest {
     }
 
     @Test
-    void givenNoMongoTemplate_whenRun_thenSkipsMongoTrail() {
-        runner.withUserConfiguration(MongoAuditTrail.class).run(context -> {
-            assertThat(context).hasNotFailed();
-            assertThat(context).doesNotHaveBean(MongoAuditTrail.class);
-        });
+    void givenAuditDisabled_whenRun_thenSkipsMongoTrail() {
+        runner.withUserConfiguration(AuditConfiguration.class, MongoAuditTrail.class)
+                .withBean(MongoTemplate.class, () -> mock(MongoTemplate.class))
+                .withPropertyValues("tickethub.audit.enabled=false")
+                .run(context -> {
+                    assertThat(context).hasNotFailed();
+                    assertThat(context).doesNotHaveBean(MongoAuditTrail.class);
+                });
     }
 }
