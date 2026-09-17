@@ -37,7 +37,7 @@ public interface ShowAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
-    @PreAuthorize("hasAuthority('show:write')")
+    @PreAuthorize("@showAccess.canWrite(#id)")
     ResponseEntity<?> addSectionToShow(@PathVariable("id") String id, @RequestBody AddSectionToShowRequest input);
 
     @PatchMapping(value = "/{id}/description", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -50,7 +50,7 @@ public interface ShowAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
-    @PreAuthorize("hasAuthority('show:write')")
+    @PreAuthorize("@showAccess.canWrite(#id)")
     ResponseEntity<?> changeShowDescription(@PathVariable("id") String id, @RequestBody ChangeShowDescriptionRequest input);
 
     @PatchMapping(value = "/{id}/name", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -63,7 +63,7 @@ public interface ShowAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
-    @PreAuthorize("hasAuthority('show:write')")
+    @PreAuthorize("@showAccess.canWrite(#id)")
     ResponseEntity<?> changeShowName(@PathVariable("id") String id, @RequestBody ChangeShowNameRequest input);
 
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -76,7 +76,7 @@ public interface ShowAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
-    @PreAuthorize("hasAuthority('show:create')")
+    @PreAuthorize("@showAccess.canCreate(#input.partnerId())")
     ResponseEntity<?> createShow(@RequestBody CreateShowRequest input);
 
     @DeleteMapping("/{id}")
@@ -89,7 +89,7 @@ public interface ShowAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
-    @PreAuthorize("hasAuthority('show:delete')")
+    @PreAuthorize("@showAccess.canDelete(#id)")
     ResponseEntity<?> deleteById(@PathVariable("id") String id);
 
     @PostMapping(value = "/{id}/publish")
@@ -102,7 +102,7 @@ public interface ShowAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
-    @PreAuthorize("hasAuthority('show:publish')")
+    @PreAuthorize("@showAccess.canPublish(#id)")
     ResponseEntity<?> publishShow(@PathVariable("id") String id);
 
     @PostMapping(value = "/{id}/publish-all")
@@ -115,7 +115,7 @@ public interface ShowAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
-    @PreAuthorize("hasAuthority('show:publish')")
+    @PreAuthorize("@showAccess.canPublish(#id)")
     ResponseEntity<?> publishAllShow(@PathVariable("id") String id);
 
     @PatchMapping(value = "/{id}/date", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -128,7 +128,7 @@ public interface ShowAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
-    @PreAuthorize("hasAuthority('show:write')")
+    @PreAuthorize("@showAccess.canWrite(#id)")
     ResponseEntity<?> rescheduleShow(@PathVariable("id") String id, @RequestBody RescheduleShowRequest input);
 
     @GetMapping("/{id}")
@@ -170,7 +170,7 @@ public interface ShowAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
-    @PreAuthorize("hasAuthority('show:publish')")
+    @PreAuthorize("@showAccess.canPublish(#id)")
     ResponseEntity<?> unpublishShow(@PathVariable("id") String id);
 
     @PostMapping(value = "/{id}/unpublish-all")
@@ -183,6 +183,6 @@ public interface ShowAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
-    @PreAuthorize("hasAuthority('show:publish')")
+    @PreAuthorize("@showAccess.canPublish(#id)")
     ResponseEntity<?> unpublishAllShow(@PathVariable("id") String id);
 }
