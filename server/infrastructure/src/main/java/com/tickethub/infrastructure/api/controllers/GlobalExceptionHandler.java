@@ -6,22 +6,36 @@ import com.tickethub.infrastructure.api.models.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+public class GlobalExceptionHandler {
     private static final Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(ApiValidationException.class)
     ResponseEntity<ErrorResponse> validation(ApiValidationException exception) {
         final var errors = exception.notification().getErrors();
-        // Existing use cases represent missing entities as notifications.
+        // Existing use cases represent missing entities as notifications ("X not found: id").
         final boolean missing = errors.stream().anyMatch(error ->
-                error.message().matches("^(Customer|Partner|Show|Section|Spot) not found: .*$"));
+                error.message() != null && error.message().matches("^.+ not found: .*$"));
         return ResponseEntity.status(missing ? 404 : 422).body(new ErrorResponse(errors));
+    }
+
+    @ExceptionHandler({MethodArgumentNotValidException.class, HttpMessageNotReadableException.class,
+            MissingServletRequestParameterException.class, NoResourceFoundException.class})
+    ResponseEntity<ErrorResponse> badRequest(Exception exception) {
+        final String message = exception instanceof MethodArgumentNotValidException validation
+                ? validation.getBindingResult().getFieldErrors().stream()
+                        .map(field -> "'" + field.getField() + "' " + field.getDefaultMessage())
+                        .findFirst().orElse("Invalid request")
+                : "Invalid request";
+        return ResponseEntity.badRequest().body(ErrorResponse.from(message));
     }
 
     @ExceptionHandler(DomainException.class)
