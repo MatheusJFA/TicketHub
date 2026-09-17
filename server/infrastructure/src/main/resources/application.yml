@@ -40,6 +40,8 @@ tickethub:
   liquibase:
     enabled: ${LIQUIBASE_ENABLED:true}
     change-log: db/changelog/db.changelog-master.xml
+  audit:
+    enabled: ${AUDIT_ENABLED:true}
   mongo:
     connect-timeout: ${MONGO_CONNECT_TIMEOUT:5s}
     read-timeout: ${MONGO_READ_TIMEOUT:5s}
