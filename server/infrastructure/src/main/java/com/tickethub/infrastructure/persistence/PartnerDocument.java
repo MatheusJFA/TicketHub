@@ -22,6 +22,8 @@ public record PartnerDocument(
         String createdBy,
         String lastModifiedBy) {
 
+    public static final String COLLECTION = "partners";
+
     public static PartnerDocument from(final Partner partner) {
         return new PartnerDocument(
                 partner.getId().getValue(),

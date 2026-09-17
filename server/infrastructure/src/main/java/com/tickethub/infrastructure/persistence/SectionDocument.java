@@ -29,6 +29,8 @@ public record SectionDocument(
         String createdBy,
         String lastModifiedBy) {
 
+    public static final String COLLECTION = "sections";
+
     public static SectionDocument from(final Section section) {
         return new SectionDocument(
                 section.getId().getValue(),

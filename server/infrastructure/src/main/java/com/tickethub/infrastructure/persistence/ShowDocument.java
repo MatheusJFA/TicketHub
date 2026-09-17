@@ -33,6 +33,8 @@ public record ShowDocument(
         String createdBy,
         String lastModifiedBy) {
 
+    public static final String COLLECTION = "shows";
+
     public static ShowDocument from(final Show show) {
         return new ShowDocument(
                 show.getId().getValue(),

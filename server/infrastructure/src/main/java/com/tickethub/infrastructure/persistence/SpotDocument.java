@@ -21,6 +21,8 @@ public record SpotDocument(
         String createdBy,
         String lastModifiedBy) {
 
+    public static final String COLLECTION = "spots";
+
     public static SpotDocument from(final Spot spot) {
         return new SpotDocument(
                 spot.getId().getValue(),

@@ -21,6 +21,8 @@ public record CustomerDocument(
         String createdBy,
         String lastModifiedBy) {
 
+    public static final String COLLECTION = "customers";
+
     public static CustomerDocument from(final Customer customer) {
         return new CustomerDocument(
                 customer.getId().getValue(),
