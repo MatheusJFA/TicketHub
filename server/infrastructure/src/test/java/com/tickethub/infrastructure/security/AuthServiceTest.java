@@ -37,6 +37,12 @@ class AuthServiceTest {
         admin.setPassword(new BCryptPasswordEncoder().encode("admin-local"));
         admin.setRoles(Set.of(Role.ADMIN));
         properties.getUsers().add(admin);
+        final var partner = new SecurityProperties.User();
+        partner.setUsername("partner");
+        partner.setPassword(new BCryptPasswordEncoder().encode("partner-local"));
+        partner.setRoles(Set.of(Role.PARTNER));
+        partner.setOwnerId("partner-1");
+        properties.getUsers().add(partner);
         return properties;
     }
 
@@ -53,6 +59,22 @@ class AuthServiceTest {
         assertTrue(authorities.contains("ROLE_ADMIN"));
         assertTrue(authorities.contains("show:create"));
         assertTrue(authorities.contains("customer:delete"));
+    }
+
+    @Test
+    void givenPartnerWithOwner_whenLogin_thenIncludesOwnerIdClaim() {
+        final var response = service.login("partner", "partner-local");
+
+        final var jwt = decoder.decode(response.token());
+        assertEquals("partner-1", jwt.getClaimAsString("ownerId"));
+    }
+
+    @Test
+    void givenAdminWithoutOwner_whenLogin_thenOmitsOwnerIdClaim() {
+        final var response = service.login("admin", "admin-local");
+
+        final var jwt = decoder.decode(response.token());
+        assertEquals(null, jwt.getClaimAsString("ownerId"));
     }
 
     @Test

@@ -25,7 +25,8 @@ public class SecurityProperties {
         return users.stream()
                 .filter(user -> user.getUsername().equals(username))
                 .findFirst()
-                .map(user -> new SecurityUser(user.getUsername(), user.getPassword(), user.getRoles()));
+                .map(user -> new SecurityUser(user.getUsername(), user.getPassword(), user.getRoles(),
+                        user.getOwnerId()));
     }
 
     public static class Jwt {
@@ -53,6 +54,7 @@ public class SecurityProperties {
         private String username;
         private String password;
         private Set<Role> roles = Set.of(Role.CUSTOMER);
+        private String ownerId;
 
         public String getUsername() {
             return username;
@@ -76,6 +78,14 @@ public class SecurityProperties {
 
         public void setRoles(final Set<Role> roles) {
             this.roles = roles;
+        }
+
+        public String getOwnerId() {
+            return ownerId;
+        }
+
+        public void setOwnerId(final String ownerId) {
+            this.ownerId = ownerId;
         }
     }
 }

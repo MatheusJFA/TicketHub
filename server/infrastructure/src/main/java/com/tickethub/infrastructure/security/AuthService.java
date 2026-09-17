@@ -41,10 +41,12 @@ public class AuthService {
                 .issuedAt(now)
                 .expiresAt(now.plus(expirationMinutes, ChronoUnit.MINUTES))
                 .subject(user.username())
-                .claim("authorities", user.authorities())
-                .build();
+                .claim("authorities", user.authorities());
+        if (user.ownerId() != null) {
+            claims.claim("ownerId", user.ownerId());
+        }
         final String token = jwtEncoder
-                .encode(JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(), claims))
+                .encode(JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(), claims.build()))
                 .getTokenValue();
         return TokenResponse.bearer(token, expirationMinutes * 60);
     }

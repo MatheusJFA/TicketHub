@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-public record SecurityUser(String username, String passwordHash, Set<Role> roles) {
+public record SecurityUser(String username, String passwordHash, Set<Role> roles, String ownerId) {
 
     public SecurityUser {
         if (username == null || username.isBlank()) {
@@ -13,6 +13,7 @@ public record SecurityUser(String username, String passwordHash, Set<Role> roles
         }
         Objects.requireNonNull(passwordHash, "'passwordHash' should not be null");
         roles = roles == null || roles.isEmpty() ? Set.of(Role.CUSTOMER) : Set.copyOf(roles);
+        ownerId = ownerId == null || ownerId.isBlank() ? null : ownerId;
     }
 
     public List<String> authorities() {
