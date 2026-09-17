@@ -22,8 +22,12 @@ public final class Money extends ValueObject {
             throw new DomainException("Invalid money");
         }
 
-        BigDecimal normalizedValue = value.setScale(currency.getDefaultFractionDigits(), RoundingMode.UNNECESSARY);
-        return new Money(normalizedValue, currency);
+        try {
+            final BigDecimal normalizedValue = value.setScale(currency.getDefaultFractionDigits(), RoundingMode.UNNECESSARY);
+            return new Money(normalizedValue, currency);
+        } catch (final ArithmeticException e) {
+            throw new DomainException("Invalid money", e);
+        }
     }
 
     private static boolean isValid(BigDecimal value, Currency currency) {
