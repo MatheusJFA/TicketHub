@@ -1,4 +1,7 @@
 @baseUrl = http://localhost:8080
+# Login via auth.http first, then paste the token below.
+# The token must carry the ownerId claim matching the resource being managed.
+@token = PASTE_JWT_HERE
 @showId = REPLACE_WITH_SHOW_ID
 @partnerId = REPLACE_WITH_PARTNER_ID
 
@@ -39,6 +42,7 @@ Accept: application/json
 ### Change show name
 # @name changeShowName
 PATCH {{baseUrl}}/shows/{{showId}}/name
+Authorization: Bearer {{token}}
 Content-Type: application/json
 X-Correlation-ID: show-rename-1
 
@@ -49,6 +53,7 @@ X-Correlation-ID: show-rename-1
 ### Change show description
 # @name changeShowDescription
 PATCH {{baseUrl}}/shows/{{showId}}/description
+Authorization: Bearer {{token}}
 Content-Type: application/json
 X-Correlation-ID: show-description-1
 
@@ -59,6 +64,7 @@ X-Correlation-ID: show-description-1
 ### Reschedule show
 # @name rescheduleShow
 PATCH {{baseUrl}}/shows/{{showId}}/date
+Authorization: Bearer {{token}}
 Content-Type: application/json
 X-Correlation-ID: show-reschedule-1
 
@@ -69,6 +75,7 @@ X-Correlation-ID: show-reschedule-1
 ### Add section to show
 # @name addSectionToShow
 POST {{baseUrl}}/shows/{{showId}}/sections
+Authorization: Bearer {{token}}
 Content-Type: application/json
 X-Correlation-ID: show-add-section-1
 
@@ -85,23 +92,28 @@ X-Correlation-ID: show-add-section-1
 ### Publish show
 # @name publishShow
 POST {{baseUrl}}/shows/{{showId}}/publish
+Authorization: Bearer {{token}}
 X-Correlation-ID: show-publish-1
 
 ### Unpublish show
 # @name unpublishShow
 POST {{baseUrl}}/shows/{{showId}}/unpublish
+Authorization: Bearer {{token}}
 X-Correlation-ID: show-unpublish-1
 
 ### Publish show with all sections and spots
 # @name publishAllShow
 POST {{baseUrl}}/shows/{{showId}}/publish-all
+Authorization: Bearer {{token}}
 X-Correlation-ID: show-publish-all-1
 
 ### Unpublish show with all sections and spots
 # @name unpublishAllShow
 POST {{baseUrl}}/shows/{{showId}}/unpublish-all
+Authorization: Bearer {{token}}
 X-Correlation-ID: show-unpublish-all-1
 
 ### Delete show
 # @name deleteShow
 DELETE {{baseUrl}}/shows/{{showId}}
+Authorization: Bearer {{token}}

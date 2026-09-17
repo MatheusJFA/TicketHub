@@ -1,4 +1,7 @@
 @baseUrl = http://localhost:8080
+# Login via auth.http first, then paste the token below.
+# The token must carry the ownerId claim matching the resource being managed.
+@token = PASTE_JWT_HERE
 @spotId = REPLACE_WITH_SPOT_ID
 
 ### Create spot
@@ -24,6 +27,7 @@ Accept: application/json
 ### Change spot location
 # @name changeSpotLocation
 PATCH {{baseUrl}}/spots/{{spotId}}/location
+Authorization: Bearer {{token}}
 Content-Type: application/json
 X-Correlation-ID: spot-location-1
 
@@ -34,13 +38,16 @@ X-Correlation-ID: spot-location-1
 ### Publish spot
 # @name publishSpot
 POST {{baseUrl}}/spots/{{spotId}}/publish
+Authorization: Bearer {{token}}
 X-Correlation-ID: spot-publish-1
 
 ### Unpublish spot
 # @name unpublishSpot
 POST {{baseUrl}}/spots/{{spotId}}/unpublish
+Authorization: Bearer {{token}}
 X-Correlation-ID: spot-unpublish-1
 
 ### Delete spot
 # @name deleteSpot
 DELETE {{baseUrl}}/spots/{{spotId}}
+Authorization: Bearer {{token}}

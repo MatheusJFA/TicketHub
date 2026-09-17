@@ -1,4 +1,7 @@
 @baseUrl = http://localhost:8080
+# Login via auth.http first, then paste the token below.
+# The token must carry the ownerId claim matching the resource being managed.
+@token = PASTE_JWT_HERE
 @customerId = REPLACE_WITH_CUSTOMER_ID
 
 ### Create customer
@@ -15,16 +18,19 @@ X-Correlation-ID: customer-create-1
 ### Get customer by id
 # @name getCustomer
 GET {{baseUrl}}/customers/{{customerId}}
+Authorization: Bearer {{token}}
 Accept: application/json
 
 ### List customers
 # @name listCustomers
 GET {{baseUrl}}/customers?search=maria&page=0&perPage=10&sort=name&dir=asc
+Authorization: Bearer {{token}}
 Accept: application/json
 
 ### Change customer name
 # @name changeCustomerName
 PATCH {{baseUrl}}/customers/{{customerId}}/name
+Authorization: Bearer {{token}}
 Content-Type: application/json
 X-Correlation-ID: customer-rename-1
 
@@ -35,3 +41,4 @@ X-Correlation-ID: customer-rename-1
 ### Delete customer
 # @name deleteCustomer
 DELETE {{baseUrl}}/customers/{{customerId}}
+Authorization: Bearer {{token}}

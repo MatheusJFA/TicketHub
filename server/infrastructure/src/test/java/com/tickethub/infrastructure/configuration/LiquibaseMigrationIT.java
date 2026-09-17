@@ -3,6 +3,7 @@ package com.tickethub.infrastructure.configuration;
 import com.mongodb.client.MongoClient;
 import com.tickethub.infrastructure.Main;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import org.bson.Document;
 import org.junit.jupiter.api.AfterAll;
@@ -35,7 +36,7 @@ class LiquibaseMigrationIT {
     void migratesOnStartupAndDoesNotReapplyChangesOrCloseClient() throws Exception {
         final var database = factory.getMongoDatabase();
         final var collections = database.listCollectionNames().into(new ArrayList<>());
-        assertTrue(collections.containsAll(java.util.List.of("customers", "partners", "shows", "sections", "spots")));
+        assertTrue(collections.containsAll(List.of("customers", "partners", "shows", "sections", "spots")));
         final var history = database.getCollection("DATABASECHANGELOG");
         assertEquals(5, history.countDocuments());
         database.getCollection("customers").insertOne(new Document("_id", "preserved"));
