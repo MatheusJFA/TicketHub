@@ -1,0 +1,107 @@
+@baseUrl = http://localhost:8080
+@showId = REPLACE_WITH_SHOW_ID
+@partnerId = REPLACE_WITH_PARTNER_ID
+
+### Create show
+# @name createShow
+POST {{baseUrl}}/shows
+Content-Type: application/json
+X-Correlation-ID: show-create-1
+
+{
+  "partnerId": "{{partnerId}}",
+  "name": "Rock in Rio",
+  "description": "Festival de música",
+  "date": "2027-01-15T20:00:00-03:00",
+  "address": {
+    "street": "Rua do Rock",
+    "number": "s/n",
+    "complement": null,
+    "neighborhood": "Barra da Tijuca",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "country": "Brasil",
+    "zipCode": "22640-100"
+  },
+  "totalSpots": 100
+}
+
+### Get show by id
+# @name getShow
+GET {{baseUrl}}/shows/{{showId}}
+Accept: application/json
+
+### List shows
+# @name listShows
+GET {{baseUrl}}/shows?search=rock&page=0&perPage=10&sort=name&dir=asc
+Accept: application/json
+
+### Change show name
+# @name changeShowName
+PATCH {{baseUrl}}/shows/{{showId}}/name
+Content-Type: application/json
+X-Correlation-ID: show-rename-1
+
+{
+  "name": "Rock in Rio 2027"
+}
+
+### Change show description
+# @name changeShowDescription
+PATCH {{baseUrl}}/shows/{{showId}}/description
+Content-Type: application/json
+X-Correlation-ID: show-description-1
+
+{
+  "description": "O maior festival de música do Brasil"
+}
+
+### Reschedule show
+# @name rescheduleShow
+PATCH {{baseUrl}}/shows/{{showId}}/date
+Content-Type: application/json
+X-Correlation-ID: show-reschedule-1
+
+{
+  "date": "2027-02-20T21:00:00-03:00"
+}
+
+### Add section to show
+# @name addSectionToShow
+POST {{baseUrl}}/shows/{{showId}}/sections
+Content-Type: application/json
+X-Correlation-ID: show-add-section-1
+
+{
+  "name": "Pista Premium",
+  "description": "Área em frente ao palco",
+  "totalSpots": 50,
+  "price": {
+    "value": 350.00,
+    "currency": "BRL"
+  }
+}
+
+### Publish show
+# @name publishShow
+POST {{baseUrl}}/shows/{{showId}}/publish
+X-Correlation-ID: show-publish-1
+
+### Unpublish show
+# @name unpublishShow
+POST {{baseUrl}}/shows/{{showId}}/unpublish
+X-Correlation-ID: show-unpublish-1
+
+### Publish show with all sections and spots
+# @name publishAllShow
+POST {{baseUrl}}/shows/{{showId}}/publish-all
+X-Correlation-ID: show-publish-all-1
+
+### Unpublish show with all sections and spots
+# @name unpublishAllShow
+POST {{baseUrl}}/shows/{{showId}}/unpublish-all
+X-Correlation-ID: show-unpublish-all-1
+
+### Delete show
+# @name deleteShow
+DELETE {{baseUrl}}/shows/{{showId}}

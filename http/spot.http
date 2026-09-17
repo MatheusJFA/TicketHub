@@ -1,0 +1,46 @@
+@baseUrl = http://localhost:8080
+@spotId = REPLACE_WITH_SPOT_ID
+
+### Create spot
+# @name createSpot
+POST {{baseUrl}}/spots
+Content-Type: application/json
+X-Correlation-ID: spot-create-1
+
+{
+  "location": "A1"
+}
+
+### Get spot by id
+# @name getSpot
+GET {{baseUrl}}/spots/{{spotId}}
+Accept: application/json
+
+### List spots
+# @name listSpots
+GET {{baseUrl}}/spots?search=A&page=0&perPage=10&sort=createdAt&dir=asc
+Accept: application/json
+
+### Change spot location
+# @name changeSpotLocation
+PATCH {{baseUrl}}/spots/{{spotId}}/location
+Content-Type: application/json
+X-Correlation-ID: spot-location-1
+
+{
+  "location": "B2"
+}
+
+### Publish spot
+# @name publishSpot
+POST {{baseUrl}}/spots/{{spotId}}/publish
+X-Correlation-ID: spot-publish-1
+
+### Unpublish spot
+# @name unpublishSpot
+POST {{baseUrl}}/spots/{{spotId}}/unpublish
+X-Correlation-ID: spot-unpublish-1
+
+### Delete spot
+# @name deleteSpot
+DELETE {{baseUrl}}/spots/{{spotId}}
