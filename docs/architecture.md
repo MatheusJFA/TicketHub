@@ -141,7 +141,7 @@ Entidades carregam auditoria de domínio (`createdAt`, `updatedAt`, `deletedAt`,
 | Customer | `customer:write`/`delete` + dono | 403 | só `ADMIN` |
 | Partner | `partner:write`/`delete` + dono | 403 | só `ADMIN` |
 | Show | dono do `partnerId` (`@showAccess`, claim `ownerId`) | 403 | pública (catálogo) |
-| Section / Spot | role (`section:*`, `spot:*`) | — (sem vínculo de dono no domínio) | pública (catálogo) |
+| Section / Spot | dono via `partnerId` denormalizado (`@showAccess.canWriteSection/canWriteSpot`, fallback `showId`; órfão nega) | 403 | pública (catálogo) |
 
 Cadastro (`POST /customers`, `POST /partners`) e login são públicos.
 

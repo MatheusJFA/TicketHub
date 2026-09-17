@@ -14,10 +14,11 @@ A API nasceu aberta. Era preciso autenticar atores (cliente, parceiro, admin) e 
   - Roles como pacotes de permissões (`Permission`: `show:create`, `section:publish`, `spot:write`…): `CUSTOMER` (própria conta), `PARTNER` (catálogo + própria conta), `ADMIN` (tudo).
   - Enforcement por permissão (`hasAuthority`) + ownership: `@showAccess` (dono do `partnerId` via claim `ownerId`) nos shows; `@ownerAccess.isSelfOrAdmin(#id)` nas contas; listagens de contas só `ADMIN`; catálogo (`GET`) público; cadastros públicos.
 - Segurança fica na `infrastructure` (method security nas interfaces `*API`); o domínio não conhece atores.
+- Ownership fino de `Section`/`Spot`: `@showAccess.canWriteSection/canWriteSpot` (e variantes publish/delete) resolvem o dono via campos denormalizados (`partnerId`, fallback `showId`) — 1 leitura indexada no fast path. Updates avulsos preservam os vínculos; documentos órfãos/legados sem vínculo negam escrita para não-admin (fail-closed).
 - `@EnableMethodSecurity(proxyTargetClass = true)`: sem CGLIB, os proxies JDK escondem os controllers e zeram os mappings no Spring Boot 4.
 
 ## Consequências
 
 - **Pró:** granularidade sem explosão administrativa; testes com JWT real cobrem 401/403/200 e a matriz (`ApiAuthorizationTest` trava drift via reflection).
 - **Contra:** `ownerId` precisa ser provisionado junto ao usuário (env) até o cadastro existir.
-- **Contra:** sections/spots avulsos seguem só por role — ownership encadeado exige `showId` no domínio (evolução futura).
+- **Contra:** criação avulsa (`POST /sections`, `POST /spots`) segue só por role — o vínculo de dono nasce na persistência via grafo do `Show`.

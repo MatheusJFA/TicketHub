@@ -18,5 +18,5 @@ MongoDB 8.0 como banco principal, via Spring Data MongoDB (`MongoTemplate`), com
 ## Consequências
 
 - **Pró:** modelo de leitura simples, sem joins para o catálogo; evolução de schema sem migrações pesadas.
-- **Contra:** sem joins — ownership `Spot → Section → Show` precisa de múltiplas leituras (limita ownership fino em sections/spots avulsos).
+- **Contra (mitigado):** sem joins — ownership `Spot → Section → Show` exigiria múltiplas leituras. Mitigação: `sections` e `spots` denormalizam `showId`/`sectionId`/`partnerId` no momento da persistência via `ShowMongoGateway`, de modo que ownership resolve em 1 leitura indexada (fast path por `partnerId`) com fallback para documentos legados; a leitura do grafo usa 3 queries indexadas (`show` + `sections by showId` + `spots by showId`) em vez de N+1.
 - **Contra:** MongoDB standalone não tem transações multi-documento; atomicidade entre coleções exige replica set (fora do escopo atual — ver Unit of Work nos adapters).
