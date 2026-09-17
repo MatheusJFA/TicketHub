@@ -45,7 +45,7 @@ public class ResilienceConfiguration {
                 .waitDurationInOpenState(Duration.ofMillis(openStateWaitMs))
                 .slidingWindowSize(slidingWindowSize)
                 .minimumNumberOfCalls(minimumCalls)
-                .recordResultPredicate(ResiliencePolicy::isTransientResult)
+                .recordResult(ResiliencePolicy::isTransientResult)
                 .ignoreExceptions(CallNotPermittedException.class)
                 .build());
         return ResiliencePolicy.of(retry, circuitBreaker);
