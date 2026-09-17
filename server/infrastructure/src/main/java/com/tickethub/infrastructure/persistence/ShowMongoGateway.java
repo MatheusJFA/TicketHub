@@ -53,6 +53,10 @@ public class ShowMongoGateway implements ShowGateway {
         unitOfWork.registerRemoved(SectionDocument.COLLECTION, sectionIds);
         unitOfWork.registerRemoved(ShowDocument.COLLECTION, id.getValue());
         unitOfWork.commit();
+        // Children written with denormalized showId (newer docs) are removed by parent field,
+        // covering sections/spots added outside the legacy id arrays.
+        MongoGatewaySupport.removeSpotsByShowId(mongoTemplate, id.getValue());
+        MongoGatewaySupport.removeSectionsByShowId(mongoTemplate, id.getValue());
     }
 
     @Override
@@ -80,15 +84,17 @@ public class ShowMongoGateway implements ShowGateway {
     }
 
     private void registerGraph(final MongoUnitOfWork unitOfWork, final Show show, final boolean dirty) {
+        final String showId = show.getId().getValue();
+        final String partnerId = show.getPartnerId() == null ? null : show.getPartnerId().getValue();
         for (final Section section : show.getSections()) {
-            final var sectionDocument = SectionDocument.from(section);
+            final var sectionDocument = SectionDocument.from(section, showId, partnerId);
             if (dirty) {
                 unitOfWork.registerDirty(SectionDocument.COLLECTION, sectionDocument.id(), sectionDocument);
             } else {
                 unitOfWork.registerNew(SectionDocument.COLLECTION, sectionDocument);
             }
             for (final Spot spot : section.getSpots()) {
-                final var spotDocument = SpotDocument.from(spot);
+                final var spotDocument = SpotDocument.from(spot, showId, section.getId().getValue(), partnerId);
                 if (dirty) {
                     unitOfWork.registerDirty(SpotDocument.COLLECTION, spotDocument.id(), spotDocument);
                 } else {
@@ -99,27 +105,47 @@ public class ShowMongoGateway implements ShowGateway {
     }
 
     private Show toDomain(final ShowDocument document) {
-        final var sectionsById = MongoGatewaySupport.sectionsByIds(mongoTemplate, document.sectionIds()).stream()
-                .collect(Collectors.toMap(SectionDocument::id, Function.identity()));
+        // Prefer the denormalized parent fields (3 reads total, all indexed);
+        // fall back to the legacy id arrays for documents written before them.
+        List<SectionDocument> sectionDocuments = MongoGatewaySupport.sectionsByShowId(mongoTemplate, document.id());
+        if (sectionDocuments.isEmpty() && document.sectionIds() != null && !document.sectionIds().isEmpty()) {
+            sectionDocuments = MongoGatewaySupport.sectionsByIds(mongoTemplate, document.sectionIds());
+        }
+        final var spotsBySection = MongoGatewaySupport.spotsByShowId(mongoTemplate, document.id()).stream()
+                .filter(spot -> spot.sectionId() != null)
+                .collect(Collectors.groupingBy(SpotDocument::sectionId));
+        final var sectionsById = sectionDocuments.stream()
+                .collect(Collectors.toMap(SectionDocument::id, Function.identity(), (first, second) -> first));
         final Set<Section> sections = new HashSet<>();
-        for (final String sectionId : document.sectionIds()) {
+        final List<String> order = (document.sectionIds() == null || document.sectionIds().isEmpty())
+                ? sectionDocuments.stream().map(SectionDocument::id).toList()
+                : document.sectionIds();
+        for (final String sectionId : order) {
             final var section = sectionsById.get(sectionId);
             if (section != null) {
-                sections.add(toDomain(section));
+                sections.add(toDomain(section, spotsBySection.getOrDefault(sectionId, List.of())));
             }
         }
         return document.toDomain(sections);
     }
 
-    private Section toDomain(final SectionDocument document) {
-        final var spotsById = MongoGatewaySupport.spotsByIds(mongoTemplate, document.spotIds()).stream()
-                .collect(Collectors.toMap(SpotDocument::id, Function.identity()));
+    private Section toDomain(final SectionDocument document, final List<SpotDocument> candidates) {
+        final List<SpotDocument> spotDocuments;
+        if (!candidates.isEmpty()) {
+            spotDocuments = candidates;
+        } else if (document.spotIds() != null && !document.spotIds().isEmpty()) {
+            final var byId = MongoGatewaySupport.spotsByIds(mongoTemplate, document.spotIds()).stream()
+                    .collect(Collectors.toMap(SpotDocument::id, Function.identity(), (first, second) -> first));
+            spotDocuments = document.spotIds().stream()
+                    .map(byId::get)
+                    .filter(Objects::nonNull)
+                    .toList();
+        } else {
+            spotDocuments = MongoGatewaySupport.spotsBySectionId(mongoTemplate, document.id());
+        }
         final Set<Spot> spots = new HashSet<>();
-        for (final String spotId : document.spotIds()) {
-            final var spot = spotsById.get(spotId);
-            if (spot != null) {
-                spots.add(spot.toDomain());
-            }
+        for (final SpotDocument spot : spotDocuments) {
+            spots.add(spot.toDomain());
         }
         return document.toDomain(spots);
     }

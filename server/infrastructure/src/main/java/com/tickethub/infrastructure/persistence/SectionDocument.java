@@ -23,6 +23,8 @@ public record SectionDocument(
         long totalSpotsSold,
         MoneyDocument price,
         List<String> spotIds,
+        String showId,
+        String partnerId,
         Instant createdAt,
         Instant updatedAt,
         Instant deletedAt,
@@ -32,6 +34,10 @@ public record SectionDocument(
     public static final String COLLECTION = "sections";
 
     public static SectionDocument from(final Section section) {
+        return from(section, null, null);
+    }
+
+    public static SectionDocument from(final Section section, final String showId, final String partnerId) {
         return new SectionDocument(
                 section.getId().getValue(),
                 section.getName().getValue(),
@@ -41,6 +47,8 @@ public record SectionDocument(
                 section.getTotalSpotsSold(),
                 MoneyDocument.from(section.getPrice()),
                 section.getSpots().stream().map(spot -> spot.getId().getValue()).toList(),
+                showId,
+                partnerId,
                 section.getCreatedAt(),
                 section.getUpdatedAt(),
                 section.getDeletedAt(),

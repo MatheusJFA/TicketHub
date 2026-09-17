@@ -51,6 +51,8 @@ public class SectionMongoGateway implements SectionGateway {
         unitOfWork.registerRemoved(SectionDocument.COLLECTION, id.getValue());
         unitOfWork.registerRemoved(SpotDocument.COLLECTION, spotIds);
         unitOfWork.commit();
+        // Spots written with denormalized sectionId (via the Show graph) are removed by parent field.
+        MongoGatewaySupport.removeSpotsBySectionId(mongoTemplate, id.getValue());
     }
 
     @Override
@@ -63,11 +65,23 @@ public class SectionMongoGateway implements SectionGateway {
 
     @Override
     public Section update(final Section section) {
+        // Preserve the denormalized ownership links: standalone updates carry no parent context,
+        // so carry over whatever the Show graph stored instead of wiping it with nulls.
+        final var links = Optional
+                .ofNullable(mongoTemplate.findById(section.getId().getValue(), SectionDocument.class,
+                        SectionDocument.COLLECTION))
+                .map(existing -> new String[] { existing.showId(), existing.partnerId() })
+                .orElseGet(() -> new String[] { null, null });
         final var unitOfWork = new MongoUnitOfWork(mongoTemplate);
-        final var document = SectionDocument.from(section);
+        final var document = SectionDocument.from(section, links[0], links[1]);
         unitOfWork.registerDirty(SectionDocument.COLLECTION, document.id(), document);
+        final var existingSpots = MongoGatewaySupport.spotsBySectionId(mongoTemplate, document.id()).stream()
+                .collect(Collectors.toMap(SpotDocument::id, Function.identity(), (first, second) -> first));
         for (final Spot spot : section.getSpots()) {
-            final var spotDocument = SpotDocument.from(spot);
+            final var existing = existingSpots.get(spot.getId().getValue());
+            final var spotDocument = existing == null
+                    ? SpotDocument.from(spot)
+                    : SpotDocument.from(spot, existing.showId(), existing.sectionId(), existing.partnerId());
             unitOfWork.registerDirty(SpotDocument.COLLECTION, spotDocument.id(), spotDocument);
         }
         unitOfWork.commit();
@@ -82,14 +96,21 @@ public class SectionMongoGateway implements SectionGateway {
     }
 
     private Section toDomain(final SectionDocument document) {
-        final var spotsById = MongoGatewaySupport.spotsByIds(mongoTemplate, document.spotIds()).stream()
-                .collect(Collectors.toMap(SpotDocument::id, Function.identity()));
+        // Prefer the denormalized parent field (single indexed query);
+        // fall back to the legacy id array for older documents.
+        List<SpotDocument> spotDocuments = MongoGatewaySupport.spotsBySectionId(mongoTemplate, document.id());
+        if (spotDocuments.isEmpty() && document.spotIds() != null && !document.spotIds().isEmpty()) {
+            final var spotsById = MongoGatewaySupport.spotsByIds(mongoTemplate, document.spotIds()).stream()
+                    .collect(Collectors.toMap(SpotDocument::id, Function.identity(),
+                            (first, second) -> first));
+            spotDocuments = document.spotIds().stream()
+                    .map(spotsById::get)
+                    .filter(Objects::nonNull)
+                    .toList();
+        }
         final Set<Spot> spots = new HashSet<>();
-        for (final String spotId : document.spotIds()) {
-            final var spot = spotsById.get(spotId);
-            if (spot != null) {
-                spots.add(spot.toDomain());
-            }
+        for (final SpotDocument spot : spotDocuments) {
+            spots.add(spot.toDomain());
         }
         return document.toDomain(spots);
     }

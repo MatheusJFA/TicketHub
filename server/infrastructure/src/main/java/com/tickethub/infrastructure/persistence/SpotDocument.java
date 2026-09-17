@@ -15,6 +15,9 @@ public record SpotDocument(
         String location,
         boolean available,
         boolean published,
+        String showId,
+        String sectionId,
+        String partnerId,
         Instant createdAt,
         Instant updatedAt,
         Instant deletedAt,
@@ -24,11 +27,19 @@ public record SpotDocument(
     public static final String COLLECTION = "spots";
 
     public static SpotDocument from(final Spot spot) {
+        return from(spot, null, null, null);
+    }
+
+    public static SpotDocument from(final Spot spot, final String showId, final String sectionId,
+            final String partnerId) {
         return new SpotDocument(
                 spot.getId().getValue(),
                 spot.getLocation() == null ? null : spot.getLocation().getValue(),
                 spot.isAvailable(),
                 spot.isPublished(),
+                showId,
+                sectionId,
+                partnerId,
                 spot.getCreatedAt(),
                 spot.getUpdatedAt(),
                 spot.getDeletedAt(),

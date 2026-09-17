@@ -46,7 +46,13 @@ public class SpotMongoGateway implements SpotGateway {
 
     @Override
     public Spot update(final Spot spot) {
-        return mongoTemplate.save(SpotDocument.from(spot), SpotDocument.COLLECTION).toDomain();
+        // Preserve the denormalized ownership links (see SectionMongoGateway.update).
+        final var existing = mongoTemplate.findById(spot.getId().getValue(), SpotDocument.class,
+                SpotDocument.COLLECTION);
+        final var document = existing == null
+                ? SpotDocument.from(spot)
+                : SpotDocument.from(spot, existing.showId(), existing.sectionId(), existing.partnerId());
+        return mongoTemplate.save(document, SpotDocument.COLLECTION).toDomain();
     }
 
     @Override

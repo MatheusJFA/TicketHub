@@ -62,11 +62,59 @@ final class MongoGatewaySupport {
                 SectionDocument.class, SectionDocument.COLLECTION);
     }
 
+    static List<SectionDocument> sectionsByShowId(final MongoTemplate mongoTemplate, final String showId) {
+        if (showId == null || showId.isBlank()) {
+            return List.of();
+        }
+        return mongoTemplate.find(Query.query(Criteria.where("showId").is(showId)),
+                SectionDocument.class, SectionDocument.COLLECTION);
+    }
+
     static List<SpotDocument> spotsByIds(final MongoTemplate mongoTemplate, final List<String> ids) {
         if (ids == null || ids.isEmpty()) {
             return List.of();
         }
         return mongoTemplate.find(Query.query(Criteria.where("_id").in(ids)),
+                SpotDocument.class, SpotDocument.COLLECTION);
+    }
+
+    static List<SpotDocument> spotsByShowId(final MongoTemplate mongoTemplate, final String showId) {
+        if (showId == null || showId.isBlank()) {
+            return List.of();
+        }
+        return mongoTemplate.find(Query.query(Criteria.where("showId").is(showId)),
+                SpotDocument.class, SpotDocument.COLLECTION);
+    }
+
+    static List<SpotDocument> spotsBySectionId(final MongoTemplate mongoTemplate, final String sectionId) {
+        if (sectionId == null || sectionId.isBlank()) {
+            return List.of();
+        }
+        return mongoTemplate.find(Query.query(Criteria.where("sectionId").is(sectionId)),
+                SpotDocument.class, SpotDocument.COLLECTION);
+    }
+
+    static void removeSectionsByShowId(final MongoTemplate mongoTemplate, final String showId) {
+        if (showId == null || showId.isBlank()) {
+            return;
+        }
+        mongoTemplate.remove(Query.query(Criteria.where("showId").is(showId)),
+                SectionDocument.class, SectionDocument.COLLECTION);
+    }
+
+    static void removeSpotsByShowId(final MongoTemplate mongoTemplate, final String showId) {
+        if (showId == null || showId.isBlank()) {
+            return;
+        }
+        mongoTemplate.remove(Query.query(Criteria.where("showId").is(showId)),
+                SpotDocument.class, SpotDocument.COLLECTION);
+    }
+
+    static void removeSpotsBySectionId(final MongoTemplate mongoTemplate, final String sectionId) {
+        if (sectionId == null || sectionId.isBlank()) {
+            return;
+        }
+        mongoTemplate.remove(Query.query(Criteria.where("sectionId").is(sectionId)),
                 SpotDocument.class, SpotDocument.COLLECTION);
     }
 }
