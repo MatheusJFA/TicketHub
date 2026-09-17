@@ -23,7 +23,7 @@ public final class DefaultAddSectionToShowUseCase extends AddSectionToShowUseCas
             final ShowID id = ShowID.from(command.showId());
             final Optional<Show> found = showGateway.findById(id);
 
-            if (!found.isPresent()) {
+            if (found.isEmpty()) {
                 return Either.left(notFound(Show.class.getSimpleName(), id.getValue()));
             }
 
@@ -48,6 +48,12 @@ public final class DefaultAddSectionToShowUseCase extends AddSectionToShowUseCas
                     command.description(),
                     command.totalSpots(),
                     command.price());
+
+            final Notification afterMutation = Notification.create();
+            entity.validate(afterMutation);
+            if (afterMutation.hasError()) {
+                return Either.left(afterMutation);
+            }
 
             final Show updatedShow = showGateway.update(entity);
             final AddSectionToShowOutput output = AddSectionToShowOutput.from(updatedShow);
