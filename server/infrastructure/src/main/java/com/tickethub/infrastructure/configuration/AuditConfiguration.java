@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.slf4j.MDC;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
@@ -15,9 +16,12 @@ import com.tickethub.infrastructure.web.CorrelationIdFilter;
 @Configuration(proxyBeanMethods = false)
 public class AuditConfiguration {
 
-    public AuditConfiguration(final ObjectProvider<AuditTrail> trails) {
-        final AuditTrail trail = trails.getIfAvailable();
-        ApiSupport.configureAuditTrail(trail == null ? AuditTrail.noop() : trail);
+    @Bean
+    public SmartInitializingSingleton auditInstaller(final ObjectProvider<AuditTrail> trails) {
+        return () -> {
+            final AuditTrail trail = trails.getIfAvailable();
+            ApiSupport.configureAuditTrail(trail == null ? AuditTrail.noop() : trail);
+        };
     }
 
     @Bean

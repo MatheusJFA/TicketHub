@@ -3,13 +3,11 @@ package com.tickethub.infrastructure.audit;
 import static java.util.Objects.requireNonNull;
 
 import org.bson.Document;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnBean(MongoTemplate.class)
 @ConditionalOnProperty(value = "tickethub.audit.enabled", havingValue = "true", matchIfMissing = true)
 public class MongoAuditTrail implements AuditTrail {
 

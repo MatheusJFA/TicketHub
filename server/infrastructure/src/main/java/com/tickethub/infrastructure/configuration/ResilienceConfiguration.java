@@ -2,6 +2,7 @@ package com.tickethub.infrastructure.configuration;
 
 import java.time.Duration;
 
+import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,8 +23,9 @@ import io.github.resilience4j.retry.RetryConfig;
 @Configuration(proxyBeanMethods = false)
 public class ResilienceConfiguration {
 
-    public ResilienceConfiguration(final ResiliencePolicy tickethubResiliencePolicy) {
-        ApiSupport.configureResilience(tickethubResiliencePolicy);
+    @Bean
+    public SmartInitializingSingleton resilienceInstaller(final ResiliencePolicy tickethubResiliencePolicy) {
+        return () -> ApiSupport.configureResilience(tickethubResiliencePolicy);
     }
 
     @Bean
