@@ -12,10 +12,12 @@ public abstract class Entity<ID extends Identifier> {
     private final Instant createdAt;
     private Instant updatedAt;
     private Instant deletedAt;
+    private final String createdBy;
+    private String lastModifiedBy;
 
     protected Entity(final ID id) {
         final var now = Instant.now();
-        this(id, now, now, null);
+        this(id, now, now, null, null, null);
     }
 
     protected Entity(
@@ -24,6 +26,17 @@ public abstract class Entity<ID extends Identifier> {
             final Instant updatedAt,
             final Instant deletedAt
     ) {
+        this(id, createdAt, updatedAt, deletedAt, null, null);
+    }
+
+    protected Entity(
+            final ID id,
+            final Instant createdAt,
+            final Instant updatedAt,
+            final Instant deletedAt,
+            final String createdBy,
+            final String lastModifiedBy
+    ) {
         if (id == null) {
             throw new DomainException("'id' should not be null");
         }
@@ -31,6 +44,8 @@ public abstract class Entity<ID extends Identifier> {
         this.createdAt = Objects.requireNonNull(createdAt, "'createdAt' should not be null");
         this.updatedAt = Objects.requireNonNull(updatedAt, "'updatedAt' should not be null");
         this.deletedAt = deletedAt;
+        this.createdBy = createdBy;
+        this.lastModifiedBy = lastModifiedBy;
     }
 
     public ID getId() {
@@ -49,8 +64,21 @@ public abstract class Entity<ID extends Identifier> {
         return deletedAt;
     }
 
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
     protected void markAsUpdated() {
         this.updatedAt = Instant.now();
+    }
+
+    protected void markAsUpdatedBy(final String actor) {
+        this.updatedAt = Instant.now();
+        this.lastModifiedBy = actor;
     }
 
     public void delete() {
