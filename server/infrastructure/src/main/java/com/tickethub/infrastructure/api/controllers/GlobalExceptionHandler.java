@@ -5,8 +5,10 @@ import com.tickethub.infrastructure.api.ApiValidationException;
 import com.tickethub.infrastructure.api.models.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -47,6 +49,11 @@ public class GlobalExceptionHandler {
     ResponseEntity<ErrorResponse> status(ResponseStatusException exception) {
         return ResponseEntity.status(exception.getStatusCode())
                 .body(ErrorResponse.from(exception.getReason()));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    ResponseEntity<ErrorResponse> forbidden(AccessDeniedException exception) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ErrorResponse.from("Access denied"));
     }
 
     @ExceptionHandler(Exception.class)
