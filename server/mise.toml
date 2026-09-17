@@ -9,6 +9,14 @@ run = [
   "java -jar infrastructure/target/infrastructure-0.0.1-SNAPSHOT.jar",
 ]
 
+[tasks.compile]
+description = "Compile every module without running tests"
+run = "mvn -B -ntp compile"
+
+[tasks.compile-watch]
+description = "Recompile automatically on file changes (requires watchexec)"
+run = "mise watch compile"
+
 [tasks.test]
 description = "Run tests in every module, including architecture tests"
 run = "mvn -B -ntp test"
