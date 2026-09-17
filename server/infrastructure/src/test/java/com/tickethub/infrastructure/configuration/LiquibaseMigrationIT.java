@@ -32,9 +32,19 @@ class LiquibaseMigrationIT extends ContainerSupport {
         final var database = factory.getMongoDatabase();
         final var collections = database.listCollectionNames().into(new ArrayList<>());
         assertTrue(collections.containsAll(
-                List.of("customers", "partners", "shows", "sections", "spots", "audit_logs")));
+                List.of("customers", "partners", "shows", "sections", "spots")));
         final var history = database.getCollection("DATABASECHANGELOG");
         assertEquals(8, history.countDocuments());
+        final var appliedIds = history.find()
+                .into(new ArrayList<>())
+                .stream()
+                .map(document -> document.getString("id"))
+                .toList();
+        assertTrue(appliedIds.containsAll(List.of(
+                "001-1-create-customers",
+                "002-1-create-indexes",
+                "003-1-create-audit-logs",
+                "003-2-create-audit-logs-indexes")));
         database.getCollection("customers").insertOne(new Document("_id", "preserved"));
         LiquibaseConfiguration.migrate(client, factory, CHANGELOG);
         assertEquals(8, history.countDocuments());
