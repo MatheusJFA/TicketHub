@@ -22,7 +22,7 @@ public final class DefaultPublishSpotUseCase extends PublishSpotUseCase {
             final SpotID id = SpotID.from(command.id());
             final Optional<Spot> found = spotGateway.findById(id);
 
-            if (!found.isPresent()) {
+            if (found.isEmpty()) {
                 return Either.left(notFound(Spot.class.getSimpleName(), id.getValue()));
             }
 

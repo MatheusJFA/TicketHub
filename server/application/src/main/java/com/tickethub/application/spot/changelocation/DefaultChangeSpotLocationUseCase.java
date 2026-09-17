@@ -22,7 +22,7 @@ public final class DefaultChangeSpotLocationUseCase extends ChangeSpotLocationUs
             final SpotID id = SpotID.from(input.id());
             final Optional<Spot> found = spotGateway.findById(id);
 
-            if (!found.isPresent()) {
+            if (found.isEmpty()) {
                 return Either.left(notFound(Spot.class.getSimpleName(), id.getValue()));
             }
 

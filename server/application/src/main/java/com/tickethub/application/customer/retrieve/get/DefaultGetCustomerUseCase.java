@@ -22,7 +22,7 @@ public final class DefaultGetCustomerUseCase extends GetCustomerUseCase {
             final CustomerID id = CustomerID.from(input);
 
             final Optional<Customer> found = customerGateway.findById(id);
-            if (!found.isPresent()) {
+            if (found.isEmpty()) {
                 return Either.left(notFound(Customer.class.getSimpleName(), id.getValue()));
             }
             

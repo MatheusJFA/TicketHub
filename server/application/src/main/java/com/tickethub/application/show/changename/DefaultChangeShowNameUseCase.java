@@ -21,7 +21,7 @@ public final class DefaultChangeShowNameUseCase extends ChangeShowNameUseCase {
         try {
             final ShowID id = ShowID.from(input.id());
             final Optional<Show> found = showGateway.findById(id);
-            if (!found.isPresent()) {
+            if (found.isEmpty()) {
                 return Either.left(notFound(Show.class.getSimpleName(), id.getValue()));
             }
 

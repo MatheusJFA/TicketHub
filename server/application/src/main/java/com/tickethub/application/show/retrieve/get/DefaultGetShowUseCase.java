@@ -22,7 +22,7 @@ public final class DefaultGetShowUseCase extends GetShowUseCase {
             final ShowID id = ShowID.from(input);
             final Optional<Show> found = showGateway.findById(id);
 
-            if (!found.isPresent()) {
+            if (found.isEmpty()) {
                 return Either.left(notFound(Show.class.getSimpleName(), id.getValue()));
             }
 

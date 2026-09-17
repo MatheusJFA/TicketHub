@@ -22,7 +22,7 @@ public final class DefaultPublishSectionUseCase extends PublishSectionUseCase {
             final SectionID id = SectionID.from(command.id());
 
             final Optional<Section> found = sectionGateway.findById(id);
-            if (!found.isPresent()) {
+            if (found.isEmpty()) {
                 return Either.left(notFound(Section.class.getSimpleName(), id.getValue()));
             }
 

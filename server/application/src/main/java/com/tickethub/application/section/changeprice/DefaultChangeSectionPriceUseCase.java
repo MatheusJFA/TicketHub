@@ -22,7 +22,7 @@ public final class DefaultChangeSectionPriceUseCase extends ChangeSectionPriceUs
             final SectionID id = SectionID.from(input.id());
 
             final Optional<Section> found = sectionGateway.findById(id);
-            if (!found.isPresent()) {
+            if (found.isEmpty()) {
                 return Either.left(notFound(Section.class.getSimpleName(), id.getValue()));
             }
 

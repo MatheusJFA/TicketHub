@@ -22,7 +22,7 @@ public final class DefaultChangeCustomerNameUseCase extends ChangeCustomerNameUs
             final CustomerID id = CustomerID.from(input.id());
 
             final Optional<Customer> found = customerGateway.findById(id);
-            if (!found.isPresent()) {
+            if (found.isEmpty()) {
                 return Either.left(notFound(Customer.class.getSimpleName(), id.getValue()));
             }
 
