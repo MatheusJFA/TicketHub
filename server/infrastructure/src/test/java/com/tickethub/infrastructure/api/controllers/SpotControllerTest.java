@@ -13,7 +13,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.web.servlet.MockMvc;
+import com.tickethub.infrastructure.security.TestTokens;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -22,6 +24,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ControllerTest(controllers = SpotController.class)
 class SpotControllerTest {
     @Autowired MockMvc mvc;
+    @Value("${tickethub.security.jwt.secret}")
+    String jwtSecret;
+
+    private String bearer(final String... authorities) {
+        return "Bearer " + TestTokens.bearer(jwtSecret, authorities);
+    }
     @MockitoBean ChangeSpotLocationUseCase changeSpotLocation;
     @MockitoBean CreateSpotUseCase createSpot;
     @MockitoBean DeleteSpotUseCase deleteSpot;
@@ -34,7 +42,7 @@ class SpotControllerTest {
     void givenAValidCommand_whenCallsCreateSpot_shouldReturnSpotId() throws Exception {
         when(createSpot.execute(any())).thenReturn(Either.right(new CreateSpotOutput("spot-1")));
 
-        mvc.perform(post("/spots").contentType(MediaType.APPLICATION_JSON).content("{\"location\":\"A1\"}"))
+        mvc.perform(post("/spots").header("Authorization", bearer("spot:write")).contentType(MediaType.APPLICATION_JSON).content("{\"location\":\"A1\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/spots/spot-1"))
                 .andExpect(jsonPath("$.id").value("spot-1"));

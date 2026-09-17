@@ -17,7 +17,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.web.servlet.MockMvc;
+import com.tickethub.infrastructure.security.TestTokens;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -26,6 +28,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ControllerTest(controllers = SectionController.class)
 class SectionControllerTest {
     @Autowired MockMvc mvc;
+    @Value("${tickethub.security.jwt.secret}")
+    String jwtSecret;
+
+    private String bearer(final String... authorities) {
+        return "Bearer " + TestTokens.bearer(jwtSecret, authorities);
+    }
     @MockitoBean ChangeSectionDescriptionUseCase changeSectionDescription;
     @MockitoBean ChangeSectionNameUseCase changeSectionName;
     @MockitoBean ChangeSectionPriceUseCase changeSectionPrice;
@@ -42,7 +50,7 @@ class SectionControllerTest {
     void givenAValidCommand_whenCallsCreateSection_shouldReturnSectionId() throws Exception {
         when(createSection.execute(any())).thenReturn(Either.right(new CreateSectionOutput("section-1")));
 
-        mvc.perform(post("/sections").contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(post("/sections").header("Authorization", bearer("section:write")).contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"VIP\",\"description\":\"VIP\",\"totalSpots\":10,\"price\":{\"value\":50.00,\"currency\":\"BRL\"}}"))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/sections/section-1"))

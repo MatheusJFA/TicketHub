@@ -18,7 +18,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.web.servlet.MockMvc;
+import com.tickethub.infrastructure.security.TestTokens;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -27,6 +29,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ControllerTest(controllers = ShowController.class)
 class ShowControllerTest {
     @Autowired MockMvc mvc;
+    @Value("${tickethub.security.jwt.secret}")
+    String jwtSecret;
+
+    private String bearer(final String... authorities) {
+        return "Bearer " + TestTokens.bearer(jwtSecret, authorities);
+    }
     @MockitoBean AddSectionToShowUseCase addSectionToShow;
     @MockitoBean ChangeShowDescriptionUseCase changeShowDescription;
     @MockitoBean ChangeShowNameUseCase changeShowName;
@@ -44,7 +52,7 @@ class ShowControllerTest {
     void givenAValidCommand_whenCallsCreateShow_shouldReturnShowId() throws Exception {
         when(createShow.execute(any())).thenReturn(Either.right(new CreateShowOutput("show-1")));
 
-        mvc.perform(post("/shows").contentType(MediaType.APPLICATION_JSON).content("""
+        mvc.perform(post("/shows").header("Authorization", bearer("show:create")).contentType(MediaType.APPLICATION_JSON).content("""
                 {"partnerId":"partner-1","name":"Show","description":"Concert","date":"2027-01-15T20:00:00-03:00"}
                 """))
                 .andExpect(status().isCreated())

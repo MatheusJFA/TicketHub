@@ -26,6 +26,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.tickethub.infrastructure.security.TestTokens;
+import org.springframework.beans.factory.annotation.Value;
 
 @ControllerTest(controllers = CustomerController.class)
 class CustomerControllerTest {
@@ -35,6 +37,13 @@ class CustomerControllerTest {
     @MockitoBean DeleteCustomerUseCase deleteCustomer;
     @MockitoBean GetCustomerUseCase getCustomer;
     @MockitoBean ListCustomersUseCase listCustomers;
+
+    @Value("${tickethub.security.jwt.secret}")
+    String jwtSecret;
+
+    private String bearer(final String... authorities) {
+        return "Bearer " + TestTokens.bearer(jwtSecret, authorities);
+    }
 
     @Test
     void givenAValidCommand_whenCallsCreateCustomer_shouldReturnCustomerId() throws Exception {
@@ -66,6 +75,7 @@ class CustomerControllerTest {
         when(changeCustomerName.execute(any())).thenReturn(Either.right(new ChangeCustomerNameOutput("customer-1")));
 
         mvc.perform(patch("/customers/customer-1/name").contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", bearer("customer:write"))
                         .content("{\"name\":\"Maria Silva\"}"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.id").value("customer-1"));
     }
@@ -74,7 +84,7 @@ class CustomerControllerTest {
     void givenAValidId_whenCallsDeleteCustomer_shouldReturnNoContent() throws Exception {
         when(deleteCustomer.execute("customer-1")).thenReturn(Either.right(new DeleteCustomerOutput("customer-1")));
 
-        mvc.perform(delete("/customers/customer-1")).andExpect(status().isNoContent());
+        mvc.perform(delete("/customers/customer-1").header("Authorization", bearer("customer:delete"))).andExpect(status().isNoContent());
         verify(deleteCustomer).execute("customer-1");
     }
 
@@ -82,7 +92,7 @@ class CustomerControllerTest {
     void givenValidParams_whenCallsListCustomers_shouldReturnCustomers() throws Exception {
         when(listCustomers.execute(any())).thenReturn(Either.right(new Pagination<>(0, 10, 0, List.of())));
 
-        mvc.perform(get("/customers").param("search", "maria").param("sort", "name").param("dir", "asc"))
+        mvc.perform(get("/customers").header("Authorization", bearer("customer:write")).param("search", "maria").param("sort", "name").param("dir", "asc"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.items").isArray());
     }
 }
