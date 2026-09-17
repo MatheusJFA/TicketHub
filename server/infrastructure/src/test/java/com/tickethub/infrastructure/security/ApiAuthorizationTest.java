@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,13 +23,21 @@ import com.tickethub.infrastructure.api.SpotAPI;
 class ApiAuthorizationTest {
 
     private static final Pattern AUTHORITY = Pattern.compile("hasAuthority\\('([^']+)'\\)");
+    private static final Pattern BEAN_CALL = Pattern.compile("@([a-zA-Z]+)\\.([a-zA-Z]+)\\(");
+
+    private static final Map<String, Set<String>> BEAN_METHODS = Map.of(
+            "showAccess", Set.of("canCreate", "canWrite", "canPublish", "canDelete"),
+            "ownerAccess", Set.of("isSelfOrAdmin"));
+
+    private static final Set<String> ROLES = Set.of("ADMIN");
 
     @Test
-    void everyAuthorityUsedInPreAuthorizeExistsInPermissions() {
-        final var known = Arrays.stream(Permission.values())
+    void everyPreAuthorizeExpressionUsesKnownAuthoritiesBeansAndRoles() {
+        final var knownAuthorities = Arrays.stream(Permission.values())
                 .map(Permission::authority)
                 .collect(Collectors.toSet());
-        final var used = new HashSet<String>();
+        final var unknown = new HashSet<String>();
+        var expressions = 0;
         for (final Class<?> api : Set.of(CustomerAPI.class, PartnerAPI.class, ShowAPI.class,
                 SectionAPI.class, SpotAPI.class)) {
             for (final Method method : api.getDeclaredMethods()) {
@@ -36,14 +45,30 @@ class ApiAuthorizationTest {
                 if (authorize == null) {
                     continue;
                 }
-                final Matcher matcher = AUTHORITY.matcher(authorize.value());
-                assertTrue(matcher.find(),
-                        "Unsupported expression in " + api.getSimpleName() + "#" + method.getName());
-                used.add(matcher.group(1));
+                expressions++;
+                final String value = authorize.value();
+                final Matcher authorities = AUTHORITY.matcher(value);
+                while (authorities.find()) {
+                    if (!knownAuthorities.contains(authorities.group(1))) {
+                        unknown.add(authorities.group(1));
+                    }
+                }
+                final Matcher beans = BEAN_CALL.matcher(value);
+                while (beans.find()) {
+                    final var allowed = BEAN_METHODS.get(beans.group(1));
+                    if (allowed == null || !allowed.contains(beans.group(2))) {
+                        unknown.add(beans.group(0));
+                    }
+                }
+                if (value.contains("hasRole(")) {
+                    final var role = value.replaceAll(".*hasRole\\('([^']+)'\\).*", "$1");
+                    if (!ROLES.contains(role)) {
+                        unknown.add(role);
+                    }
+                }
             }
         }
-        final var unknown = used.stream().filter(authority -> !known.contains(authority)).toList();
-        assertTrue(unknown.isEmpty(), "Unknown authorities: " + unknown);
-        assertTrue(used.contains("show:create"));
+        assertTrue(expressions > 0, "Expected @PreAuthorize expressions");
+        assertTrue(unknown.isEmpty(), "Unknown authorities, beans or roles: " + unknown);
     }
 }

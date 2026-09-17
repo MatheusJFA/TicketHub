@@ -14,6 +14,7 @@ import com.tickethub.application.show.retrieve.list.*;
 import com.tickethub.application.show.unpublish.*;
 import com.tickethub.application.show.unpublishall.*;
 import com.tickethub.infrastructure.ControllerTest;
+import com.tickethub.infrastructure.security.ShowAccess;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -33,7 +34,7 @@ class ShowControllerTest {
     String jwtSecret;
 
     private String bearer(final String... authorities) {
-        return "Bearer " + TestTokens.bearer(jwtSecret, authorities);
+        return "Bearer " + TestTokens.bearer(jwtSecret, "partner-1", authorities);
     }
     @MockitoBean AddSectionToShowUseCase addSectionToShow;
     @MockitoBean ChangeShowDescriptionUseCase changeShowDescription;
@@ -47,10 +48,12 @@ class ShowControllerTest {
     @MockitoBean ListShowsUseCase listShows;
     @MockitoBean UnpublishShowUseCase unpublishShow;
     @MockitoBean UnpublishAllShowUseCase unpublishAllShow;
+    @MockitoBean(name = "showAccess") ShowAccess showAccess;
 
     @Test
     void givenAValidCommand_whenCallsCreateShow_shouldReturnShowId() throws Exception {
         when(createShow.execute(any())).thenReturn(Either.right(new CreateShowOutput("show-1")));
+        when(showAccess.canCreate("partner-1")).thenReturn(true);
 
         mvc.perform(post("/shows").header("Authorization", bearer("show:create")).contentType(MediaType.APPLICATION_JSON).content("""
                 {"partnerId":"partner-1","name":"Show","description":"Concert","date":"2027-01-15T20:00:00-03:00"}

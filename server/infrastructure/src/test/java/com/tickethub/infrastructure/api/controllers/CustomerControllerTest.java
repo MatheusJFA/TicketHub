@@ -3,6 +3,7 @@ package com.tickethub.infrastructure.api.controllers;
 import com.tickethub.application.Either;
 import com.tickethub.application.customer.changename.ChangeCustomerNameOutput;
 import com.tickethub.application.customer.changename.ChangeCustomerNameUseCase;
+import com.tickethub.application.customer.create.CreateCustomerCommand;
 import com.tickethub.application.customer.create.CreateCustomerOutput;
 import com.tickethub.application.customer.create.CreateCustomerUseCase;
 import com.tickethub.application.customer.delete.DeleteCustomerOutput;
@@ -13,6 +14,7 @@ import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.Notification;
 import com.tickethub.infrastructure.ControllerTest;
+import com.tickethub.infrastructure.security.OwnerAccess;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -37,12 +39,13 @@ class CustomerControllerTest {
     @MockitoBean DeleteCustomerUseCase deleteCustomer;
     @MockitoBean GetCustomerUseCase getCustomer;
     @MockitoBean ListCustomersUseCase listCustomers;
+    @MockitoBean(name = "ownerAccess") OwnerAccess ownerAccess;
 
     @Value("${tickethub.security.jwt.secret}")
     String jwtSecret;
 
-    private String bearer(final String... authorities) {
-        return "Bearer " + TestTokens.bearer(jwtSecret, authorities);
+    private String bearer(final String ownerId, final String... authorities) {
+        return "Bearer " + TestTokens.bearer(jwtSecret, ownerId, authorities);
     }
 
     @Test
@@ -57,7 +60,7 @@ class CustomerControllerTest {
                 .andExpect(header().string("Location", "/customers/customer-1"))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value("customer-1"));
-        verify(createCustomer).execute(new com.tickethub.application.customer.create.CreateCustomerCommand("52998224725", "Maria"));
+        verify(createCustomer).execute(new CreateCustomerCommand("52998224725", "Maria"));
     }
 
     @Test
@@ -73,9 +76,10 @@ class CustomerControllerTest {
     @Test
     void givenAValidCommand_whenCallsChangeName_shouldReturnCustomerId() throws Exception {
         when(changeCustomerName.execute(any())).thenReturn(Either.right(new ChangeCustomerNameOutput("customer-1")));
+        when(ownerAccess.isSelfOrAdmin("customer-1")).thenReturn(true);
 
         mvc.perform(patch("/customers/customer-1/name").contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization", bearer("customer:write"))
+                        .header("Authorization", bearer("customer-1", "customer:write"))
                         .content("{\"name\":\"Maria Silva\"}"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.id").value("customer-1"));
     }
@@ -83,8 +87,9 @@ class CustomerControllerTest {
     @Test
     void givenAValidId_whenCallsDeleteCustomer_shouldReturnNoContent() throws Exception {
         when(deleteCustomer.execute("customer-1")).thenReturn(Either.right(new DeleteCustomerOutput("customer-1")));
+        when(ownerAccess.isSelfOrAdmin("customer-1")).thenReturn(true);
 
-        mvc.perform(delete("/customers/customer-1").header("Authorization", bearer("customer:delete"))).andExpect(status().isNoContent());
+        mvc.perform(delete("/customers/customer-1").header("Authorization", bearer("customer-1", "customer:delete"))).andExpect(status().isNoContent());
         verify(deleteCustomer).execute("customer-1");
     }
 
@@ -92,7 +97,30 @@ class CustomerControllerTest {
     void givenValidParams_whenCallsListCustomers_shouldReturnCustomers() throws Exception {
         when(listCustomers.execute(any())).thenReturn(Either.right(new Pagination<>(0, 10, 0, List.of())));
 
-        mvc.perform(get("/customers").header("Authorization", bearer("customer:write")).param("search", "maria").param("sort", "name").param("dir", "asc"))
+        mvc.perform(get("/customers").header("Authorization", bearer(null, "ROLE_ADMIN")).param("search", "maria").param("sort", "name").param("dir", "asc"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.items").isArray());
+    }
+
+    @Test
+    void givenAnotherAccount_whenCallsDeleteCustomer_thenReturnsForbidden() throws Exception {
+        mvc.perform(delete("/customers/customer-1")
+                        .header("Authorization", bearer("customer-9", "customer:delete")))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void givenAdmin_whenCallsDeleteAnotherCustomer_thenReturnsNoContent() throws Exception {
+        when(deleteCustomer.execute("customer-1")).thenReturn(Either.right(new DeleteCustomerOutput("customer-1")));
+
+        when(ownerAccess.isSelfOrAdmin("customer-1")).thenReturn(true);
+
+        mvc.perform(delete("/customers/customer-1").header("Authorization", bearer(null, "ROLE_ADMIN", "customer:delete")))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void givenCustomer_whenCallsListCustomers_thenReturnsForbidden() throws Exception {
+        mvc.perform(get("/customers").header("Authorization", bearer("customer-1", "customer:write")))
+                .andExpect(status().isForbidden());
     }
 }
