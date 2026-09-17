@@ -19,9 +19,10 @@ public final class DefaultPublishShowUseCase extends PublishShowUseCase {
     @Override
     public Either<Notification, PublishShowOutput> execute(final PublishShowCommand command) {
         try {
-            final Optional<Show> found = showGateway.findById(ShowID.from(command.id()));
+            final ShowID id = ShowID.from(command.id());
+            final Optional<Show> found = showGateway.findById(id);
 
-            if (!found.isPresent()) {
+            if (found.isEmpty()) {
                 return Either.left(notFound(Show.class.getSimpleName(), id.getValue()));
             }
 
@@ -29,7 +30,6 @@ public final class DefaultPublishShowUseCase extends PublishShowUseCase {
 
             final Notification notification = Notification.create();
             entity.validate(notification);
-
             if (notification.hasError()) {
                 return Either.left(notification);
             }

@@ -19,9 +19,10 @@ public final class DefaultUnpublishAllSectionUseCase extends UnpublishAllSection
     @Override
     public Either<Notification, UnpublishAllSectionOutput> execute(final UnpublishAllSectionCommand command) {
         try {
-            final Optional<Section> found = sectionGateway.findById(SectionID.from(command.id()));
+            final SectionID id = SectionID.from(command.id());
+            final Optional<Section> found = sectionGateway.findById(id);
 
-            if (!found.isPresent()) {
+            if (found.isEmpty()) {
                 return Either.left(notFound(Section.class.getSimpleName(), id.getValue()));
             }
 

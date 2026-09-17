@@ -19,9 +19,10 @@ public final class DefaultChangePartnerNameUseCase extends ChangePartnerNameUseC
     @Override
     public Either<Notification, ChangePartnerNameOutput> execute(final ChangePartnerNameCommand input) {
         try {
-            final Optional<Partner> found = partnerGateway.findById(PartnerID.from(input.id()));
+            final PartnerID id = PartnerID.from(input.id());
+            final Optional<Partner> found = partnerGateway.findById(id);
 
-            if (!found.isPresent()) {
+            if (found.isEmpty()) {
                 return Either.left(notFound(Partner.class.getSimpleName(), id.getValue()));
             }
 
