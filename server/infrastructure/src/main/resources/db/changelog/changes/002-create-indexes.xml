@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd
+                   http://www.liquibase.org/xml/ns/dbchangelog-ext https://www.liquibase.org/xml/ns/dbchangelog-ext.xsd">
+    <changeSet id="002-1-create-indexes" author="tickethub">
+        <ext:createIndex collectionName="customers">
+            <ext:keys>{ "cpf": 1 }</ext:keys>
+            <ext:options>{ "unique": true, "name": "uq_customers_cpf" }</ext:options>
+        </ext:createIndex>
+        <ext:createIndex collectionName="partners">
+            <ext:keys>{ "cnpj": 1 }</ext:keys>
+            <ext:options>{ "unique": true, "name": "uq_partners_cnpj" }</ext:options>
+        </ext:createIndex>
+        <ext:createIndex collectionName="shows">
+            <ext:keys>{ "partnerId": 1 }</ext:keys>
+            <ext:options>{ "name": "idx_shows_partnerId" }</ext:options>
+        </ext:createIndex>
+        <ext:createIndex collectionName="sections">
+            <ext:keys>{ "showId": 1 }</ext:keys>
+            <ext:options>{ "name": "idx_sections_showId" }</ext:options>
+        </ext:createIndex>
+        <ext:createIndex collectionName="spots">
+            <ext:keys>{ "sectionId": 1 }</ext:keys>
+            <ext:options>{ "name": "idx_spots_sectionId" }</ext:options>
+        </ext:createIndex>
+    </changeSet>
+</databaseChangeLog>
