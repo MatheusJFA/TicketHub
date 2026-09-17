@@ -2,6 +2,7 @@ package com.tickethub.domain.core.section;
 
 import static java.util.Objects.isNull;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,8 +27,9 @@ public class Section extends Entity<SectionID> {
     private final Set<Spot> spots;
 
     private Section(SectionID id, Name name, Text description, boolean isPublished, long totalSpots,
-            long totalSpotsSold, Money price, Set<Spot> spots) {
-        super(id);
+            long totalSpotsSold, Money price, Set<Spot> spots,
+            Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
+        super(id, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
         this.name = name;
         this.description = description;
         this.isPublished = isPublished;
@@ -41,8 +43,9 @@ public class Section extends Entity<SectionID> {
             long totalSpotsSold, Money price, Set<Spot> spots) {
         final SectionID id = SectionID.generate();
         final Set<Spot> spotList = isNull(spots) ? new HashSet<>() : new HashSet<>(spots);
+        final var now = Instant.now();
         return new Section(id, Name.create(name), Text.create(description), isPublished, totalSpots, totalSpotsSold,
-                price, spotList);
+                price, spotList, now, now, null, null, null);
     }
 
     public static Section create(String name, String description, long totalSpots, Money price) {
@@ -51,10 +54,19 @@ public class Section extends Entity<SectionID> {
         }
         final SectionID id = SectionID.generate();
         final Set<Spot> spots = generateSpots(totalSpots);
+        final var now = Instant.now();
         final Section section = new Section(id, Name.create(name), Text.create(description), false, totalSpots, 0,
-                price, spots);
+                price, spots, now, now, null, null, null);
 
         return section;
+    }
+
+    public static Section reconstitute(SectionID id, Name name, Text description, boolean isPublished, long totalSpots,
+            long totalSpotsSold, Money price, Set<Spot> spots,
+            Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
+        final Set<Spot> spotList = isNull(spots) ? new HashSet<>() : new HashSet<>(spots);
+        return new Section(id, name, description, isPublished, totalSpots, totalSpotsSold,
+                price, spotList, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
     }
 
     private static Set<Spot> generateSpots(long totalSpots) {

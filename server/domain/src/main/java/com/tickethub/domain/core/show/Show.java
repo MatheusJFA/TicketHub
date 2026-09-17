@@ -2,6 +2,7 @@ package com.tickethub.domain.core.show;
 
 import static java.util.Objects.isNull;
 
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.HashSet;
@@ -35,8 +36,9 @@ public class Show extends AggregateRoot<ShowID> {
 
     private Show(ShowID id, Name name, Text description, OffsetDateTime date, Address address, boolean isPublished, long totalSpots,
             long totalSpotsSold,
-            PartnerID partnerId, Set<Section> sections) {
-        super(id);
+            PartnerID partnerId, Set<Section> sections,
+            Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
+        super(id, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
         this.name = name;
         this.description = description;
         this.date = date;
@@ -53,8 +55,9 @@ public class Show extends AggregateRoot<ShowID> {
             long totalSpotsSold, PartnerID partnerId, Set<Section> sections) {
         final ShowID id = ShowID.generate();
         final Set<Section> sectionList = isNull(sections) ? new HashSet<>() : new HashSet<>(sections);
+        final var now = Instant.now();
         return new Show(id, Name.create(name), Text.create(description), date, address, isPublished, totalSpots, totalSpotsSold,
-                partnerId, sectionList);
+                partnerId, sectionList, now, now, null, null, null);
     }
 
     public static Show create(String name, String description, OffsetDateTime date, Address address, long totalSpots,
@@ -62,15 +65,25 @@ public class Show extends AggregateRoot<ShowID> {
             Set<Section> sections) {
         final ShowID id = ShowID.generate();
         final Set<Section> sectionList = isNull(sections) ? new HashSet<>() : new HashSet<>(sections);
+        final var now = Instant.now();
         return new Show(id, Name.create(name), Text.create(description), date, address, false, totalSpots, 0, partnerId,
-                sectionList);
+                sectionList, now, now, null, null, null);
     }
 
     public static Show create(String name, String description, OffsetDateTime date, Address address, long totalSpots,
             PartnerID partnerId) {
         final ShowID id = ShowID.generate();
+        final var now = Instant.now();
         return new Show(id, Name.create(name), Text.create(description), date, address, false, totalSpots, 0, partnerId,
-                new HashSet<>());
+                new HashSet<>(), now, now, null, null, null);
+    }
+
+    public static Show reconstitute(ShowID id, Name name, Text description, OffsetDateTime date, Address address,
+            boolean isPublished, long totalSpots, long totalSpotsSold, PartnerID partnerId, Set<Section> sections,
+            Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
+        final Set<Section> sectionList = isNull(sections) ? new HashSet<>() : new HashSet<>(sections);
+        return new Show(id, name, description, date, address, isPublished, totalSpots, totalSpotsSold,
+                partnerId, sectionList, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
     }
 
     public void addSection(String name, String description, long totalSpots, Money price) {

@@ -1,5 +1,6 @@
 package com.tickethub.domain.core.partner;
 
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import static java.util.Objects.isNull;
 
@@ -16,8 +17,9 @@ public class Partner extends AggregateRoot<PartnerID> {
     private final CNPJ cnpj;
     private Address address;
 
-    private Partner(PartnerID id, Name name, CNPJ cnpj, Address address) {
-        super(id);
+    private Partner(PartnerID id, Name name, CNPJ cnpj, Address address,
+            Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
+        super(id, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
         this.name = name;
         this.cnpj = cnpj;
         this.address = requireAddress(address);
@@ -25,7 +27,13 @@ public class Partner extends AggregateRoot<PartnerID> {
 
     public static Partner create(String name, String cnpj, Address address) {
         final PartnerID id = PartnerID.generate();
-        return new Partner(id, Name.create(name), CNPJ.create(cnpj), address);
+        final var now = Instant.now();
+        return new Partner(id, Name.create(name), CNPJ.create(cnpj), address, now, now, null, null, null);
+    }
+
+    public static Partner reconstitute(PartnerID id, Name name, CNPJ cnpj, Address address,
+            Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
+        return new Partner(id, name, cnpj, address, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
     }
 
     public Show createShow(String name, String description, OffsetDateTime date, Address address, long totalSpots) {
