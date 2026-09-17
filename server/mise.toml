@@ -19,7 +19,7 @@ alias = "verify"
 run = "mvn -B -ntp verify"
 
 [tasks.integration]
-description = "Verify all modules and test real MongoDB and Kafka connections (start Compose dependencies first)"
+description = "Verify all modules and test real MongoDB and Kafka via Testcontainers (requires Docker)"
 run = "mvn -B -ntp -Pintegration verify"
 
 [tasks.install]

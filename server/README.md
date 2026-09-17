@@ -78,13 +78,13 @@ O grupo padrão é `tickethub`, configurável por `KAFKA_CONSUMER_GROUP`. Novos 
 
 As configurações seguem os mecanismos oficiais do Spring: [KafkaAdmin e tópicos](https://docs.spring.io/spring-kafka/reference/kafka/configuring-topics.html) e [customização do cliente MongoDB](https://docs.spring.io/spring-boot/4.0/api/java/org/springframework/boot/mongodb/autoconfigure/MongoClientSettingsBuilderCustomizer.html).
 
-Para validar as conexões reais, inicie as dependências na raiz:
+Para validar as conexões reais, basta ter o Docker disponível — os testes sobem MongoDB e Kafka próprios com Testcontainers, sem depender do Compose:
 
 ```shell
-docker-compose up -d --wait mongo kafka
+mise run integration
 ```
 
-Depois, em `server`, execute `mise run integration`. O perfil Maven `integration` executa os testes `*IT` pelo Failsafe: gravação, leitura e exclusão com `MongoTemplate`, criação de tópico e envio/consumo com os clientes Spring Kafka. Os testes usam coleção e tópico com nomes únicos e os removem ao terminar. `mise run test` e `mise run build` continuam sem exigir serviços externos.
+O comando executa em `server` o equivalente a `mvn -B -ntp -Pintegration verify`. O perfil Maven `integration` executa os testes `*IT` pelo Failsafe, filtrados pelas tags `integrationTest` e `e2eTest` (o Surefire os exclui da fase `test`). Se o Docker estiver indisponível, os testes de container são ignorados. Cobertura: gravação, leitura e exclusão com `MongoTemplate`, criação de tópico e envio/consumo com os clientes Spring Kafka, migrações Liquibase, persistência da trilha de auditoria e o fluxo HTTP de ponta a ponta (login, 401/503 e auditoria). Os testes usam coleção e tópico com nomes únicos e os removem ao terminar; a coleção `audit_logs` é limpa antes de cada teste. `mise run test` e `mise run build` continuam sem exigir serviços externos.
 
 ## Migrações com Liquibase
 
