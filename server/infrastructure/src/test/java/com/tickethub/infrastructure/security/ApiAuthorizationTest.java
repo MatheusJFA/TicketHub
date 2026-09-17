@@ -26,7 +26,9 @@ class ApiAuthorizationTest {
     private static final Pattern BEAN_CALL = Pattern.compile("@([a-zA-Z]+)\\.([a-zA-Z]+)\\(");
 
     private static final Map<String, Set<String>> BEAN_METHODS = Map.of(
-            "showAccess", Set.of("canCreate", "canWrite", "canPublish", "canDelete"),
+            "showAccess", Set.of("canCreate", "canWrite", "canPublish", "canDelete",
+                    "canWriteSection", "canPublishSection", "canDeleteSection",
+                    "canWriteSpot", "canPublishSpot", "canDeleteSpot"),
             "ownerAccess", Set.of("isSelfOrAdmin"));
 
     private static final Set<String> ROLES = Set.of("ADMIN");

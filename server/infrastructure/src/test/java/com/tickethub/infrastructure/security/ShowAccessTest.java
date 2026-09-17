@@ -23,11 +23,15 @@ import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.core.show.Show;
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.show.ShowID;
+import com.tickethub.infrastructure.persistence.SectionDocument;
+import com.tickethub.infrastructure.persistence.SpotDocument;
 
 class ShowAccessTest {
 
     private final ShowGateway gateway = mock(ShowGateway.class);
-    private final ShowAccess access = new ShowAccess(gateway);
+    private final org.springframework.data.mongodb.core.MongoTemplate mongoTemplate =
+            mock(org.springframework.data.mongodb.core.MongoTemplate.class);
+    private final ShowAccess access = new ShowAccess(gateway, mongoTemplate);
 
     @AfterEach
     void clearContext() {
@@ -102,5 +106,73 @@ class ShowAccessTest {
     @Test
     void givenAnonymous_whenCanWrite_thenReturnsFalse() {
         assertFalse(access.canWrite("show-1"));
+    }
+
+    private static SectionDocument sectionOwnedBy(final String sectionId, final String partnerId) {
+        return new SectionDocument(sectionId, "VIP", "Front", false, 2, 0, null, List.of(),
+                "show-1", partnerId, Instant.now(), Instant.now(), null, null, null);
+    }
+
+    private static SpotDocument spotOwnedBy(final String spotId, final String partnerId) {
+        return new SpotDocument(spotId, "A1", true, false, "show-1", "section-1", partnerId,
+                Instant.now(), Instant.now(), null, null, null);
+    }
+
+    @Test
+    void givenOwner_whenCanWriteSection_thenReturnsTrueWithSingleRead() {
+        authenticateAsPartner("partner-1");
+        when(mongoTemplate.findById("section-1", SectionDocument.class, SectionDocument.COLLECTION))
+                .thenReturn(sectionOwnedBy("section-1", "partner-1"));
+
+        assertTrue(access.canWriteSection("section-1"));
+    }
+
+    @Test
+    void givenAnotherPartner_whenCanWriteSection_thenReturnsFalse() {
+        authenticateAsPartner("partner-9");
+        when(mongoTemplate.findById("section-1", SectionDocument.class, SectionDocument.COLLECTION))
+                .thenReturn(sectionOwnedBy("section-1", "partner-1"));
+
+        assertFalse(access.canWriteSection("section-1"));
+        assertFalse(access.canPublishSection("section-1"));
+        assertFalse(access.canDeleteSection("section-1"));
+    }
+
+    @Test
+    void givenOrphanSection_whenCanWriteSection_thenReturnsFalse() {
+        authenticateAsPartner("partner-1");
+        when(mongoTemplate.findById("section-1", SectionDocument.class, SectionDocument.COLLECTION))
+                .thenReturn(new SectionDocument("section-1", "VIP", "Front", false, 0, 0, null, List.of(),
+                        null, null, Instant.now(), Instant.now(), null, null, null));
+        when(mongoTemplate.findOne(any(), any(), any())).thenReturn(null);
+
+        assertFalse(access.canWriteSection("section-1"));
+    }
+
+    @Test
+    void givenOwner_whenCanWriteSpot_thenReturnsTrueWithSingleRead() {
+        authenticateAsPartner("partner-1");
+        when(mongoTemplate.findById("spot-1", SpotDocument.class, SpotDocument.COLLECTION))
+                .thenReturn(spotOwnedBy("spot-1", "partner-1"));
+
+        assertTrue(access.canWriteSpot("spot-1"));
+    }
+
+    @Test
+    void givenAnotherPartner_whenCanPublishSpot_thenReturnsFalse() {
+        authenticateAsPartner("partner-9");
+        when(mongoTemplate.findById("spot-1", SpotDocument.class, SpotDocument.COLLECTION))
+                .thenReturn(spotOwnedBy("spot-1", "partner-1"));
+
+        assertFalse(access.canPublishSpot("spot-1"));
+        assertFalse(access.canDeleteSpot("spot-1"));
+    }
+
+    @Test
+    void givenAdmin_whenCanWriteSectionOrSpot_thenReturnsTrueWithoutLookup() {
+        authenticateAsAdmin();
+
+        assertTrue(access.canWriteSection("any-section"));
+        assertTrue(access.canWriteSpot("any-spot"));
     }
 }
