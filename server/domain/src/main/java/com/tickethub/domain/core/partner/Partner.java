@@ -5,12 +5,13 @@ import static java.util.Objects.isNull;
 
 import com.tickethub.domain.AggregateRoot;
 import com.tickethub.domain.core.show.Show;
+import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.shared.CNPJ;
 import com.tickethub.domain.shared.Name;
 import com.tickethub.domain.validation.ValidationHandler;
 
-public class Partner extends AggregateRoot<PartnerID> implements Cloneable {
+public class Partner extends AggregateRoot<PartnerID> {
     private Name name;
     private final CNPJ cnpj;
     private Address address;
@@ -45,7 +46,7 @@ public class Partner extends AggregateRoot<PartnerID> implements Cloneable {
 
     private static Address requireAddress(final Address address) {
         if (isNull(address)) {
-            throw new com.tickethub.domain.exception.DomainException("'address' should not be null");
+            throw new DomainException("'address' should not be null");
         }
         return address;
     }
@@ -66,10 +67,5 @@ public class Partner extends AggregateRoot<PartnerID> implements Cloneable {
     public void validate(final ValidationHandler handler) {
         final var validator = new PartnerValidator(this, handler);
         validator.validate();
-    }
-
-    @Override
-    public Partner clone() throws CloneNotSupportedException {
-        return (Partner) super.clone();
     }
 }

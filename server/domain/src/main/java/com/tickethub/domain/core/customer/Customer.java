@@ -5,7 +5,7 @@ import com.tickethub.domain.shared.CPF;
 import com.tickethub.domain.shared.Name;
 import com.tickethub.domain.validation.ValidationHandler;
 
-public class Customer extends AggregateRoot<CustomerID> implements Cloneable {
+public class Customer extends AggregateRoot<CustomerID> {
     private final CPF cpf;
     private Name name;
 
@@ -41,10 +41,5 @@ public class Customer extends AggregateRoot<CustomerID> implements Cloneable {
     public void validate(final ValidationHandler handler) {
         final var validator = new CustomerValidator(this, handler);
         validator.validate();
-    }
-
-    @Override
-    public Customer clone() throws CloneNotSupportedException {
-        return (Customer) super.clone();
     }
 }

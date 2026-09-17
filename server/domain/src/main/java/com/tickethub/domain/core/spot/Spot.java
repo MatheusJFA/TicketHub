@@ -1,9 +1,10 @@
 package com.tickethub.domain.core.spot;
 
 import com.tickethub.domain.Entity;
+import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.shared.Location;
 
-public class Spot extends Entity<SpotID> implements Cloneable {
+public class Spot extends Entity<SpotID> {
     private Location location;
     private boolean isAvailable;
     private boolean isPublished;
@@ -42,7 +43,7 @@ public class Spot extends Entity<SpotID> implements Cloneable {
 
     public Spot changeLocation(final Location location) {
         if (location == null) {
-            throw new com.tickethub.domain.exception.DomainException("'location' should not be null");
+            throw new DomainException("'location' should not be null");
         }
         this.location = location;
         markAsUpdated();
@@ -59,11 +60,6 @@ public class Spot extends Entity<SpotID> implements Cloneable {
 
     public boolean isPublished() {
         return isPublished;
-    }
-
-    @Override
-    public Spot clone() throws CloneNotSupportedException {
-        return (Spot) super.clone();
     }
 
 }
