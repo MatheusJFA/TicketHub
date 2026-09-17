@@ -2,6 +2,8 @@ package com.tickethub.domain.shared;
 
 import static java.util.Objects.isNull;
 
+import java.util.Objects;
+
 import com.tickethub.domain.ValueObject;
 import com.tickethub.domain.exception.DomainException;
 
@@ -37,12 +39,12 @@ public final class Text extends ValueObject {
 
     @Override
     public boolean equals(Object other) {
-        return other instanceof Text text && value.equals(text.value);
+        return other instanceof Text text && Objects.equals(value, text.value);
     }
 
     @Override
     public int hashCode() {
-        return value.hashCode();
+        return Objects.hashCode(value);
     }
 
     @Override
