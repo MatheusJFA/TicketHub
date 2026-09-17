@@ -54,24 +54,25 @@ class SpotE2ETest extends ContainerSupport {
     }
 
     @Test
-    void givenAdminToken_whenCreateSpotWithoutPersistence_thenReturns503AndAudits() throws Exception {
+    void givenAdminToken_whenCreateSpot_thenPersistsAndAudits() throws Exception {
         mvc.perform(post("/spots")
                         .header("Authorization", "Bearer " + adminToken())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"location\":\"A1\"}"))
-                .andExpect(status().isServiceUnavailable());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").exists());
 
         final var entries = mongoTemplate.findAll(Document.class, MongoAuditTrail.COLLECTION);
         assertEquals(1, entries.size());
         final var entry = entries.get(0);
         assertEquals("DefaultCreateSpotUseCase", entry.getString("action"));
-        assertEquals("UNAVAILABLE", entry.getString("outcome"));
+        assertEquals("SUCCESS", entry.getString("outcome"));
         assertEquals("admin", entry.getString("actor"));
     }
 
     @Test
-    void givenPublicCatalog_whenListSpotsWithoutPersistence_thenReturns503() throws Exception {
+    void givenPublicCatalog_whenListSpots_thenSucceeds() throws Exception {
         mvc.perform(get("/spots"))
-                .andExpect(status().isServiceUnavailable());
+                .andExpect(status().isOk());
     }
 }
