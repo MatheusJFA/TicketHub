@@ -1,0 +1,125 @@
+package com.tickethub.infrastructure.persistence;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.util.Currency;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+
+import com.tickethub.domain.core.partner.PartnerID;
+import com.tickethub.domain.core.show.Show;
+import com.tickethub.domain.pagination.SearchQuery;
+import com.tickethub.domain.shared.Address;
+import com.tickethub.domain.shared.Money;
+import com.tickethub.infrastructure.ContainerSupport;
+import com.tickethub.infrastructure.IntegrationTest;
+import com.tickethub.infrastructure.MongoCleanUpExtension;
+
+@IntegrationTest
+class ShowMongoGatewayIT extends ContainerSupport {
+
+    private static final Address ADDRESS = Address.create("Rua do Rock", "s/n", null, "Barra da Tijuca",
+            "Rio de Janeiro", "RJ", "Brasil", "22640-100");
+    private static final Money PRICE = Money.create(new BigDecimal("350.00"), Currency.getInstance("BRL"));
+    private static final OffsetDateTime DATE = OffsetDateTime.parse("2027-01-15T20:00:00-03:00");
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
+    @Autowired
+    private ShowMongoGateway gateway;
+
+    @BeforeEach
+    void cleanUp() {
+        MongoCleanUpExtension.cleanCollections(mongoTemplate,
+                ShowDocument.COLLECTION, SectionDocument.COLLECTION, SpotDocument.COLLECTION);
+    }
+
+    private long count(final String collection) {
+        return mongoTemplate.count(new Query(), collection);
+    }
+
+    private Show sample() {
+        final var show = Show.create("Rock in Rio", "Festival", DATE, ADDRESS, 4, PartnerID.generate());
+        show.addSection("Pista Premium", "Perto do palco", 2, PRICE);
+        show.addSection("Camarote", "Open bar", 2, PRICE);
+        return show;
+    }
+
+    @Test
+    void givenAShowWithSections_whenCreate_thenBulkPersistsWholeGraph() {
+        final var show = sample();
+
+        gateway.create(show);
+
+        assertEquals(1, count(ShowDocument.COLLECTION));
+        assertEquals(2, count(SectionDocument.COLLECTION));
+        assertEquals(4, count(SpotDocument.COLLECTION));
+
+        final var found = gateway.findById(show.getId()).orElseThrow();
+        assertEquals("Rock in Rio", found.getName().getValue());
+        assertEquals("Festival", found.getDescription().getValue());
+        assertEquals(DATE, found.getDate());
+        assertEquals("Rua do Rock", found.getAddress().getStreet());
+        assertEquals(show.getPartnerId(), found.getPartnerId());
+        assertEquals(2, found.getSections().size());
+        assertTrue(found.getSections().stream().allMatch(section -> section.getSpots().size() == 2));
+        assertTrue(found.getSections().stream()
+                .allMatch(section -> PRICE.equals(section.getPrice())));
+        assertFalse(found.isPublished());
+    }
+
+    @Test
+    void givenAShow_whenAddSectionAndUpdate_thenUpsertsNewChildren() {
+        final var show = gateway.create(sample());
+
+        show.addSection("Backstage", "Acesso total", 3, PRICE);
+        show.publishAll();
+        gateway.update(show);
+
+        final var found = gateway.findById(show.getId()).orElseThrow();
+        assertEquals(3, found.getSections().size());
+        assertEquals(7, found.getSections().stream().mapToLong(section -> section.getSpots().size()).sum());
+        assertTrue(found.isPublished());
+        assertTrue(found.getSections().stream().allMatch(section -> section.isPublished()));
+        assertEquals(3, count(SectionDocument.COLLECTION));
+        assertEquals(7, count(SpotDocument.COLLECTION));
+    }
+
+    @Test
+    void givenAShow_whenDelete_thenCascadesWholeGraph() {
+        final var show = gateway.create(sample());
+
+        gateway.deleteById(show.getId());
+
+        assertFalse(gateway.findById(show.getId()).isPresent());
+        assertEquals(0, count(ShowDocument.COLLECTION));
+        assertEquals(0, count(SectionDocument.COLLECTION));
+        assertEquals(0, count(SpotDocument.COLLECTION));
+    }
+
+    @Test
+    void givenShows_whenFindAll_thenPaginatesAndSearches() {
+        gateway.create(sample());
+        gateway.create(Show.create("Jazz Fest", "Suave", DATE, ADDRESS, 0, PartnerID.generate()));
+
+        final var page = gateway.findAll(new SearchQuery(0, 10, "", "name", "asc"));
+
+        assertEquals(2, page.totalItems());
+        assertEquals(2, page.items().size());
+        assertTrue(page.items().stream().allMatch(show -> show.getPartnerId() != null));
+
+        final var search = gateway.findAll(new SearchQuery(0, 10, "jazz", "name", "asc"));
+        assertEquals(1, search.totalItems());
+        assertEquals("Jazz Fest", search.items().get(0).getName().getValue());
+        assertTrue(search.items().get(0).getSections().isEmpty());
+    }
+}
