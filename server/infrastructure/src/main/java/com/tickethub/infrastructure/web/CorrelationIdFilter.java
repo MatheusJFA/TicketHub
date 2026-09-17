@@ -1,0 +1,52 @@
+package com.tickethub.infrastructure.web;
+
+import java.io.IOException;
+import java.util.UUID;
+
+import org.slf4j.MDC;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@Component
+public class CorrelationIdFilter extends OncePerRequestFilter {
+
+    public static final String CORRELATION_ID_HEADER = "X-Correlation-ID";
+    public static final String ACTOR_HEADER = "X-Actor";
+
+    public static final String CORRELATION_ID_KEY = "correlationId";
+    public static final String ACTOR_KEY = "actor";
+
+    public static final String ANONYMOUS_ACTOR = "system";
+
+    @Override
+    protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response,
+            final FilterChain filterChain) throws ServletException, IOException {
+        final String correlationId = headerOrGenerated(request, CORRELATION_ID_HEADER);
+        final String actor = headerOrDefault(request, ACTOR_HEADER, ANONYMOUS_ACTOR);
+        MDC.put(CORRELATION_ID_KEY, correlationId);
+        MDC.put(ACTOR_KEY, actor);
+        response.setHeader(CORRELATION_ID_HEADER, correlationId);
+        try {
+            filterChain.doFilter(request, response);
+        } finally {
+            MDC.remove(CORRELATION_ID_KEY);
+            MDC.remove(ACTOR_KEY);
+        }
+    }
+
+    private static String headerOrGenerated(final HttpServletRequest request, final String header) {
+        final String value = request.getHeader(header);
+        return value == null || value.isBlank() ? UUID.randomUUID().toString() : value;
+    }
+
+    private static String headerOrDefault(final HttpServletRequest request, final String header,
+            final String fallback) {
+        final String value = request.getHeader(header);
+        return value == null || value.isBlank() ? fallback : value;
+    }
+}
