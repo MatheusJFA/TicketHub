@@ -8,7 +8,8 @@ import com.tickethub.application.customer.retrieve.get.*;
 import com.tickethub.application.customer.retrieve.list.*;
 import com.tickethub.infrastructure.customer.models.*;
 import org.springframework.http.ResponseEntity;
-import com.tickethub.infrastructure.api.ApiSupport;
+import com.tickethub.infrastructure.api.HttpResults;
+import com.tickethub.infrastructure.mapping.CustomerMapper;
 import com.tickethub.infrastructure.api.CustomerAPI;
 
 import java.net.URI;
@@ -22,48 +23,49 @@ public class CustomerController implements CustomerAPI {
     private final DeleteCustomerUseCase deleteCustomer;
     private final GetCustomerUseCase getCustomer;
     private final ListCustomersUseCase listCustomers;
+    private final CustomerMapper mapper;
 
     public CustomerController(ChangeCustomerNameUseCase changeCustomerName,
             CreateCustomerUseCase createCustomer,
             DeleteCustomerUseCase deleteCustomer,
             GetCustomerUseCase getCustomer,
-            ListCustomersUseCase listCustomers) {
+            ListCustomersUseCase listCustomers,
+            CustomerMapper mapper) {
         this.changeCustomerName = changeCustomerName;
         this.createCustomer = createCustomer;
         this.deleteCustomer = deleteCustomer;
         this.getCustomer = getCustomer;
         this.listCustomers = listCustomers;
+        this.mapper = mapper;
     }
 
     @Override
     public ResponseEntity<?> changeCustomerName(String id, ChangeCustomerNameRequest input) {
-        final var output = ApiSupport.execute(changeCustomerName,
-                new ChangeCustomerNameCommand(id, input.name()));
+        final var output = HttpResults.require(changeCustomerName.execute(mapper.toCommand(id, input)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
     public ResponseEntity<?> createCustomer(CreateCustomerRequest input) {
-        final var output = ApiSupport.execute(createCustomer,
-                new CreateCustomerCommand(input.cpf(), input.name()));
+        final var output = HttpResults.require(createCustomer.execute(mapper.toCommand(input)));
         return ResponseEntity.created(URI.create("/customers/" + output.id())).body(new IdResponse(output.id()));
     }
 
     @Override
     public ResponseEntity<?> deleteById(String id) {
-        ApiSupport.execute(deleteCustomer, id);
+        HttpResults.requireEmpty(deleteCustomer.execute(id));
         return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<?> getById(String id) {
-        return ResponseEntity.ok(CustomerResponse.from(ApiSupport.execute(getCustomer, id)));
+        return ResponseEntity.ok(mapper.toResponse(HttpResults.require(getCustomer.execute(id))));
     }
 
     @Override
     public ResponseEntity<?> list(String search, int page, int perPage, String sort, String direction) {
-        final var result = ApiSupport.execute(listCustomers, ApiSupport.query(search, page, perPage, sort, direction))
-                .map(CustomerListResponse::from);
+        final var result = HttpResults.require(listCustomers.execute(HttpResults.search(search, page, perPage, sort, direction)))
+                .map(mapper::toListResponse);
         return ResponseEntity.ok(result);
     }
 }

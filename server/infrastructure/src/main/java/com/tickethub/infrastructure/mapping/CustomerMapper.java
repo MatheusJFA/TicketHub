@@ -1,0 +1,24 @@
+package com.tickethub.infrastructure.mapping;
+
+import org.mapstruct.Mapper;
+
+import com.tickethub.application.customer.changename.ChangeCustomerNameCommand;
+import com.tickethub.application.customer.create.CreateCustomerCommand;
+import com.tickethub.application.customer.retrieve.get.GetCustomerOutput;
+import com.tickethub.application.customer.retrieve.list.ListCustomersOutput;
+import com.tickethub.infrastructure.customer.models.ChangeCustomerNameRequest;
+import com.tickethub.infrastructure.customer.models.CreateCustomerRequest;
+import com.tickethub.infrastructure.customer.models.CustomerListResponse;
+import com.tickethub.infrastructure.customer.models.CustomerResponse;
+
+@Mapper(componentModel = "spring")
+public interface CustomerMapper {
+
+    CustomerResponse toResponse(GetCustomerOutput output);
+
+    CustomerListResponse toListResponse(ListCustomersOutput output);
+
+    CreateCustomerCommand toCommand(CreateCustomerRequest request);
+
+    ChangeCustomerNameCommand toCommand(String id, ChangeCustomerNameRequest request);
+}

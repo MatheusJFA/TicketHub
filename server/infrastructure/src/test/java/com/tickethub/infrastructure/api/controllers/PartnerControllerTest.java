@@ -15,7 +15,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
+import com.tickethub.infrastructure.mapping.SharedMapperImpl;
+import com.tickethub.infrastructure.mapping.PartnerMapperImpl;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -25,6 +28,7 @@ import com.tickethub.infrastructure.security.TestTokens;
 import org.springframework.beans.factory.annotation.Value;
 
 @ControllerTest(controllers = PartnerController.class)
+@Import({SharedMapperImpl.class, PartnerMapperImpl.class})
 class PartnerControllerTest {
     @Autowired MockMvc mvc;
     @MockitoBean ChangePartnerAddressUseCase changePartnerAddress;

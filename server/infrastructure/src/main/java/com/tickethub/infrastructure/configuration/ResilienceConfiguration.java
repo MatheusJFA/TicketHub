@@ -2,12 +2,10 @@ package com.tickethub.infrastructure.configuration;
 
 import java.time.Duration;
 
-import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.tickethub.infrastructure.api.ApiSupport;
 import com.tickethub.infrastructure.api.ResiliencePolicy;
 
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
@@ -17,16 +15,11 @@ import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
 
 /**
- * Builds the retry + circuit breaker policy from configuration and plugs it
- * into {@link ApiSupport}, the single choke point for use case execution.
+ * Builds the retry + circuit breaker policy from configuration. The
+ * {@code UseCaseMonitoringAspect} applies it to every use case execution.
  */
 @Configuration(proxyBeanMethods = false)
 public class ResilienceConfiguration {
-
-    @Bean
-    public SmartInitializingSingleton resilienceInstaller(final ResiliencePolicy tickethubResiliencePolicy) {
-        return () -> ApiSupport.configureResilience(tickethubResiliencePolicy);
-    }
 
     @Bean
     public ResiliencePolicy tickethubResiliencePolicy(

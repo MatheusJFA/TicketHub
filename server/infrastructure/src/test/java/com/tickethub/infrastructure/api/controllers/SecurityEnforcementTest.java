@@ -14,7 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
+import com.tickethub.infrastructure.mapping.SharedMapperImpl;
+import com.tickethub.infrastructure.mapping.SpotMapperImpl;
 
 import com.tickethub.application.Either;
 import com.tickethub.application.spot.changelocation.ChangeSpotLocationUseCase;
@@ -30,6 +33,7 @@ import com.tickethub.infrastructure.ControllerTest;
 import com.tickethub.infrastructure.security.TestTokens;
 
 @ControllerTest(controllers = SpotController.class)
+@Import({SharedMapperImpl.class, SpotMapperImpl.class})
 class SecurityEnforcementTest {
 
     @Autowired

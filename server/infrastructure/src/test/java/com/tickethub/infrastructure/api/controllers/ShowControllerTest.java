@@ -20,7 +20,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
+import com.tickethub.infrastructure.mapping.SharedMapperImpl;
+import com.tickethub.infrastructure.mapping.ShowMapperImpl;
 import com.tickethub.infrastructure.security.TestTokens;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -28,6 +31,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ControllerTest(controllers = ShowController.class)
+@Import({SharedMapperImpl.class, ShowMapperImpl.class})
 class ShowControllerTest {
     @Autowired MockMvc mvc;
     @Value("${tickethub.security.jwt.secret}")

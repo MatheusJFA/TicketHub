@@ -9,7 +9,8 @@ import com.tickethub.application.partner.retrieve.get.*;
 import com.tickethub.application.partner.retrieve.list.*;
 import com.tickethub.infrastructure.partner.models.*;
 import org.springframework.http.ResponseEntity;
-import com.tickethub.infrastructure.api.ApiSupport;
+import com.tickethub.infrastructure.api.HttpResults;
+import com.tickethub.infrastructure.mapping.PartnerMapper;
 import com.tickethub.infrastructure.api.PartnerAPI;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,61 +24,57 @@ public class PartnerController implements PartnerAPI {
     private final DeletePartnerUseCase deletePartner;
     private final GetPartnerUseCase getPartner;
     private final ListPartnersUseCase listPartners;
+    private final PartnerMapper mapper;
 
     public PartnerController(ChangePartnerAddressUseCase changePartnerAddress,
             ChangePartnerNameUseCase changePartnerName,
             CreatePartnerUseCase createPartner,
             DeletePartnerUseCase deletePartner,
             GetPartnerUseCase getPartner,
-            ListPartnersUseCase listPartners) {
+            ListPartnersUseCase listPartners,
+            PartnerMapper mapper) {
         this.changePartnerAddress = changePartnerAddress;
         this.changePartnerName = changePartnerName;
         this.createPartner = createPartner;
         this.deletePartner = deletePartner;
         this.getPartner = getPartner;
         this.listPartners = listPartners;
+        this.mapper = mapper;
     }
 
     @Override
     public ResponseEntity<?> changePartnerAddress(String id, ChangePartnerAddressRequest input) {
-        final var output = ApiSupport.execute(changePartnerAddress, new ChangePartnerAddressCommand(
-                id,
-                input.address() == null ? null : input.address().toDomain()));
+        final var output = HttpResults.require(changePartnerAddress.execute(mapper.toCommand(id, input)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
     public ResponseEntity<?> changePartnerName(String id, ChangePartnerNameRequest input) {
-        final var output = ApiSupport.execute(changePartnerName, new ChangePartnerNameCommand(
-                id,
-                input.name()));
+        final var output = HttpResults.require(changePartnerName.execute(mapper.toCommand(id, input)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
     public ResponseEntity<?> createPartner(CreatePartnerRequest input) {
-        final var output = ApiSupport.execute(createPartner, new CreatePartnerCommand(
-                input.name(),
-                input.cnpj(),
-                input.address() == null ? null : input.address().toDomain()));
+        final var output = HttpResults.require(createPartner.execute(mapper.toCommand(input)));
         return ResponseEntity.created(URI.create("/partners/" + output.id())).body(new IdResponse(output.id()));
     }
 
     @Override
     public ResponseEntity<?> deleteById(String id) {
-        ApiSupport.execute(deletePartner, id);
+        HttpResults.requireEmpty(deletePartner.execute(id));
         return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<?> getById(String id) {
-        return ResponseEntity.ok(PartnerResponse.from(ApiSupport.execute(getPartner, id)));
+        return ResponseEntity.ok(mapper.toResponse(HttpResults.require(getPartner.execute(id))));
     }
 
     @Override
     public ResponseEntity<?> list(String search, int page, int perPage, String sort, String direction) {
-        final var result = ApiSupport.execute(listPartners, ApiSupport.query(search, page, perPage, sort, direction))
-                .map(PartnerListResponse::from);
+        final var result = HttpResults.require(listPartners.execute(HttpResults.search(search, page, perPage, sort, direction)))
+                .map(mapper::toListResponse);
         return ResponseEntity.ok(result);
     }
 }
