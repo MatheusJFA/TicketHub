@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.HashSet;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -158,5 +159,50 @@ class SectionTest {
         );
 
         assertEquals("Invalid name " + expectedName, exception.getMessage());
+    }
+
+    @Test
+    void givenCapacity_whenCreate_thenGenerateSequentialSeatCodes() {
+        final var price = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
+
+        final var section = Section.create("VIP", "Front stage", 3, price, "B");
+
+        final var codes = section.getSpots().stream()
+                .map(spot -> spot.getLocation().getValue())
+                .sorted()
+                .toList();
+        assertEquals(List.of("B00001", "B00002", "B00003"), codes);
+    }
+
+    @Test
+    void givenCapacity_whenCreateWithoutCode_thenDefaultToFirstSection() {
+        final var price = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
+
+        final var section = Section.create("VIP", "Front stage", 2, price);
+
+        final var codes = section.getSpots().stream()
+                .map(spot -> spot.getLocation().getValue())
+                .sorted()
+                .toList();
+        assertEquals(List.of("A00001", "A00002"), codes);
+    }
+
+    @Test
+    void givenShell_whenGenerateMissingSpots_thenCompleteSequentially() {
+        final var price = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
+        final var section = Section.createShell("VIP", "Front stage", 3, price);
+
+        assertTrue(section.getSpots().isEmpty());
+
+        section.generateMissingSpots("C");
+
+        final var codes = section.getSpots().stream()
+                .map(spot -> spot.getLocation().getValue())
+                .sorted()
+                .toList();
+        assertEquals(List.of("C00001", "C00002", "C00003"), codes);
+
+        section.generateMissingSpots("C");
+        assertEquals(3, section.getSpots().size());
     }
 }

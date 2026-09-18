@@ -34,7 +34,7 @@ public class Spot extends Entity<SpotID> {
     public static Spot create() {
         final SpotID id = SpotID.generate();
         final var now = Instant.now();
-        return new Spot(id, null, true, false, now, now, null, null, null);
+        return new Spot(id, Location.generateRandom(), true, false, now, now, null, null, null);
     }
 
     public static Spot reconstitute(SpotID id, Location location, boolean isAvailable, boolean isPublished,

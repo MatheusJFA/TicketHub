@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import com.tickethub.domain.Entity;
 import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.exception.DomainException;
+import com.tickethub.domain.shared.Location;
 import com.tickethub.domain.shared.Money;
 import com.tickethub.domain.shared.Name;
 import com.tickethub.domain.shared.Text;
@@ -49,16 +50,35 @@ public class Section extends Entity<SectionID> {
     }
 
     public static Section create(String name, String description, long totalSpots, Money price) {
+        return create(name, description, totalSpots, price, Location.sectionCode(0));
+    }
+
+    public static Section create(String name, String description, long totalSpots, Money price,
+            String sectionCode) {
         if (totalSpots < 0) {
             throw new DomainException("'totalSpots' should not be negative");
         }
         final SectionID id = SectionID.generate();
-        final Set<Spot> spots = generateSpots(totalSpots);
+        final Set<Spot> spots = generateSpots(totalSpots, sectionCode);
         final var now = Instant.now();
         final Section section = new Section(id, Name.create(name), Text.create(description), false, totalSpots, 0,
                 price, spots, now, now, null, null, null);
 
         return section;
+    }
+
+    /**
+     * Creates a section shell without materialized spots, for asynchronous
+     * spot generation (see {@link #generateMissingSpots(String)}).
+     */
+    public static Section createShell(String name, String description, long totalSpots, Money price) {
+        if (totalSpots < 0) {
+            throw new DomainException("'totalSpots' should not be negative");
+        }
+        final SectionID id = SectionID.generate();
+        final var now = Instant.now();
+        return new Section(id, Name.create(name), Text.create(description), false, totalSpots, 0,
+                price, new HashSet<>(), now, now, null, null, null);
     }
 
     public static Section reconstitute(SectionID id, Name name, Text description, boolean isPublished, long totalSpots,
@@ -69,14 +89,30 @@ public class Section extends Entity<SectionID> {
                 price, spotList, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
     }
 
-    private static Set<Spot> generateSpots(long totalSpots) {
+    private static Set<Spot> generateSpots(long totalSpots, String sectionCode) {
         if (totalSpots < 0) {
             throw new DomainException("'totalSpots' should not be negative");
         }
         return Stream.iterate(0, i -> i + 1)
                 .limit(totalSpots)
-                .map(i -> Spot.create())
+                .map(i -> Spot.create(Location.generateSeat(sectionCode, i + 1)))
                 .collect(Collectors.toCollection(HashSet::new));
+    }
+
+    /**
+     * Materializes the spots still missing to reach {@code totalSpots},
+     * continuing the seat numbering after the spots already present.
+     * Idempotent: does nothing when the section is already complete.
+     */
+    public void generateMissingSpots(final String sectionCode) {
+        final long existing = spots.size();
+        if (existing >= totalSpots) {
+            return;
+        }
+        for (long seatNumber = existing + 1; seatNumber <= totalSpots; seatNumber++) {
+            spots.add(Spot.create(Location.generateSeat(sectionCode, seatNumber)));
+        }
+        markAsUpdated();
     }
 
     public void publishAll() {

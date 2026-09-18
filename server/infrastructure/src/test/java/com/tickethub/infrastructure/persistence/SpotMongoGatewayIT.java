@@ -2,7 +2,7 @@ package com.tickethub.infrastructure.persistence;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -46,12 +46,15 @@ class SpotMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
-    void givenASpotWithoutLocation_whenCreate_thenRoundTripsNull() {
+    void givenASpotWithoutLocation_whenCreate_thenGeneratesAndRoundTripsCode() {
         final var spot = Spot.create();
 
         gateway.create(spot);
 
-        assertNull(gateway.findById(spot.getId()).orElseThrow().getLocation());
+        final var found = gateway.findById(spot.getId()).orElseThrow();
+        assertNotNull(found.getLocation());
+        assertTrue(found.getLocation().getValue().matches("[A-Z]\\d{5}"));
+        assertEquals(spot.getLocation(), found.getLocation());
     }
 
     @Test

@@ -13,6 +13,7 @@ import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.core.section.Section;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.shared.Address;
+import com.tickethub.domain.shared.Location;
 import com.tickethub.domain.shared.Money;
 import com.tickethub.domain.shared.Name;
 import com.tickethub.domain.shared.Text;
@@ -90,10 +91,27 @@ public class Show extends AggregateRoot<ShowID> {
         if (totalSpots < 0) {
             throw new DomainException("'totalSpots' should not be negative");
         }
-        final Section section = Section.create(name, description, totalSpots, price);
+        final Section section = Section.create(name, description, totalSpots, price,
+                Location.sectionCode(sections.size()));
         this.sections.add(section);
         this.totalSpots += totalSpots;
         this.markAsUpdated();
+    }
+
+    /**
+     * Adds a section shell without materialized spots, for asynchronous spot
+     * generation. The returned section id lets callers reference it (e.g. in
+     * a generation event) before the spots exist.
+     */
+    public Section addSectionShell(String name, String description, long totalSpots, Money price) {
+        if (totalSpots < 0) {
+            throw new DomainException("'totalSpots' should not be negative");
+        }
+        final Section section = Section.createShell(name, description, totalSpots, price);
+        this.sections.add(section);
+        this.totalSpots += totalSpots;
+        this.markAsUpdated();
+        return section;
     }
 
     public void publishAll() {

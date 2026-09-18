@@ -74,7 +74,8 @@ public class CreateSpotUseCaseTest extends UseCaseTest {
 
         assertNotNull(output.id());
         verify(spotGateway, times(1)).create(argThat(spot ->
-                spot.getLocation() == null
+                spot.getLocation() != null
+                        && spot.getLocation().getValue().matches("[A-Z]\\d{5}")
                         && spot.isAvailable()
                         && !spot.isPublished()));
     }

@@ -61,4 +61,12 @@ class SpotTest {
         assertNotNull(actualSpot.getId());
         assertNull(actualSpot.getLocation());
     }
+
+    @Test
+    void givenNoLocation_whenCreate_thenGenerateShortCode() {
+        final var actualSpot = Spot.create();
+
+        assertNotNull(actualSpot.getLocation());
+        assertTrue(actualSpot.getLocation().getValue().matches("[A-Z]\\d{5}"));
+    }
 }
