@@ -20,5 +20,4 @@ A direção `infrastructure → application → domain` é verificada por testes
 ## Consequências
 
 - **Pró:** domínio testável com JUnit puro; trocar MongoDB por outro banco afeta só `infrastructure`.
-- **Pró:** ports (`*Gateway`) permitem stubs de fallback (503) enquanto os adapters não existem.
 - **Contra:** mais boilerplate (Command/Output por caso de uso) e navegação entre módulos.

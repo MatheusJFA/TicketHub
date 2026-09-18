@@ -14,13 +14,13 @@ flowchart TB
     subgraph Server["server (Maven aggregator)"]
         subgraph Infra["infrastructure — Spring Boot"]
             API["Controllers + *API interfaces\n@ControllerTest slices"]
-            SUP["ApiSupport\nchoke point: resilience + audit"]
+            MAP["mapping (MapStruct)\nrequests/commands • outputs/responses"]
+            ASP["UseCaseMonitoringAspect\nresilience + audit (@Around)"]
             SEC["Security\nJWT HS256 • Roles • Permissions • Ownership"]
             RES["ResiliencePolicy\nRetry + CircuitBreaker → 503"]
             AUD["Audit\nMDC correlation/actor → audit_logs"]
             CFG["Config\nMongo • Kafka • Liquibase • OpenAPI"]
-            FALLBACK["PersistenceFallback\nstubs 503 via ConditionalOnMissingBean"]
-            PERS["persistence adapters\nDocuments + Gateways — EM ANDAMENTO"]
+            PERS["persistence adapters\nDocuments + Gateways"]
         end
         APP["application\n~40 Use Cases + Either"]
         DOM["domain (puro, sem framework)\nAggregates • VOs • Notification • Gateway ports"]
@@ -32,16 +32,16 @@ flowchart TB
     end
 
     HTTP --> API
-    API --> SUP
-    SUP --> SEC
-    SUP --> APP
+    API --> MAP
+    API --> SEC
+    API --> APP
     APP --> DOM
-    SUP --> RES
-    SUP --> AUD
+    ASP --> APP
+    ASP --> RES
+    ASP --> AUD
     AUD --> MONGO
     CFG --> MONGO
     CFG --> KAFKA
-    FALLBACK -.->|"até os adapters existirem"| APP
     PERS -.->|"implementa"| DOM
     PERS -.->|"usa"| MONGO
 ```
@@ -50,7 +50,7 @@ Regras de dependência (verificadas por ArchUnit em `ArchitectureTest`):
 
 - `infrastructure → application → domain`. `domain` não conhece nenhum framework.
 - Gateways (`*Gateway`) são **ports** definidos no `domain` e implementados na `infrastructure`.
-- Controllers são finos: contrato/OpenAPI nas interfaces `*API`, execução delegada ao `ApiSupport`.
+- Controllers são finos: contrato/OpenAPI nas interfaces `*API`, conversão via MapStruct, chamadas diretas aos casos de uso com tradução `Either → HTTP` pelo `HttpResults`; resiliência e auditoria via aspecto.
 
 ## 2. Fluxo de uma requisição (ex.: `POST /spots`)
 
@@ -60,10 +60,10 @@ sequenceDiagram
     participant F as CorrelationIdFilter
     participant S as Spring Security
     participant CT as SpotController
-    participant A as ApiSupport
+    participant A as UseCaseMonitoringAspect
     participant R as ResiliencePolicy
     participant U as DefaultCreateSpotUseCase
-    participant G as SpotGateway (fallback)
+    participant G as SpotGateway
     participant M as MongoDB audit_logs
 
     C->>F: POST /spots + Bearer JWT
@@ -71,15 +71,15 @@ sequenceDiagram
     F->>S: filter chain
     S->>S: hasAuthority('spot:write')
     S->>CT: autorizado
-    CT->>A: execute(useCase, command)
+    CT->>A: execute(command)
     A->>R: decorate (retry 3x + circuit breaker)
     R->>U: execute
     U->>G: create(spot)
-    G-->>U: 503 persistence not configured
-    U-->>A: Left(Notification + cause)
-    A->>M: audit action + UNAVAILABLE + actor
-    A-->>CT: ResponseStatusException 503
-    CT-->>C: 503 ErrorResponse
+    G-->>U: ok
+    U-->>A: Right(output)
+    A->>M: audit action + SUCCESS + actor
+    A-->>CT: output
+    CT-->>C: 201 IdResponse
 ```
 
 Notas do fluxo:

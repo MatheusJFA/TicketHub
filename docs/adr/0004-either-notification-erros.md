@@ -9,10 +9,10 @@ Casos de uso precisam distinguir três situações: sucesso, erro de validação
 
 ## Decisão
 
-- Todo caso de uso retorna `Either<Notification, Output>`; `Notification` acumula `Error`s (pattern do Full Cycle).
-- `ApiSupport.execute` é o choke point: converte o resultado em resposta ou exceção tipada.
+- Todo caso de uso retorna `Either<Notification, Output>` (`Optional<Notification>` nos deletes via `UnitUseCase`); `Notification` acumula `Error`s (pattern do Full Cycle).
+- `HttpResults` traduz o resultado em valor ou exceção tipada (`require`/`requireEmpty`); o aspecto `UseCaseMonitoringAspect` aplica resiliência e auditoria a cada execução.
 - `GlobalExceptionHandler` mapeia para o envelope `ErrorResponse`: 404 (`"<Recurso> not found: <id>"`), 422 (validação), 400 (sintaxe/bean), 401/403 (segurança), 503 (indisponível), 500 genérico sem vazar stack.
-- Controllers finos: contrato/OpenAPI nas interfaces `*API`, lógica delegada ao `ApiSupport`.
+- Controllers finos: contrato/OpenAPI nas interfaces `*API`, comandos e respostas convertidos por mappers MapStruct (`infrastructure.mapping`), lógica delegada aos casos de uso.
 
 ## Consequências
 
