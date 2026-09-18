@@ -29,6 +29,8 @@ import com.tickethub.application.section.generatespots.GenerateSectionSpotsUseCa
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.partner.PartnerGateway;
 import com.tickethub.domain.event.DomainEventPublisher;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.Assert;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -48,8 +50,10 @@ public class ShowUseCaseConfig {
     }
 
     @Bean
-    public AddSectionToShowUseCase addSectionToShowUseCase() {
-        return new DefaultAddSectionToShowUseCase(showGateway, eventPublisher);
+    public AddSectionToShowUseCase addSectionToShowUseCase(
+            @Value("${tickethub.spots.async-threshold:1000}") final long asyncSpotThreshold) {
+        Assert.isTrue(asyncSpotThreshold > 0, "tickethub.spots.async-threshold must be positive");
+        return new DefaultAddSectionToShowUseCase(showGateway, eventPublisher, asyncSpotThreshold);
     }
 
     @Bean

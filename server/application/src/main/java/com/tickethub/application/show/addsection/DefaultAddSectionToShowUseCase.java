@@ -16,15 +16,18 @@ import com.tickethub.domain.validation.Notification;
 
 public final class DefaultAddSectionToShowUseCase extends AddSectionToShowUseCase {
 
-    static final long ASYNC_SPOT_THRESHOLD = 1_000;
-
     private final ShowGateway showGateway;
     private final DomainEventPublisher eventPublisher;
+    private final long asyncSpotThreshold;
 
     public DefaultAddSectionToShowUseCase(final ShowGateway showGateway,
-            final DomainEventPublisher eventPublisher) {
+            final DomainEventPublisher eventPublisher, final long asyncSpotThreshold) {
         this.showGateway = Objects.requireNonNull(showGateway);
         this.eventPublisher = Objects.requireNonNull(eventPublisher);
+        if (asyncSpotThreshold < 1) {
+            throw new IllegalArgumentException("'asyncSpotThreshold' should be positive");
+        }
+        this.asyncSpotThreshold = asyncSpotThreshold;
     }
 
     @Override
@@ -45,7 +48,7 @@ public final class DefaultAddSectionToShowUseCase extends AddSectionToShowUseCas
                 return Either.left(notification);
             }
 
-            if (command.totalSpots() >= ASYNC_SPOT_THRESHOLD) {
+            if (command.totalSpots() >= asyncSpotThreshold) {
                 return addSectionAsync(entity, command);
             }
 

@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import com.tickethub.application.UseCaseTest;
@@ -28,7 +27,8 @@ public class AddSectionToShowUseCaseTest extends UseCaseTest {
     private static final Address ADDRESS = Address.create("Rua Augusta", "100", null, "Centro", "São Paulo", "SP", "Brasil", "01305-000");
     private static final Money PRICE = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
 
-    @InjectMocks
+    private static final long ASYNC_THRESHOLD = 1000;
+
     private DefaultAddSectionToShowUseCase useCase;
 
     @Mock
@@ -36,6 +36,11 @@ public class AddSectionToShowUseCaseTest extends UseCaseTest {
 
     @Mock
     private DomainEventPublisher eventPublisher;
+
+    @org.junit.jupiter.api.BeforeEach
+    void setUp() {
+        useCase = new DefaultAddSectionToShowUseCase(showGateway, eventPublisher, ASYNC_THRESHOLD);
+    }
 
     @Override
     protected List<Object> getMocks() {

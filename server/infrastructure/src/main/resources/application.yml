@@ -40,6 +40,8 @@ tickethub:
   liquibase:
     enabled: ${LIQUIBASE_ENABLED:true}
     change-log: db/changelog/db.changelog-master.xml
+  spots:
+    async-threshold: ${SPOTS_ASYNC_THRESHOLD:1000}
   audit:
     enabled: ${AUDIT_ENABLED:true}
   security:
