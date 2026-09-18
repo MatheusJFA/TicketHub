@@ -9,7 +9,7 @@ import com.tickethub.domain.core.partner.PartnerGateway;
 import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.validation.Notification;
 
-public final class DefaultChangePartnerAddressUseCase extends ChangePartnerAddressUseCase {
+public class DefaultChangePartnerAddressUseCase extends ChangePartnerAddressUseCase {
     private final PartnerGateway partnerGateway;
 
     public DefaultChangePartnerAddressUseCase(final PartnerGateway partnerGateway) {

@@ -9,7 +9,7 @@ import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.domain.validation.Notification;
 
-public final class DefaultChangeShowDescriptionUseCase extends ChangeShowDescriptionUseCase {
+public class DefaultChangeShowDescriptionUseCase extends ChangeShowDescriptionUseCase {
     private final ShowGateway showGateway;
 
     public DefaultChangeShowDescriptionUseCase(final ShowGateway showGateway) {

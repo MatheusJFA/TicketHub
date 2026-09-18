@@ -12,7 +12,7 @@ import com.tickethub.domain.core.customer.CustomerGateway;
 
 
 
-public final class DefaultListCustomersUseCase extends ListCustomersUseCase {
+public class DefaultListCustomersUseCase extends ListCustomersUseCase {
     private final CustomerGateway customerGateway;
 
     public DefaultListCustomersUseCase(final CustomerGateway customerGateway) {

@@ -9,7 +9,7 @@ import com.tickethub.domain.core.customer.CustomerGateway;
 import com.tickethub.domain.core.customer.CustomerID;
 
 
-public final class DefaultDeleteCustomerUseCase extends DeleteCustomerUseCase {
+public class DefaultDeleteCustomerUseCase extends DeleteCustomerUseCase {
     private final CustomerGateway customerGateway;
 
     public DefaultDeleteCustomerUseCase(final CustomerGateway customerGateway) {

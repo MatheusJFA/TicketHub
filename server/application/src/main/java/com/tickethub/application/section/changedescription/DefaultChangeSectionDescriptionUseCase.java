@@ -9,7 +9,7 @@ import com.tickethub.domain.core.section.SectionGateway;
 import com.tickethub.domain.core.section.SectionID;
 import com.tickethub.domain.validation.Notification;
 
-public final class DefaultChangeSectionDescriptionUseCase extends ChangeSectionDescriptionUseCase {
+public class DefaultChangeSectionDescriptionUseCase extends ChangeSectionDescriptionUseCase {
     private final SectionGateway sectionGateway;
 
     public DefaultChangeSectionDescriptionUseCase(final SectionGateway sectionGateway) {

@@ -9,7 +9,7 @@ import com.tickethub.domain.core.spot.SpotGateway;
 import com.tickethub.domain.core.spot.SpotID;
 import com.tickethub.domain.validation.Notification;
 
-public final class DefaultGetSpotUseCase extends GetSpotUseCase {
+public class DefaultGetSpotUseCase extends GetSpotUseCase {
     private final SpotGateway spotGateway;
 
     public DefaultGetSpotUseCase(final SpotGateway spotGateway) {

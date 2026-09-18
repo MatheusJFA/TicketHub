@@ -11,7 +11,7 @@ import com.tickethub.domain.core.show.Show;
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.validation.Notification;
 
-public final class DefaultCreateShowUseCase extends CreateShowUseCase {
+public class DefaultCreateShowUseCase extends CreateShowUseCase {
     private final ShowGateway showGateway;
     private final PartnerGateway partnerGateway;
 

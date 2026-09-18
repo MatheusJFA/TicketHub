@@ -9,7 +9,7 @@ import com.tickethub.domain.core.customer.CustomerGateway;
 import com.tickethub.domain.core.customer.CustomerID;
 import com.tickethub.domain.validation.Notification;
 
-public final class DefaultChangeCustomerNameUseCase extends ChangeCustomerNameUseCase {
+public class DefaultChangeCustomerNameUseCase extends ChangeCustomerNameUseCase {
     private final CustomerGateway customerGateway;
 
     public DefaultChangeCustomerNameUseCase(final CustomerGateway customerGateway) {

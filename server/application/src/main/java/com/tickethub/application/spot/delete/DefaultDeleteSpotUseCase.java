@@ -9,7 +9,7 @@ import com.tickethub.domain.core.spot.SpotGateway;
 import com.tickethub.domain.core.spot.SpotID;
 
 
-public final class DefaultDeleteSpotUseCase extends DeleteSpotUseCase {
+public class DefaultDeleteSpotUseCase extends DeleteSpotUseCase {
     private final SpotGateway spotGateway;
 
     public DefaultDeleteSpotUseCase(final SpotGateway spotGateway) {

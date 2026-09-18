@@ -9,7 +9,7 @@ import com.tickethub.domain.core.partner.PartnerGateway;
 import com.tickethub.domain.core.partner.PartnerID;
 
 
-public final class DefaultDeletePartnerUseCase extends DeletePartnerUseCase {
+public class DefaultDeletePartnerUseCase extends DeletePartnerUseCase {
     private final PartnerGateway partnerGateway;
 
     public DefaultDeletePartnerUseCase(final PartnerGateway partnerGateway) {

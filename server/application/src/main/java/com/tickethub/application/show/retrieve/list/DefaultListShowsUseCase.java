@@ -11,7 +11,7 @@ import com.tickethub.domain.core.show.ShowGateway;
 
 
 
-public final class DefaultListShowsUseCase extends ListShowsUseCase {
+public class DefaultListShowsUseCase extends ListShowsUseCase {
     private final ShowGateway showGateway;
 
     public DefaultListShowsUseCase(final ShowGateway showGateway) {

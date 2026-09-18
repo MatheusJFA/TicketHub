@@ -7,7 +7,7 @@ import com.tickethub.domain.core.partner.Partner;
 import com.tickethub.domain.core.partner.PartnerGateway;
 import com.tickethub.domain.validation.Notification;
 
-public final class DefaultCreatePartnerUseCase extends CreatePartnerUseCase {
+public class DefaultCreatePartnerUseCase extends CreatePartnerUseCase {
     private final PartnerGateway partnerGateway;
 
     public DefaultCreatePartnerUseCase(final PartnerGateway partnerGateway) {

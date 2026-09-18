@@ -9,7 +9,7 @@ import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.show.ShowID;
 
 
-public final class DefaultDeleteShowUseCase extends DeleteShowUseCase {
+public class DefaultDeleteShowUseCase extends DeleteShowUseCase {
     private final ShowGateway showGateway;
 
     public DefaultDeleteShowUseCase(final ShowGateway showGateway) {

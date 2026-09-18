@@ -9,7 +9,7 @@ import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.domain.validation.Notification;
 
-public final class DefaultGenerateSectionSpotsUseCase extends GenerateSectionSpotsUseCase {
+public class DefaultGenerateSectionSpotsUseCase extends GenerateSectionSpotsUseCase {
     private final ShowGateway showGateway;
 
     public DefaultGenerateSectionSpotsUseCase(final ShowGateway showGateway) {

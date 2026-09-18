@@ -10,7 +10,7 @@ import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.domain.validation.Notification;
 
-public final class DefaultRescheduleShowUseCase extends RescheduleShowUseCase {
+public class DefaultRescheduleShowUseCase extends RescheduleShowUseCase {
     private final ShowGateway showGateway;
 
     public DefaultRescheduleShowUseCase(final ShowGateway showGateway) {

@@ -8,7 +8,7 @@ import com.tickethub.domain.core.section.SectionGateway;
 import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.Notification;
 
-public final class DefaultCreateSectionUseCase extends CreateSectionUseCase {
+public class DefaultCreateSectionUseCase extends CreateSectionUseCase {
     private final SectionGateway sectionGateway;
 
     public DefaultCreateSectionUseCase(final SectionGateway sectionGateway) {

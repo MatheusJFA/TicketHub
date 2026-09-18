@@ -11,7 +11,7 @@ import com.tickethub.domain.core.spot.SpotGateway;
 
 
 
-public final class DefaultListSpotsUseCase extends ListSpotsUseCase {
+public class DefaultListSpotsUseCase extends ListSpotsUseCase {
     private final SpotGateway spotGateway;
 
     public DefaultListSpotsUseCase(final SpotGateway spotGateway) {

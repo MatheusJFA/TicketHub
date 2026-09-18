@@ -8,7 +8,7 @@ import com.tickethub.domain.core.spot.SpotGateway;
 import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.Notification;
 
-public final class DefaultCreateSpotUseCase extends CreateSpotUseCase {
+public class DefaultCreateSpotUseCase extends CreateSpotUseCase {
     private final SpotGateway spotGateway;
 
     public DefaultCreateSpotUseCase(final SpotGateway spotGateway) {

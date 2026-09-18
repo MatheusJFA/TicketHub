@@ -14,7 +14,7 @@ import com.tickethub.domain.event.DomainEventPublisher;
 import com.tickethub.domain.shared.Location;
 import com.tickethub.domain.validation.Notification;
 
-public final class DefaultAddSectionToShowUseCase extends AddSectionToShowUseCase {
+public class DefaultAddSectionToShowUseCase extends AddSectionToShowUseCase {
 
     private final ShowGateway showGateway;
     private final DomainEventPublisher eventPublisher;

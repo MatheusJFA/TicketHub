@@ -9,7 +9,7 @@ import com.tickethub.domain.core.section.SectionGateway;
 import com.tickethub.domain.core.section.SectionID;
 
 
-public final class DefaultDeleteSectionUseCase extends DeleteSectionUseCase {
+public class DefaultDeleteSectionUseCase extends DeleteSectionUseCase {
     private final SectionGateway sectionGateway;
 
     public DefaultDeleteSectionUseCase(final SectionGateway sectionGateway) {
