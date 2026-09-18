@@ -9,9 +9,13 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import com.tickethub.domain.core.section.Section;
+import com.tickethub.domain.core.section.SectionID;
 import com.tickethub.domain.core.show.Show;
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.show.ShowID;
@@ -81,6 +85,29 @@ public class ShowMongoGateway implements ShowGateway {
         final var mongoQuery = MongoGatewaySupport.searchQuery(query, "name", "description");
         return MongoGatewaySupport.paginate(mongoTemplate, mongoQuery, ShowDocument.class,
                 ShowDocument.COLLECTION, query, SORTABLE_FIELDS, this::toDomain);
+    }
+
+    @Override
+    public void appendSpots(final ShowID showId, final SectionID sectionId, final Set<Spot> spots) {
+        if (spots == null || spots.isEmpty()) {
+            return;
+        }
+        final String partnerId = Optional
+                .ofNullable(mongoTemplate.findById(showId.getValue(), ShowDocument.class,
+                        ShowDocument.COLLECTION))
+                .map(ShowDocument::partnerId)
+                .orElse(null);
+        final var unitOfWork = new MongoUnitOfWork(mongoTemplate);
+        for (final Spot spot : spots) {
+            unitOfWork.registerNew(SpotDocument.COLLECTION,
+                    SpotDocument.from(spot, showId.getValue(), sectionId.getValue(), partnerId));
+        }
+        unitOfWork.commit();
+        mongoTemplate.updateFirst(
+                Query.query(Criteria.where("_id").is(sectionId.getValue())),
+                new Update().push("spotIds").each(
+                        spots.stream().map(spot -> spot.getId().getValue()).toArray()),
+                SectionDocument.class, SectionDocument.COLLECTION);
     }
 
     private void registerGraph(final MongoUnitOfWork unitOfWork, final Show show, final boolean dirty) {

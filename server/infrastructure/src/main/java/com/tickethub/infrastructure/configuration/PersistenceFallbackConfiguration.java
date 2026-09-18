@@ -1,6 +1,7 @@
 package com.tickethub.infrastructure.configuration;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +25,7 @@ import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.core.spot.SpotGateway;
 import com.tickethub.domain.core.spot.SpotID;
 import com.tickethub.domain.pagination.Pagination;
+import com.tickethub.domain.pagination.SearchQuery;
 import com.tickethub.domain.pagination.SearchQuery;
 
 /**
@@ -72,6 +74,9 @@ public class PersistenceFallbackConfiguration {
             @Override public Optional<Show> findById(ShowID id) { throw unavailable("Show"); }
             @Override public Show update(Show s) { throw unavailable("Show"); }
             @Override public Pagination<Show> findAll(SearchQuery q) { throw unavailable("Show"); }
+            @Override public void appendSpots(ShowID showId, SectionID sectionId, Set<Spot> spots) {
+                throw unavailable("Show");
+            }
         };
     }
 

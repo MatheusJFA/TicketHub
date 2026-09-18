@@ -101,18 +101,23 @@ public class Section extends Entity<SectionID> {
 
     /**
      * Materializes the spots still missing to reach {@code totalSpots},
-     * continuing the seat numbering after the spots already present.
-     * Idempotent: does nothing when the section is already complete.
+     * continuing the seat numbering after the spots already present, and
+     * returns the newly created spots. Idempotent: returns an empty set when
+     * the section is already complete.
      */
-    public void generateMissingSpots(final String sectionCode) {
+    public Set<Spot> generateMissingSpots(final String sectionCode) {
         final long existing = spots.size();
         if (existing >= totalSpots) {
-            return;
+            return Set.of();
         }
+        final Set<Spot> generated = new HashSet<>();
         for (long seatNumber = existing + 1; seatNumber <= totalSpots; seatNumber++) {
-            spots.add(Spot.create(Location.generateSeat(sectionCode, seatNumber)));
+            final Spot spot = Spot.create(Location.generateSeat(sectionCode, seatNumber));
+            spots.add(spot);
+            generated.add(spot);
         }
         markAsUpdated();
+        return Collections.unmodifiableSet(generated);
     }
 
     public void publishAll() {

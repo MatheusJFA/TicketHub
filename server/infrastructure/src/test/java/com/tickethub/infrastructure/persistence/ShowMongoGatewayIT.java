@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Currency;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -104,6 +105,25 @@ class ShowMongoGatewayIT extends ContainerSupport {
         assertEquals(0, count(ShowDocument.COLLECTION));
         assertEquals(0, count(SectionDocument.COLLECTION));
         assertEquals(0, count(SpotDocument.COLLECTION));
+    }
+
+    @Test
+    void givenShellSection_whenAppendSpots_thenBulkInsertsAndLinks() {
+        final var show = Show.create("Mega Fest", "Grande", DATE, ADDRESS, 0, PartnerID.generate());
+        final var shell = show.addSectionShell("Arena", "Pista", 3, PRICE);
+        gateway.create(show);
+
+        final var generated = shell.generateMissingSpots("A");
+        gateway.appendSpots(show.getId(), shell.getId(), generated);
+
+        assertEquals(3, count(SpotDocument.COLLECTION));
+        final var found = gateway.findById(show.getId()).orElseThrow();
+        final var codes = found.getSections().stream()
+                .flatMap(section -> section.getSpots().stream())
+                .map(spot -> spot.getLocation().getValue())
+                .sorted()
+                .toList();
+        assertEquals(List.of("A00001", "A00002", "A00003"), codes);
     }
 
     @Test

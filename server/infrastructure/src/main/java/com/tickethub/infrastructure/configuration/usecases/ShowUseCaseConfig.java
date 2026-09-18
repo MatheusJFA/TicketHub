@@ -24,8 +24,11 @@ import com.tickethub.application.show.unpublish.UnpublishShowUseCase;
 import com.tickethub.application.show.unpublish.DefaultUnpublishShowUseCase;
 import com.tickethub.application.show.unpublishall.UnpublishAllShowUseCase;
 import com.tickethub.application.show.unpublishall.DefaultUnpublishAllShowUseCase;
+import com.tickethub.application.section.generatespots.DefaultGenerateSectionSpotsUseCase;
+import com.tickethub.application.section.generatespots.GenerateSectionSpotsUseCase;
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.partner.PartnerGateway;
+import com.tickethub.domain.event.DomainEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -35,15 +38,23 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 public class ShowUseCaseConfig {
     private final ShowGateway showGateway;
     private final PartnerGateway partnerGateway;
+    private final DomainEventPublisher eventPublisher;
 
-    public ShowUseCaseConfig(final ShowGateway showGateway, final PartnerGateway partnerGateway) {
+    public ShowUseCaseConfig(final ShowGateway showGateway, final PartnerGateway partnerGateway,
+            final DomainEventPublisher eventPublisher) {
         this.showGateway = showGateway;
         this.partnerGateway = partnerGateway;
+        this.eventPublisher = eventPublisher;
     }
 
     @Bean
     public AddSectionToShowUseCase addSectionToShowUseCase() {
-        return new DefaultAddSectionToShowUseCase(showGateway);
+        return new DefaultAddSectionToShowUseCase(showGateway, eventPublisher);
+    }
+
+    @Bean
+    public GenerateSectionSpotsUseCase generateSectionSpotsUseCase() {
+        return new DefaultGenerateSectionSpotsUseCase(showGateway);
     }
 
     @Bean

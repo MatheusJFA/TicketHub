@@ -26,5 +26,6 @@ public final class ShowValidator extends Validator {
             handler.append(new Error("'totalSpots' should not be negative"));
         if (show.getTotalSpotsSold() < 0)
             handler.append(new Error("'totalSpotsSold' should not be negative"));
+        show.getSections().forEach(section -> section.validate(handler));
     }
 }
