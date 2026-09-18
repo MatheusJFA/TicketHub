@@ -12,3 +12,4 @@ Decisões arquiteturais do TicketHub, em ordem cronológica. Convenção: `NNNN-
 | [006](./0006-trilha-de-auditoria.md) | Trilha de auditoria (MDC + `audit_logs`) | Aceito |
 | [007](./0007-jwt-rbac-ownership.md) | JWT próprio + RBAC com permissões + ownership | Aceito |
 | [008](./0008-testcontainers-testes-integracao.md) | Testcontainers nos testes de integração | Aceito |
+| [009](./0009-cucumber-testes-aceitacao.md) | Testes de aceitação com Cucumber | Aceito |

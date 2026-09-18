@@ -154,5 +154,6 @@ Cadastro (`POST /customers`, `POST /partners`) e login são públicos.
 | Arquitetura | ArchUnit | `ArchitectureTest` |
 | Integração | `@IntegrationTest` + Testcontainers | `*IT` (failsafe, tag `integrationTest`) |
 | Ponta a ponta | `@E2ETest` + MockMvc + Testcontainers | `*E2ETest` (failsafe, tag `e2eTest`) |
+| Aceitação | Cucumber (Gherkin PT) + MockMvc + Testcontainers | `features/*.feature` via `CucumberAcceptanceIT` (failsafe, tag `e2eTest`) |
 
 `MongoCleanUpExtension` limpa `audit_logs` antes de cada teste de integração. `mise run test` não exige Docker; `mise run integration` exige.
