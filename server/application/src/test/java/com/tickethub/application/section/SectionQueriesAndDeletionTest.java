@@ -90,8 +90,8 @@ class SectionQueriesAndDeletionTest {
     @Test
     void delegatesRepeatedDeletionWithoutLookup() {
         final var useCase = new DefaultDeleteSectionUseCase(gateway);
-        assertEquals(id, useCase.execute(id).getRight().id());
-        assertEquals(id, useCase.execute(id).getRight().id());
+        assertTrue(useCase.execute(id).isEmpty());
+        assertTrue(useCase.execute(id).isEmpty());
         verify(gateway, times(2)).deleteById(entity.getId());
         verifyNoMoreInteractions(gateway);
     }
@@ -100,6 +100,6 @@ class SectionQueriesAndDeletionTest {
     void reportsDeletionFailure() {
         doThrow(new IllegalStateException("delete failed")).when(gateway).deleteById(entity.getId());
         final var result = new DefaultDeleteSectionUseCase(gateway).execute(id);
-        assertEquals("delete failed", result.getLeft().firstError().message());
+        assertEquals("delete failed", result.orElseThrow().firstError().message());
     }
 }

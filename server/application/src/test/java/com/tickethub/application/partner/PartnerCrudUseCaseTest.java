@@ -119,8 +119,8 @@ class PartnerCrudUseCaseTest {
     @Test
     void deletesIdempotentlyThroughGateway() {
         final var useCase = new DefaultDeletePartnerUseCase(gateway);
-        assertEquals(id, useCase.execute(id).getRight().id());
-        assertEquals(id, useCase.execute(id).getRight().id());
+        assertTrue(useCase.execute(id).isEmpty());
+        assertTrue(useCase.execute(id).isEmpty());
         verify(gateway, times(2)).deleteById(partner.getId());
         verifyNoMoreInteractions(gateway);
     }
@@ -129,6 +129,6 @@ class PartnerCrudUseCaseTest {
     void returnsDeleteFailureAsNotification() {
         doThrow(new IllegalStateException("delete failed")).when(gateway).deleteById(partner.getId());
         assertEquals("delete failed",
-                new DefaultDeletePartnerUseCase(gateway).execute(id).getLeft().firstError().message());
+                new DefaultDeletePartnerUseCase(gateway).execute(id).orElseThrow().firstError().message());
     }
 }

@@ -4,11 +4,13 @@ import com.tickethub.application.Either;
 import com.tickethub.application.partner.changeaddress.*;
 import com.tickethub.application.partner.changename.*;
 import com.tickethub.application.partner.create.*;
-import com.tickethub.application.partner.delete.*;
+import com.tickethub.application.partner.delete.DeletePartnerUseCase;
 import com.tickethub.application.partner.retrieve.get.*;
 import com.tickethub.application.partner.retrieve.list.*;
 import com.tickethub.infrastructure.ControllerTest;
 import com.tickethub.infrastructure.security.OwnerAccess;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -54,7 +56,7 @@ class PartnerControllerTest {
 
     @Test
     void givenOwner_whenCallsDeleteOwnPartner_thenReturnsNoContent() throws Exception {
-        when(deletePartner.execute("partner-1")).thenReturn(Either.right(new DeletePartnerOutput("partner-1")));
+        when(deletePartner.execute("partner-1")).thenReturn(Optional.empty());
         when(ownerAccess.isSelfOrAdmin("partner-1")).thenReturn(true);
 
         mvc.perform(delete("/partners/partner-1")

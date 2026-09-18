@@ -1,6 +1,8 @@
 package com.tickethub.application.partner.delete;
+
 import java.util.Objects;
-import com.tickethub.application.Either;
+import java.util.Optional;
+
 import com.tickethub.domain.validation.Notification;
 
 import com.tickethub.domain.core.partner.PartnerGateway;
@@ -15,16 +17,13 @@ public final class DefaultDeletePartnerUseCase extends DeletePartnerUseCase {
     }
 
     @Override
-    public Either<Notification, DeletePartnerOutput> execute(final String input) {
+    public Optional<Notification> execute(final String input) {
         try {
             final PartnerID id = PartnerID.from(input);
             partnerGateway.deleteById(id);
-
-            final DeletePartnerOutput output = DeletePartnerOutput.from(input);
-            return Either.right(output);
+            return Optional.empty();
         } catch (final RuntimeException exception) {
-            final Notification notification = Notification.create(exception);
-            return Either.left(notification);
+            return Optional.of(Notification.create(exception));
         }
     }
 }

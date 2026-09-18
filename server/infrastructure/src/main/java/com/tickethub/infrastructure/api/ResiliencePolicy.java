@@ -1,6 +1,7 @@
 package com.tickethub.infrastructure.api;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.tickethub.application.Either;
@@ -43,16 +44,20 @@ public final class ResiliencePolicy {
     }
 
     public static boolean isTransientResult(final Object result) {
-        return result instanceof Either<?, ?> either
-                && either.isLeft()
-                && isTransientFailure(((Either<Notification, ?>) either).getLeft());
+        if (result instanceof Either<?, ?> either && either.isLeft()) {
+            return isTransientFailure(((Either<Notification, ?>) either).getLeft());
+        }
+        if (result instanceof Optional<?> optional && optional.orElse(null) instanceof Notification notification) {
+            return isTransientFailure(notification);
+        }
+        return false;
     }
 
     private static boolean isTransientFailure(final Notification notification) {
         return notification.getCause() != null && !(notification.getCause() instanceof DomainException);
     }
 
-    public <O> Supplier<Either<Notification, O>> decorate(final Supplier<Either<Notification, O>> supplier) {
+    public <T> Supplier<T> decorate(final Supplier<T> supplier) {
         Objects.requireNonNull(supplier, "'supplier' should not be null");
         if (!enabled) {
             return supplier;

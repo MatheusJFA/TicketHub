@@ -3,6 +3,7 @@ package com.tickethub.infrastructure.api;
 import java.time.Instant;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.tickethub.application.Either;
+import com.tickethub.application.UnitUseCase;
 import com.tickethub.application.UseCase;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.pagination.SearchQuery;
@@ -59,14 +61,40 @@ public final class ApiSupport {
         }
         final Notification notification = result.getLeft();
         audit(action, inputSummary, startedAt, outcomeOf(notification), firstMessage(notification));
-        if (notification.getCause() instanceof ResponseStatusException status) {
+        throw throwFor(notification);
+    }
+
+    public static <I> void execute(final UnitUseCase<I> useCase, final I input) {
+        final String action = useCase.getClass().getSimpleName();
+        final String inputSummary = String.valueOf(input);
+        final long startedAt = System.nanoTime();
+        final Optional<Notification> failure;
+        try {
+            final Supplier<Optional<Notification>> call = () -> useCase.execute(input);
+            failure = resilience.decorate(call).get();
+        } catch (final CallNotPermittedException e) {
+            final var status = new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE,
+                    "Service temporarily unavailable", e);
+            audit(action, inputSummary, startedAt, AuditOutcome.UNAVAILABLE, status.getReason());
             throw status;
         }
-
-        if (notification.getCause() != null && !(notification.getCause() instanceof DomainException)) {
-            throw new IllegalStateException("Use case failed", notification.getCause());
+        if (failure.isEmpty()) {
+            audit(action, inputSummary, startedAt, AuditOutcome.SUCCESS, null);
+            return;
         }
-        throw new ApiValidationException(notification);
+        final Notification notification = failure.get();
+        audit(action, inputSummary, startedAt, outcomeOf(notification), firstMessage(notification));
+        throw throwFor(notification);
+    }
+
+    private static RuntimeException throwFor(final Notification notification) {
+        if (notification.getCause() instanceof ResponseStatusException status) {
+            return status;
+        }
+        if (notification.getCause() != null && !(notification.getCause() instanceof DomainException)) {
+            return new IllegalStateException("Use case failed", notification.getCause());
+        }
+        return new ApiValidationException(notification);
     }
 
     private static void audit(final String action, final String input, final long startedAt,

@@ -1,7 +1,8 @@
 package com.tickethub.application.show.delete;
 
 import java.util.Objects;
-import com.tickethub.application.Either;
+import java.util.Optional;
+
 import com.tickethub.domain.validation.Notification;
 
 import com.tickethub.domain.core.show.ShowGateway;
@@ -16,16 +17,13 @@ public final class DefaultDeleteShowUseCase extends DeleteShowUseCase {
     }
 
     @Override
-    public Either<Notification, DeleteShowOutput> execute(final String input) {
+    public Optional<Notification> execute(final String input) {
         try {
             final ShowID id = ShowID.from(input);
             showGateway.deleteById(id);
-
-            final DeleteShowOutput output = DeleteShowOutput.from(input);
-            return Either.right(output);
+            return Optional.empty();
         } catch (final RuntimeException exception) {
-            final Notification notification = Notification.create(exception);
-            return Either.left(notification);
+            return Optional.of(Notification.create(exception));
         }
     }
 }

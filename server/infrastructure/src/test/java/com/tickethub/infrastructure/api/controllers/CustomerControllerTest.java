@@ -6,7 +6,6 @@ import com.tickethub.application.customer.changename.ChangeCustomerNameUseCase;
 import com.tickethub.application.customer.create.CreateCustomerCommand;
 import com.tickethub.application.customer.create.CreateCustomerOutput;
 import com.tickethub.application.customer.create.CreateCustomerUseCase;
-import com.tickethub.application.customer.delete.DeleteCustomerOutput;
 import com.tickethub.application.customer.delete.DeleteCustomerUseCase;
 import com.tickethub.application.customer.retrieve.get.GetCustomerUseCase;
 import com.tickethub.application.customer.retrieve.list.ListCustomersUseCase;
@@ -15,6 +14,8 @@ import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.Notification;
 import com.tickethub.infrastructure.ControllerTest;
 import com.tickethub.infrastructure.security.OwnerAccess;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -86,7 +87,7 @@ class CustomerControllerTest {
 
     @Test
     void givenAValidId_whenCallsDeleteCustomer_shouldReturnNoContent() throws Exception {
-        when(deleteCustomer.execute("customer-1")).thenReturn(Either.right(new DeleteCustomerOutput("customer-1")));
+        when(deleteCustomer.execute("customer-1")).thenReturn(Optional.empty());
         when(ownerAccess.isSelfOrAdmin("customer-1")).thenReturn(true);
 
         mvc.perform(delete("/customers/customer-1").header("Authorization", bearer("customer-1", "customer:delete"))).andExpect(status().isNoContent());
@@ -110,7 +111,7 @@ class CustomerControllerTest {
 
     @Test
     void givenAdmin_whenCallsDeleteAnotherCustomer_thenReturnsNoContent() throws Exception {
-        when(deleteCustomer.execute("customer-1")).thenReturn(Either.right(new DeleteCustomerOutput("customer-1")));
+        when(deleteCustomer.execute("customer-1")).thenReturn(Optional.empty());
 
         when(ownerAccess.isSelfOrAdmin("customer-1")).thenReturn(true);
 
