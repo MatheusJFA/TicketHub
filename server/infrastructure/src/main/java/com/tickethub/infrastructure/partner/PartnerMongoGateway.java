@@ -14,6 +14,7 @@ import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.domain.pagination.SearchQuery;
+import com.tickethub.domain.shared.Email;
 import com.tickethub.infrastructure.partner.persistence.PartnerDocument;
 import com.tickethub.infrastructure.partner.persistence.PartnerRepository;
 import com.tickethub.infrastructure.shared.persistence.MongoGatewaySupport;
@@ -51,6 +52,11 @@ public class PartnerMongoGateway implements PartnerGateway {
     }
 
     @Override
+    public Optional<Partner> findByEmail(final Email email) {
+        return repository.findByEmail(email.getValue()).map(PartnerDocument::toDomain);
+    }
+
+    @Override
     public Partner update(final Partner partner) {
         try {
             return mongoTemplate.save(PartnerDocument.from(partner), PartnerDocument.COLLECTION).toDomain();
@@ -69,6 +75,9 @@ public class PartnerMongoGateway implements PartnerGateway {
     private static DomainException duplicateKey(final DuplicateKeyException e) {
         if (e.getMessage() != null && e.getMessage().contains("uq_partners_cnpj")) {
             return new DomainException("'cnpj' already in use");
+        }
+        if (e.getMessage() != null && e.getMessage().contains("uq_partners_email")) {
+            return new DomainException("'email' already in use");
         }
         throw e;
     }

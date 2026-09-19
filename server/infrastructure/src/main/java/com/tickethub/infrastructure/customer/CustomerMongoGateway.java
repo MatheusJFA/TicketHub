@@ -14,6 +14,7 @@ import com.tickethub.domain.core.customer.CustomerID;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.domain.pagination.SearchQuery;
+import com.tickethub.domain.shared.Email;
 import com.tickethub.infrastructure.customer.persistence.CustomerDocument;
 import com.tickethub.infrastructure.customer.persistence.CustomerRepository;
 import com.tickethub.infrastructure.shared.persistence.MongoGatewaySupport;
@@ -51,6 +52,11 @@ public class CustomerMongoGateway implements CustomerGateway {
     }
 
     @Override
+    public Optional<Customer> findByEmail(final Email email) {
+        return repository.findByEmail(email.getValue()).map(CustomerDocument::toDomain);
+    }
+
+    @Override
     public Customer update(final Customer customer) {
         try {
             return mongoTemplate.save(CustomerDocument.from(customer), CustomerDocument.COLLECTION).toDomain();
@@ -69,6 +75,9 @@ public class CustomerMongoGateway implements CustomerGateway {
     private static DomainException duplicateKey(final DuplicateKeyException e) {
         if (e.getMessage() != null && e.getMessage().contains("uq_customers_cpf")) {
             return new DomainException("'cpf' already in use");
+        }
+        if (e.getMessage() != null && e.getMessage().contains("uq_customers_email")) {
+            return new DomainException("'email' already in use");
         }
         throw e;
     }
