@@ -47,3 +47,51 @@ jobs:
 
       - name: Run integration tests via Testcontainers
         run: ./mvnw -B -ntp -Pintegration verify
+
+  acceptance:
+    name: Acceptance tests (Cucumber)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+
+      - name: Run Cucumber acceptance suite via Testcontainers
+        run: ./mvnw -B -ntp -Pintegration -Dtest='!*' -Dsurefire.failIfNoSpecifiedTests=false -Dit.test='CucumberAcceptanceIT' -DfailIfNoTests=false verify
+
+  veracode:
+    name: Veracode pipeline scan
+    runs-on: ubuntu-latest
+    # Skipped until VERACODE_API_ID / VERACODE_API_KEY repo secrets are configured.
+    if: ${{ secrets.VERACODE_API_ID != '' && secrets.VERACODE_API_KEY != '' }}
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+
+      - name: Build application JAR
+        run: ./mvnw -B -ntp -pl infrastructure -am package -DskipTests
+
+      - name: Veracode pipeline scan
+        uses: veracode/Veracode-pipeline-scan-action@v1.0.20
+        with:
+          vid: ${{ secrets.VERACODE_API_ID }}
+          vkey: ${{ secrets.VERACODE_API_KEY }}
+          file: "infrastructure/target/infrastructure-0.0.1-SNAPSHOT.jar"
+          fail_build: true
