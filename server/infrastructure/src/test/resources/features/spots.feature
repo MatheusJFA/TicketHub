@@ -29,3 +29,8 @@ Funcionalidade: Gestão de spots
     E que estou autenticado como outro parceiro
     Quando altero a localização do spot para "Z9"
     Então a resposta deve ter status 403
+
+  Cenário: Criar spot de seção inexistente retorna 404
+    Dado que sou o administrador
+    Quando crio o spot na seção inexistente
+    Então a resposta deve ter status 404

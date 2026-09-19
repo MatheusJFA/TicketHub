@@ -38,3 +38,8 @@ Funcionalidade: Gestão de shows
     Dado que estou sem credenciais
     Quando crio o show "Rock in Rio" do parceiro "Rock Produções"
     Então a resposta deve ter status 401
+
+  Cenário: Criar seção avulsa de show inexistente retorna 404
+    Dado que sou o administrador
+    Quando crio a seção avulsa do show inexistente
+    Então a resposta deve ter status 404

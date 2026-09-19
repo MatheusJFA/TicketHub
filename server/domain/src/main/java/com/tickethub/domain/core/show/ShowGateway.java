@@ -1,5 +1,6 @@
 package com.tickethub.domain.core.show;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -14,6 +15,7 @@ public interface ShowGateway {
     Optional<Show> findById(ShowID id);
     Show update(Show show);
     Pagination<Show> findAll(SearchQuery query);
+    List<ShowID> existsByIds(List<ShowID> ids);
 
     /**
      * Bulk-inserts new spots for a section of the show, linking them to the

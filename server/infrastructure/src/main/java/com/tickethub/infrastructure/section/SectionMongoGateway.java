@@ -14,10 +14,12 @@ import org.springframework.stereotype.Component;
 import com.tickethub.domain.core.section.Section;
 import com.tickethub.domain.core.section.SectionGateway;
 import com.tickethub.domain.core.section.SectionID;
+import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.domain.pagination.SearchQuery;
 import com.tickethub.infrastructure.section.persistence.SectionDocument;
+import com.tickethub.infrastructure.show.persistence.ShowDocument;
 import com.tickethub.infrastructure.spot.persistence.SpotDocument;
 import com.tickethub.infrastructure.shared.persistence.MongoGatewaySupport;
 import com.tickethub.infrastructure.shared.persistence.MongoUnitOfWork;
@@ -34,11 +36,20 @@ public class SectionMongoGateway implements SectionGateway {
     }
 
     @Override
-    public Section create(final Section section) {
+    public Section create(final Section section, final ShowID showId) {
+        Objects.requireNonNull(showId, "'showId' should not be null");
+        // Resolve the remaining denormalized links from the parent show.
+        final var partnerId = Optional
+                .ofNullable(mongoTemplate.findById(showId.getValue(), ShowDocument.class,
+                        ShowDocument.COLLECTION))
+                .map(ShowDocument::partnerId)
+                .orElse(null);
         final var unitOfWork = new MongoUnitOfWork(mongoTemplate);
-        unitOfWork.registerNew(SectionDocument.COLLECTION, SectionDocument.from(section));
+        unitOfWork.registerNew(SectionDocument.COLLECTION,
+                SectionDocument.from(section, showId.getValue(), partnerId));
         for (final Spot spot : section.getSpots()) {
-            unitOfWork.registerNew(SpotDocument.COLLECTION, SpotDocument.from(spot));
+            unitOfWork.registerNew(SpotDocument.COLLECTION,
+                    SpotDocument.from(spot, showId.getValue(), section.getId().getValue(), partnerId));
         }
         unitOfWork.commit();
         return section;
@@ -97,6 +108,19 @@ public class SectionMongoGateway implements SectionGateway {
         final var mongoQuery = MongoGatewaySupport.searchQuery(query, "name", "description");
         return MongoGatewaySupport.paginate(mongoTemplate, mongoQuery, SectionDocument.class,
                 SectionDocument.COLLECTION, query, SORTABLE_FIELDS, this::toDomain);
+    }
+
+    @Override
+    public List<SectionID> existsByIds(final List<SectionID> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return MongoGatewaySupport
+                .existingIds(mongoTemplate, ids.stream().map(SectionID::getValue).toList(),
+                        SectionDocument.COLLECTION)
+                .stream()
+                .map(SectionID::from)
+                .toList();
     }
 
     private Section toDomain(final SectionDocument document) {

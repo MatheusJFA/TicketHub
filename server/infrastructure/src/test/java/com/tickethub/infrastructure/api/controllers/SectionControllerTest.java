@@ -63,7 +63,7 @@ class SectionControllerTest {
         when(createSection.execute(any())).thenReturn(Either.right(new CreateSectionOutput("section-1")));
 
         mvc.perform(post("/sections").header("Authorization", bearer("section:write")).contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"VIP\",\"description\":\"VIP\",\"totalSpots\":10,\"price\":{\"value\":50.00,\"currency\":\"BRL\"}}"))
+                        .content("{\"showId\":\"show-1\",\"name\":\"VIP\",\"description\":\"VIP\",\"totalSpots\":10,\"price\":{\"value\":50.00,\"currency\":\"BRL\"}}"))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/sections/section-1"))
                 .andExpect(jsonPath("$.id").value("section-1"));

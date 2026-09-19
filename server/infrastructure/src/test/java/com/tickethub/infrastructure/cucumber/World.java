@@ -16,6 +16,7 @@ public class World {
     private String currentPartner;
     private String token;
     private String showId;
+    private String sectionId;
     private String spotId;
     private String spotLocation;
     private MvcResult lastResult;
@@ -25,6 +26,7 @@ public class World {
         currentPartner = null;
         token = null;
         showId = null;
+        sectionId = null;
         spotId = null;
         spotLocation = null;
         lastResult = null;
@@ -58,10 +60,17 @@ public class World {
         this.showId = showId;
     }
 
+    public String sectionId() {
+        return sectionId;
+    }
+
+    public void sectionId(final String sectionId) {
+        this.sectionId = sectionId;
+    }
+
     public String spotId() {
         return spotId;
     }
-
     public void spotId(final String spotId) {
         this.spotId = spotId;
     }
