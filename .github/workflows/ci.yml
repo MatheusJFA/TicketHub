@@ -67,11 +67,13 @@ jobs:
       - name: Run Cucumber acceptance suite via Testcontainers
         run: ./mvnw -B -ntp -Pintegration -Dtest='!*' -Dsurefire.failIfNoSpecifiedTests=false -Dit.test='CucumberAcceptanceIT' -DfailIfNoTests=false verify
 
-  veracode:
-    name: Veracode pipeline scan
+  codeql:
+    name: CodeQL analysis
     runs-on: ubuntu-latest
-    # Skipped until VERACODE_API_ID / VERACODE_API_KEY repo secrets are configured.
-    if: ${{ secrets.VERACODE_API_ID != '' && secrets.VERACODE_API_KEY != '' }}
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
     defaults:
       run:
         working-directory: server
@@ -85,13 +87,16 @@ jobs:
           java-version: "25"
           cache: maven
 
-      - name: Build application JAR
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: java-kotlin
+          queries: security-extended
+
+      - name: Build for CodeQL
         run: ./mvnw -B -ntp -pl infrastructure -am package -DskipTests
 
-      - name: Veracode pipeline scan
-        uses: veracode/Veracode-pipeline-scan-action@v1.0.20
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v3
         with:
-          vid: ${{ secrets.VERACODE_API_ID }}
-          vkey: ${{ secrets.VERACODE_API_KEY }}
-          file: "infrastructure/target/infrastructure-0.0.1-SNAPSHOT.jar"
-          fail_build: true
+          category: "/language:java-kotlin"
