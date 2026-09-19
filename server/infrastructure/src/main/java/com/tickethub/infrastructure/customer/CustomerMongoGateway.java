@@ -6,8 +6,6 @@ import java.util.Set;
 
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import com.tickethub.domain.core.customer.Customer;
@@ -17,6 +15,7 @@ import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.domain.pagination.SearchQuery;
 import com.tickethub.infrastructure.customer.persistence.CustomerDocument;
+import com.tickethub.infrastructure.customer.persistence.CustomerRepository;
 import com.tickethub.infrastructure.shared.persistence.MongoGatewaySupport;
 
 @Component
@@ -25,9 +24,11 @@ public class CustomerMongoGateway implements CustomerGateway {
     private static final Set<String> SORTABLE_FIELDS = Set.of("name", "cpf", "createdAt", "updatedAt");
 
     private final MongoTemplate mongoTemplate;
+    private final CustomerRepository repository;
 
-    public CustomerMongoGateway(final MongoTemplate mongoTemplate) {
+    public CustomerMongoGateway(final MongoTemplate mongoTemplate, final CustomerRepository repository) {
         this.mongoTemplate = Objects.requireNonNull(mongoTemplate, "'mongoTemplate' should not be null");
+        this.repository = Objects.requireNonNull(repository, "'repository' should not be null");
     }
 
     @Override
@@ -41,16 +42,12 @@ public class CustomerMongoGateway implements CustomerGateway {
 
     @Override
     public void deleteById(final CustomerID id) {
-        mongoTemplate.remove(Query.query(Criteria.where("_id").is(id.getValue())),
-                CustomerDocument.class, CustomerDocument.COLLECTION);
+        repository.deleteById(id.getValue());
     }
 
     @Override
     public Optional<Customer> findById(final CustomerID id) {
-        return Optional
-                .ofNullable(mongoTemplate.findById(id.getValue(), CustomerDocument.class,
-                        CustomerDocument.COLLECTION))
-                .map(CustomerDocument::toDomain);
+        return repository.findById(id.getValue()).map(CustomerDocument::toDomain);
     }
 
     @Override

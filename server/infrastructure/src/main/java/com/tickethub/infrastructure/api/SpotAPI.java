@@ -33,7 +33,7 @@ public interface SpotAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("hasAuthority('spot:write') and @showAccess.canWriteSpot(#id)")
-    ResponseEntity<?> changeSpotLocation(@PathVariable("id") String id, @RequestBody ChangeSpotLocationRequest input);
+    ResponseEntity<IdResponse> changeSpotLocation(@PathVariable("id") String id, @RequestBody ChangeSpotLocationRequest input);
 
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Create Spot")
@@ -46,7 +46,7 @@ public interface SpotAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("hasAuthority('spot:write')")
-    ResponseEntity<?> createSpot(@RequestBody CreateSpotRequest input);
+    ResponseEntity<IdResponse> createSpot(@RequestBody CreateSpotRequest input);
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete Spot")
@@ -59,7 +59,7 @@ public interface SpotAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("hasAuthority('spot:delete') and @showAccess.canDeleteSpot(#id)")
-    ResponseEntity<?> deleteById(@PathVariable("id") String id);
+    ResponseEntity<Void> deleteById(@PathVariable("id") String id);
 
     @PostMapping(value = "/{id}/publish")
     @Operation(summary = "Publish Spot")
@@ -72,7 +72,7 @@ public interface SpotAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("hasAuthority('spot:publish') and @showAccess.canPublishSpot(#id)")
-    ResponseEntity<?> publishSpot(@PathVariable("id") String id);
+    ResponseEntity<IdResponse> publishSpot(@PathVariable("id") String id);
 
     @GetMapping("/{id}")
     @Operation(summary = "Get Spot")
@@ -114,7 +114,7 @@ public interface SpotAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("hasAuthority('spot:publish') and @showAccess.canPublishSpot(#id)")
-    ResponseEntity<?> unpublishSpot(@PathVariable("id") String id);
+    ResponseEntity<IdResponse> unpublishSpot(@PathVariable("id") String id);
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Update Spot")
@@ -127,5 +127,5 @@ public interface SpotAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("hasAuthority('spot:write') and @showAccess.canWriteSpot(#id)")
-    ResponseEntity<?> updateSpot(@PathVariable("id") String id, @RequestBody UpdateSpotRequest input);
+    ResponseEntity<IdResponse> updateSpot(@PathVariable("id") String id, @RequestBody UpdateSpotRequest input);
 }

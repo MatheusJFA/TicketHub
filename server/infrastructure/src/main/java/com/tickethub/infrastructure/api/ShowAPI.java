@@ -38,7 +38,7 @@ public interface ShowAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("@showAccess.canWrite(#id)")
-    ResponseEntity<?> addSectionToShow(@PathVariable("id") String id, @RequestBody AddSectionToShowRequest input);
+    ResponseEntity<IdResponse> addSectionToShow(@PathVariable("id") String id, @RequestBody AddSectionToShowRequest input);
 
     @PatchMapping(value = "/{id}/description", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Change Show Description")
@@ -51,7 +51,7 @@ public interface ShowAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("@showAccess.canWrite(#id)")
-    ResponseEntity<?> changeShowDescription(@PathVariable("id") String id, @RequestBody ChangeShowDescriptionRequest input);
+    ResponseEntity<IdResponse> changeShowDescription(@PathVariable("id") String id, @RequestBody ChangeShowDescriptionRequest input);
 
     @PatchMapping(value = "/{id}/name", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Change Show Name")
@@ -64,7 +64,7 @@ public interface ShowAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("@showAccess.canWrite(#id)")
-    ResponseEntity<?> changeShowName(@PathVariable("id") String id, @RequestBody ChangeShowNameRequest input);
+    ResponseEntity<IdResponse> changeShowName(@PathVariable("id") String id, @RequestBody ChangeShowNameRequest input);
 
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Create Show")
@@ -77,7 +77,7 @@ public interface ShowAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("@showAccess.canCreate(#input.partnerId())")
-    ResponseEntity<?> createShow(@RequestBody CreateShowRequest input);
+    ResponseEntity<IdResponse> createShow(@RequestBody CreateShowRequest input);
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete Show")
@@ -90,7 +90,7 @@ public interface ShowAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("@showAccess.canDelete(#id)")
-    ResponseEntity<?> deleteById(@PathVariable("id") String id);
+    ResponseEntity<Void> deleteById(@PathVariable("id") String id);
 
     @PostMapping(value = "/{id}/publish")
     @Operation(summary = "Publish Show")
@@ -103,7 +103,7 @@ public interface ShowAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("@showAccess.canPublish(#id)")
-    ResponseEntity<?> publishShow(@PathVariable("id") String id);
+    ResponseEntity<IdResponse> publishShow(@PathVariable("id") String id);
 
     @PostMapping(value = "/{id}/publish-all")
     @Operation(summary = "Publish All Show")
@@ -116,7 +116,7 @@ public interface ShowAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("@showAccess.canPublish(#id)")
-    ResponseEntity<?> publishAllShow(@PathVariable("id") String id);
+    ResponseEntity<IdResponse> publishAllShow(@PathVariable("id") String id);
 
     @PatchMapping(value = "/{id}/date", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Reschedule Show")
@@ -129,7 +129,7 @@ public interface ShowAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("@showAccess.canWrite(#id)")
-    ResponseEntity<?> rescheduleShow(@PathVariable("id") String id, @RequestBody RescheduleShowRequest input);
+    ResponseEntity<IdResponse> rescheduleShow(@PathVariable("id") String id, @RequestBody RescheduleShowRequest input);
 
     @GetMapping("/{id}")
     @Operation(summary = "Get Show")
@@ -171,7 +171,7 @@ public interface ShowAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("@showAccess.canPublish(#id)")
-    ResponseEntity<?> unpublishShow(@PathVariable("id") String id);
+    ResponseEntity<IdResponse> unpublishShow(@PathVariable("id") String id);
 
     @PostMapping(value = "/{id}/unpublish-all")
     @Operation(summary = "Unpublish All Show")
@@ -184,7 +184,7 @@ public interface ShowAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("@showAccess.canPublish(#id)")
-    ResponseEntity<?> unpublishAllShow(@PathVariable("id") String id);
+    ResponseEntity<IdResponse> unpublishAllShow(@PathVariable("id") String id);
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Update Show")
@@ -197,5 +197,5 @@ public interface ShowAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("@showAccess.canWrite(#id)")
-    ResponseEntity<?> updateShow(@PathVariable("id") String id, @RequestBody UpdateShowRequest input);
+    ResponseEntity<IdResponse> updateShow(@PathVariable("id") String id, @RequestBody UpdateShowRequest input);
 }

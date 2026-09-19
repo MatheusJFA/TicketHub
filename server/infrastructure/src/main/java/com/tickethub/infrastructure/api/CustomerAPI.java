@@ -31,7 +31,7 @@ public interface CustomerAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("hasAuthority('customer:write') and @ownerAccess.isSelfOrAdmin(#id)")
-    ResponseEntity<?> changeCustomerName(@PathVariable("id") String id, @RequestBody ChangeCustomerNameRequest input);
+    ResponseEntity<IdResponse> changeCustomerName(@PathVariable("id") String id, @RequestBody ChangeCustomerNameRequest input);
 
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Create Customer")
@@ -43,7 +43,7 @@ public interface CustomerAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
-    ResponseEntity<?> createCustomer(@RequestBody CreateCustomerRequest input);
+    ResponseEntity<IdResponse> createCustomer(@RequestBody CreateCustomerRequest input);
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete Customer")
@@ -56,7 +56,7 @@ public interface CustomerAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("hasAuthority('customer:delete') and @ownerAccess.isSelfOrAdmin(#id)")
-    ResponseEntity<?> deleteById(@PathVariable("id") String id);
+    ResponseEntity<Void> deleteById(@PathVariable("id") String id);
 
     @GetMapping("/{id}")
     @Operation(summary = "Get Customer")
@@ -69,7 +69,7 @@ public interface CustomerAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("@ownerAccess.isSelfOrAdmin(#id)")
-    ResponseEntity<?> getById(@PathVariable("id") String id);
+    ResponseEntity<CustomerResponse> getById(@PathVariable("id") String id);
 
     @GetMapping
     @Operation(summary = "List Customers")
@@ -82,7 +82,7 @@ public interface CustomerAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("hasRole('ADMIN')")
-    ResponseEntity<?> list(
+    ResponseEntity<Pagination<CustomerListResponse>> list(
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int perPage,
@@ -100,5 +100,5 @@ public interface CustomerAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("hasAuthority('customer:write') and @ownerAccess.isSelfOrAdmin(#id)")
-    ResponseEntity<?> updateCustomer(@PathVariable("id") String id, @RequestBody UpdateCustomerRequest input);
+    ResponseEntity<IdResponse> updateCustomer(@PathVariable("id") String id, @RequestBody UpdateCustomerRequest input);
 }

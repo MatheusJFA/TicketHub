@@ -9,6 +9,7 @@ import com.tickethub.application.partner.retrieve.get.*;
 import com.tickethub.application.partner.retrieve.list.*;
 import com.tickethub.application.partner.update.*;
 import com.tickethub.infrastructure.partner.models.*;
+import com.tickethub.domain.pagination.Pagination;
 import org.springframework.http.ResponseEntity;
 import com.tickethub.infrastructure.api.HttpResults;
 import com.tickethub.infrastructure.partner.presenters.PartnerMapper;
@@ -47,36 +48,36 @@ public class PartnerController implements PartnerAPI {
     }
 
     @Override
-    public ResponseEntity<?> changePartnerAddress(String id, ChangePartnerAddressRequest input) {
+    public ResponseEntity<IdResponse> changePartnerAddress(String id, ChangePartnerAddressRequest input) {
         final var output = HttpResults.require(changePartnerAddress.execute(mapper.toCommand(id, input)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
-    public ResponseEntity<?> changePartnerName(String id, ChangePartnerNameRequest input) {
+    public ResponseEntity<IdResponse> changePartnerName(String id, ChangePartnerNameRequest input) {
         final var output = HttpResults.require(changePartnerName.execute(mapper.toCommand(id, input)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
-    public ResponseEntity<?> createPartner(CreatePartnerRequest input) {
+    public ResponseEntity<IdResponse> createPartner(CreatePartnerRequest input) {
         final var output = HttpResults.require(createPartner.execute(mapper.toCommand(input)));
         return ResponseEntity.created(URI.create("/partners/" + output.id())).body(new IdResponse(output.id()));
     }
 
     @Override
-    public ResponseEntity<?> deleteById(String id) {
+    public ResponseEntity<Void> deleteById(String id) {
         HttpResults.requireEmpty(deletePartner.execute(id));
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<?> getById(String id) {
+    public ResponseEntity<PartnerResponse> getById(String id) {
         return ResponseEntity.ok(mapper.toResponse(HttpResults.require(getPartner.execute(id))));
     }
 
     @Override
-    public ResponseEntity<?> list(String search, int page, int perPage, String sort, String direction) {
+    public ResponseEntity<Pagination<PartnerListResponse>> list(String search, int page, int perPage, String sort, String direction) {
         final var result = HttpResults.require(listPartners.execute(HttpResults.search(search, page, perPage, sort, direction)))
                 .map(mapper::toListResponse);
         return ResponseEntity.ok(result);
