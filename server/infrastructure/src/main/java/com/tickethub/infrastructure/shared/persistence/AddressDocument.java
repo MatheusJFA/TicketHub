@@ -1,4 +1,4 @@
-package com.tickethub.infrastructure.persistence;
+package com.tickethub.infrastructure.shared.persistence;
 
 import com.tickethub.domain.shared.Address;
 

@@ -1,4 +1,4 @@
-package com.tickethub.infrastructure.persistence;
+package com.tickethub.infrastructure.shared.persistence;
 
 import java.math.BigDecimal;
 import java.util.Currency;

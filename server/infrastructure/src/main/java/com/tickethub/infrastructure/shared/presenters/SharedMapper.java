@@ -1,4 +1,4 @@
-package com.tickethub.infrastructure.mapping;
+package com.tickethub.infrastructure.shared.presenters;
 
 import java.util.Currency;
 

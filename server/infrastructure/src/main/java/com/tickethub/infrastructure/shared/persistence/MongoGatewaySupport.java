@@ -1,4 +1,4 @@
-package com.tickethub.infrastructure.persistence;
+package com.tickethub.infrastructure.shared.persistence;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,13 +14,15 @@ import org.springframework.data.mongodb.core.query.Query;
 
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.domain.pagination.SearchQuery;
+import com.tickethub.infrastructure.spot.persistence.SpotDocument;
+import com.tickethub.infrastructure.section.persistence.SectionDocument;
 
-final class MongoGatewaySupport {
+public final class MongoGatewaySupport {
 
     private MongoGatewaySupport() {
     }
 
-    static Query searchQuery(final SearchQuery query, final String... fields) {
+    public static Query searchQuery(final SearchQuery query, final String... fields) {
         final Query mongoQuery = new Query();
         if (query.searchTerm() != null && !query.searchTerm().isBlank() && fields.length > 0) {
             final var pattern = Pattern.compile(Pattern.quote(query.searchTerm().trim()),
@@ -33,7 +35,7 @@ final class MongoGatewaySupport {
         return mongoQuery;
     }
 
-    static Sort sortOf(final SearchQuery query, final Set<String> allowedFields, final String fallback) {
+    public static Sort sortOf(final SearchQuery query, final Set<String> allowedFields, final String fallback) {
         final String sort = query.sort() != null && allowedFields.contains(query.sort())
                 ? query.sort()
                 : fallback;
@@ -43,7 +45,7 @@ final class MongoGatewaySupport {
         return Sort.by(direction, sort);
     }
 
-    static <D, T> Pagination<T> paginate(final MongoTemplate mongoTemplate, final Query query,
+    public static <D, T> Pagination<T> paginate(final MongoTemplate mongoTemplate, final Query query,
             final Class<D> documentType, final String collection, final SearchQuery search,
             final Set<String> sortableFields, final Function<D, T> mapper) {
         final long total = mongoTemplate.count(query, documentType, collection);
@@ -54,7 +56,7 @@ final class MongoGatewaySupport {
         return new Pagination<>(search.page(), search.perPage(), total, page.stream().map(mapper).toList());
     }
 
-    static List<SectionDocument> sectionsByIds(final MongoTemplate mongoTemplate, final List<String> ids) {
+    public static List<SectionDocument> sectionsByIds(final MongoTemplate mongoTemplate, final List<String> ids) {
         if (ids == null || ids.isEmpty()) {
             return List.of();
         }
@@ -62,7 +64,7 @@ final class MongoGatewaySupport {
                 SectionDocument.class, SectionDocument.COLLECTION);
     }
 
-    static List<SectionDocument> sectionsByShowId(final MongoTemplate mongoTemplate, final String showId) {
+    public static List<SectionDocument> sectionsByShowId(final MongoTemplate mongoTemplate, final String showId) {
         if (showId == null || showId.isBlank()) {
             return List.of();
         }
@@ -70,7 +72,7 @@ final class MongoGatewaySupport {
                 SectionDocument.class, SectionDocument.COLLECTION);
     }
 
-    static List<SpotDocument> spotsByIds(final MongoTemplate mongoTemplate, final List<String> ids) {
+    public static List<SpotDocument> spotsByIds(final MongoTemplate mongoTemplate, final List<String> ids) {
         if (ids == null || ids.isEmpty()) {
             return List.of();
         }
@@ -78,7 +80,7 @@ final class MongoGatewaySupport {
                 SpotDocument.class, SpotDocument.COLLECTION);
     }
 
-    static List<SpotDocument> spotsByShowId(final MongoTemplate mongoTemplate, final String showId) {
+    public static List<SpotDocument> spotsByShowId(final MongoTemplate mongoTemplate, final String showId) {
         if (showId == null || showId.isBlank()) {
             return List.of();
         }
@@ -86,7 +88,7 @@ final class MongoGatewaySupport {
                 SpotDocument.class, SpotDocument.COLLECTION);
     }
 
-    static List<SpotDocument> spotsBySectionId(final MongoTemplate mongoTemplate, final String sectionId) {
+    public static List<SpotDocument> spotsBySectionId(final MongoTemplate mongoTemplate, final String sectionId) {
         if (sectionId == null || sectionId.isBlank()) {
             return List.of();
         }
@@ -94,7 +96,7 @@ final class MongoGatewaySupport {
                 SpotDocument.class, SpotDocument.COLLECTION);
     }
 
-    static void removeSectionsByShowId(final MongoTemplate mongoTemplate, final String showId) {
+    public static void removeSectionsByShowId(final MongoTemplate mongoTemplate, final String showId) {
         if (showId == null || showId.isBlank()) {
             return;
         }
@@ -102,7 +104,7 @@ final class MongoGatewaySupport {
                 SectionDocument.class, SectionDocument.COLLECTION);
     }
 
-    static void removeSpotsByShowId(final MongoTemplate mongoTemplate, final String showId) {
+    public static void removeSpotsByShowId(final MongoTemplate mongoTemplate, final String showId) {
         if (showId == null || showId.isBlank()) {
             return;
         }
@@ -110,7 +112,7 @@ final class MongoGatewaySupport {
                 SpotDocument.class, SpotDocument.COLLECTION);
     }
 
-    static void removeSpotsBySectionId(final MongoTemplate mongoTemplate, final String sectionId) {
+    public static void removeSpotsBySectionId(final MongoTemplate mongoTemplate, final String sectionId) {
         if (sectionId == null || sectionId.isBlank()) {
             return;
         }
