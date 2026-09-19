@@ -13,3 +13,5 @@ Decisões arquiteturais do TicketHub, em ordem cronológica. Convenção: `NNNN-
 | [007](./0007-jwt-rbac-ownership.md) | JWT próprio + RBAC com permissões + ownership | Aceito |
 | [008](./0008-testcontainers-testes-integracao.md) | Testcontainers nos testes de integração | Aceito |
 | [009](./0009-cucumber-testes-aceitacao.md) | Testes de aceitação com Cucumber | Aceito |
+| [010](./0010-login-email-refresh-logout.md) | Login por email + refresh rotativo com revogação | Aceito |
+| [011](./0011-enriquecimento-endereco-cep.md) | Enriquecimento de endereço via CEP (ViaCEP) | Aceito |

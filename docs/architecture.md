@@ -27,7 +27,7 @@ flowchart TB
     end
 
     subgraph Ext["External — docker-compose"]
-        MONGO[("MongoDB 8.0\ncustomers • partners • shows\nsections • spots • audit_logs")]
+        MONGO[("MongoDB 8.0\ncustomers • partners • shows\nsections • spots • audit_logs • refresh_sessions")]
         KAFKA["Kafka 3.9.1 KRaft\ntickethub.events (3 partições)"]
     end
 
@@ -143,7 +143,12 @@ Entidades carregam auditoria de domínio (`createdAt`, `updatedAt`, `deletedAt`,
 | Show | dono do `partnerId` (`@showAccess`, claim `ownerId`) | 403 | pública (catálogo) |
 | Section / Spot | dono via `partnerId` denormalizado (`@showAccess.canWriteSection/canWriteSpot`, fallback `showId`; órfão nega) | 403 | pública (catálogo) |
 
-Cadastro (`POST /customers`, `POST /partners`) e login são públicos.
+Cadastro (`POST /customers`, `POST /partners`) e login são públicos. O cadastro
+cria a credencial (email + senha com hash BCrypt); o login (`POST /auth/login`
+com `identifier` = email ou username bootstrap) devolve access JWT curto +
+refresh opaco rotativo (`POST /auth/refresh`, `POST /auth/logout`; coleção
+`refresh_sessions`). Reuso de refresh rotacionado revoga a família. Detalhes em
+[`ADR-010`](./adr/0010-login-email-refresh-logout.md).
 
 ## 5. Testes
 
