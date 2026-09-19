@@ -5,11 +5,11 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 
 import com.tickethub.infrastructure.MongoCleanUpExtension;
 import com.tickethub.infrastructure.audit.MongoAuditTrail;
-import com.tickethub.infrastructure.persistence.CustomerDocument;
-import com.tickethub.infrastructure.persistence.PartnerDocument;
-import com.tickethub.infrastructure.persistence.SectionDocument;
-import com.tickethub.infrastructure.persistence.ShowDocument;
-import com.tickethub.infrastructure.persistence.SpotDocument;
+import com.tickethub.infrastructure.customer.persistence.CustomerDocument;
+import com.tickethub.infrastructure.partner.persistence.PartnerDocument;
+import com.tickethub.infrastructure.section.persistence.SectionDocument;
+import com.tickethub.infrastructure.show.persistence.ShowDocument;
+import com.tickethub.infrastructure.spot.persistence.SpotDocument;
 
 import io.cucumber.java.Before;
 

@@ -19,7 +19,7 @@ import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import com.tickethub.infrastructure.api.ShowAPI;
 import com.tickethub.infrastructure.api.HttpResults;
-import com.tickethub.infrastructure.mapping.ShowMapper;
+import com.tickethub.infrastructure.show.presenters.ShowMapper;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController

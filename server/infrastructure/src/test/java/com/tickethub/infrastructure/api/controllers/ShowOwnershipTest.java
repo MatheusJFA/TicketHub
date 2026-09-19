@@ -12,8 +12,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
-import com.tickethub.infrastructure.mapping.SharedMapperImpl;
-import com.tickethub.infrastructure.mapping.ShowMapperImpl;
+import com.tickethub.infrastructure.shared.presenters.SharedMapperImpl;
+import com.tickethub.infrastructure.show.presenters.ShowMapperImpl;
 
 import com.tickethub.application.Either;
 import com.tickethub.application.show.addsection.AddSectionToShowUseCase;

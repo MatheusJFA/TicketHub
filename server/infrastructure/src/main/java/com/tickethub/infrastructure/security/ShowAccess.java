@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.show.ShowID;
-import com.tickethub.infrastructure.persistence.SectionDocument;
-import com.tickethub.infrastructure.persistence.ShowDocument;
-import com.tickethub.infrastructure.persistence.SpotDocument;
+import com.tickethub.infrastructure.section.persistence.SectionDocument;
+import com.tickethub.infrastructure.show.persistence.ShowDocument;
+import com.tickethub.infrastructure.spot.persistence.SpotDocument;
 
 @Component("showAccess")
 public class ShowAccess {

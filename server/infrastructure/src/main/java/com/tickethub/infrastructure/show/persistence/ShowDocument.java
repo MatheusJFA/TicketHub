@@ -1,4 +1,4 @@
-package com.tickethub.infrastructure.persistence;
+package com.tickethub.infrastructure.show.persistence;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -14,6 +14,7 @@ import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.shared.Name;
 import com.tickethub.domain.shared.Text;
+import com.tickethub.infrastructure.shared.persistence.AddressDocument;
 
 @Document("shows")
 public record ShowDocument(

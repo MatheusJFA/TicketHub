@@ -1,6 +1,8 @@
-package com.tickethub.infrastructure.mapping;
+package com.tickethub.infrastructure.show.presenters;
 
 import org.mapstruct.Mapper;
+
+import com.tickethub.infrastructure.shared.presenters.SharedMapper;
 import org.mapstruct.Mapping;
 
 import com.tickethub.application.show.addsection.AddSectionToShowCommand;
