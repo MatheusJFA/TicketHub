@@ -42,6 +42,6 @@ public final class PasswordHash extends ValueObject {
 
     @Override
     public String toString() {
-        return "***";
+        return "*".repeat(100);
     }
 }
