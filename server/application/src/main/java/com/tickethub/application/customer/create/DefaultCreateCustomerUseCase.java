@@ -7,7 +7,7 @@ import com.tickethub.domain.core.customer.Customer;
 import com.tickethub.domain.core.customer.CustomerGateway;
 import com.tickethub.domain.validation.Notification;
 
-public final class DefaultCreateCustomerUseCase extends CreateCustomerUseCase {
+public class DefaultCreateCustomerUseCase extends CreateCustomerUseCase {
     private final CustomerGateway customerGateway;
 
     public DefaultCreateCustomerUseCase(final CustomerGateway customerGateway) {

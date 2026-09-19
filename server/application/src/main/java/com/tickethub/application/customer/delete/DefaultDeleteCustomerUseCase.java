@@ -1,14 +1,15 @@
 package com.tickethub.application.customer.delete;
 
 import java.util.Objects;
-import com.tickethub.application.Either;
+import java.util.Optional;
+
 import com.tickethub.domain.validation.Notification;
 
 import com.tickethub.domain.core.customer.CustomerGateway;
 import com.tickethub.domain.core.customer.CustomerID;
 
 
-public final class DefaultDeleteCustomerUseCase extends DeleteCustomerUseCase {
+public class DefaultDeleteCustomerUseCase extends DeleteCustomerUseCase {
     private final CustomerGateway customerGateway;
 
     public DefaultDeleteCustomerUseCase(final CustomerGateway customerGateway) {
@@ -16,17 +17,13 @@ public final class DefaultDeleteCustomerUseCase extends DeleteCustomerUseCase {
     }
 
     @Override
-    public Either<Notification, DeleteCustomerOutput> execute(final String input) {
+    public Optional<Notification> execute(final String input) {
         try {
             final CustomerID id = CustomerID.from(input);
-            
             customerGateway.deleteById(id);
-
-            final DeleteCustomerOutput output = new DeleteCustomerOutput(input);
-            return Either.right(output);
+            return Optional.empty();
         } catch (final RuntimeException exception) {
-            final Notification notification = Notification.create(exception);
-            return Either.left(notification);
+            return Optional.of(Notification.create(exception));
         }
     }
 }

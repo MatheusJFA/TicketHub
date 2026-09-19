@@ -1,5 +1,7 @@
 package com.tickethub.application;
 
+import java.util.Optional;
+
 import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.Notification;
 
@@ -9,5 +11,10 @@ public abstract class UseCase<IN, OUT> {
 
     protected final Notification notFound(final String resource, final String id) {
         return Notification.create(new Error(resource + " not found: " + id));
+    }
+
+    protected final <T> Either<Notification, T> findOrNotFound(final Optional<T> found, final String resource, final String id) {
+        return found.<Either<Notification, T>>map(Either::right)
+                .orElseGet(() -> Either.left(notFound(resource, id)));
     }
 }

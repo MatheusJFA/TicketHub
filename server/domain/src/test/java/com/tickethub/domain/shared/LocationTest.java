@@ -91,4 +91,42 @@ public class LocationTest {
         assertFalse(location.equals("A12"));
         assertFalse(location.equals(Text.create("A12")));
     }
+
+    @ParameterizedTest
+    @CsvSource(value = {"0, A", "1, B", "25, Z", "26, AA", "27, AB", "51, AZ", "52, BA"})
+    void givenSectionIndex_whenSectionCode_thenDeriveSpreadsheetStyleCode(int index, String expected) {
+        assertEquals(expected, Location.sectionCode(index));
+    }
+
+    @Test
+    void givenNegativeSectionIndex_whenSectionCode_thenThrowDomainException() {
+        assertThrows(DomainException.class, () -> Location.sectionCode(-1));
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"A, 1, A00001", "A, 42, A00042", "B, 7, B00007", "AA, 3, AA00003", "Z, 100000, Z100000"})
+    void givenSectionCodeAndSeat_whenGenerateSeat_thenFormatCode(String code, long seat, String expected) {
+        assertEquals(expected, Location.generateSeat(code, seat).getValue());
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"a", "A1", "ABCD", "A-1"})
+    void givenInvalidSectionCode_whenGenerateSeat_thenThrowDomainException(String code) {
+        assertThrows(DomainException.class, () -> Location.generateSeat(code, 1));
+    }
+
+    @Test
+    void givenZeroSeatNumber_whenGenerateSeat_thenThrowDomainException() {
+        assertThrows(DomainException.class, () -> Location.generateSeat("A", 0));
+    }
+
+    @Test
+    void givenNoContext_whenGenerateRandom_thenReturnShortCode() {
+        final var first = Location.generateRandom();
+        final var second = Location.generateRandom();
+
+        assertTrue(first.getValue().matches("[A-Z]\\d{5}"));
+        assertTrue(second.getValue().matches("[A-Z]\\d{5}"));
+    }
 }

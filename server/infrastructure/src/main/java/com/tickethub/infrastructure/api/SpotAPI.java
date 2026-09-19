@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RequestMapping(value = "/spots", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Spots")
@@ -31,6 +32,7 @@ public interface SpotAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
+    @PreAuthorize("hasAuthority('spot:write') and @showAccess.canWriteSpot(#id)")
     ResponseEntity<?> changeSpotLocation(@PathVariable("id") String id, @RequestBody ChangeSpotLocationRequest input);
 
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -43,6 +45,7 @@ public interface SpotAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
+    @PreAuthorize("hasAuthority('spot:write')")
     ResponseEntity<?> createSpot(@RequestBody CreateSpotRequest input);
 
     @DeleteMapping("/{id}")
@@ -55,6 +58,7 @@ public interface SpotAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
+    @PreAuthorize("hasAuthority('spot:delete') and @showAccess.canDeleteSpot(#id)")
     ResponseEntity<?> deleteById(@PathVariable("id") String id);
 
     @PostMapping(value = "/{id}/publish")
@@ -67,6 +71,7 @@ public interface SpotAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
+    @PreAuthorize("hasAuthority('spot:publish') and @showAccess.canPublishSpot(#id)")
     ResponseEntity<?> publishSpot(@PathVariable("id") String id);
 
     @GetMapping("/{id}")
@@ -108,5 +113,6 @@ public interface SpotAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
+    @PreAuthorize("hasAuthority('spot:publish') and @showAccess.canPublishSpot(#id)")
     ResponseEntity<?> unpublishSpot(@PathVariable("id") String id);
 }

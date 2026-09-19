@@ -10,7 +10,7 @@ import com.tickethub.domain.core.section.Section;
 
 
 
-public final class DefaultListSectionsUseCase extends ListSectionsUseCase {
+public class DefaultListSectionsUseCase extends ListSectionsUseCase {
     private final SectionGateway sectionGateway;
 
     public DefaultListSectionsUseCase(final SectionGateway sectionGateway) {

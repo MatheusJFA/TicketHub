@@ -10,9 +10,11 @@ import com.tickethub.application.spot.retrieve.get.*;
 import com.tickethub.application.spot.retrieve.list.*;
 import com.tickethub.application.spot.unpublish.*;
 import com.tickethub.infrastructure.spot.models.*;
+import com.tickethub.infrastructure.spot.presenters.SpotMapper;
+import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import com.tickethub.infrastructure.api.SpotAPI;
-import com.tickethub.infrastructure.api.ApiSupport;
+import com.tickethub.infrastructure.api.HttpResults;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -24,6 +26,7 @@ public class SpotController implements SpotAPI {
     private final GetSpotUseCase getSpot;
     private final ListSpotsUseCase listSpots;
     private final UnpublishSpotUseCase unpublishSpot;
+    private final SpotMapper mapper;
 
     public SpotController(ChangeSpotLocationUseCase changeSpotLocation,
             CreateSpotUseCase createSpot,
@@ -31,7 +34,8 @@ public class SpotController implements SpotAPI {
             PublishSpotUseCase publishSpot,
             GetSpotUseCase getSpot,
             ListSpotsUseCase listSpots,
-            UnpublishSpotUseCase unpublishSpot) {
+            UnpublishSpotUseCase unpublishSpot,
+            SpotMapper mapper) {
         this.changeSpotLocation = changeSpotLocation;
         this.createSpot = createSpot;
         this.deleteSpot = deleteSpot;
@@ -39,45 +43,46 @@ public class SpotController implements SpotAPI {
         this.getSpot = getSpot;
         this.listSpots = listSpots;
         this.unpublishSpot = unpublishSpot;
+        this.mapper = mapper;
     }
 
     @Override
     public ResponseEntity<IdResponse> changeSpotLocation(String id, ChangeSpotLocationRequest input) {
-        final var output = ApiSupport.execute(changeSpotLocation, new ChangeSpotLocationCommand(id, input.location() == null ? null : com.tickethub.domain.shared.Location.create(input.location())));
+        final var output = HttpResults.require(changeSpotLocation.execute(mapper.toCommand(id, input)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
     public ResponseEntity<IdResponse> createSpot(CreateSpotRequest input) {
-        final var output = ApiSupport.execute(createSpot, new CreateSpotCommand(input.location() == null ? null : com.tickethub.domain.shared.Location.create(input.location())));
-        return ResponseEntity.created(java.net.URI.create("/spots/" + output.id())).body(new IdResponse(output.id()));
+        final var output = HttpResults.require(createSpot.execute(mapper.toCommand(input)));
+        return ResponseEntity.created(URI.create("/spots/" + output.id())).body(new IdResponse(output.id()));
     }
 
     @Override
     public ResponseEntity<Void> deleteById(String id) {
-        ApiSupport.execute(deleteSpot, id);
+        HttpResults.requireEmpty(deleteSpot.execute(id));
         return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<IdResponse> publishSpot(String id) {
-        final var output = ApiSupport.execute(publishSpot, new PublishSpotCommand(id));
+        final var output = HttpResults.require(publishSpot.execute(new PublishSpotCommand(id)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
     public SpotResponse getById(String id) {
-        return SpotResponse.from(ApiSupport.execute(getSpot, id));
+        return mapper.toResponse(HttpResults.require(getSpot.execute(id)));
     }
 
     @Override
     public Pagination<SpotListResponse> list(String search, int page, int perPage, String sort, String direction) {
-        return ApiSupport.execute(listSpots, ApiSupport.query(search, page, perPage, sort, direction)).map(SpotListResponse::from);
+        return HttpResults.require(listSpots.execute(HttpResults.search(search, page, perPage, sort, direction))).map(mapper::toListResponse);
     }
 
     @Override
     public ResponseEntity<IdResponse> unpublishSpot(String id) {
-        final var output = ApiSupport.execute(unpublishSpot, new UnpublishSpotCommand(id));
+        final var output = HttpResults.require(unpublishSpot.execute(new UnpublishSpotCommand(id)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 }

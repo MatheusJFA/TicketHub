@@ -1,14 +1,15 @@
 package com.tickethub.application.section.delete;
 
 import java.util.Objects;
-import com.tickethub.application.Either;
+import java.util.Optional;
+
 import com.tickethub.domain.validation.Notification;
 
 import com.tickethub.domain.core.section.SectionGateway;
 import com.tickethub.domain.core.section.SectionID;
 
 
-public final class DefaultDeleteSectionUseCase extends DeleteSectionUseCase {
+public class DefaultDeleteSectionUseCase extends DeleteSectionUseCase {
     private final SectionGateway sectionGateway;
 
     public DefaultDeleteSectionUseCase(final SectionGateway sectionGateway) {
@@ -16,17 +17,13 @@ public final class DefaultDeleteSectionUseCase extends DeleteSectionUseCase {
     }
 
     @Override
-    public Either<Notification, DeleteSectionOutput> execute(final String input) {
+    public Optional<Notification> execute(final String input) {
         try {
             final SectionID id = SectionID.from(input);
-            
             sectionGateway.deleteById(id);
-
-            final DeleteSectionOutput output = DeleteSectionOutput.from(input);
-            return Either.right(output);
+            return Optional.empty();
         } catch (final RuntimeException exception) {
-            final Notification notification = Notification.create(exception);
-            return Either.left(notification);
+            return Optional.of(Notification.create(exception));
         }
     }
 }

@@ -18,8 +18,9 @@ import static org.mockito.AdditionalAnswers.returnsFirstArg;
 
 class UseCaseConfigurationTest {
     private final ApplicationContextRunner runner = new ApplicationContextRunner()
-            .withUserConfiguration(CustomerUseCaseConfig.class, PartnerUseCaseConfig.class,
-                    ShowUseCaseConfig.class, SectionUseCaseConfig.class, SpotUseCaseConfig.class);
+            .withUserConfiguration(EventConfiguration.class, CustomerUseCaseConfig.class,
+                    PartnerUseCaseConfig.class, ShowUseCaseConfig.class, SectionUseCaseConfig.class,
+                    SpotUseCaseConfig.class);
 
     @Test
     void startsWithoutPersistenceAdapters() {

@@ -2,19 +2,24 @@ package com.tickethub.domain.core.show;
 
 import static java.util.Objects.isNull;
 
+import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 
 import com.tickethub.domain.AggregateRoot;
 import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.core.section.Section;
+import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.shared.Address;
+import com.tickethub.domain.shared.Location;
 import com.tickethub.domain.shared.Money;
 import com.tickethub.domain.shared.Name;
 import com.tickethub.domain.shared.Text;
 import com.tickethub.domain.validation.ValidationHandler;
 
-public class Show extends AggregateRoot<ShowID> implements Cloneable {
+public class Show extends AggregateRoot<ShowID> {
     private Name name;
     private Text description;
 
@@ -28,12 +33,13 @@ public class Show extends AggregateRoot<ShowID> implements Cloneable {
 
     private final PartnerID partnerId;
 
-    private HashSet<Section> sections;
+    private final Set<Section> sections;
 
     private Show(ShowID id, Name name, Text description, OffsetDateTime date, Address address, boolean isPublished, long totalSpots,
             long totalSpotsSold,
-            PartnerID partnerId, HashSet<Section> sections) {
-        super(id);
+            PartnerID partnerId, Set<Section> sections,
+            Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
+        super(id, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
         this.name = name;
         this.description = description;
         this.date = date;
@@ -47,34 +53,65 @@ public class Show extends AggregateRoot<ShowID> implements Cloneable {
 
     public static Show create(String name, String description, OffsetDateTime date, Address address, boolean isPublished,
             long totalSpots,
-            long totalSpotsSold, PartnerID partnerId, HashSet<Section> sections) {
+            long totalSpotsSold, PartnerID partnerId, Set<Section> sections) {
         final ShowID id = ShowID.generate();
-        final HashSet<Section> sectionList = isNull(sections) ? new HashSet<>() : new HashSet<>(sections);
+        final Set<Section> sectionList = isNull(sections) ? new HashSet<>() : new HashSet<>(sections);
+        final var now = Instant.now();
         return new Show(id, Name.create(name), Text.create(description), date, address, isPublished, totalSpots, totalSpotsSold,
-                partnerId, sectionList);
+                partnerId, sectionList, now, now, null, null, null);
     }
 
     public static Show create(String name, String description, OffsetDateTime date, Address address, long totalSpots,
             PartnerID partnerId,
-            HashSet<Section> sections) {
+            Set<Section> sections) {
         final ShowID id = ShowID.generate();
-        final HashSet<Section> sectionList = isNull(sections) ? new HashSet<>() : new HashSet<>(sections);
+        final Set<Section> sectionList = isNull(sections) ? new HashSet<>() : new HashSet<>(sections);
+        final var now = Instant.now();
         return new Show(id, Name.create(name), Text.create(description), date, address, false, totalSpots, 0, partnerId,
-                sectionList);
+                sectionList, now, now, null, null, null);
     }
 
     public static Show create(String name, String description, OffsetDateTime date, Address address, long totalSpots,
             PartnerID partnerId) {
         final ShowID id = ShowID.generate();
+        final var now = Instant.now();
         return new Show(id, Name.create(name), Text.create(description), date, address, false, totalSpots, 0, partnerId,
-                new HashSet<>());
+                new HashSet<>(), now, now, null, null, null);
+    }
+
+    public static Show reconstitute(ShowID id, Name name, Text description, OffsetDateTime date, Address address,
+            boolean isPublished, long totalSpots, long totalSpotsSold, PartnerID partnerId, Set<Section> sections,
+            Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
+        final Set<Section> sectionList = isNull(sections) ? new HashSet<>() : new HashSet<>(sections);
+        return new Show(id, name, description, date, address, isPublished, totalSpots, totalSpotsSold,
+                partnerId, sectionList, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
     }
 
     public void addSection(String name, String description, long totalSpots, Money price) {
-        final Section section = Section.create(name, description, totalSpots, price);
+        if (totalSpots < 0) {
+            throw new DomainException("'totalSpots' should not be negative");
+        }
+        final Section section = Section.create(name, description, totalSpots, price,
+                Location.sectionCode(sections.size()));
         this.sections.add(section);
         this.totalSpots += totalSpots;
         this.markAsUpdated();
+    }
+
+    /**
+     * Adds a section shell without materialized spots, for asynchronous spot
+     * generation. The returned section id lets callers reference it (e.g. in
+     * a generation event) before the spots exist.
+     */
+    public Section addSectionShell(String name, String description, long totalSpots, Money price) {
+        if (totalSpots < 0) {
+            throw new DomainException("'totalSpots' should not be negative");
+        }
+        final Section section = Section.createShell(name, description, totalSpots, price);
+        this.sections.add(section);
+        this.totalSpots += totalSpots;
+        this.markAsUpdated();
+        return section;
     }
 
     public void publishAll() {
@@ -111,7 +148,7 @@ public class Show extends AggregateRoot<ShowID> implements Cloneable {
 
     public Show reschedule(final OffsetDateTime date) {
         if (date == null) {
-            throw new com.tickethub.domain.exception.DomainException("'date' should not be null");
+            throw new DomainException("'date' should not be null");
         }
         this.date = date;
         markAsUpdated();
@@ -150,19 +187,14 @@ public class Show extends AggregateRoot<ShowID> implements Cloneable {
         return partnerId;
     }
 
-    public HashSet<Section> getSections() {
-        return sections;
+    public Set<Section> getSections() {
+        return Collections.unmodifiableSet(sections);
     }
 
     @Override
     public void validate(final ValidationHandler handler) {
         final var validator = new ShowValidator(this, handler);
         validator.validate();
-    }
-
-    @Override
-    public Show clone() throws CloneNotSupportedException {
-        return (Show) super.clone();
     }
 
 }

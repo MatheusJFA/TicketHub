@@ -15,9 +15,11 @@ import com.tickethub.application.show.retrieve.list.*;
 import com.tickethub.application.show.unpublish.*;
 import com.tickethub.application.show.unpublishall.*;
 import com.tickethub.infrastructure.show.models.*;
+import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import com.tickethub.infrastructure.api.ShowAPI;
-import com.tickethub.infrastructure.api.ApiSupport;
+import com.tickethub.infrastructure.api.HttpResults;
+import com.tickethub.infrastructure.show.presenters.ShowMapper;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -34,6 +36,7 @@ public class ShowController implements ShowAPI {
     private final ListShowsUseCase listShows;
     private final UnpublishShowUseCase unpublishShow;
     private final UnpublishAllShowUseCase unpublishAllShow;
+    private final ShowMapper mapper;
 
     public ShowController(AddSectionToShowUseCase addSectionToShow,
             ChangeShowDescriptionUseCase changeShowDescription,
@@ -46,7 +49,8 @@ public class ShowController implements ShowAPI {
             GetShowUseCase getShow,
             ListShowsUseCase listShows,
             UnpublishShowUseCase unpublishShow,
-            UnpublishAllShowUseCase unpublishAllShow) {
+            UnpublishAllShowUseCase unpublishAllShow,
+            ShowMapper mapper) {
         this.addSectionToShow = addSectionToShow;
         this.changeShowDescription = changeShowDescription;
         this.changeShowName = changeShowName;
@@ -59,75 +63,76 @@ public class ShowController implements ShowAPI {
         this.listShows = listShows;
         this.unpublishShow = unpublishShow;
         this.unpublishAllShow = unpublishAllShow;
+        this.mapper = mapper;
     }
 
     @Override
     public ResponseEntity<IdResponse> addSectionToShow(String id, AddSectionToShowRequest input) {
-        final var output = ApiSupport.execute(addSectionToShow, new AddSectionToShowCommand(id, input.name(), input.description(), input.totalSpots(), input.price() == null ? null : input.price().toDomain()));
+        final var output = HttpResults.require(addSectionToShow.execute(mapper.toCommand(id, input)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
     public ResponseEntity<IdResponse> changeShowDescription(String id, ChangeShowDescriptionRequest input) {
-        final var output = ApiSupport.execute(changeShowDescription, new ChangeShowDescriptionCommand(id, input.description()));
+        final var output = HttpResults.require(changeShowDescription.execute(mapper.toCommand(id, input)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
     public ResponseEntity<IdResponse> changeShowName(String id, ChangeShowNameRequest input) {
-        final var output = ApiSupport.execute(changeShowName, new ChangeShowNameCommand(id, input.name()));
+        final var output = HttpResults.require(changeShowName.execute(mapper.toCommand(id, input)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
     public ResponseEntity<IdResponse> createShow(CreateShowRequest input) {
-        final var output = ApiSupport.execute(createShow, new CreateShowCommand(input.partnerId(), input.name(), input.description(), input.date(), input.address() == null ? null : input.address().toDomain(), input.totalSpots()));
-        return ResponseEntity.created(java.net.URI.create("/shows/" + output.id())).body(new IdResponse(output.id()));
+        final var output = HttpResults.require(createShow.execute(mapper.toCommand(input)));
+        return ResponseEntity.created(URI.create("/shows/" + output.id())).body(new IdResponse(output.id()));
     }
 
     @Override
     public ResponseEntity<Void> deleteById(String id) {
-        ApiSupport.execute(deleteShow, id);
+        HttpResults.requireEmpty(deleteShow.execute(id));
         return ResponseEntity.noContent().build();
     }
 
     @Override
     public ResponseEntity<IdResponse> publishShow(String id) {
-        final var output = ApiSupport.execute(publishShow, new PublishShowCommand(id));
+        final var output = HttpResults.require(publishShow.execute(new PublishShowCommand(id)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
     public ResponseEntity<IdResponse> publishAllShow(String id) {
-        final var output = ApiSupport.execute(publishAllShow, new PublishAllShowCommand(id));
+        final var output = HttpResults.require(publishAllShow.execute(new PublishAllShowCommand(id)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
     public ResponseEntity<IdResponse> rescheduleShow(String id, RescheduleShowRequest input) {
-        final var output = ApiSupport.execute(rescheduleShow, new RescheduleShowCommand(id, input.date()));
+        final var output = HttpResults.require(rescheduleShow.execute(mapper.toCommand(id, input)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
     public ShowResponse getById(String id) {
-        return ShowResponse.from(ApiSupport.execute(getShow, id));
+        return mapper.toResponse(HttpResults.require(getShow.execute(id)));
     }
 
     @Override
     public Pagination<ShowListResponse> list(String search, int page, int perPage, String sort, String direction) {
-        return ApiSupport.execute(listShows, ApiSupport.query(search, page, perPage, sort, direction)).map(ShowListResponse::from);
+        return HttpResults.require(listShows.execute(HttpResults.search(search, page, perPage, sort, direction))).map(mapper::toListResponse);
     }
 
     @Override
     public ResponseEntity<IdResponse> unpublishShow(String id) {
-        final var output = ApiSupport.execute(unpublishShow, new UnpublishShowCommand(id));
+        final var output = HttpResults.require(unpublishShow.execute(new UnpublishShowCommand(id)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
     public ResponseEntity<IdResponse> unpublishAllShow(String id) {
-        final var output = ApiSupport.execute(unpublishAllShow, new UnpublishAllShowCommand(id));
+        final var output = HttpResults.require(unpublishAllShow.execute(new UnpublishAllShowCommand(id)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 }

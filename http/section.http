@@ -1,0 +1,96 @@
+@baseUrl = http://localhost:8080
+# Login via auth.http first, then paste the token below.
+# The token must carry the ownerId claim matching the resource being managed.
+@token = PASTE_JWT_HERE
+@sectionId = REPLACE_WITH_SECTION_ID
+
+### Create section
+# @name createSection
+POST {{baseUrl}}/sections
+Content-Type: application/json
+X-Correlation-ID: section-create-1
+
+{
+  "name": "Pista",
+  "description": "Pista comum",
+  "totalSpots": 200,
+  "price": {
+    "value": 150.00,
+    "currency": "BRL"
+  }
+}
+
+### Get section by id
+# @name getSection
+GET {{baseUrl}}/sections/{{sectionId}}
+Accept: application/json
+
+### List sections
+# @name listSections
+GET {{baseUrl}}/sections?search=pista&page=0&perPage=10&sort=name&dir=asc
+Accept: application/json
+
+### Change section name
+# @name changeSectionName
+PATCH {{baseUrl}}/sections/{{sectionId}}/name
+Authorization: Bearer {{token}}
+Content-Type: application/json
+X-Correlation-ID: section-rename-1
+
+{
+  "name": "Pista VIP"
+}
+
+### Change section description
+# @name changeSectionDescription
+PATCH {{baseUrl}}/sections/{{sectionId}}/description
+Authorization: Bearer {{token}}
+Content-Type: application/json
+X-Correlation-ID: section-description-1
+
+{
+  "description": "Pista com acesso ao front stage"
+}
+
+### Change section price
+# @name changeSectionPrice
+PATCH {{baseUrl}}/sections/{{sectionId}}/price
+Authorization: Bearer {{token}}
+Content-Type: application/json
+X-Correlation-ID: section-price-1
+
+{
+  "price": {
+    "value": 199.90,
+    "currency": "BRL"
+  }
+}
+
+### Publish section
+# @name publishSection
+POST {{baseUrl}}/sections/{{sectionId}}/publish
+Authorization: Bearer {{token}}
+X-Correlation-ID: section-publish-1
+
+### Unpublish section
+# @name unpublishSection
+POST {{baseUrl}}/sections/{{sectionId}}/unpublish
+Authorization: Bearer {{token}}
+X-Correlation-ID: section-unpublish-1
+
+### Publish section with all spots
+# @name publishAllSection
+POST {{baseUrl}}/sections/{{sectionId}}/publish-all
+Authorization: Bearer {{token}}
+X-Correlation-ID: section-publish-all-1
+
+### Unpublish section with all spots
+# @name unpublishAllSection
+POST {{baseUrl}}/sections/{{sectionId}}/unpublish-all
+Authorization: Bearer {{token}}
+X-Correlation-ID: section-unpublish-all-1
+
+### Delete section
+# @name deleteSection
+DELETE {{baseUrl}}/sections/{{sectionId}}
+Authorization: Bearer {{token}}

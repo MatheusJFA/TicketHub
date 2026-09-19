@@ -2,12 +2,17 @@ package com.tickethub.domain.core.section;
 
 import static java.util.Objects.isNull;
 
+import java.time.Instant;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.tickethub.domain.Entity;
 import com.tickethub.domain.core.spot.Spot;
+import com.tickethub.domain.exception.DomainException;
+import com.tickethub.domain.shared.Location;
 import com.tickethub.domain.shared.Money;
 import com.tickethub.domain.shared.Name;
 import com.tickethub.domain.shared.Text;
@@ -20,11 +25,12 @@ public class Section extends Entity<SectionID> {
     private long totalSpots;
     private long totalSpotsSold;
     private Money price;
-    private HashSet<Spot> spots;
+    private final Set<Spot> spots;
 
     private Section(SectionID id, Name name, Text description, boolean isPublished, long totalSpots,
-            long totalSpotsSold, Money price, HashSet<Spot> spots) {
-        super(id);
+            long totalSpotsSold, Money price, Set<Spot> spots,
+            Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
+        super(id, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
         this.name = name;
         this.description = description;
         this.isPublished = isPublished;
@@ -35,27 +41,83 @@ public class Section extends Entity<SectionID> {
     }
 
     public static Section create(String name, String description, boolean isPublished, long totalSpots,
-            long totalSpotsSold, Money price, HashSet<Spot> spots) {
+            long totalSpotsSold, Money price, Set<Spot> spots) {
         final SectionID id = SectionID.generate();
-        final HashSet<Spot> spotList = isNull(spots) ? new HashSet<>() : new HashSet<>(spots);
+        final Set<Spot> spotList = isNull(spots) ? new HashSet<>() : new HashSet<>(spots);
+        final var now = Instant.now();
         return new Section(id, Name.create(name), Text.create(description), isPublished, totalSpots, totalSpotsSold,
-                price, spotList);
+                price, spotList, now, now, null, null, null);
     }
 
     public static Section create(String name, String description, long totalSpots, Money price) {
+        return create(name, description, totalSpots, price, Location.sectionCode(0));
+    }
+
+    public static Section create(String name, String description, long totalSpots, Money price,
+            String sectionCode) {
+        if (totalSpots < 0) {
+            throw new DomainException("'totalSpots' should not be negative");
+        }
         final SectionID id = SectionID.generate();
-        final HashSet<Spot> spots = generateSpots(totalSpots);
+        final Set<Spot> spots = generateSpots(totalSpots, sectionCode);
+        final var now = Instant.now();
         final Section section = new Section(id, Name.create(name), Text.create(description), false, totalSpots, 0,
-                price, spots);
+                price, spots, now, now, null, null, null);
 
         return section;
     }
 
-    private static HashSet<Spot> generateSpots(long totalSpots) {
+    /**
+     * Creates a section shell without materialized spots, for asynchronous
+     * spot generation (see {@link #generateMissingSpots(String)}).
+     */
+    public static Section createShell(String name, String description, long totalSpots, Money price) {
+        if (totalSpots < 0) {
+            throw new DomainException("'totalSpots' should not be negative");
+        }
+        final SectionID id = SectionID.generate();
+        final var now = Instant.now();
+        return new Section(id, Name.create(name), Text.create(description), false, totalSpots, 0,
+                price, new HashSet<>(), now, now, null, null, null);
+    }
+
+    public static Section reconstitute(SectionID id, Name name, Text description, boolean isPublished, long totalSpots,
+            long totalSpotsSold, Money price, Set<Spot> spots,
+            Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
+        final Set<Spot> spotList = isNull(spots) ? new HashSet<>() : new HashSet<>(spots);
+        return new Section(id, name, description, isPublished, totalSpots, totalSpotsSold,
+                price, spotList, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
+    }
+
+    private static Set<Spot> generateSpots(long totalSpots, String sectionCode) {
+        if (totalSpots < 0) {
+            throw new DomainException("'totalSpots' should not be negative");
+        }
         return Stream.iterate(0, i -> i + 1)
                 .limit(totalSpots)
-                .map(i -> Spot.create())
+                .map(i -> Spot.create(Location.generateSeat(sectionCode, i + 1)))
                 .collect(Collectors.toCollection(HashSet::new));
+    }
+
+    /**
+     * Materializes the spots still missing to reach {@code totalSpots},
+     * continuing the seat numbering after the spots already present, and
+     * returns the newly created spots. Idempotent: returns an empty set when
+     * the section is already complete.
+     */
+    public Set<Spot> generateMissingSpots(final String sectionCode) {
+        final long existing = spots.size();
+        if (existing >= totalSpots) {
+            return Set.of();
+        }
+        final Set<Spot> generated = new HashSet<>();
+        for (long seatNumber = existing + 1; seatNumber <= totalSpots; seatNumber++) {
+            final Spot spot = Spot.create(Location.generateSeat(sectionCode, seatNumber));
+            spots.add(spot);
+            generated.add(spot);
+        }
+        markAsUpdated();
+        return Collections.unmodifiableSet(generated);
     }
 
     public void publishAll() {
@@ -92,7 +154,7 @@ public class Section extends Entity<SectionID> {
 
     public Section changePrice(final Money price) {
         if (price == null) {
-            throw new com.tickethub.domain.exception.DomainException("'price' should not be null");
+            throw new DomainException("'price' should not be null");
         }
         this.price = price;
         markAsUpdated();
@@ -123,19 +185,14 @@ public class Section extends Entity<SectionID> {
         return price;
     }
 
-    public HashSet<Spot> getSpots() {
-        return spots;
+    public Set<Spot> getSpots() {
+        return Collections.unmodifiableSet(spots);
     }
 
     @Override
     public void validate(final ValidationHandler handler) {
         final var validator = new SectionValidator(this, handler);
         validator.validate();
-    }
-
-    @Override
-    public Section clone() throws CloneNotSupportedException {
-        return (Section) super.clone();
     }
 
 }

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd
+                   http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <changeSet id="004-1-ownership-links-indexes" author="tickethub">
+        <ext:createIndex collectionName="sections">
+            <ext:keys>{ "partnerId": 1 }</ext:keys>
+            <ext:options>{ "name": "idx_sections_partnerId" }</ext:options>
+        </ext:createIndex>
+        <ext:createIndex collectionName="spots">
+            <ext:keys>{ "showId": 1 }</ext:keys>
+            <ext:options>{ "name": "idx_spots_showId" }</ext:options>
+        </ext:createIndex>
+        <ext:createIndex collectionName="spots">
+            <ext:keys>{ "partnerId": 1 }</ext:keys>
+            <ext:options>{ "name": "idx_spots_partnerId" }</ext:options>
+        </ext:createIndex>
+    </changeSet>
+</databaseChangeLog>

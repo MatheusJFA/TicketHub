@@ -1,0 +1,74 @@
+@baseUrl = http://localhost:8080
+# Login via auth.http first, then paste the token below.
+# The token must carry the ownerId claim matching the resource being managed.
+@token = PASTE_JWT_HERE
+@partnerId = REPLACE_WITH_PARTNER_ID
+
+### Create partner
+# @name createPartner
+POST {{baseUrl}}/partners
+Content-Type: application/json
+X-Correlation-ID: partner-create-1
+
+{
+  "name": "Cinema Nova",
+  "cnpj": "11222333000181",
+  "address": {
+    "street": "Rua Augusta",
+    "number": "100",
+    "complement": "Sala 10",
+    "neighborhood": "Centro",
+    "city": "São Paulo",
+    "state": "SP",
+    "country": "Brasil",
+    "zipCode": "01305-000"
+  }
+}
+
+### Get partner by id
+# @name getPartner
+GET {{baseUrl}}/partners/{{partnerId}}
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### List partners
+# @name listPartners
+GET {{baseUrl}}/partners?search=cinema&page=0&perPage=10&sort=name&dir=asc
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Change partner name
+# @name changePartnerName
+PATCH {{baseUrl}}/partners/{{partnerId}}/name
+Authorization: Bearer {{token}}
+Content-Type: application/json
+X-Correlation-ID: partner-rename-1
+
+{
+  "name": "Cinema Novo"
+}
+
+### Change partner address
+# @name changePartnerAddress
+PATCH {{baseUrl}}/partners/{{partnerId}}/address
+Authorization: Bearer {{token}}
+Content-Type: application/json
+X-Correlation-ID: partner-address-1
+
+{
+  "address": {
+    "street": "Avenida Paulista",
+    "number": "1000",
+    "complement": null,
+    "neighborhood": "Bela Vista",
+    "city": "São Paulo",
+    "state": "SP",
+    "country": "Brasil",
+    "zipCode": "01310-100"
+  }
+}
+
+### Delete partner
+# @name deletePartner
+DELETE {{baseUrl}}/partners/{{partnerId}}
+Authorization: Bearer {{token}}

@@ -1,15 +1,16 @@
 package com.tickethub.application;
 
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.atomic.AtomicReference;
+import com.tickethub.domain.validation.Error;
+import com.tickethub.domain.validation.Notification;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-
-abstract class UnitUseCase<T> {
-    public abstract void execute(T input);
-}
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UnitUseCaseTest {
 
@@ -17,8 +18,16 @@ class UnitUseCaseTest {
         final AtomicReference<String> stored = new AtomicReference<>();
 
         @Override
-        public void execute(final String input) {
+        public Optional<Notification> execute(final String input) {
             stored.set(input);
+            return Optional.empty();
+        }
+    }
+
+    static class FailingUseCase extends UnitUseCase<String> {
+        @Override
+        public Optional<Notification> execute(final String input) {
+            return Optional.of(Notification.create(new Error("boom: " + input)));
         }
     }
 
@@ -26,8 +35,9 @@ class UnitUseCaseTest {
     void executesWithoutOutput() {
         final var useCase = new StoreUseCase();
 
-        useCase.execute("value");
+        final var result = useCase.execute("value");
 
+        assertTrue(result.isEmpty());
         assertEquals("value", useCase.stored.get());
     }
 
@@ -38,5 +48,13 @@ class UnitUseCaseTest {
         useCase.execute(null);
 
         assertNull(useCase.stored.get());
+    }
+
+    @Test
+    void reportsFailureAsNotification() {
+        final var result = new FailingUseCase().execute("value");
+
+        assertTrue(result.isPresent());
+        assertEquals("boom: value", result.orElseThrow().firstError().message());
     }
 }

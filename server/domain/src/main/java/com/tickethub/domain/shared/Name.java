@@ -5,8 +5,10 @@ import static java.util.Objects.isNull;
 import com.tickethub.domain.ValueObject;
 import com.tickethub.domain.exception.DomainException;
 
+import java.util.Objects;
 
-public class Name extends ValueObject {
+
+public final class Name extends ValueObject {
     private static final int MIN_LENGTH = 2;
     private static final int MAX_LENGTH = 100;
     private static final String SPACE = " ";
@@ -53,6 +55,16 @@ public class Name extends ValueObject {
 
     public String getValue() {
         return value;
+    }
+
+    @Override
+    public boolean equals(final Object other) {
+        return other instanceof Name name && Objects.equals(value, name.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 
     @Override

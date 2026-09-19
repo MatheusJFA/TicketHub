@@ -8,7 +8,7 @@ import com.tickethub.domain.core.spot.SpotGateway;
 import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.Notification;
 
-public final class DefaultCreateSpotUseCase extends CreateSpotUseCase {
+public class DefaultCreateSpotUseCase extends CreateSpotUseCase {
     private final SpotGateway spotGateway;
 
     public DefaultCreateSpotUseCase(final SpotGateway spotGateway) {
@@ -18,7 +18,8 @@ public final class DefaultCreateSpotUseCase extends CreateSpotUseCase {
     @Override
     public Either<Notification, CreateSpotOutput> execute(final CreateSpotCommand command) {
         try {
-            final Spot entity = Spot.create(command.location());
+            // A missing location generates a short hash-based code (see Location).
+            final Spot entity = command.location() == null ? Spot.create() : Spot.create(command.location());
             final Notification notification = Notification.create();
             entity.validate(notification);
 

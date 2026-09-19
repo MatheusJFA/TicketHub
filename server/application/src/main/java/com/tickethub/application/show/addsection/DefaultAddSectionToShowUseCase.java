@@ -1,63 +1,120 @@
 package com.tickethub.application.show.addsection;
 
-import com.tickethub.domain.core.show.Show;
-
+import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.section.Section;
+import com.tickethub.domain.core.section.SpotsGenerationRequested;
+import com.tickethub.domain.core.show.Show;
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.show.ShowID;
-import com.tickethub.domain.validation.Error;
+import com.tickethub.domain.event.DomainEventPublisher;
+import com.tickethub.domain.shared.Location;
 import com.tickethub.domain.validation.Notification;
 
-public final class DefaultAddSectionToShowUseCase extends AddSectionToShowUseCase {
-    private final ShowGateway showGateway;
+public class DefaultAddSectionToShowUseCase extends AddSectionToShowUseCase {
 
-    public DefaultAddSectionToShowUseCase(final ShowGateway showGateway) {
+    private final ShowGateway showGateway;
+    private final DomainEventPublisher eventPublisher;
+    private final long asyncSpotThreshold;
+
+    public DefaultAddSectionToShowUseCase(final ShowGateway showGateway,
+            final DomainEventPublisher eventPublisher, final long asyncSpotThreshold) {
         this.showGateway = Objects.requireNonNull(showGateway);
+        this.eventPublisher = Objects.requireNonNull(eventPublisher);
+        if (asyncSpotThreshold < 1) {
+            throw new IllegalArgumentException("'asyncSpotThreshold' should be positive");
+        }
+        this.asyncSpotThreshold = asyncSpotThreshold;
     }
 
     @Override
     public Either<Notification, AddSectionToShowOutput> execute(final AddSectionToShowCommand command) {
         try {
-            final Optional<Show> found = showGateway.findById(ShowID.from(command.showId()));
+            final ShowID id = ShowID.from(command.showId());
+            final Optional<Show> found = showGateway.findById(id);
 
-            if (!found.isPresent()) {
-                return Either.left(notFound("Show", command.showId()));
+            if (found.isEmpty()) {
+                return Either.left(notFound(Show.class.getSimpleName(), id.getValue()));
             }
-            
+
             final Show entity = found.get();
-            
+
             final Notification notification = Notification.create();
             entity.validate(notification);
             if (notification.hasError()) {
                 return Either.left(notification);
             }
-            
-            final Section section = Section.create(command.name(), command.description(), false,
-                    command.totalSpots(), 0, command.price(), null);
-            section.validate(notification);
-            
+
+            if (command.totalSpots() >= asyncSpotThreshold) {
+                return addSectionAsync(entity, command);
+            }
+
+            final Section candidate = Section.create(command.name(), command.description(),
+                    command.totalSpots(), command.price());
+            candidate.validate(notification);
             if (notification.hasError()) {
                 return Either.left(notification);
             }
-            
+
             entity.addSection(
-                command.name(), 
-                command.description(), 
-                command.totalSpots(), 
-                command.price()
-            );
+                    command.name(),
+                    command.description(),
+                    command.totalSpots(),
+                    command.price());
+
+            final Notification afterMutation = Notification.create();
+            entity.validate(afterMutation);
+            if (afterMutation.hasError()) {
+                return Either.left(afterMutation);
+            }
 
             final Show updatedShow = showGateway.update(entity);
             final AddSectionToShowOutput output = AddSectionToShowOutput.from(updatedShow);
             return Either.right(output);
         } catch (final RuntimeException exception) {
-            final Notification notification = Notification.create(exception);
-            return Either.left(notification);
+            final Notification failed = Notification.create(exception);
+            return Either.left(failed);
         }
+    }
+
+    private Either<Notification, AddSectionToShowOutput> addSectionAsync(final Show entity,
+            final AddSectionToShowCommand command) {
+        final Section candidate = Section.createShell(command.name(), command.description(),
+                command.totalSpots(), command.price());
+        final Notification validation = Notification.create();
+        candidate.validate(validation);
+        if (validation.hasError()) {
+            return Either.left(validation);
+        }
+        final String sectionCode = Location.sectionCode(entity.getSections().size());
+        final Section shell = entity.addSectionShell(
+                command.name(),
+                command.description(),
+                command.totalSpots(),
+                command.price());
+
+        final Notification afterMutation = Notification.create();
+        entity.validate(afterMutation);
+        if (afterMutation.hasError()) {
+            return Either.left(afterMutation);
+        }
+
+        final Show updatedShow = showGateway.update(entity);
+        try {
+            eventPublisher.publish(new SpotsGenerationRequested(
+                    entity.getId().getValue(),
+                    shell.getId().getValue(),
+                    sectionCode,
+                    command.totalSpots(),
+                    Instant.now()));
+        } catch (final RuntimeException publishFailure) {
+            final var generated = shell.generateMissingSpots(sectionCode);
+            showGateway.appendSpots(entity.getId(), shell.getId(), generated);
+        }
+        return Either.right(AddSectionToShowOutput.from(updatedShow));
     }
 
 }

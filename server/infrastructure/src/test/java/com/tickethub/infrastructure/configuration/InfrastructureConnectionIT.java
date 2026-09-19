@@ -1,5 +1,10 @@
 package com.tickethub.infrastructure.configuration;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
+
 import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
@@ -13,7 +18,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.KafkaAdmin;
@@ -21,24 +25,27 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
-import com.tickethub.infrastructure.Main;
+import com.tickethub.infrastructure.ContainerSupport;
+import com.tickethub.infrastructure.IntegrationTest;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-@SpringBootTest(classes = Main.class, webEnvironment = SpringBootTest.WebEnvironment.NONE,
-        properties = "tickethub.liquibase.enabled=false")
+@IntegrationTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class InfrastructureConnectionIT {
+class InfrastructureConnectionIT extends ContainerSupport {
 
     private static final String TEST_ID = UUID.randomUUID().toString().replace("-", "");
     private static final String TOPIC = "tickethub-integration-" + TEST_ID;
     private static final String COLLECTION = "integration_" + TEST_ID;
 
-    @Autowired private MongoTemplate mongoTemplate;
-    @Autowired private KafkaTemplate<String, String> kafkaTemplate;
-    @Autowired private ConsumerFactory<String, String> consumerFactory;
-    @Autowired private KafkaAdmin kafkaAdmin;
-    @Autowired private NewTopic eventsTopic;
+    @Autowired
+    private MongoTemplate mongoTemplate;
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+    @Autowired
+    private ConsumerFactory<String, String> consumerFactory;
+    @Autowired
+    private KafkaAdmin kafkaAdmin;
+    @Autowired
+    private NewTopic eventsTopic;
 
     @DynamicPropertySource
     static void testProperties(final DynamicPropertyRegistry registry) {

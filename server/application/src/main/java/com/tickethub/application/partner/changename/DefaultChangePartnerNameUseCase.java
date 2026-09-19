@@ -1,15 +1,15 @@
 package com.tickethub.application.partner.changename;
+
 import java.util.Objects;
 import java.util.Optional;
-import com.tickethub.application.Either;
-import com.tickethub.domain.validation.Notification;
 
+import com.tickethub.application.Either;
+import com.tickethub.domain.core.partner.Partner;
 import com.tickethub.domain.core.partner.PartnerGateway;
 import com.tickethub.domain.core.partner.PartnerID;
-import com.tickethub.domain.core.partner.Partner;
-import com.tickethub.domain.validation.Error;
+import com.tickethub.domain.validation.Notification;
 
-public final class DefaultChangePartnerNameUseCase extends ChangePartnerNameUseCase {
+public class DefaultChangePartnerNameUseCase extends ChangePartnerNameUseCase {
     private final PartnerGateway partnerGateway;
 
     public DefaultChangePartnerNameUseCase(final PartnerGateway partnerGateway) {
@@ -19,18 +19,19 @@ public final class DefaultChangePartnerNameUseCase extends ChangePartnerNameUseC
     @Override
     public Either<Notification, ChangePartnerNameOutput> execute(final ChangePartnerNameCommand input) {
         try {
-            final Optional<Partner> found = partnerGateway.findById(PartnerID.from(input.id()));
+            final PartnerID id = PartnerID.from(input.id());
+            final Optional<Partner> found = partnerGateway.findById(id);
 
-            if (!found.isPresent()) {
-                return Either.left(notFound("Partner", input.id()));
+            if (found.isEmpty()) {
+                return Either.left(notFound(Partner.class.getSimpleName(), id.getValue()));
             }
 
             final Partner entity = found.get();
             entity.changeName(input.name());
-            
+
             final Notification notification = Notification.create();
             entity.validate(notification);
-            
+
             if (notification.hasError()) {
                 return Either.left(notification);
             }

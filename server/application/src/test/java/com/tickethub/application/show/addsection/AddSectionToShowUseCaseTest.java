@@ -11,13 +11,14 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import com.tickethub.application.UseCaseTest;
+import com.tickethub.domain.core.section.SpotsGenerationRequested;
 import com.tickethub.domain.core.show.Show;
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.partner.PartnerID;
+import com.tickethub.domain.event.DomainEventPublisher;
 import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.shared.Money;
 
@@ -26,15 +27,24 @@ public class AddSectionToShowUseCaseTest extends UseCaseTest {
     private static final Address ADDRESS = Address.create("Rua Augusta", "100", null, "Centro", "São Paulo", "SP", "Brasil", "01305-000");
     private static final Money PRICE = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
 
-    @InjectMocks
+    private static final long ASYNC_THRESHOLD = 1000;
+
     private DefaultAddSectionToShowUseCase useCase;
 
     @Mock
     private ShowGateway showGateway;
 
+    @Mock
+    private DomainEventPublisher eventPublisher;
+
+    @org.junit.jupiter.api.BeforeEach
+    void setUp() {
+        useCase = new DefaultAddSectionToShowUseCase(showGateway, eventPublisher, ASYNC_THRESHOLD);
+    }
+
     @Override
     protected List<Object> getMocks() {
-        return List.of(showGateway);
+        return List.of(showGateway, eventPublisher);
     }
 
     @Test
@@ -112,6 +122,49 @@ public class AddSectionToShowUseCaseTest extends UseCaseTest {
         assertEquals("Lookup failed", notification.firstError().message());
         verify(showGateway, times(1)).findById(entity.getId());
         verify(showGateway, never()).update(any());
+    }
+
+    @Test
+    public void givenLargeSection_whenExecute_shouldPersistShellAndPublishEvent() {
+        final var entity = entity();
+        final var command = AddSectionToShowCommand.with(entity.getId().getValue(), "Arena", "Description", 1500, PRICE);
+        when(showGateway.findById(entity.getId())).thenReturn(Optional.of(entity));
+        when(showGateway.update(any())).thenAnswer(returnsFirstArg());
+
+        final var output = useCase.execute(command).getRight();
+
+        assertEquals(entity.getId().getValue(), output.id());
+        verify(showGateway, times(1)).update(argThat(saved ->
+                saved.getSections().size() == 2
+                        && saved.getTotalSpots() == 1502
+                        && saved.getSections().stream()
+                                .filter(section -> section.getName().getValue().equals("Arena"))
+                                .allMatch(section -> section.getSpots().isEmpty()
+                                        && section.getTotalSpots() == 1500)));
+        verify(eventPublisher, times(1)).publish(argThat(event ->
+                event instanceof SpotsGenerationRequested requested
+                        && requested.showId().equals(entity.getId().getValue())
+                        && requested.sectionCode().equals("B")
+                        && requested.totalSpots() == 1500
+                        && requested.occurredOn() != null));
+    }
+
+    @Test
+    public void givenPublishFailure_whenExecute_shouldDegradeToBulkAppend() {
+        final var entity = entity();
+        final var command = AddSectionToShowCommand.with(entity.getId().getValue(), "Arena", "Description", 1500, PRICE);
+        when(showGateway.findById(entity.getId())).thenReturn(Optional.of(entity));
+        when(showGateway.update(any())).thenAnswer(returnsFirstArg());
+        doThrow(new IllegalStateException("kafka down")).when(eventPublisher).publish(any());
+
+        final var output = useCase.execute(command).getRight();
+
+        assertEquals(entity.getId().getValue(), output.id());
+        verify(showGateway, times(1)).update(any());
+        verify(eventPublisher, times(1)).publish(any());
+        verify(showGateway, times(1)).appendSpots(eq(entity.getId()), any(),
+                argThat(spots -> spots.size() == 1500
+                        && spots.stream().allMatch(spot -> spot.getLocation().getValue().matches("B\\d{5}"))));
     }
 
     private static Show entity() {

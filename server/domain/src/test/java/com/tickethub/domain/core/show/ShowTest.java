@@ -3,7 +3,6 @@ package com.tickethub.domain.core.show;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -172,7 +171,7 @@ class ShowTest {
             assertNotNull(spot.getId());
             assertTrue(spot.isAvailable());
             assertFalse(spot.isPublished());
-            assertNull(spot.getLocation());
+            assertTrue(spot.getLocation().getValue().matches("A\\d{5}"));
         });
     }
 
@@ -180,7 +179,7 @@ class ShowTest {
     void givenNoLocation_whenCreateSpot_thenAllowValidationWithDefaultFlags() {
         final var spot = Spot.create();
         assertNotNull(spot.getId());
-        assertNull(spot.getLocation());
+        assertNotNull(spot.getLocation());
         assertTrue(spot.isAvailable());
         assertFalse(spot.isPublished());
         final var notification = Notification.create();
@@ -211,6 +210,12 @@ class ShowTest {
         assertEquals(15, show.getTotalSpots());
         assertEquals(0, show.getTotalSpotsSold());
         assertEquals(5, show.getSections().stream().flatMap(s -> s.getSpots().stream()).map(Spot::getId).distinct().count());
+        final var codes = show.getSections().stream()
+                .flatMap(s -> s.getSpots().stream())
+                .map(spot -> spot.getLocation().getValue())
+                .sorted()
+                .toList();
+        assertEquals(List.of("A00001", "A00002", "A00003", "B00001", "B00002"), codes);
         assertTrue(show.getUpdatedAt().isAfter(Instant.EPOCH));
         assertEquals(createdAt, show.getCreatedAt());
     }

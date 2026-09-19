@@ -1,8 +1,6 @@
 package com.tickethub.application.partner.delete;
-import com.tickethub.application.Either;
-import com.tickethub.domain.validation.Notification;
 
-import com.tickethub.application.UseCase;
+import com.tickethub.application.UnitUseCase;
 
-public abstract class DeletePartnerUseCase extends UseCase<String, Either<Notification, DeletePartnerOutput>> {
+public abstract class DeletePartnerUseCase extends UnitUseCase<String> {
 }

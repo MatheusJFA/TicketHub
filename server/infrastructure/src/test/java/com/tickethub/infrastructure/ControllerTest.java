@@ -1,6 +1,7 @@
 package com.tickethub.infrastructure;
 
 import com.tickethub.infrastructure.api.controllers.GlobalExceptionHandler;
+import com.tickethub.infrastructure.configuration.SecurityConfiguration;
 import org.junit.jupiter.api.Tag;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
@@ -16,7 +17,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @WebMvcTest
-@Import(GlobalExceptionHandler.class)
+@Import({GlobalExceptionHandler.class, SecurityConfiguration.class})
 @Tag("controllerTest")
 public @interface ControllerTest {
 

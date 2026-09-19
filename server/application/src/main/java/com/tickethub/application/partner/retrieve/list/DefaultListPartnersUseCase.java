@@ -9,7 +9,7 @@ import com.tickethub.domain.core.partner.Partner;
 
 
 
-public final class DefaultListPartnersUseCase extends ListPartnersUseCase {
+public class DefaultListPartnersUseCase extends ListPartnersUseCase {
     private final PartnerGateway partnerGateway;
 
     public DefaultListPartnersUseCase(final PartnerGateway partnerGateway) {

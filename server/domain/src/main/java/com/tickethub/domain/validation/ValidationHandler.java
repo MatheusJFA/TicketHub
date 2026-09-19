@@ -21,8 +21,11 @@ public interface ValidationHandler {
     }
 
     default Error lastError() {
-        final var lastElement = getErrors().size() - 1;
-        return hasError() ? getErrors().get(lastElement) : null;
+        if (!hasError()) {
+            return null;
+        }
+        
+        return getErrors().get(getErrors().size() - 1);
     }
 
     interface Validation<T> {

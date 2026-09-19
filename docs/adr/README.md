@@ -1,0 +1,15 @@
+# Architecture Decision Records
+
+Decisões arquiteturais do TicketHub, em ordem cronológica. Convenção: `NNNN-titulo-em-kebab-case.md`.
+
+| ADR | Título | Status |
+|---|---|---|
+| [001](./0001-clean-architecture-ddd-modular.md) | Clean Architecture + DDD em módulos Maven | Aceito |
+| [002](./0002-mongodb-como-banco-principal.md) | MongoDB como banco principal | Aceito |
+| [003](./0003-kafka-para-eventos-de-dominio.md) | Kafka para eventos de domínio | Aceito |
+| [004](./0004-either-notification-erros.md) | `Either<Notification, Output>` e envelope de erros | Aceito |
+| [005](./0005-resilience4j-retry-circuit-breaker.md) | Resilience4j com 503 | Aceito |
+| [006](./0006-trilha-de-auditoria.md) | Trilha de auditoria (MDC + `audit_logs`) | Aceito |
+| [007](./0007-jwt-rbac-ownership.md) | JWT próprio + RBAC com permissões + ownership | Aceito |
+| [008](./0008-testcontainers-testes-integracao.md) | Testcontainers nos testes de integração | Aceito |
+| [009](./0009-cucumber-testes-aceitacao.md) | Testes de aceitação com Cucumber | Aceito |

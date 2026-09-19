@@ -36,12 +36,14 @@ public class Notification implements ValidationHandler {
 
     @Override
     public Notification append(final Error error) {
+        Objects.requireNonNull(error, "'error' should not be null");
         errors.add(error);
         return this;
     }
 
     @Override
     public Notification append(final ValidationHandler handler) {
+        Objects.requireNonNull(handler, "'handler' should not be null");
         errors.addAll(handler.getErrors());
         return this;
     }
@@ -51,9 +53,9 @@ public class Notification implements ValidationHandler {
         try {
             return validation.validate();
         } catch (final DomainException e) {
-            errors.add(new Error(e.getMessage()));
+            errors.add(new Error(Objects.requireNonNullElse(e.getMessage(), DomainException.class.getSimpleName())));
         } catch (final RuntimeException e) {
-            errors.add(new Error(e.getMessage()));
+            errors.add(new Error(Objects.requireNonNullElse(e.getMessage(), e.getClass().getSimpleName())));
         }
         return null;
     }
