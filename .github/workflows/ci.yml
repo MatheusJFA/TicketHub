@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, develop, infrastructure]
+    branches: [main, develop]
   pull_request:
 
 concurrency:
@@ -26,7 +26,7 @@ jobs:
           java-version: "25"
           cache: maven
 
-      - name: Run unit tests (equivale a `mise run test`)
+      - name: Run unit tests
         run: ./mvnw -B -ntp test
 
   integration:
@@ -45,5 +45,5 @@ jobs:
           java-version: "25"
           cache: maven
 
-      - name: Run integration tests via Testcontainers (equivale a `mise run integration`)
+      - name: Run integration tests via Testcontainers
         run: ./mvnw -B -ntp -Pintegration verify
