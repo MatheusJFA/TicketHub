@@ -18,7 +18,7 @@ import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import com.tickethub.infrastructure.api.SectionAPI;
 import com.tickethub.infrastructure.api.HttpResults;
-import com.tickethub.infrastructure.mapping.SectionMapper;
+import com.tickethub.infrastructure.section.presenters.SectionMapper;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController

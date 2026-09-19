@@ -1,6 +1,8 @@
-package com.tickethub.infrastructure.mapping;
+package com.tickethub.infrastructure.section.presenters;
 
 import org.mapstruct.Mapper;
+
+import com.tickethub.infrastructure.shared.presenters.SharedMapper;
 
 import com.tickethub.application.section.changedescription.ChangeSectionDescriptionCommand;
 import com.tickethub.application.section.changename.ChangeSectionNameCommand;

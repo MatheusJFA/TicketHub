@@ -1,4 +1,4 @@
-package com.tickethub.infrastructure.persistence;
+package com.tickethub.infrastructure.section.persistence;
 
 import java.time.Instant;
 import java.util.List;
@@ -12,6 +12,7 @@ import com.tickethub.domain.core.section.SectionID;
 import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.shared.Name;
 import com.tickethub.domain.shared.Text;
+import com.tickethub.infrastructure.shared.persistence.MoneyDocument;
 
 @Document("sections")
 public record SectionDocument(

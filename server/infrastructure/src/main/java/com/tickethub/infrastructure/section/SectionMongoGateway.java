@@ -1,4 +1,4 @@
-package com.tickethub.infrastructure.persistence;
+package com.tickethub.infrastructure.section;
 
 import java.util.HashSet;
 import java.util.List;
@@ -17,6 +17,10 @@ import com.tickethub.domain.core.section.SectionID;
 import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.domain.pagination.SearchQuery;
+import com.tickethub.infrastructure.section.persistence.SectionDocument;
+import com.tickethub.infrastructure.spot.persistence.SpotDocument;
+import com.tickethub.infrastructure.shared.persistence.MongoGatewaySupport;
+import com.tickethub.infrastructure.shared.persistence.MongoUnitOfWork;
 
 @Component
 public class SectionMongoGateway implements SectionGateway {

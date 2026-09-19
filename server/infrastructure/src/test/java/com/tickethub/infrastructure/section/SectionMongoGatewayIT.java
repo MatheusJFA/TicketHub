@@ -1,4 +1,4 @@
-package com.tickethub.infrastructure.persistence;
+package com.tickethub.infrastructure.section;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -19,6 +19,9 @@ import com.tickethub.domain.shared.Money;
 import com.tickethub.infrastructure.ContainerSupport;
 import com.tickethub.infrastructure.IntegrationTest;
 import com.tickethub.infrastructure.MongoCleanUpExtension;
+import com.tickethub.infrastructure.section.SectionMongoGateway;
+import com.tickethub.infrastructure.section.persistence.SectionDocument;
+import com.tickethub.infrastructure.spot.persistence.SpotDocument;
 
 @IntegrationTest
 class SectionMongoGatewayIT extends ContainerSupport {
