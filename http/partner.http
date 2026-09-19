@@ -72,3 +72,22 @@ X-Correlation-ID: partner-address-1
 # @name deletePartner
 DELETE {{baseUrl}}/partners/{{partnerId}}
 Authorization: Bearer {{token}}
+
+### Update partner (full update)
+# @name updatePartner
+PUT {{baseUrl}}/partners/{{partnerId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Cinema Novo",
+  "address": {
+    "street": "Rua B",
+    "number": "2",
+    "neighborhood": "Centro",
+    "city": "São Paulo",
+    "state": "SP",
+    "country": "Brasil",
+    "zipCode": "01001000"
+  }
+}

@@ -12,6 +12,8 @@ import com.tickethub.application.partner.retrieve.get.GetPartnerUseCase;
 import com.tickethub.application.partner.retrieve.get.DefaultGetPartnerUseCase;
 import com.tickethub.application.partner.retrieve.list.ListPartnersUseCase;
 import com.tickethub.application.partner.retrieve.list.DefaultListPartnersUseCase;
+import com.tickethub.application.partner.update.UpdatePartnerUseCase;
+import com.tickethub.application.partner.update.DefaultUpdatePartnerUseCase;
 import com.tickethub.domain.core.partner.PartnerGateway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,5 +56,10 @@ public class PartnerUseCaseConfig {
     @Bean
     public ListPartnersUseCase listPartnersUseCase() {
         return new DefaultListPartnersUseCase(partnerGateway);
+    }
+
+    @Bean
+    public UpdatePartnerUseCase updatePartnerUseCase() {
+        return new DefaultUpdatePartnerUseCase(partnerGateway);
     }
 }

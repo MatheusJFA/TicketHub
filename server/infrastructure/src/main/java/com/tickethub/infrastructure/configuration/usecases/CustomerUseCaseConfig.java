@@ -10,6 +10,8 @@ import com.tickethub.application.customer.retrieve.get.GetCustomerUseCase;
 import com.tickethub.application.customer.retrieve.get.DefaultGetCustomerUseCase;
 import com.tickethub.application.customer.retrieve.list.ListCustomersUseCase;
 import com.tickethub.application.customer.retrieve.list.DefaultListCustomersUseCase;
+import com.tickethub.application.customer.update.UpdateCustomerUseCase;
+import com.tickethub.application.customer.update.DefaultUpdateCustomerUseCase;
 import com.tickethub.domain.core.customer.CustomerGateway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,5 +49,10 @@ public class CustomerUseCaseConfig {
     @Bean
     public ListCustomersUseCase listCustomersUseCase() {
         return new DefaultListCustomersUseCase(customerGateway);
+    }
+
+    @Bean
+    public UpdateCustomerUseCase updateCustomerUseCase() {
+        return new DefaultUpdateCustomerUseCase(customerGateway);
     }
 }

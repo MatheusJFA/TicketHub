@@ -22,6 +22,8 @@ import com.tickethub.application.section.unpublish.UnpublishSectionUseCase;
 import com.tickethub.application.section.unpublish.DefaultUnpublishSectionUseCase;
 import com.tickethub.application.section.unpublishall.UnpublishAllSectionUseCase;
 import com.tickethub.application.section.unpublishall.DefaultUnpublishAllSectionUseCase;
+import com.tickethub.application.section.update.UpdateSectionUseCase;
+import com.tickethub.application.section.update.DefaultUpdateSectionUseCase;
 import com.tickethub.domain.core.section.SectionGateway;
 import com.tickethub.domain.core.show.ShowGateway;
 import org.springframework.context.annotation.Bean;
@@ -92,5 +94,10 @@ public class SectionUseCaseConfig {
     @Bean
     public UnpublishAllSectionUseCase unpublishAllSectionUseCase() {
         return new DefaultUnpublishAllSectionUseCase(sectionGateway);
+    }
+
+    @Bean
+    public UpdateSectionUseCase updateSectionUseCase() {
+        return new DefaultUpdateSectionUseCase(sectionGateway);
     }
 }

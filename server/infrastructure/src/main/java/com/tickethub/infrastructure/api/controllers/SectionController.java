@@ -13,6 +13,7 @@ import com.tickethub.application.section.retrieve.get.*;
 import com.tickethub.application.section.retrieve.list.*;
 import com.tickethub.application.section.unpublish.*;
 import com.tickethub.application.section.unpublishall.*;
+import com.tickethub.application.section.update.*;
 import com.tickethub.infrastructure.section.models.*;
 import java.net.URI;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,7 @@ public class SectionController implements SectionAPI {
     private final ListSectionsUseCase listSections;
     private final UnpublishSectionUseCase unpublishSection;
     private final UnpublishAllSectionUseCase unpublishAllSection;
+    private final UpdateSectionUseCase updateSection;
     private final SectionMapper mapper;
 
     public SectionController(ChangeSectionDescriptionUseCase changeSectionDescription,
@@ -47,6 +49,7 @@ public class SectionController implements SectionAPI {
             ListSectionsUseCase listSections,
             UnpublishSectionUseCase unpublishSection,
             UnpublishAllSectionUseCase unpublishAllSection,
+            UpdateSectionUseCase updateSection,
             SectionMapper mapper) {
         this.changeSectionDescription = changeSectionDescription;
         this.changeSectionName = changeSectionName;
@@ -59,6 +62,7 @@ public class SectionController implements SectionAPI {
         this.listSections = listSections;
         this.unpublishSection = unpublishSection;
         this.unpublishAllSection = unpublishAllSection;
+        this.updateSection = updateSection;
         this.mapper = mapper;
     }
 
@@ -123,6 +127,12 @@ public class SectionController implements SectionAPI {
     @Override
     public ResponseEntity<IdResponse> unpublishAllSection(String id) {
         final var output = HttpResults.require(unpublishAllSection.execute(new UnpublishAllSectionCommand(id)));
+        return ResponseEntity.ok(new IdResponse(output.id()));
+    }
+
+    @Override
+    public ResponseEntity<IdResponse> updateSection(String id, UpdateSectionRequest input) {
+        final var output = HttpResults.require(updateSection.execute(mapper.toCommand(id, input)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 }

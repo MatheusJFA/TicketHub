@@ -117,3 +117,15 @@ X-Correlation-ID: show-unpublish-all-1
 # @name deleteShow
 DELETE {{baseUrl}}/shows/{{showId}}
 Authorization: Bearer {{token}}
+
+### Update show (full update)
+# @name updateShow
+PUT {{baseUrl}}/shows/{{showId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Rock in Rio Edicao Especial",
+  "description": "Festival atualizado",
+  "date": "2027-02-20T21:00:00-03:00"
+}

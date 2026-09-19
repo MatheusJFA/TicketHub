@@ -7,6 +7,7 @@ import com.tickethub.application.partner.create.*;
 import com.tickethub.application.partner.delete.DeletePartnerUseCase;
 import com.tickethub.application.partner.retrieve.get.*;
 import com.tickethub.application.partner.retrieve.list.*;
+import com.tickethub.application.partner.update.*;
 import com.tickethub.infrastructure.ControllerTest;
 import com.tickethub.infrastructure.security.OwnerAccess;
 import java.util.Optional;
@@ -23,6 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import com.tickethub.infrastructure.security.TestTokens;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +39,7 @@ class PartnerControllerTest {
     @MockitoBean DeletePartnerUseCase deletePartner;
     @MockitoBean GetPartnerUseCase getPartner;
     @MockitoBean ListPartnersUseCase listPartners;
+    @MockitoBean UpdatePartnerUseCase updatePartner;
     @MockitoBean(name = "ownerAccess") OwnerAccess ownerAccess;
 
     @Value("${tickethub.security.jwt.secret}")
@@ -72,6 +75,32 @@ class PartnerControllerTest {
     void givenAnotherAccount_whenCallsDeletePartner_thenReturnsForbidden() throws Exception {
         mvc.perform(delete("/partners/partner-1")
                         .header("Authorization", bearer("partner-9", "partner:delete")))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void givenOwner_whenCallsUpdatePartner_thenSucceeds() throws Exception {
+        when(updatePartner.execute(any())).thenReturn(Either.right(new UpdatePartnerOutput("partner-1")));
+        when(ownerAccess.isSelfOrAdmin("partner-1")).thenReturn(true);
+
+        mvc.perform(put("/partners/partner-1")
+                        .header("Authorization", bearer("partner-1", "partner:write"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"name":"Cinema Novo","address":{"street":"Rua B","number":"2","neighborhood":"Centro","city":"São Paulo","state":"SP","country":"Brasil","zipCode":"01001000"}}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("partner-1"));
+    }
+
+    @Test
+    void givenAnotherAccount_whenCallsUpdatePartner_thenReturnsForbidden() throws Exception {
+        mvc.perform(put("/partners/partner-1")
+                        .header("Authorization", bearer("partner-9", "partner:write"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"name":"Cinema Novo","address":{"street":"Rua B","number":"2","neighborhood":"Centro","city":"São Paulo","state":"SP","country":"Brasil","zipCode":"01001000"}}
+                                """))
                 .andExpect(status().isForbidden());
     }
 }

@@ -171,4 +171,17 @@ public interface SectionAPI {
     })
     @PreAuthorize("hasAuthority('section:publish') and @showAccess.canPublishSection(#id)")
     ResponseEntity<?> unpublishAllSection(@PathVariable("id") String id);
+
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Update Section")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Section updated successfully; returns the resource identifier"),
+        @ApiResponse(responseCode = "400", description = "The request body is missing or contains malformed JSON, or a request parameter has an incompatible type"),
+        @ApiResponse(responseCode = "404", description = "The requested resource or a referenced resource was not found for the supplied identifier"),
+        @ApiResponse(responseCode = "422", description = "The request was parsed, but its values or the current resource state violate domain validation rules"),
+        @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
+        @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
+    })
+    @PreAuthorize("hasAuthority('section:write') and @showAccess.canWriteSection(#id)")
+    ResponseEntity<?> updateSection(@PathVariable("id") String id, @RequestBody UpdateSectionRequest input);
 }

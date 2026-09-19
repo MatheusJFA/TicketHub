@@ -12,6 +12,7 @@ import com.tickethub.application.section.retrieve.get.*;
 import com.tickethub.application.section.retrieve.list.*;
 import com.tickethub.application.section.unpublish.*;
 import com.tickethub.application.section.unpublishall.*;
+import com.tickethub.application.section.update.*;
 import com.tickethub.infrastructure.ControllerTest;
 import com.tickethub.infrastructure.security.ShowAccess;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ControllerTest(controllers = SectionController.class)
@@ -55,6 +57,7 @@ class SectionControllerTest {
     @MockitoBean ListSectionsUseCase listSections;
     @MockitoBean UnpublishSectionUseCase unpublishSection;
     @MockitoBean UnpublishAllSectionUseCase unpublishAllSection;
+    @MockitoBean UpdateSectionUseCase updateSection;
     @MockitoBean(name = "showAccess")
     ShowAccess showAccess;
 
@@ -92,5 +95,30 @@ class SectionControllerTest {
                         .content("{\"name\":\"Pista\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("section-1"));
+    }
+
+    @Test
+    void givenOwner_whenCallsUpdateSection_thenSucceeds() throws Exception {
+        when(showAccess.canWriteSection("section-1")).thenReturn(true);
+        when(updateSection.execute(any()))
+                .thenReturn(Either.right(new UpdateSectionOutput("section-1")));
+
+        mvc.perform(put("/sections/section-1")
+                        .header("Authorization", bearerAsOwner("partner-1", "section:write"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Pista\",\"description\":\"Geral\",\"price\":{\"value\":60.00,\"currency\":\"BRL\"}}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("section-1"));
+    }
+
+    @Test
+    void givenNonOwner_whenCallsUpdateSection_thenReturnsForbidden() throws Exception {
+        when(showAccess.canWriteSection("section-1")).thenReturn(false);
+
+        mvc.perform(put("/sections/section-1")
+                        .header("Authorization", bearerAsOwner("partner-9", "section:write"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Pista\",\"description\":\"Geral\",\"price\":{\"value\":60.00,\"currency\":\"BRL\"}}"))
+                .andExpect(status().isForbidden());
     }
 }

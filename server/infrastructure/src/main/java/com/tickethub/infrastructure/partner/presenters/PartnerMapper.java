@@ -9,11 +9,13 @@ import com.tickethub.application.partner.changename.ChangePartnerNameCommand;
 import com.tickethub.application.partner.create.CreatePartnerCommand;
 import com.tickethub.application.partner.retrieve.get.GetPartnerOutput;
 import com.tickethub.application.partner.retrieve.list.ListPartnersOutput;
+import com.tickethub.application.partner.update.UpdatePartnerCommand;
 import com.tickethub.infrastructure.partner.models.ChangePartnerAddressRequest;
 import com.tickethub.infrastructure.partner.models.ChangePartnerNameRequest;
 import com.tickethub.infrastructure.partner.models.CreatePartnerRequest;
 import com.tickethub.infrastructure.partner.models.PartnerListResponse;
 import com.tickethub.infrastructure.partner.models.PartnerResponse;
+import com.tickethub.infrastructure.partner.models.UpdatePartnerRequest;
 
 @Mapper(componentModel = "spring", uses = SharedMapper.class)
 public interface PartnerMapper {
@@ -27,4 +29,6 @@ public interface PartnerMapper {
     ChangePartnerNameCommand toCommand(String id, ChangePartnerNameRequest request);
 
     ChangePartnerAddressCommand toCommand(String id, ChangePartnerAddressRequest request);
+
+    UpdatePartnerCommand toCommand(String id, UpdatePartnerRequest request);
 }

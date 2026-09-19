@@ -14,6 +14,8 @@ import com.tickethub.application.spot.retrieve.list.ListSpotsUseCase;
 import com.tickethub.application.spot.retrieve.list.DefaultListSpotsUseCase;
 import com.tickethub.application.spot.unpublish.UnpublishSpotUseCase;
 import com.tickethub.application.spot.unpublish.DefaultUnpublishSpotUseCase;
+import com.tickethub.application.spot.update.UpdateSpotUseCase;
+import com.tickethub.application.spot.update.DefaultUpdateSpotUseCase;
 import com.tickethub.domain.core.spot.SpotGateway;
 import com.tickethub.domain.core.section.SectionGateway;
 import org.springframework.context.annotation.Bean;
@@ -64,5 +66,10 @@ public class SpotUseCaseConfig {
     @Bean
     public UnpublishSpotUseCase unpublishSpotUseCase() {
         return new DefaultUnpublishSpotUseCase(spotGateway);
+    }
+
+    @Bean
+    public UpdateSpotUseCase updateSpotUseCase() {
+        return new DefaultUpdateSpotUseCase(spotGateway);
     }
 }

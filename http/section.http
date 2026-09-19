@@ -96,3 +96,18 @@ X-Correlation-ID: section-unpublish-all-1
 # @name deleteSection
 DELETE {{baseUrl}}/sections/{{sectionId}}
 Authorization: Bearer {{token}}
+
+### Update section (full update)
+# @name updateSection
+PUT {{baseUrl}}/sections/{{sectionId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Pista",
+  "description": "Pista comum atualizada",
+  "price": {
+    "value": 160.00,
+    "currency": "BRL"
+  }
+}

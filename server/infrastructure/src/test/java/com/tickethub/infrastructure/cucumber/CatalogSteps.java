@@ -72,6 +72,21 @@ public class CatalogSteps extends BaseSteps {
                 """);
     }
 
+    @Quando("atualizo o show para {string}")
+    public void atualizoShow(final String name) throws Exception {
+        put("/shows/" + world.showId(), """
+                {"name":"%s","description":"Festival atualizado",\
+                "date":"2027-02-20T21:00:00-03:00"}\
+                """.formatted(name));
+    }
+
+    @Entao("o show deve ter nome {string}")
+    public void showTemNome(final String expected) throws Exception {
+        get("/shows/" + world.showId());
+        assertStatus(200);
+        assertEquals(expected, body().get("name").asText());
+    }
+
     @Quando("guardo o show criado")
     public void guardoShow() throws Exception {
         world.showId(body().get("id").asText());

@@ -42,3 +42,13 @@ X-Correlation-ID: customer-rename-1
 # @name deleteCustomer
 DELETE {{baseUrl}}/customers/{{customerId}}
 Authorization: Bearer {{token}}
+
+### Update customer (full update)
+# @name updateCustomer
+PUT {{baseUrl}}/customers/{{customerId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Maria Souza"
+}

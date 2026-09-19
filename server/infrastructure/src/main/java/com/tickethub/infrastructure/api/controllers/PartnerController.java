@@ -7,6 +7,7 @@ import com.tickethub.application.partner.create.*;
 import com.tickethub.application.partner.delete.*;
 import com.tickethub.application.partner.retrieve.get.*;
 import com.tickethub.application.partner.retrieve.list.*;
+import com.tickethub.application.partner.update.*;
 import com.tickethub.infrastructure.partner.models.*;
 import org.springframework.http.ResponseEntity;
 import com.tickethub.infrastructure.api.HttpResults;
@@ -24,6 +25,7 @@ public class PartnerController implements PartnerAPI {
     private final DeletePartnerUseCase deletePartner;
     private final GetPartnerUseCase getPartner;
     private final ListPartnersUseCase listPartners;
+    private final UpdatePartnerUseCase updatePartner;
     private final PartnerMapper mapper;
 
     public PartnerController(ChangePartnerAddressUseCase changePartnerAddress,
@@ -32,6 +34,7 @@ public class PartnerController implements PartnerAPI {
             DeletePartnerUseCase deletePartner,
             GetPartnerUseCase getPartner,
             ListPartnersUseCase listPartners,
+            UpdatePartnerUseCase updatePartner,
             PartnerMapper mapper) {
         this.changePartnerAddress = changePartnerAddress;
         this.changePartnerName = changePartnerName;
@@ -39,6 +42,7 @@ public class PartnerController implements PartnerAPI {
         this.deletePartner = deletePartner;
         this.getPartner = getPartner;
         this.listPartners = listPartners;
+        this.updatePartner = updatePartner;
         this.mapper = mapper;
     }
 
@@ -76,5 +80,11 @@ public class PartnerController implements PartnerAPI {
         final var result = HttpResults.require(listPartners.execute(HttpResults.search(search, page, perPage, sort, direction)))
                 .map(mapper::toListResponse);
         return ResponseEntity.ok(result);
+    }
+
+    @Override
+    public ResponseEntity<IdResponse> updatePartner(String id, UpdatePartnerRequest input) {
+        final var output = HttpResults.require(updatePartner.execute(mapper.toCommand(id, input)));
+        return ResponseEntity.ok(new IdResponse(output.id()));
     }
 }

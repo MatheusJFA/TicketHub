@@ -13,6 +13,7 @@ import com.tickethub.application.show.retrieve.get.*;
 import com.tickethub.application.show.retrieve.list.*;
 import com.tickethub.application.show.unpublish.*;
 import com.tickethub.application.show.unpublishall.*;
+import com.tickethub.application.show.update.*;
 import com.tickethub.infrastructure.ControllerTest;
 import com.tickethub.infrastructure.security.ShowAccess;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,7 @@ import com.tickethub.infrastructure.security.TestTokens;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ControllerTest(controllers = ShowController.class)
@@ -52,6 +54,7 @@ class ShowControllerTest {
     @MockitoBean ListShowsUseCase listShows;
     @MockitoBean UnpublishShowUseCase unpublishShow;
     @MockitoBean UnpublishAllShowUseCase unpublishAllShow;
+    @MockitoBean UpdateShowUseCase updateShow;
     @MockitoBean(name = "showAccess") ShowAccess showAccess;
 
     @Test
@@ -65,5 +68,28 @@ class ShowControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/shows/show-1"))
                 .andExpect(jsonPath("$.id").value("show-1"));
+    }
+
+    @Test
+    void givenOwner_whenCallsUpdateShow_thenSucceeds() throws Exception {
+        when(showAccess.canWrite("show-1")).thenReturn(true);
+        when(updateShow.execute(any()))
+                .thenReturn(Either.right(new UpdateShowOutput("show-1")));
+
+        mvc.perform(put("/shows/show-1").header("Authorization", bearer("show:write")).contentType(MediaType.APPLICATION_JSON).content("""
+                {"name":"Show","description":"Festival","date":"2027-02-20T21:00:00-03:00"}
+                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("show-1"));
+    }
+
+    @Test
+    void givenNonOwner_whenCallsUpdateShow_thenReturnsForbidden() throws Exception {
+        when(showAccess.canWrite("show-1")).thenReturn(false);
+
+        mvc.perform(put("/shows/show-1").header("Authorization", bearer("show:write")).contentType(MediaType.APPLICATION_JSON).content("""
+                {"name":"Show","description":"Festival","date":"2027-02-20T21:00:00-03:00"}
+                """))
+                .andExpect(status().isForbidden());
     }
 }

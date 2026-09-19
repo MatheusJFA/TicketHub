@@ -9,6 +9,7 @@ import com.tickethub.application.spot.publish.*;
 import com.tickethub.application.spot.retrieve.get.*;
 import com.tickethub.application.spot.retrieve.list.*;
 import com.tickethub.application.spot.unpublish.*;
+import com.tickethub.application.spot.update.*;
 import com.tickethub.infrastructure.spot.models.*;
 import com.tickethub.infrastructure.spot.presenters.SpotMapper;
 import java.net.URI;
@@ -26,6 +27,7 @@ public class SpotController implements SpotAPI {
     private final GetSpotUseCase getSpot;
     private final ListSpotsUseCase listSpots;
     private final UnpublishSpotUseCase unpublishSpot;
+    private final UpdateSpotUseCase updateSpot;
     private final SpotMapper mapper;
 
     public SpotController(ChangeSpotLocationUseCase changeSpotLocation,
@@ -35,6 +37,7 @@ public class SpotController implements SpotAPI {
             GetSpotUseCase getSpot,
             ListSpotsUseCase listSpots,
             UnpublishSpotUseCase unpublishSpot,
+            UpdateSpotUseCase updateSpot,
             SpotMapper mapper) {
         this.changeSpotLocation = changeSpotLocation;
         this.createSpot = createSpot;
@@ -43,6 +46,7 @@ public class SpotController implements SpotAPI {
         this.getSpot = getSpot;
         this.listSpots = listSpots;
         this.unpublishSpot = unpublishSpot;
+        this.updateSpot = updateSpot;
         this.mapper = mapper;
     }
 
@@ -83,6 +87,12 @@ public class SpotController implements SpotAPI {
     @Override
     public ResponseEntity<IdResponse> unpublishSpot(String id) {
         final var output = HttpResults.require(unpublishSpot.execute(new UnpublishSpotCommand(id)));
+        return ResponseEntity.ok(new IdResponse(output.id()));
+    }
+
+    @Override
+    public ResponseEntity<IdResponse> updateSpot(String id, UpdateSpotRequest input) {
+        final var output = HttpResults.require(updateSpot.execute(mapper.toCommand(id, input)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 }

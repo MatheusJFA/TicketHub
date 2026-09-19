@@ -112,6 +112,14 @@ public abstract class BaseSteps {
         return result;
     }
 
+    protected MvcResult put(final String url, final String json) throws Exception {
+        final var result = mvc.perform(authorized(MockMvcRequestBuilders
+                        .put(url).contentType(MediaType.APPLICATION_JSON).content(json)))
+                .andReturn();
+        world.lastResult(result);
+        return result;
+    }
+
     protected static String addressJson() {
         return ADDRESS;
     }
