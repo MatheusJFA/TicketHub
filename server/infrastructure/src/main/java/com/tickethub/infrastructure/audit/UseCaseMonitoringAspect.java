@@ -16,6 +16,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.tickethub.application.Either;
+import com.tickethub.domain.auth.AuthenticationException;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.validation.Notification;
 import com.tickethub.infrastructure.api.ResiliencePolicy;
@@ -100,6 +101,9 @@ public class UseCaseMonitoringAspect {
         if (notification.getCause() instanceof ResponseStatusException status
                 && status.getStatusCode() == HttpStatus.SERVICE_UNAVAILABLE) {
             return AuditOutcome.UNAVAILABLE;
+        }
+        if (notification.getCause() instanceof AuthenticationException) {
+            return AuditOutcome.UNAUTHORIZED;
         }
         if (notification.getCause() != null) {
             return AuditOutcome.INFRA_ERROR;

@@ -1,5 +1,6 @@
 package com.tickethub.infrastructure.api.controllers;
 
+import com.tickethub.domain.auth.AuthenticationException;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.infrastructure.api.ApiValidationException;
 import com.tickethub.infrastructure.api.models.ErrorResponse;
@@ -38,6 +39,11 @@ public class GlobalExceptionHandler {
                         .findFirst().orElse("Invalid request")
                 : "Invalid request";
         return ResponseEntity.badRequest().body(ErrorResponse.from(message));
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    ResponseEntity<ErrorResponse> authentication(AuthenticationException exception) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorResponse.from(exception.getMessage()));
     }
 
     @ExceptionHandler(DomainException.class)

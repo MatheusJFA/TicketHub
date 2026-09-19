@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.tickethub.application.Either;
+import com.tickethub.domain.auth.AuthenticationException;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.pagination.SearchQuery;
 import com.tickethub.domain.validation.Notification;
@@ -40,6 +41,9 @@ public final class HttpResults {
     public static RuntimeException toException(final Notification notification) {
         if (notification.getCause() instanceof ResponseStatusException status) {
             return status;
+        }
+        if (notification.getCause() instanceof AuthenticationException authentication) {
+            return authentication;
         }
         if (notification.getCause() != null && !(notification.getCause() instanceof DomainException)) {
             return new IllegalStateException("Use case failed", notification.getCause());

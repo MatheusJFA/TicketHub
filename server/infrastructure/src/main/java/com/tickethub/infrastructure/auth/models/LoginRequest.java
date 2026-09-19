@@ -1,4 +1,8 @@
 package com.tickethub.infrastructure.auth.models;
 
-public record LoginRequest(String username, String password) {
+import jakarta.validation.constraints.NotBlank;
+
+public record LoginRequest(
+        @NotBlank(message = "must not be blank") String identifier,
+        @NotBlank(message = "must not be blank") String password) {
 }

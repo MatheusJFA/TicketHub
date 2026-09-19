@@ -6,4 +6,6 @@
     <include file="changes/002-create-indexes.xml" relativeToChangelogFile="true"/>
     <include file="changes/003-create-audit-logs.xml" relativeToChangelogFile="true"/>
     <include file="changes/004-ownership-links.xml" relativeToChangelogFile="true"/>
+    <include file="changes/005-auth-credentials.xml" relativeToChangelogFile="true"/>
+    <include file="changes/006-refresh-sessions.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

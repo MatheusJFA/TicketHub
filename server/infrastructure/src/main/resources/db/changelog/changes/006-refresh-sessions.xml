@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd
+                   http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <changeSet id="006-1-create-refresh-sessions" author="tickethub">
+        <ext:createCollection collectionName="refresh_sessions"/>
+    </changeSet>
+    <changeSet id="006-2-create-refresh-sessions-indexes" author="tickethub">
+        <ext:createIndex collectionName="refresh_sessions">
+            <ext:keys>{ "tokenHash": 1 }</ext:keys>
+            <ext:options>{ "unique": true, "name": "uq_refresh_sessions_tokenHash" }</ext:options>
+        </ext:createIndex>
+        <ext:createIndex collectionName="refresh_sessions">
+            <ext:keys>{ "familyId": 1 }</ext:keys>
+            <ext:options>{ "name": "idx_refresh_sessions_familyId" }</ext:options>
+        </ext:createIndex>
+        <ext:createIndex collectionName="refresh_sessions">
+            <ext:keys>{ "expiresAt": 1 }</ext:keys>
+            <ext:options>{ "name": "idx_refresh_sessions_expiresAt", "expireAfterSeconds": 0 }</ext:options>
+        </ext:createIndex>
+    </changeSet>
+</databaseChangeLog>

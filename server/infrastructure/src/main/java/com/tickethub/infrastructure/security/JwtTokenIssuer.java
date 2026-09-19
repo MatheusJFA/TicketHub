@@ -2,52 +2,46 @@ package com.tickethub.infrastructure.security;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Objects;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.JwsHeader;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.stereotype.Component;
 
-import com.tickethub.infrastructure.auth.models.TokenResponse;
+import com.tickethub.domain.auth.IssuedToken;
+import com.tickethub.domain.auth.TokenIssuer;
 
-@Service
-public class AuthService {
+@Component
+public class JwtTokenIssuer implements TokenIssuer {
 
     private final SecurityProperties properties;
-    private final PasswordEncoder passwordEncoder;
     private final JwtEncoder jwtEncoder;
 
-    public AuthService(final SecurityProperties properties, final PasswordEncoder passwordEncoder,
-            final JwtEncoder jwtEncoder) {
+    public JwtTokenIssuer(final SecurityProperties properties, final JwtEncoder jwtEncoder) {
         this.properties = Objects.requireNonNull(properties, "'properties' should not be null");
-        this.passwordEncoder = Objects.requireNonNull(passwordEncoder, "'passwordEncoder' should not be null");
         this.jwtEncoder = Objects.requireNonNull(jwtEncoder, "'jwtEncoder' should not be null");
     }
 
-    public TokenResponse login(final String username, final String password) {
-        final SecurityUser user = properties.findByUsername(username)
-                .filter(candidate -> passwordEncoder.matches(password, candidate.passwordHash()))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
+    @Override
+    public IssuedToken issueAccess(final String subject, final List<String> authorities, final String ownerId) {
         final Instant now = Instant.now();
         final long expirationMinutes = properties.getJwt().getExpirationMinutes();
         final var claims = JwtClaimsSet.builder()
                 .issuer("tickethub")
                 .issuedAt(now)
                 .expiresAt(now.plus(expirationMinutes, ChronoUnit.MINUTES))
-                .subject(user.username())
-                .claim("authorities", user.authorities());
-        if (user.ownerId() != null) {
-            claims.claim("ownerId", user.ownerId());
+                .subject(subject)
+                .claim("authorities", authorities == null ? List.of() : List.copyOf(authorities));
+        if (ownerId != null) {
+            claims.claim("ownerId", ownerId);
         }
         final String token = jwtEncoder
                 .encode(JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(), claims.build()))
                 .getTokenValue();
-        return TokenResponse.bearer(token, expirationMinutes * 60);
+        return new IssuedToken(token, expirationMinutes * 60);
     }
 }
