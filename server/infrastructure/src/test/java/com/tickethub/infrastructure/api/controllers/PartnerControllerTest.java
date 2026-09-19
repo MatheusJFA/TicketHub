@@ -54,7 +54,7 @@ class PartnerControllerTest {
         when(createPartner.execute(any())).thenReturn(Either.right(new CreatePartnerOutput("partner-1")));
 
         mvc.perform(post("/partners").contentType(MediaType.APPLICATION_JSON).content("""
-                {"name":"Cinema","cnpj":"11222333000181","address":{"street":"Rua A","number":"1","neighborhood":"Centro","city":"São Paulo","state":"SP","country":"Brasil","zipCode":"01001000"}}
+                {"name":"Cinema","cnpj":"11222333000181","address":{"street":"Rua A","number":"1","neighborhood":"Centro","city":"São Paulo","state":"SP","country":"Brasil","zipCode":"01001000"},"email":"cinema@domain.com","password":"secret-123"}
                 """))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/partners/partner-1"))

@@ -2,9 +2,11 @@ package com.tickethub.infrastructure.configuration;
 
 import com.tickethub.application.customer.create.CreateCustomerUseCase;
 import com.tickethub.application.show.create.CreateShowUseCase;
+import com.tickethub.domain.auth.PasswordHasher;
 import com.tickethub.domain.core.customer.CustomerGateway;
 import com.tickethub.domain.core.partner.PartnerGateway;
 import com.tickethub.domain.core.show.ShowGateway;
+import com.tickethub.domain.geo.CepLookup;
 import org.junit.jupiter.api.Test;
 import com.tickethub.infrastructure.configuration.usecases.CustomerUseCaseConfig;
 import com.tickethub.infrastructure.configuration.usecases.PartnerUseCaseConfig;
@@ -35,10 +37,16 @@ class UseCaseConfigurationTest {
     void wiresRealUseCaseWhenGatewayExists() {
         final var gateway = mock(CustomerGateway.class);
         when(gateway.create(any())).thenAnswer(returnsFirstArg());
-        runner.withBean(CustomerGateway.class, () -> gateway).run(context -> {
+        final var passwordHasher = mock(PasswordHasher.class);
+        when(passwordHasher.hash(any())).thenReturn(
+                "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
+        runner.withBean(CustomerGateway.class, () -> gateway)
+                .withBean(PasswordHasher.class, () -> passwordHasher)
+                .run(context -> {
             assertThat(context).hasSingleBean(CreateCustomerUseCase.class);
             final var result = context.getBean(CreateCustomerUseCase.class).execute(
-                    new com.tickethub.application.customer.create.CreateCustomerCommand("52998224725", "Maria"));
+                    new com.tickethub.application.customer.create.CreateCustomerCommand("52998224725", "Maria",
+                            "maria@domain.com", "secret-123"));
             assertThat(result.isRight()).isTrue();
             verify(gateway).create(any());
         });
@@ -46,9 +54,13 @@ class UseCaseConfigurationTest {
 
     @Test
     void showCreationRequiresBothGateways() {
-        runner.withBean(ShowGateway.class, () -> mock(ShowGateway.class))
+        runner.withBean(PasswordHasher.class, () -> mock(PasswordHasher.class))
+                .withBean(CepLookup.class, () -> mock(CepLookup.class))
+                .withBean(ShowGateway.class, () -> mock(ShowGateway.class))
                 .run(context -> assertThat(context).doesNotHaveBean(CreateShowUseCase.class));
-        runner.withBean(ShowGateway.class, () -> mock(ShowGateway.class))
+        runner.withBean(PasswordHasher.class, () -> mock(PasswordHasher.class))
+                .withBean(CepLookup.class, () -> mock(CepLookup.class))
+                .withBean(ShowGateway.class, () -> mock(ShowGateway.class))
                 .withBean(PartnerGateway.class, () -> mock(PartnerGateway.class))
                 .run(context -> assertThat(context).hasSingleBean(CreateShowUseCase.class));
     }

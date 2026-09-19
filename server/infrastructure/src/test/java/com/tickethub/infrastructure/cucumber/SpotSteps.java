@@ -14,7 +14,8 @@ public class SpotSteps extends BaseSteps {
         }
         asAdmin();
         post("/partners", """
-                {"name":"Spot Fixtures","cnpj":"99999999000191","address":%s}\
+                {"name":"Spot Fixtures","cnpj":"99999999000191","address":%s,\
+                "email":"spot-fixtures@domain.com","password":"secret-123"}\
                 """.formatted(addressJson()));
         assertStatus(201);
         final String partnerId = body().get("id").asText();

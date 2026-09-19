@@ -12,7 +12,9 @@ X-Correlation-ID: customer-create-1
 
 {
   "cpf": "52998224725",
-  "name": "Maria Silva"
+  "name": "Maria Silva",
+  "email": "maria@domain.com",
+  "password": "secret-123"
 }
 
 ### Get customer by id

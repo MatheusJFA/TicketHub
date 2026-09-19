@@ -29,10 +29,13 @@ class ArchitectureTest {
 
     @Test
     void domainAndApplicationAreFrameworkFree() {
+        // commons-lang3/collections4 are pure utility libraries (no framework,
+        // no I/O), allowed alongside the JDK for null/string/collection guards.
         classes()
                 .that().resideInAnyPackage("..domain..", "..application..")
                 .should().onlyDependOnClassesThat()
-                .resideInAnyPackage("java..", "com.tickethub.domain..", "com.tickethub.application..")
+                .resideInAnyPackage("java..", "org.apache.commons..",
+                        "com.tickethub.domain..", "com.tickethub.application..")
                 .check(CLASSES);
     }
 

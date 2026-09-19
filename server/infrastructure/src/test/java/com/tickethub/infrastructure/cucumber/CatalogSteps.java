@@ -22,9 +22,10 @@ public class CatalogSteps extends BaseSteps {
     @Dado("que existe o parceiro {string} com cnpj {string}")
     public void existeParceiro(final String name, final String cnpj) throws Exception {
         asAdmin();
+        final String email = name.toLowerCase().replaceAll("[^a-z0-9]", "") + "@domain.com";
         final String json = """
-                {"name":"%s","cnpj":"%s","address":%s}\
-                """.formatted(name, cnpj, addressJson());
+                {"name":"%s","cnpj":"%s","address":%s,"email":"%s","password":"secret-123"}\
+                """.formatted(name, cnpj, addressJson(), email);
         post("/partners", json);
         assertStatus(201);
         world.partners().put(name, body().get("id").asText());

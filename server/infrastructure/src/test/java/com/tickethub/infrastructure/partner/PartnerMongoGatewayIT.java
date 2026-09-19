@@ -27,6 +27,7 @@ class PartnerMongoGatewayIT extends ContainerSupport {
 
     private static final Address ADDRESS = Address.create("Rua Augusta", "100", "Sala 10", "Centro",
             "São Paulo", "SP", "Brasil", "01305-000");
+    private static final String PASSWORD_HASH = "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS";
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -41,7 +42,7 @@ class PartnerMongoGatewayIT extends ContainerSupport {
 
     @Test
     void givenAPartner_whenCreate_thenPersistsAndFinds() {
-        final var partner = Partner.create("Cinema Nova", "11222333000181", ADDRESS);
+        final var partner = Partner.create("Cinema Nova", "11222333000181", ADDRESS, "cinema@domain.com", PASSWORD_HASH);
 
         gateway.create(partner);
 
@@ -49,6 +50,8 @@ class PartnerMongoGatewayIT extends ContainerSupport {
         assertTrue(found.isPresent());
         assertEquals("Cinema Nova", found.get().getName().getValue());
         assertEquals("11222333000181", found.get().getCnpj().getValue());
+        assertEquals("cinema@domain.com", found.get().getEmail().getValue());
+        assertEquals(PASSWORD_HASH, found.get().getPasswordHash().getValue());
         assertEquals("Rua Augusta", found.get().getAddress().getStreet());
         assertEquals("Sala 10", found.get().getAddress().getComplement());
         assertNotNull(found.get().getCreatedAt());
@@ -56,17 +59,38 @@ class PartnerMongoGatewayIT extends ContainerSupport {
 
     @Test
     void givenDuplicateCnpj_whenCreate_thenThrowsDomainException() {
-        gateway.create(Partner.create("Cinema Nova", "11222333000181", ADDRESS));
+        gateway.create(Partner.create("Cinema Nova", "11222333000181", ADDRESS, "cinema@domain.com", PASSWORD_HASH));
 
         final var exception = assertThrows(DomainException.class,
-                () -> gateway.create(Partner.create("Cinema Velha", "11222333000181", ADDRESS)));
+                () -> gateway.create(Partner.create("Cinema Velha", "11222333000181", ADDRESS, "velha@domain.com", PASSWORD_HASH)));
 
         assertEquals("'cnpj' already in use", exception.getMessage());
     }
 
     @Test
+    void givenDuplicateEmail_whenCreate_thenThrowsDomainException() {
+        gateway.create(Partner.create("Cinema Nova", "11222333000181", ADDRESS, "cinema@domain.com", PASSWORD_HASH));
+
+        final var exception = assertThrows(DomainException.class,
+                () -> gateway.create(Partner.create("Cinema Velha", "04252011000110", ADDRESS, "cinema@domain.com", PASSWORD_HASH)));
+
+        assertEquals("'email' already in use", exception.getMessage());
+    }
+
+    @Test
+    void givenAPartner_whenFindByEmail_thenReturnsPartner() {
+        final var partner = gateway.create(
+                Partner.create("Cinema Nova", "11222333000181", ADDRESS, "cinema@domain.com", PASSWORD_HASH));
+
+        final var found = gateway.findByEmail(com.tickethub.domain.shared.Email.create("CINEMA@domain.com"));
+
+        assertTrue(found.isPresent());
+        assertEquals(partner.getId(), found.get().getId());
+    }
+
+    @Test
     void givenAPartner_whenUpdate_thenPersistsChanges() {
-        final var partner = gateway.create(Partner.create("Cinema Nova", "11222333000181", ADDRESS));
+        final var partner = gateway.create(Partner.create("Cinema Nova", "11222333000181", ADDRESS, "cinema@domain.com", PASSWORD_HASH));
 
         partner.changeName("Cinema Novo");
         gateway.update(partner);
@@ -76,7 +100,7 @@ class PartnerMongoGatewayIT extends ContainerSupport {
 
     @Test
     void givenAPartner_whenDelete_thenRemoves() {
-        final var partner = gateway.create(Partner.create("Cinema Nova", "11222333000181", ADDRESS));
+        final var partner = gateway.create(Partner.create("Cinema Nova", "11222333000181", ADDRESS, "cinema@domain.com", PASSWORD_HASH));
 
         gateway.deleteById(partner.getId());
 
@@ -85,8 +109,8 @@ class PartnerMongoGatewayIT extends ContainerSupport {
 
     @Test
     void givenPartners_whenFindAll_thenSearches() {
-        gateway.create(Partner.create("Cinema Nova", "11222333000181", ADDRESS));
-        gateway.create(Partner.create("Teatro Velho", "04252011000110", ADDRESS));
+        gateway.create(Partner.create("Cinema Nova", "11222333000181", ADDRESS, "cinema@domain.com", PASSWORD_HASH));
+        gateway.create(Partner.create("Teatro Velho", "04252011000110", ADDRESS, "teatro@domain.com", PASSWORD_HASH));
 
         final var search = gateway.findAll(new SearchQuery(0, 10, "cinema", "name", "asc"));
 

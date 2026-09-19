@@ -1,33 +1,23 @@
 @baseUrl = http://localhost:8080
 
-### Login as admin
+### Login as admin (bootstrap username)
 # @name loginAdmin
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "username": "admin",
+  "identifier": "admin",
   "password": "admin-local"
 }
 
-### Login as partner
-# @name loginPartner
-POST {{baseUrl}}/auth/login
-Content-Type: application/json
-
-{
-  "username": "partner",
-  "password": "partner-local"
-}
-
-### Login as customer
+### Login as customer (registered email)
 # @name loginCustomer
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "username": "customer",
-  "password": "customer-local"
+  "identifier": "maria@domain.com",
+  "password": "secret-123"
 }
 
 ### Login with invalid credentials
@@ -36,6 +26,24 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "username": "admin",
+  "identifier": "maria@domain.com",
   "password": "wrong"
+}
+
+### Refresh session (paste refreshToken from login)
+# @name refresh
+POST {{baseUrl}}/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "PASTE_REFRESH_TOKEN_HERE"
+}
+
+### Logout (revokes the refresh token)
+# @name logout
+POST {{baseUrl}}/auth/logout
+Content-Type: application/json
+
+{
+  "refreshToken": "PASTE_REFRESH_TOKEN_HERE"
 }

@@ -22,7 +22,9 @@ X-Correlation-ID: partner-create-1
     "state": "SP",
     "country": "Brasil",
     "zipCode": "01305-000"
-  }
+  },
+  "email": "cinema@domain.com",
+  "password": "secret-123"
 }
 
 ### Get partner by id

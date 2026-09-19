@@ -29,6 +29,8 @@ class CustomerMongoGatewayIT extends ContainerSupport {
     @Autowired
     private CustomerMongoGateway gateway;
 
+    private static final String PASSWORD_HASH = "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS";
+
     @BeforeEach
     void cleanUp() {
         MongoCleanUpExtension.cleanCollections(mongoTemplate, CustomerDocument.COLLECTION);
@@ -36,7 +38,7 @@ class CustomerMongoGatewayIT extends ContainerSupport {
 
     @Test
     void givenACustomer_whenCreate_thenPersistsAndFinds() {
-        final var customer = Customer.create("52998224725", "Maria Silva");
+        final var customer = Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH);
 
         final var saved = gateway.create(customer);
 
@@ -45,23 +47,46 @@ class CustomerMongoGatewayIT extends ContainerSupport {
         assertTrue(found.isPresent());
         assertEquals("52998224725", found.get().getCpf().getValue());
         assertEquals("Maria Silva", found.get().getName().getValue());
+        assertEquals("maria@domain.com", found.get().getEmail().getValue());
+        assertEquals(PASSWORD_HASH, found.get().getPasswordHash().getValue());
         assertNotNull(found.get().getCreatedAt());
         assertNotNull(found.get().getUpdatedAt());
     }
 
     @Test
     void givenDuplicateCpf_whenCreate_thenThrowsDomainException() {
-        gateway.create(Customer.create("52998224725", "Maria Silva"));
+        gateway.create(Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH));
 
         final var exception = assertThrows(DomainException.class,
-                () -> gateway.create(Customer.create("52998224725", "Maria Souza")));
+                () -> gateway.create(Customer.create("52998224725", "Maria Souza", "maria.souza@domain.com", PASSWORD_HASH)));
 
         assertEquals("'cpf' already in use", exception.getMessage());
     }
 
     @Test
+    void givenDuplicateEmail_whenCreate_thenThrowsDomainException() {
+        gateway.create(Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH));
+
+        final var exception = assertThrows(DomainException.class,
+                () -> gateway.create(Customer.create("12345678909", "Maria Souza", "maria@domain.com", PASSWORD_HASH)));
+
+        assertEquals("'email' already in use", exception.getMessage());
+    }
+
+    @Test
+    void givenACustomer_whenFindByEmail_thenReturnsCustomer() {
+        final var customer = gateway.create(
+                Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH));
+
+        final var found = gateway.findByEmail(com.tickethub.domain.shared.Email.create("MARIA@domain.com"));
+
+        assertTrue(found.isPresent());
+        assertEquals(customer.getId(), found.get().getId());
+    }
+
+    @Test
     void givenACustomer_whenUpdate_thenPersistsChanges() {
-        final var customer = gateway.create(Customer.create("52998224725", "Maria Silva"));
+        final var customer = gateway.create(Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH));
 
         customer.changeName("Maria Souza");
         final var updated = gateway.update(customer);
@@ -72,7 +97,7 @@ class CustomerMongoGatewayIT extends ContainerSupport {
 
     @Test
     void givenACustomer_whenDelete_thenRemoves() {
-        final var customer = gateway.create(Customer.create("52998224725", "Maria Silva"));
+        final var customer = gateway.create(Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH));
 
         gateway.deleteById(customer.getId());
 
@@ -82,8 +107,8 @@ class CustomerMongoGatewayIT extends ContainerSupport {
 
     @Test
     void givenCustomers_whenFindAll_thenPaginatesAndSearches() {
-        gateway.create(Customer.create("52998224725", "Maria Silva"));
-        gateway.create(Customer.create("12345678909", "João Souza"));
+        gateway.create(Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH));
+        gateway.create(Customer.create("12345678909", "João Souza", "joao@domain.com", PASSWORD_HASH));
 
         final var first = gateway.findAll(new SearchQuery(0, 1, "", "name", "asc"));
         assertEquals(0, first.currentPage());

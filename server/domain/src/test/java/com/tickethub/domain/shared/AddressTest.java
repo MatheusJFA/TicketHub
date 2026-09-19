@@ -13,7 +13,8 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+
+import com.tickethub.domain.geo.CepAddress;import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -104,6 +105,34 @@ class AddressTest {
                 () -> new Address(null, "100", null, "Centro", "São Paulo", "SP", "Brasil", "01305-000"));
 
         assertEquals("'street' should not be null or blank", exception.getMessage());
+    }
+
+    @Test
+    void givenCepData_whenEnrichedWith_thenOverwritesExceptNumberAndComplement() {
+        final var address = create(validFields());
+        final var cep = new CepAddress("01305000", "Avenida Paulista", "Bela Vista", "São Paulo", "SP",
+                "Brasil");
+
+        final var enriched = address.enrichedWith(cep);
+
+        assertEquals("Avenida Paulista", enriched.getStreet());
+        assertEquals("Bela Vista", enriched.getNeighborhood());
+        assertEquals("100", enriched.getNumber());
+        assertEquals("Sala 10", enriched.getComplement());
+        assertEquals("01305000", enriched.getZipCode());
+    }
+
+    @Test
+    void givenBlankCepFields_whenEnrichedWith_thenKeepsCurrentValues() {
+        final var address = create(validFields());
+        final var cep = new CepAddress("01305000", "", null, "São Paulo", "", null);
+
+        final var enriched = address.enrichedWith(cep);
+
+        assertEquals("Rua Augusta", enriched.getStreet());
+        assertEquals("Centro", enriched.getNeighborhood());
+        assertEquals("São Paulo", enriched.getCity());
+        assertEquals("SP", enriched.getState());
     }
 
     private static String[] validFields() {

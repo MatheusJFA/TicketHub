@@ -33,11 +33,11 @@ class SpotE2ETest extends ContainerSupport {
     private String adminToken() throws Exception {
         final var response = mvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"admin\",\"password\":\"admin-local\"}"))
+                        .content("{\"identifier\":\"admin\",\"password\":\"admin-local\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.tokenType").value("Bearer"))
                 .andReturn().getResponse().getContentAsString();
-        return objectMapper.readTree(response).get("token").asText();
+        return objectMapper.readTree(response).get("accessToken").asText();
     }
 
     @Test

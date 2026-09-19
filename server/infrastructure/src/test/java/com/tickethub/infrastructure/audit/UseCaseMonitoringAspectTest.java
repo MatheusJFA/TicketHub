@@ -28,6 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.tickethub.application.Either;
 import com.tickethub.application.UnitUseCase;
 import com.tickethub.application.UseCase;
+import com.tickethub.domain.auth.AuthenticationException;
 import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.Notification;
 import com.tickethub.infrastructure.api.ResiliencePolicy;
@@ -165,6 +166,16 @@ class UseCaseMonitoringAspectTest {
 
         assertTrue(((Either<?, ?>) result).isLeft());
         assertEquals(AuditOutcome.INFRA_ERROR, entries.get(0).outcome());
+    }
+
+    @Test
+    void givenAuthenticationFailure_whenMonitor_thenRecordsUnauthorizedEntry() throws Throwable {
+        final var result = aspect.monitor(joinPoint(useCase(),
+                invocation -> Either.left(Notification.create(new AuthenticationException("Invalid credentials")))));
+
+        assertTrue(((Either<?, ?>) result).isLeft());
+        assertEquals(AuditOutcome.UNAUTHORIZED, entries.get(0).outcome());
+        assertEquals("Invalid credentials", entries.get(0).error());
     }
 
     @Test

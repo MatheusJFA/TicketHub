@@ -61,13 +61,13 @@ class CustomerControllerTest {
 
         final var response = mvc.perform(post("/customers")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"cpf\":\"52998224725\",\"name\":\"Maria\"}"));
+                .content("{\"cpf\":\"52998224725\",\"name\":\"Maria\",\"email\":\"maria@domain.com\",\"password\":\"secret-123\"}"));
 
         response.andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/customers/customer-1"))
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value("customer-1"));
-        verify(createCustomer).execute(new CreateCustomerCommand("52998224725", "Maria"));
+        verify(createCustomer).execute(new CreateCustomerCommand("52998224725", "Maria", "maria@domain.com", "secret-123"));
     }
 
     @Test
