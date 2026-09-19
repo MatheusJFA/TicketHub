@@ -53,3 +53,13 @@ X-Correlation-ID: spot-unpublish-1
 # @name deleteSpot
 DELETE {{baseUrl}}/spots/{{spotId}}
 Authorization: Bearer {{token}}
+
+### Update spot (full update)
+# @name updateSpot
+PUT {{baseUrl}}/spots/{{spotId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "location": "B2"
+}

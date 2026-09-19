@@ -6,6 +6,7 @@ import com.tickethub.application.customer.create.*;
 import com.tickethub.application.customer.delete.*;
 import com.tickethub.application.customer.retrieve.get.*;
 import com.tickethub.application.customer.retrieve.list.*;
+import com.tickethub.application.customer.update.*;
 import com.tickethub.infrastructure.customer.models.*;
 import org.springframework.http.ResponseEntity;
 import com.tickethub.infrastructure.api.HttpResults;
@@ -23,6 +24,7 @@ public class CustomerController implements CustomerAPI {
     private final DeleteCustomerUseCase deleteCustomer;
     private final GetCustomerUseCase getCustomer;
     private final ListCustomersUseCase listCustomers;
+    private final UpdateCustomerUseCase updateCustomer;
     private final CustomerMapper mapper;
 
     public CustomerController(ChangeCustomerNameUseCase changeCustomerName,
@@ -30,12 +32,14 @@ public class CustomerController implements CustomerAPI {
             DeleteCustomerUseCase deleteCustomer,
             GetCustomerUseCase getCustomer,
             ListCustomersUseCase listCustomers,
+            UpdateCustomerUseCase updateCustomer,
             CustomerMapper mapper) {
         this.changeCustomerName = changeCustomerName;
         this.createCustomer = createCustomer;
         this.deleteCustomer = deleteCustomer;
         this.getCustomer = getCustomer;
         this.listCustomers = listCustomers;
+        this.updateCustomer = updateCustomer;
         this.mapper = mapper;
     }
 
@@ -67,5 +71,11 @@ public class CustomerController implements CustomerAPI {
         final var result = HttpResults.require(listCustomers.execute(HttpResults.search(search, page, perPage, sort, direction)))
                 .map(mapper::toListResponse);
         return ResponseEntity.ok(result);
+    }
+
+    @Override
+    public ResponseEntity<IdResponse> updateCustomer(String id, UpdateCustomerRequest input) {
+        final var output = HttpResults.require(updateCustomer.execute(mapper.toCommand(id, input)));
+        return ResponseEntity.ok(new IdResponse(output.id()));
     }
 }

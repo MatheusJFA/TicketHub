@@ -43,3 +43,12 @@ Funcionalidade: Gestão de shows
     Dado que sou o administrador
     Quando crio a seção avulsa do show inexistente
     Então a resposta deve ter status 404
+
+  Cenário: Atualizar show por PUT altera todos os campos
+    Dado que existe o parceiro "Rock Produções" com cnpj "11222333000181"
+    E que estou autenticado como dono do parceiro "Rock Produções"
+    Quando crio o show "Rock in Rio" do parceiro "Rock Produções"
+    E guardo o show criado
+    E atualizo o show para "Rock in Rio Edicao Especial"
+    Então a resposta deve ter status 200
+    E o show deve ter nome "Rock in Rio Edicao Especial"

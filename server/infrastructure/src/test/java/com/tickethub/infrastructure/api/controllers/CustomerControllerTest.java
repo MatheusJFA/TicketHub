@@ -9,6 +9,7 @@ import com.tickethub.application.customer.create.CreateCustomerUseCase;
 import com.tickethub.application.customer.delete.DeleteCustomerUseCase;
 import com.tickethub.application.customer.retrieve.get.GetCustomerUseCase;
 import com.tickethub.application.customer.retrieve.list.ListCustomersUseCase;
+import com.tickethub.application.customer.update.*;
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.Notification;
@@ -44,6 +45,7 @@ class CustomerControllerTest {
     @MockitoBean DeleteCustomerUseCase deleteCustomer;
     @MockitoBean GetCustomerUseCase getCustomer;
     @MockitoBean ListCustomersUseCase listCustomers;
+    @MockitoBean UpdateCustomerUseCase updateCustomer;
     @MockitoBean(name = "ownerAccess") OwnerAccess ownerAccess;
 
     @Value("${tickethub.security.jwt.secret}")
@@ -110,6 +112,25 @@ class CustomerControllerTest {
     void givenAnotherAccount_whenCallsDeleteCustomer_thenReturnsForbidden() throws Exception {
         mvc.perform(delete("/customers/customer-1")
                         .header("Authorization", bearer("customer-9", "customer:delete")))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void givenOwner_whenCallsUpdateCustomer_thenSucceeds() throws Exception {
+        when(updateCustomer.execute(any())).thenReturn(Either.right(new UpdateCustomerOutput("customer-1")));
+        when(ownerAccess.isSelfOrAdmin("customer-1")).thenReturn(true);
+
+        mvc.perform(put("/customers/customer-1").contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", bearer("customer-1", "customer:write"))
+                        .content("{\"name\":\"Maria Souza\"}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.id").value("customer-1"));
+    }
+
+    @Test
+    void givenAnotherAccount_whenCallsUpdateCustomer_thenReturnsForbidden() throws Exception {
+        mvc.perform(put("/customers/customer-1").contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", bearer("customer-9", "customer:write"))
+                        .content("{\"name\":\"Maria Souza\"}"))
                 .andExpect(status().isForbidden());
     }
 

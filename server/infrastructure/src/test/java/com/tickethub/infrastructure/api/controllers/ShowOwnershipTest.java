@@ -29,6 +29,7 @@ import com.tickethub.application.show.retrieve.get.GetShowUseCase;
 import com.tickethub.application.show.retrieve.list.ListShowsUseCase;
 import com.tickethub.application.show.unpublish.UnpublishShowUseCase;
 import com.tickethub.application.show.unpublishall.UnpublishAllShowUseCase;
+import com.tickethub.application.show.update.*;
 import com.tickethub.infrastructure.ControllerTest;
 import com.tickethub.infrastructure.security.ShowAccess;
 import com.tickethub.infrastructure.security.TestTokens;
@@ -63,6 +64,7 @@ class ShowOwnershipTest {
     UnpublishShowUseCase unpublishShow;
     @MockitoBean
     UnpublishAllShowUseCase unpublishAllShow;
+    @MockitoBean UpdateShowUseCase updateShow;
     @MockitoBean(name = "showAccess")
     ShowAccess showAccess;
 

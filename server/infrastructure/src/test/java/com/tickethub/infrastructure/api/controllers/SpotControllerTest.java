@@ -8,6 +8,7 @@ import com.tickethub.application.spot.publish.*;
 import com.tickethub.application.spot.retrieve.get.*;
 import com.tickethub.application.spot.retrieve.list.*;
 import com.tickethub.application.spot.unpublish.*;
+import com.tickethub.application.spot.update.*;
 import com.tickethub.infrastructure.ControllerTest;
 import com.tickethub.infrastructure.security.ShowAccess;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ControllerTest(controllers = SpotController.class)
@@ -47,6 +49,7 @@ class SpotControllerTest {
     @MockitoBean GetSpotUseCase getSpot;
     @MockitoBean ListSpotsUseCase listSpots;
     @MockitoBean UnpublishSpotUseCase unpublishSpot;
+    @MockitoBean UpdateSpotUseCase updateSpot;
     @MockitoBean(name = "showAccess")
     ShowAccess showAccess;
 
@@ -83,5 +86,30 @@ class SpotControllerTest {
                         .content("{\"location\":\"B2\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("spot-1"));
+    }
+
+    @Test
+    void givenOwner_whenCallsUpdateSpot_thenSucceeds() throws Exception {
+        when(showAccess.canWriteSpot("spot-1")).thenReturn(true);
+        when(updateSpot.execute(any()))
+                .thenReturn(Either.right(new UpdateSpotOutput("spot-1")));
+
+        mvc.perform(put("/spots/spot-1")
+                        .header("Authorization", bearerAsOwner("partner-1", "spot:write"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"location\":\"B2\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("spot-1"));
+    }
+
+    @Test
+    void givenNonOwner_whenCallsUpdateSpot_thenReturnsForbidden() throws Exception {
+        when(showAccess.canWriteSpot("spot-1")).thenReturn(false);
+
+        mvc.perform(put("/spots/spot-1")
+                        .header("Authorization", bearerAsOwner("partner-9", "spot:write"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"location\":\"B2\"}"))
+                .andExpect(status().isForbidden());
     }
 }

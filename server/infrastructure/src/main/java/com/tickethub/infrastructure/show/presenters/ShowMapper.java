@@ -12,6 +12,7 @@ import com.tickethub.application.show.create.CreateShowCommand;
 import com.tickethub.application.show.reschedule.RescheduleShowCommand;
 import com.tickethub.application.show.retrieve.get.GetShowOutput;
 import com.tickethub.application.show.retrieve.list.ListShowsOutput;
+import com.tickethub.application.show.update.UpdateShowCommand;
 import com.tickethub.infrastructure.show.models.AddSectionToShowRequest;
 import com.tickethub.infrastructure.show.models.ChangeShowDescriptionRequest;
 import com.tickethub.infrastructure.show.models.ChangeShowNameRequest;
@@ -19,6 +20,7 @@ import com.tickethub.infrastructure.show.models.CreateShowRequest;
 import com.tickethub.infrastructure.show.models.RescheduleShowRequest;
 import com.tickethub.infrastructure.show.models.ShowListResponse;
 import com.tickethub.infrastructure.show.models.ShowResponse;
+import com.tickethub.infrastructure.show.models.UpdateShowRequest;
 
 @Mapper(componentModel = "spring", uses = SharedMapper.class)
 public interface ShowMapper {
@@ -37,4 +39,6 @@ public interface ShowMapper {
     ChangeShowDescriptionCommand toCommand(String id, ChangeShowDescriptionRequest request);
 
     RescheduleShowCommand toCommand(String id, RescheduleShowRequest request);
+
+    UpdateShowCommand toCommand(String id, UpdateShowRequest request);
 }

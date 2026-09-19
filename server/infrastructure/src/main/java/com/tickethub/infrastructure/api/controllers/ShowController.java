@@ -14,6 +14,7 @@ import com.tickethub.application.show.retrieve.get.*;
 import com.tickethub.application.show.retrieve.list.*;
 import com.tickethub.application.show.unpublish.*;
 import com.tickethub.application.show.unpublishall.*;
+import com.tickethub.application.show.update.*;
 import com.tickethub.infrastructure.show.models.*;
 import java.net.URI;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,7 @@ public class ShowController implements ShowAPI {
     private final ListShowsUseCase listShows;
     private final UnpublishShowUseCase unpublishShow;
     private final UnpublishAllShowUseCase unpublishAllShow;
+    private final UpdateShowUseCase updateShow;
     private final ShowMapper mapper;
 
     public ShowController(AddSectionToShowUseCase addSectionToShow,
@@ -50,6 +52,7 @@ public class ShowController implements ShowAPI {
             ListShowsUseCase listShows,
             UnpublishShowUseCase unpublishShow,
             UnpublishAllShowUseCase unpublishAllShow,
+            UpdateShowUseCase updateShow,
             ShowMapper mapper) {
         this.addSectionToShow = addSectionToShow;
         this.changeShowDescription = changeShowDescription;
@@ -63,6 +66,7 @@ public class ShowController implements ShowAPI {
         this.listShows = listShows;
         this.unpublishShow = unpublishShow;
         this.unpublishAllShow = unpublishAllShow;
+        this.updateShow = updateShow;
         this.mapper = mapper;
     }
 
@@ -133,6 +137,12 @@ public class ShowController implements ShowAPI {
     @Override
     public ResponseEntity<IdResponse> unpublishAllShow(String id) {
         final var output = HttpResults.require(unpublishAllShow.execute(new UnpublishAllShowCommand(id)));
+        return ResponseEntity.ok(new IdResponse(output.id()));
+    }
+
+    @Override
+    public ResponseEntity<IdResponse> updateShow(String id, UpdateShowRequest input) {
+        final var output = HttpResults.require(updateShow.execute(mapper.toCommand(id, input)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 }

@@ -28,6 +28,7 @@ import com.tickethub.application.spot.publish.PublishSpotUseCase;
 import com.tickethub.application.spot.retrieve.get.GetSpotUseCase;
 import com.tickethub.application.spot.retrieve.list.ListSpotsUseCase;
 import com.tickethub.application.spot.unpublish.UnpublishSpotUseCase;
+import com.tickethub.application.spot.update.*;
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.infrastructure.ControllerTest;
 import com.tickethub.infrastructure.security.TestTokens;
@@ -53,6 +54,7 @@ class SecurityEnforcementTest {
     ListSpotsUseCase listSpots;
     @MockitoBean
     UnpublishSpotUseCase unpublishSpot;
+    @MockitoBean UpdateSpotUseCase updateSpot;
 
     @Value("${tickethub.security.jwt.secret}")
     String jwtSecret;

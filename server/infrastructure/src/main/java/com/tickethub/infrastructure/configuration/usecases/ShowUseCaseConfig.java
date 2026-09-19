@@ -26,6 +26,8 @@ import com.tickethub.application.show.unpublishall.UnpublishAllShowUseCase;
 import com.tickethub.application.show.unpublishall.DefaultUnpublishAllShowUseCase;
 import com.tickethub.application.section.generatespots.DefaultGenerateSectionSpotsUseCase;
 import com.tickethub.application.section.generatespots.GenerateSectionSpotsUseCase;
+import com.tickethub.application.show.update.UpdateShowUseCase;
+import com.tickethub.application.show.update.DefaultUpdateShowUseCase;
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.partner.PartnerGateway;
 import com.tickethub.domain.event.DomainEventPublisher;
@@ -114,5 +116,10 @@ public class ShowUseCaseConfig {
     @Bean
     public UnpublishAllShowUseCase unpublishAllShowUseCase() {
         return new DefaultUnpublishAllShowUseCase(showGateway);
+    }
+
+    @Bean
+    public UpdateShowUseCase updateShowUseCase() {
+        return new DefaultUpdateShowUseCase(showGateway);
     }
 }
