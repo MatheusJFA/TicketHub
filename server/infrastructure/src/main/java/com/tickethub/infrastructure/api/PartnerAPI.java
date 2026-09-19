@@ -32,7 +32,7 @@ public interface PartnerAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("hasAuthority('partner:write') and @ownerAccess.isSelfOrAdmin(#id)")
-    ResponseEntity<?> changePartnerAddress(@PathVariable("id") String id, @RequestBody ChangePartnerAddressRequest input);
+    ResponseEntity<IdResponse> changePartnerAddress(@PathVariable("id") String id, @RequestBody ChangePartnerAddressRequest input);
 
     @PatchMapping(value = "/{id}/name", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Change Partner Name")
@@ -45,7 +45,7 @@ public interface PartnerAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("hasAuthority('partner:write') and @ownerAccess.isSelfOrAdmin(#id)")
-    ResponseEntity<?> changePartnerName(@PathVariable("id") String id, @RequestBody ChangePartnerNameRequest input);
+    ResponseEntity<IdResponse> changePartnerName(@PathVariable("id") String id, @RequestBody ChangePartnerNameRequest input);
 
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Create Partner")
@@ -57,7 +57,7 @@ public interface PartnerAPI {
         @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
-    ResponseEntity<?> createPartner(@RequestBody CreatePartnerRequest input);
+    ResponseEntity<IdResponse> createPartner(@RequestBody CreatePartnerRequest input);
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete Partner")
@@ -70,7 +70,7 @@ public interface PartnerAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("hasAuthority('partner:delete') and @ownerAccess.isSelfOrAdmin(#id)")
-    ResponseEntity<?> deleteById(@PathVariable("id") String id);
+    ResponseEntity<Void> deleteById(@PathVariable("id") String id);
 
     @GetMapping("/{id}")
     @Operation(summary = "Get Partner")
@@ -83,7 +83,7 @@ public interface PartnerAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("@ownerAccess.isSelfOrAdmin(#id)")
-    ResponseEntity<?> getById(@PathVariable("id") String id);
+    ResponseEntity<PartnerResponse> getById(@PathVariable("id") String id);
 
     @GetMapping
     @Operation(summary = "List Partners")
@@ -96,7 +96,7 @@ public interface PartnerAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("hasRole('ADMIN')")
-    ResponseEntity<?> list(
+    ResponseEntity<Pagination<PartnerListResponse>> list(
             @RequestParam(defaultValue = "") String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int perPage,
@@ -114,5 +114,5 @@ public interface PartnerAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     @PreAuthorize("hasAuthority('partner:write') and @ownerAccess.isSelfOrAdmin(#id)")
-    ResponseEntity<?> updatePartner(@PathVariable("id") String id, @RequestBody UpdatePartnerRequest input);
+    ResponseEntity<IdResponse> updatePartner(@PathVariable("id") String id, @RequestBody UpdatePartnerRequest input);
 }

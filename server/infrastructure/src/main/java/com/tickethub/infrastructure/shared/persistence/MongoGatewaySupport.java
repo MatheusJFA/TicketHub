@@ -1,8 +1,6 @@
 package com.tickethub.infrastructure.shared.persistence;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -57,46 +55,6 @@ public final class MongoGatewaySupport {
         return new Pagination<>(search.page(), search.perPage(), total, page.stream().map(mapper).toList());
     }
 
-    public static List<SectionDocument> sectionsByIds(final MongoTemplate mongoTemplate, final List<String> ids) {
-        if (ids == null || ids.isEmpty()) {
-            return List.of();
-        }
-        return mongoTemplate.find(Query.query(Criteria.where("_id").in(ids)),
-                SectionDocument.class, SectionDocument.COLLECTION);
-    }
-
-    public static List<SectionDocument> sectionsByShowId(final MongoTemplate mongoTemplate, final String showId) {
-        if (showId == null || showId.isBlank()) {
-            return List.of();
-        }
-        return mongoTemplate.find(Query.query(Criteria.where("showId").is(showId)),
-                SectionDocument.class, SectionDocument.COLLECTION);
-    }
-
-    public static List<SpotDocument> spotsByIds(final MongoTemplate mongoTemplate, final List<String> ids) {
-        if (ids == null || ids.isEmpty()) {
-            return List.of();
-        }
-        return mongoTemplate.find(Query.query(Criteria.where("_id").in(ids)),
-                SpotDocument.class, SpotDocument.COLLECTION);
-    }
-
-    public static List<SpotDocument> spotsByShowId(final MongoTemplate mongoTemplate, final String showId) {
-        if (showId == null || showId.isBlank()) {
-            return List.of();
-        }
-        return mongoTemplate.find(Query.query(Criteria.where("showId").is(showId)),
-                SpotDocument.class, SpotDocument.COLLECTION);
-    }
-
-    public static List<SpotDocument> spotsBySectionId(final MongoTemplate mongoTemplate, final String sectionId) {
-        if (sectionId == null || sectionId.isBlank()) {
-            return List.of();
-        }
-        return mongoTemplate.find(Query.query(Criteria.where("sectionId").is(sectionId)),
-                SpotDocument.class, SpotDocument.COLLECTION);
-    }
-
     public static void removeSectionsByShowId(final MongoTemplate mongoTemplate, final String showId) {
         if (showId == null || showId.isBlank()) {
             return;
@@ -119,18 +77,5 @@ public final class MongoGatewaySupport {
         }
         mongoTemplate.remove(Query.query(Criteria.where("sectionId").is(sectionId)),
                 SpotDocument.class, SpotDocument.COLLECTION);
-    }
-
-    public static List<String> existingIds(final MongoTemplate mongoTemplate, final List<String> ids,
-            final String collection) {
-        if (ids == null || ids.isEmpty()) {
-            return List.of();
-        }
-        final var query = Query.query(Criteria.where("_id").in(ids));
-        query.fields().include("_id");
-        return mongoTemplate.find(query, org.bson.Document.class, collection).stream()
-                .map(document -> document.getString("_id"))
-                .filter(Objects::nonNull)
-                .toList();
     }
 }

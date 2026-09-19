@@ -6,8 +6,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import com.tickethub.domain.core.spot.Spot;
@@ -17,7 +15,8 @@ import com.tickethub.domain.core.section.SectionID;
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.domain.pagination.SearchQuery;
 import com.tickethub.infrastructure.spot.persistence.SpotDocument;
-import com.tickethub.infrastructure.section.persistence.SectionDocument;
+import com.tickethub.infrastructure.spot.persistence.SpotRepository;
+import com.tickethub.infrastructure.section.persistence.SectionRepository;
 import com.tickethub.infrastructure.shared.persistence.MongoGatewaySupport;
 
 @Component
@@ -26,17 +25,21 @@ public class SpotMongoGateway implements SpotGateway {
     private static final Set<String> SORTABLE_FIELDS = Set.of("location", "createdAt", "updatedAt");
 
     private final MongoTemplate mongoTemplate;
+    private final SpotRepository repository;
+    private final SectionRepository sections;
 
-    public SpotMongoGateway(final MongoTemplate mongoTemplate) {
+    public SpotMongoGateway(final MongoTemplate mongoTemplate, final SpotRepository repository,
+            final SectionRepository sections) {
         this.mongoTemplate = Objects.requireNonNull(mongoTemplate, "'mongoTemplate' should not be null");
+        this.repository = Objects.requireNonNull(repository, "'repository' should not be null");
+        this.sections = Objects.requireNonNull(sections, "'sections' should not be null");
     }
 
     @Override
     public Spot create(final Spot spot, final SectionID sectionId) {
         Objects.requireNonNull(sectionId, "'sectionId' should not be null");
         // Resolve the remaining denormalized links from the parent section.
-        final var parent = mongoTemplate.findById(sectionId.getValue(), SectionDocument.class,
-                SectionDocument.COLLECTION);
+        final var parent = sections.findById(sectionId.getValue()).orElse(null);
         final var document = parent == null
                 ? SpotDocument.from(spot, null, sectionId.getValue(), null)
                 : SpotDocument.from(spot, parent.showId(), sectionId.getValue(), parent.partnerId());
@@ -45,22 +48,18 @@ public class SpotMongoGateway implements SpotGateway {
 
     @Override
     public void deleteById(final SpotID id) {
-        mongoTemplate.remove(Query.query(Criteria.where("_id").is(id.getValue())),
-                SpotDocument.class, SpotDocument.COLLECTION);
+        repository.deleteById(id.getValue());
     }
 
     @Override
     public Optional<Spot> findById(final SpotID id) {
-        return Optional
-                .ofNullable(mongoTemplate.findById(id.getValue(), SpotDocument.class, SpotDocument.COLLECTION))
-                .map(SpotDocument::toDomain);
+        return repository.findById(id.getValue()).map(SpotDocument::toDomain);
     }
 
     @Override
     public Spot update(final Spot spot) {
         // Preserve the denormalized ownership links (see SectionMongoGateway.update).
-        final var existing = mongoTemplate.findById(spot.getId().getValue(), SpotDocument.class,
-                SpotDocument.COLLECTION);
+        final var existing = repository.findById(spot.getId().getValue()).orElse(null);
         final var document = existing == null
                 ? SpotDocument.from(spot)
                 : SpotDocument.from(spot, existing.showId(), existing.sectionId(), existing.partnerId());
@@ -79,10 +78,8 @@ public class SpotMongoGateway implements SpotGateway {
         if (ids == null || ids.isEmpty()) {
             return List.of();
         }
-        return MongoGatewaySupport
-                .existingIds(mongoTemplate, ids.stream().map(SpotID::getValue).toList(),
-                        SpotDocument.COLLECTION)
-                .stream()
+        return repository.findAllById(ids.stream().map(SpotID::getValue).toList()).stream()
+                .map(SpotDocument::id)
                 .map(SpotID::from)
                 .toList();
     }

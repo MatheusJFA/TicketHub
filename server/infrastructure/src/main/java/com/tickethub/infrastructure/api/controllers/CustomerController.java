@@ -8,6 +8,7 @@ import com.tickethub.application.customer.retrieve.get.*;
 import com.tickethub.application.customer.retrieve.list.*;
 import com.tickethub.application.customer.update.*;
 import com.tickethub.infrastructure.customer.models.*;
+import com.tickethub.domain.pagination.Pagination;
 import org.springframework.http.ResponseEntity;
 import com.tickethub.infrastructure.api.HttpResults;
 import com.tickethub.infrastructure.customer.presenters.CustomerMapper;
@@ -44,30 +45,30 @@ public class CustomerController implements CustomerAPI {
     }
 
     @Override
-    public ResponseEntity<?> changeCustomerName(String id, ChangeCustomerNameRequest input) {
+    public ResponseEntity<IdResponse> changeCustomerName(String id, ChangeCustomerNameRequest input) {
         final var output = HttpResults.require(changeCustomerName.execute(mapper.toCommand(id, input)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
-    public ResponseEntity<?> createCustomer(CreateCustomerRequest input) {
+    public ResponseEntity<IdResponse> createCustomer(CreateCustomerRequest input) {
         final var output = HttpResults.require(createCustomer.execute(mapper.toCommand(input)));
         return ResponseEntity.created(URI.create("/customers/" + output.id())).body(new IdResponse(output.id()));
     }
 
     @Override
-    public ResponseEntity<?> deleteById(String id) {
+    public ResponseEntity<Void> deleteById(String id) {
         HttpResults.requireEmpty(deleteCustomer.execute(id));
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<?> getById(String id) {
+    public ResponseEntity<CustomerResponse> getById(String id) {
         return ResponseEntity.ok(mapper.toResponse(HttpResults.require(getCustomer.execute(id))));
     }
 
     @Override
-    public ResponseEntity<?> list(String search, int page, int perPage, String sort, String direction) {
+    public ResponseEntity<Pagination<CustomerListResponse>> list(String search, int page, int perPage, String sort, String direction) {
         final var result = HttpResults.require(listCustomers.execute(HttpResults.search(search, page, perPage, sort, direction)))
                 .map(mapper::toListResponse);
         return ResponseEntity.ok(result);

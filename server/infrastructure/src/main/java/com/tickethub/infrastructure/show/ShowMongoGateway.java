@@ -23,8 +23,11 @@ import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.domain.pagination.SearchQuery;
 import com.tickethub.infrastructure.show.persistence.ShowDocument;
+import com.tickethub.infrastructure.show.persistence.ShowRepository;
 import com.tickethub.infrastructure.section.persistence.SectionDocument;
+import com.tickethub.infrastructure.section.persistence.SectionRepository;
 import com.tickethub.infrastructure.spot.persistence.SpotDocument;
+import com.tickethub.infrastructure.spot.persistence.SpotRepository;
 import com.tickethub.infrastructure.shared.persistence.MongoGatewaySupport;
 import com.tickethub.infrastructure.shared.persistence.MongoUnitOfWork;
 
@@ -34,9 +37,16 @@ public class ShowMongoGateway implements ShowGateway {
     private static final Set<String> SORTABLE_FIELDS = Set.of("name", "createdAt", "updatedAt");
 
     private final MongoTemplate mongoTemplate;
+    private final ShowRepository repository;
+    private final SectionRepository sections;
+    private final SpotRepository spots;
 
-    public ShowMongoGateway(final MongoTemplate mongoTemplate) {
+    public ShowMongoGateway(final MongoTemplate mongoTemplate, final ShowRepository repository,
+            final SectionRepository sections, final SpotRepository spots) {
         this.mongoTemplate = Objects.requireNonNull(mongoTemplate, "'mongoTemplate' should not be null");
+        this.repository = Objects.requireNonNull(repository, "'repository' should not be null");
+        this.sections = Objects.requireNonNull(sections, "'sections' should not be null");
+        this.spots = Objects.requireNonNull(spots, "'spots' should not be null");
     }
 
     @Override
@@ -51,11 +61,11 @@ public class ShowMongoGateway implements ShowGateway {
     @Override
     public void deleteById(final ShowID id) {
         final var unitOfWork = new MongoUnitOfWork(mongoTemplate);
-        final var sectionIds = Optional
-                .ofNullable(mongoTemplate.findById(id.getValue(), ShowDocument.class, ShowDocument.COLLECTION))
+        final var sectionIds = repository.findById(id.getValue())
                 .map(ShowDocument::sectionIds)
                 .orElseGet(List::of);
-        final var spotIds = MongoGatewaySupport.sectionsByIds(mongoTemplate, sectionIds).stream()
+        final var spotIds = sections.findAllById(sectionIds).stream()
+                .filter(section -> section.spotIds() != null)
                 .flatMap(section -> section.spotIds().stream())
                 .toList();
         unitOfWork.registerRemoved(SpotDocument.COLLECTION, spotIds);
@@ -70,9 +80,7 @@ public class ShowMongoGateway implements ShowGateway {
 
     @Override
     public Optional<Show> findById(final ShowID id) {
-        return Optional
-                .ofNullable(mongoTemplate.findById(id.getValue(), ShowDocument.class, ShowDocument.COLLECTION))
-                .map(this::toDomain);
+        return repository.findById(id.getValue()).map(this::toDomain);
     }
 
     @Override
@@ -97,10 +105,8 @@ public class ShowMongoGateway implements ShowGateway {
         if (ids == null || ids.isEmpty()) {
             return List.of();
         }
-        return MongoGatewaySupport
-                .existingIds(mongoTemplate, ids.stream().map(ShowID::getValue).toList(),
-                        ShowDocument.COLLECTION)
-                .stream()
+        return repository.findAllById(ids.stream().map(ShowID::getValue).toList()).stream()
+                .map(ShowDocument::id)
                 .map(ShowID::from)
                 .toList();
     }
@@ -111,13 +117,10 @@ public class ShowMongoGateway implements ShowGateway {
             return;
         }
         // Skip orphan writes when the parent section no longer exists.
-        if (!MongoGatewaySupport.existingIds(mongoTemplate, List.of(sectionId.getValue()),
-                SectionDocument.COLLECTION).contains(sectionId.getValue())) {
+        if (!sections.existsById(sectionId.getValue())) {
             return;
         }
-        final String partnerId = Optional
-                .ofNullable(mongoTemplate.findById(showId.getValue(), ShowDocument.class,
-                        ShowDocument.COLLECTION))
+        final String partnerId = repository.findById(showId.getValue())
                 .map(ShowDocument::partnerId)
                 .orElse(null);
         final var unitOfWork = new MongoUnitOfWork(mongoTemplate);
@@ -157,11 +160,11 @@ public class ShowMongoGateway implements ShowGateway {
     private Show toDomain(final ShowDocument document) {
         // Prefer the denormalized parent fields (3 reads total, all indexed);
         // fall back to the legacy id arrays for documents written before them.
-        List<SectionDocument> sectionDocuments = MongoGatewaySupport.sectionsByShowId(mongoTemplate, document.id());
+        List<SectionDocument> sectionDocuments = sections.findByShowId(document.id());
         if (sectionDocuments.isEmpty() && document.sectionIds() != null && !document.sectionIds().isEmpty()) {
-            sectionDocuments = MongoGatewaySupport.sectionsByIds(mongoTemplate, document.sectionIds());
+            sectionDocuments = sections.findAllById(document.sectionIds());
         }
-        final var spotsBySection = MongoGatewaySupport.spotsByShowId(mongoTemplate, document.id()).stream()
+        final var spotsBySection = spots.findByShowId(document.id()).stream()
                 .filter(spot -> spot.sectionId() != null)
                 .collect(Collectors.groupingBy(SpotDocument::sectionId));
         final var sectionsById = sectionDocuments.stream()
@@ -184,14 +187,14 @@ public class ShowMongoGateway implements ShowGateway {
         if (!candidates.isEmpty()) {
             spotDocuments = candidates;
         } else if (document.spotIds() != null && !document.spotIds().isEmpty()) {
-            final var byId = MongoGatewaySupport.spotsByIds(mongoTemplate, document.spotIds()).stream()
+            final var byId = spots.findAllById(document.spotIds()).stream()
                     .collect(Collectors.toMap(SpotDocument::id, Function.identity(), (first, second) -> first));
             spotDocuments = document.spotIds().stream()
                     .map(byId::get)
                     .filter(Objects::nonNull)
                     .toList();
         } else {
-            spotDocuments = MongoGatewaySupport.spotsBySectionId(mongoTemplate, document.id());
+            spotDocuments = spots.findBySectionId(document.id());
         }
         final Set<Spot> spots = new HashSet<>();
         for (final SpotDocument spot : spotDocuments) {

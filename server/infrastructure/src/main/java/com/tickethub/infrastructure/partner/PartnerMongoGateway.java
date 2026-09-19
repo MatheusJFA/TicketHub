@@ -6,8 +6,6 @@ import java.util.Set;
 
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
 import com.tickethub.domain.core.partner.Partner;
@@ -17,6 +15,7 @@ import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.domain.pagination.SearchQuery;
 import com.tickethub.infrastructure.partner.persistence.PartnerDocument;
+import com.tickethub.infrastructure.partner.persistence.PartnerRepository;
 import com.tickethub.infrastructure.shared.persistence.MongoGatewaySupport;
 
 @Component
@@ -25,9 +24,11 @@ public class PartnerMongoGateway implements PartnerGateway {
     private static final Set<String> SORTABLE_FIELDS = Set.of("name", "cnpj", "createdAt", "updatedAt");
 
     private final MongoTemplate mongoTemplate;
+    private final PartnerRepository repository;
 
-    public PartnerMongoGateway(final MongoTemplate mongoTemplate) {
+    public PartnerMongoGateway(final MongoTemplate mongoTemplate, final PartnerRepository repository) {
         this.mongoTemplate = Objects.requireNonNull(mongoTemplate, "'mongoTemplate' should not be null");
+        this.repository = Objects.requireNonNull(repository, "'repository' should not be null");
     }
 
     @Override
@@ -41,16 +42,12 @@ public class PartnerMongoGateway implements PartnerGateway {
 
     @Override
     public void deleteById(final PartnerID id) {
-        mongoTemplate.remove(Query.query(Criteria.where("_id").is(id.getValue())),
-                PartnerDocument.class, PartnerDocument.COLLECTION);
+        repository.deleteById(id.getValue());
     }
 
     @Override
     public Optional<Partner> findById(final PartnerID id) {
-        return Optional
-                .ofNullable(mongoTemplate.findById(id.getValue(), PartnerDocument.class,
-                        PartnerDocument.COLLECTION))
-                .map(PartnerDocument::toDomain);
+        return repository.findById(id.getValue()).map(PartnerDocument::toDomain);
     }
 
     @Override
