@@ -44,6 +44,14 @@ tickethub:
     async-threshold: ${SPOTS_ASYNC_THRESHOLD:1000}
   audit:
     enabled: ${AUDIT_ENABLED:true}
+  auth:
+    refresh-ttl: ${TICKETHUB_AUTH_REFRESH_TTL:7d}
+    login-rate-limit-per-minute: ${TICKETHUB_AUTH_LOGIN_RATE_LIMIT_PER_MINUTE:10}
+  cep:
+    enabled: ${TICKETHUB_CEP_ENABLED:true}
+    base-url: ${TICKETHUB_CEP_BASE_URL:https://viacep.com.br}
+    connect-timeout: ${TICKETHUB_CEP_CONNECT_TIMEOUT:5s}
+    read-timeout: ${TICKETHUB_CEP_READ_TIMEOUT:5s}
   security:
     jwt:
       secret: ${TICKETHUB_JWT_SECRET:dev-only-change-me-in-production-0123456789abcdef}

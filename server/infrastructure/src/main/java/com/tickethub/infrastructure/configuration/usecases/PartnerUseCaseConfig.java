@@ -15,6 +15,8 @@ import com.tickethub.application.partner.retrieve.list.DefaultListPartnersUseCas
 import com.tickethub.application.partner.update.UpdatePartnerUseCase;
 import com.tickethub.application.partner.update.DefaultUpdatePartnerUseCase;
 import com.tickethub.domain.core.partner.PartnerGateway;
+import com.tickethub.domain.auth.PasswordHasher;
+import com.tickethub.domain.geo.CepLookup;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -23,14 +25,19 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 @ConditionalOnBean({PartnerGateway.class})
 public class PartnerUseCaseConfig {
     private final PartnerGateway partnerGateway;
+    private final PasswordHasher passwordHasher;
+    private final CepLookup cepLookup;
 
-    public PartnerUseCaseConfig(final PartnerGateway partnerGateway) {
+    public PartnerUseCaseConfig(final PartnerGateway partnerGateway, final PasswordHasher passwordHasher,
+            final CepLookup cepLookup) {
         this.partnerGateway = partnerGateway;
+        this.passwordHasher = passwordHasher;
+        this.cepLookup = cepLookup;
     }
 
     @Bean
     public ChangePartnerAddressUseCase changePartnerAddressUseCase() {
-        return new DefaultChangePartnerAddressUseCase(partnerGateway);
+        return new DefaultChangePartnerAddressUseCase(partnerGateway, cepLookup);
     }
 
     @Bean
@@ -40,7 +47,7 @@ public class PartnerUseCaseConfig {
 
     @Bean
     public CreatePartnerUseCase createPartnerUseCase() {
-        return new DefaultCreatePartnerUseCase(partnerGateway);
+        return new DefaultCreatePartnerUseCase(partnerGateway, passwordHasher, cepLookup);
     }
 
     @Bean
@@ -60,6 +67,6 @@ public class PartnerUseCaseConfig {
 
     @Bean
     public UpdatePartnerUseCase updatePartnerUseCase() {
-        return new DefaultUpdatePartnerUseCase(partnerGateway);
+        return new DefaultUpdatePartnerUseCase(partnerGateway, cepLookup);
     }
 }

@@ -1,5 +1,7 @@
 package com.tickethub.application.show.create;
 
+import static java.util.Objects.isNull;
+
 import java.util.Objects;
 import java.util.Optional;
 
@@ -9,15 +11,20 @@ import com.tickethub.domain.core.partner.PartnerGateway;
 import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.core.show.Show;
 import com.tickethub.domain.core.show.ShowGateway;
+import com.tickethub.domain.geo.CepLookup;
+import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.validation.Notification;
 
 public class DefaultCreateShowUseCase extends CreateShowUseCase {
     private final ShowGateway showGateway;
     private final PartnerGateway partnerGateway;
+    private final CepLookup cepLookup;
 
-    public DefaultCreateShowUseCase(final ShowGateway showGateway, final PartnerGateway partnerGateway) {
+    public DefaultCreateShowUseCase(final ShowGateway showGateway, final PartnerGateway partnerGateway,
+            final CepLookup cepLookup) {
         this.showGateway = Objects.requireNonNull(showGateway);
         this.partnerGateway = Objects.requireNonNull(partnerGateway);
+        this.cepLookup = Objects.requireNonNull(cepLookup);
     }
 
     @Override
@@ -36,7 +43,7 @@ public class DefaultCreateShowUseCase extends CreateShowUseCase {
                     command.name(),
                     command.description(),
                     command.date(),
-                    command.address(),
+                    enrich(command.address()),
                     command.totalSpots());
 
             final Notification notification = Notification.create();
@@ -55,4 +62,10 @@ public class DefaultCreateShowUseCase extends CreateShowUseCase {
         }
     }
 
+    private Address enrich(final Address address) {
+        if (isNull(address)) {
+            return null;
+        }
+        return cepLookup.lookup(address.getZipCode()).map(address::enrichedWith).orElse(address);
+    }
 }

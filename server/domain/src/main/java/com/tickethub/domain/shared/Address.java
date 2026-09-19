@@ -3,8 +3,11 @@ package com.tickethub.domain.shared;
 import java.util.Objects;
 import static java.util.Objects.isNull;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.tickethub.domain.ValueObject;
 import com.tickethub.domain.exception.DomainException;
+import com.tickethub.domain.geo.CepAddress;
 
 public final class Address extends ValueObject {
     private static final String SPACE = " ";
@@ -32,6 +35,24 @@ public final class Address extends ValueObject {
     public static Address create(String street, String number, String complement, String neighborhood,
             String city, String state, String country, String zipCode) {
         return new Address(street, number, complement, neighborhood, city, state, country, zipCode);
+    }
+
+    /**
+     * Returns a copy with street/neighborhood/city/state/country/zipCode taken
+     * from the provider, keeping number and complement typed by the user.
+     * Blank provider fields fall back to the current values.
+     */
+    public Address enrichedWith(final CepAddress cep) {
+        Objects.requireNonNull(cep, "'cep' should not be null");
+        return new Address(
+                StringUtils.defaultIfBlank(cep.street(), street),
+                number,
+                complement,
+                StringUtils.defaultIfBlank(cep.neighborhood(), neighborhood),
+                StringUtils.defaultIfBlank(cep.city(), city),
+                StringUtils.defaultIfBlank(cep.state(), state),
+                StringUtils.defaultIfBlank(cep.country(), country),
+                StringUtils.defaultIfBlank(cep.zipCode(), zipCode));
     }
 
     private static String required(String value, String field) {

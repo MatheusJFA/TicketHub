@@ -1,5 +1,7 @@
 package com.tickethub.application.partner.changeaddress;
 
+import static java.util.Objects.isNull;
+
 import java.util.Objects;
 import java.util.Optional;
 
@@ -7,13 +9,17 @@ import com.tickethub.application.Either;
 import com.tickethub.domain.core.partner.Partner;
 import com.tickethub.domain.core.partner.PartnerGateway;
 import com.tickethub.domain.core.partner.PartnerID;
+import com.tickethub.domain.geo.CepLookup;
+import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.validation.Notification;
 
 public class DefaultChangePartnerAddressUseCase extends ChangePartnerAddressUseCase {
     private final PartnerGateway partnerGateway;
+    private final CepLookup cepLookup;
 
-    public DefaultChangePartnerAddressUseCase(final PartnerGateway partnerGateway) {
+    public DefaultChangePartnerAddressUseCase(final PartnerGateway partnerGateway, final CepLookup cepLookup) {
         this.partnerGateway = Objects.requireNonNull(partnerGateway);
+        this.cepLookup = Objects.requireNonNull(cepLookup);
     }
 
     @Override
@@ -27,7 +33,7 @@ public class DefaultChangePartnerAddressUseCase extends ChangePartnerAddressUseC
             }
 
             final Partner entity = found.get();
-            entity.changeAddress(input.address());
+            entity.changeAddress(enrich(input.address()));
 
             final Notification notification = Notification.create();
             entity.validate(notification);
@@ -45,4 +51,10 @@ public class DefaultChangePartnerAddressUseCase extends ChangePartnerAddressUseC
         }
     }
 
+    private Address enrich(final Address address) {
+        if (isNull(address)) {
+            return null;
+        }
+        return cepLookup.lookup(address.getZipCode()).map(address::enrichedWith).orElse(address);
+    }
 }

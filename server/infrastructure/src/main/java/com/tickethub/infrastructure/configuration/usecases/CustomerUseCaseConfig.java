@@ -13,6 +13,7 @@ import com.tickethub.application.customer.retrieve.list.DefaultListCustomersUseC
 import com.tickethub.application.customer.update.UpdateCustomerUseCase;
 import com.tickethub.application.customer.update.DefaultUpdateCustomerUseCase;
 import com.tickethub.domain.core.customer.CustomerGateway;
+import com.tickethub.domain.auth.PasswordHasher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -21,9 +22,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 @ConditionalOnBean({CustomerGateway.class})
 public class CustomerUseCaseConfig {
     private final CustomerGateway customerGateway;
+    private final PasswordHasher passwordHasher;
 
-    public CustomerUseCaseConfig(final CustomerGateway customerGateway) {
+    public CustomerUseCaseConfig(final CustomerGateway customerGateway, final PasswordHasher passwordHasher) {
         this.customerGateway = customerGateway;
+        this.passwordHasher = passwordHasher;
     }
 
     @Bean
@@ -33,7 +36,7 @@ public class CustomerUseCaseConfig {
 
     @Bean
     public CreateCustomerUseCase createCustomerUseCase() {
-        return new DefaultCreateCustomerUseCase(customerGateway);
+        return new DefaultCreateCustomerUseCase(customerGateway, passwordHasher);
     }
 
     @Bean
