@@ -9,7 +9,7 @@ import com.tickethub.application.customer.retrieve.list.*;
 import com.tickethub.infrastructure.customer.models.*;
 import org.springframework.http.ResponseEntity;
 import com.tickethub.infrastructure.api.HttpResults;
-import com.tickethub.infrastructure.mapping.CustomerMapper;
+import com.tickethub.infrastructure.customer.presenters.CustomerMapper;
 import com.tickethub.infrastructure.api.CustomerAPI;
 
 import java.net.URI;

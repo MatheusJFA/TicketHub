@@ -1,4 +1,4 @@
-package com.tickethub.infrastructure.persistence;
+package com.tickethub.infrastructure.customer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -17,6 +17,8 @@ import com.tickethub.domain.pagination.SearchQuery;
 import com.tickethub.infrastructure.ContainerSupport;
 import com.tickethub.infrastructure.IntegrationTest;
 import com.tickethub.infrastructure.MongoCleanUpExtension;
+import com.tickethub.infrastructure.customer.CustomerMongoGateway;
+import com.tickethub.infrastructure.customer.persistence.CustomerDocument;
 
 @IntegrationTest
 class CustomerMongoGatewayIT extends ContainerSupport {

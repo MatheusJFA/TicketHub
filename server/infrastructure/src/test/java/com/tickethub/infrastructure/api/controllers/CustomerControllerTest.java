@@ -22,8 +22,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
-import com.tickethub.infrastructure.mapping.SharedMapperImpl;
-import com.tickethub.infrastructure.mapping.CustomerMapperImpl;
+import com.tickethub.infrastructure.shared.presenters.SharedMapperImpl;
+import com.tickethub.infrastructure.customer.presenters.CustomerMapperImpl;
 
 import java.util.List;
 

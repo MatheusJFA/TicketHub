@@ -1,4 +1,4 @@
-package com.tickethub.infrastructure.mapping;
+package com.tickethub.infrastructure.customer.presenters;
 
 import org.mapstruct.Mapper;
 

@@ -1,4 +1,4 @@
-package com.tickethub.infrastructure.persistence;
+package com.tickethub.infrastructure.customer;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -16,6 +16,8 @@ import com.tickethub.domain.core.customer.CustomerID;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.domain.pagination.SearchQuery;
+import com.tickethub.infrastructure.customer.persistence.CustomerDocument;
+import com.tickethub.infrastructure.shared.persistence.MongoGatewaySupport;
 
 @Component
 public class CustomerMongoGateway implements CustomerGateway {
