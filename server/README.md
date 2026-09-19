@@ -51,7 +51,9 @@ Os comandos usam automaticamente o Java e o Maven configurados em `mise.toml`, s
 | --- | --- |
 | `mise run application` | Compila os módulos necessários sem executar testes e inicia a aplicação Spring Boot. |
 | `mise run test` | Executa os testes de todos os módulos, incluindo os testes de arquitetura. |
+| `mise run test-only 'CustomerTest'` | Executa apenas os testes unitários que casam com o filtro (`-Dtest`; aceita `Classe#metodo` e listas separadas por vírgula). |
 | `mise run integration` | Executa a verificação completa e os testes reais de MongoDB e Kafka; requer os serviços do Compose iniciados. |
+| `mise run it-only 'SpotE2ETest'` | Executa apenas os testes de integração/E2E que casam com o filtro (`-Dit.test`); requer Docker (Testcontainers). |
 | `mise run build` | Compila, testa, empacota e verifica todos os módulos; `mise run verify` é um alias. |
 | `mise run install` | Verifica e instala todos os módulos no repositório Maven local, útil para resolver dependências no editor. |
 | `mise run clean` | Limpa os diretórios `target` dos módulos, preservando os backups de recuperação no `target` da raiz. |

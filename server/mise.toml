@@ -21,6 +21,16 @@ run = "mise watch compile"
 description = "Run tests in every module, including architecture tests"
 run = "mvn -B -ntp test"
 
+[tasks.test-only]
+description = "Run specific unit tests: mise run test-only 'CustomerTest,SpotTest'"
+usage = 'arg "<filter>" help="Test filter for Maven -Dtest (ex: CustomerTest or CustomerTest#myMethod)"'
+run = 'mvn -B -ntp -Dtest="${usage_filter?}" -Dsurefire.failIfNoSpecifiedTests=false test'
+
+[tasks.it-only]
+description = "Run specific integration tests: mise run it-only 'SpotE2ETest' (requires Docker)"
+usage = 'arg "<filter>" help="Test filter for Maven -Dit.test (ex: SpotE2ETest)"'
+run = 'mvn -B -ntp -Pintegration -Dtest="!*" -Dsurefire.failIfNoSpecifiedTests=false -Dit.test="${usage_filter?}" -DfailIfNoTests=false verify'
+
 [tasks.build]
 description = "Build every module and run all verification checks"
 alias = "verify"
