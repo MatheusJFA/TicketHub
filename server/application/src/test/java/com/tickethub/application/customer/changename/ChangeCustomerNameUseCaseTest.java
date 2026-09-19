@@ -14,7 +14,8 @@ import com.tickethub.domain.pagination.*;
 import com.tickethub.domain.core.customer.*;
 
 class ChangeCustomerNameUseCaseTest {
-    private final Customer entity = Customer.create("52998224725", "Maria Silva");
+    private final Customer entity = Customer.create("52998224725", "Maria Silva", "maria@domain.com",
+            "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
     private final CustomerGateway gateway = mock(CustomerGateway.class);
     private final DefaultChangeCustomerNameUseCase useCase = new DefaultChangeCustomerNameUseCase(gateway);
     private final String id = entity.getId().getValue();

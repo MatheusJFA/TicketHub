@@ -16,6 +16,7 @@ import com.tickethub.application.UseCaseTest;
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.partner.Partner;
 import com.tickethub.domain.core.partner.PartnerGateway;
+import com.tickethub.domain.geo.CepLookup;
 import com.tickethub.domain.shared.Address;
 
 public class CreateShowUseCaseTest extends UseCaseTest {
@@ -31,21 +32,26 @@ public class CreateShowUseCaseTest extends UseCaseTest {
     @Mock
     private PartnerGateway partnerGateway;
 
+    @Mock
+    private CepLookup cepLookup;
+
     @Override
     protected List<Object> getMocks() {
-        return List.of(showGateway, partnerGateway);
+        return List.of(showGateway, partnerGateway, cepLookup);
     }
 
     @Test
     public void givenValidCommand_whenExecute_shouldPersistAndReturnId() {
-        final var partner = Partner.create("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"));
+        final var partner = Partner.create("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), "cinema@domain.com", "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
         final var command = CreateShowCommand.with(partner.getId().getValue(), "Concert", "Description", DATE, ADDRESS, 10);
         when(partnerGateway.findById(partner.getId())).thenReturn(Optional.of(partner));
+        when(cepLookup.lookup("01305-000")).thenReturn(Optional.empty());
         when(showGateway.create(any())).thenAnswer(returnsFirstArg());
 
         final var output = useCase.execute(command).getRight();
 
         assertNotNull(output.id());
+        verify(cepLookup, times(1)).lookup("01305-000");
         verify(partnerGateway, times(1)).findById(partner.getId());
         verify(showGateway, times(1)).create(argThat(saved ->
                 saved.getId() != null
@@ -66,9 +72,10 @@ public class CreateShowUseCaseTest extends UseCaseTest {
 
     @Test
     public void givenGatewayFailure_whenExecute_shouldReturnNotification() {
-        final var partner = Partner.create("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"));
+        final var partner = Partner.create("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), "cinema@domain.com", "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
         final var command = CreateShowCommand.with(partner.getId().getValue(), "Concert", "Description", DATE, ADDRESS, 10);
         when(partnerGateway.findById(partner.getId())).thenReturn(Optional.of(partner));
+        when(cepLookup.lookup("01305-000")).thenReturn(Optional.empty());
         final var expectedMessage = "Gateway error";
         when(showGateway.create(any())).thenThrow(new IllegalStateException(expectedMessage));
 
@@ -76,6 +83,7 @@ public class CreateShowUseCaseTest extends UseCaseTest {
 
         assertEquals(1, notification.getErrors().size());
         assertEquals(expectedMessage, notification.firstError().message());
+        verify(cepLookup, times(1)).lookup("01305-000");
         verify(partnerGateway, times(1)).findById(partner.getId());
         verify(showGateway, times(1)).create(argThat(saved -> saved.getId() != null
                         && saved.getCreatedAt() != null
@@ -94,7 +102,7 @@ public class CreateShowUseCaseTest extends UseCaseTest {
 
     @Test
     public void givenMissingPartner_whenExecute_shouldNotPersist() {
-        final var partner = Partner.create("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"));
+        final var partner = Partner.create("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), "cinema@domain.com", "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
         final var command = CreateShowCommand.with(partner.getId().getValue(), "Concert", "Description", DATE, ADDRESS, 10);
         when(partnerGateway.findById(partner.getId())).thenReturn(Optional.empty());
 
@@ -108,7 +116,7 @@ public class CreateShowUseCaseTest extends UseCaseTest {
 
     @Test
     public void givenLookupFailure_whenExecute_shouldReturnNotification() {
-        final var partner = Partner.create("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"));
+        final var partner = Partner.create("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), "cinema@domain.com", "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
         final var command = CreateShowCommand.with(partner.getId().getValue(), "Concert", "Description", DATE, ADDRESS, 10);
         when(partnerGateway.findById(partner.getId())).thenThrow(new IllegalStateException("Lookup failed"));
 
@@ -122,7 +130,7 @@ public class CreateShowUseCaseTest extends UseCaseTest {
 
     @Test
     public void givenInvalidCommand_whenExecute_shouldReturnValidationErrorsWithoutPersisting() {
-        final var partner = Partner.create("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"));
+        final var partner = Partner.create("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), "cinema@domain.com", "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
         final var command = CreateShowCommand.with(partner.getId().getValue(), "Concert", "Description", DATE, null, -1);
         when(partnerGateway.findById(partner.getId())).thenReturn(Optional.of(partner));
 

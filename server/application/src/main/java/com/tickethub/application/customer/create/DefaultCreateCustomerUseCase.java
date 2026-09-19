@@ -3,21 +3,25 @@ package com.tickethub.application.customer.create;
 import java.util.Objects;
 
 import com.tickethub.application.Either;
+import com.tickethub.domain.auth.PasswordHasher;
 import com.tickethub.domain.core.customer.Customer;
 import com.tickethub.domain.core.customer.CustomerGateway;
 import com.tickethub.domain.validation.Notification;
 
 public class DefaultCreateCustomerUseCase extends CreateCustomerUseCase {
     private final CustomerGateway customerGateway;
+    private final PasswordHasher passwordHasher;
 
-    public DefaultCreateCustomerUseCase(final CustomerGateway customerGateway) {
+    public DefaultCreateCustomerUseCase(final CustomerGateway customerGateway, final PasswordHasher passwordHasher) {
         this.customerGateway = Objects.requireNonNull(customerGateway);
+        this.passwordHasher = Objects.requireNonNull(passwordHasher);
     }
 
     @Override
     public Either<Notification, CreateCustomerOutput> execute(final CreateCustomerCommand command) {
         try {
-            final Customer entity = Customer.create(command.cpf(), command.name());
+            final Customer entity = Customer.create(command.cpf(), command.name(), command.email(),
+                    passwordHasher.hash(command.password()));
             final Notification notification = Notification.create();
 
             entity.validate(notification);
