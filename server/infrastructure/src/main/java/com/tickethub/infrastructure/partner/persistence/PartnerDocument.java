@@ -1,4 +1,4 @@
-package com.tickethub.infrastructure.persistence;
+package com.tickethub.infrastructure.partner.persistence;
 
 import java.time.Instant;
 
@@ -9,6 +9,7 @@ import com.tickethub.domain.core.partner.Partner;
 import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.shared.CNPJ;
 import com.tickethub.domain.shared.Name;
+import com.tickethub.infrastructure.shared.persistence.AddressDocument;
 
 @Document("partners")
 public record PartnerDocument(

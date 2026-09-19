@@ -10,7 +10,7 @@ import com.tickethub.application.partner.retrieve.list.*;
 import com.tickethub.infrastructure.partner.models.*;
 import org.springframework.http.ResponseEntity;
 import com.tickethub.infrastructure.api.HttpResults;
-import com.tickethub.infrastructure.mapping.PartnerMapper;
+import com.tickethub.infrastructure.partner.presenters.PartnerMapper;
 import com.tickethub.infrastructure.api.PartnerAPI;
 import org.springframework.web.bind.annotation.RestController;
 

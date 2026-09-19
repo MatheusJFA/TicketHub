@@ -1,4 +1,4 @@
-package com.tickethub.infrastructure.persistence;
+package com.tickethub.infrastructure.partner;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -19,6 +19,8 @@ import com.tickethub.domain.shared.Address;
 import com.tickethub.infrastructure.ContainerSupport;
 import com.tickethub.infrastructure.IntegrationTest;
 import com.tickethub.infrastructure.MongoCleanUpExtension;
+import com.tickethub.infrastructure.partner.PartnerMongoGateway;
+import com.tickethub.infrastructure.partner.persistence.PartnerDocument;
 
 @IntegrationTest
 class PartnerMongoGatewayIT extends ContainerSupport {

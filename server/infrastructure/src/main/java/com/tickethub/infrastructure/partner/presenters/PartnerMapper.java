@@ -1,6 +1,8 @@
-package com.tickethub.infrastructure.mapping;
+package com.tickethub.infrastructure.partner.presenters;
 
 import org.mapstruct.Mapper;
+
+import com.tickethub.infrastructure.shared.presenters.SharedMapper;
 
 import com.tickethub.application.partner.changeaddress.ChangePartnerAddressCommand;
 import com.tickethub.application.partner.changename.ChangePartnerNameCommand;
