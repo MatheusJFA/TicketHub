@@ -54,7 +54,7 @@ class SpotControllerTest {
     void givenAValidCommand_whenCallsCreateSpot_shouldReturnSpotId() throws Exception {
         when(createSpot.execute(any())).thenReturn(Either.right(new CreateSpotOutput("spot-1")));
 
-        mvc.perform(post("/spots").header("Authorization", bearer("spot:write")).contentType(MediaType.APPLICATION_JSON).content("{\"location\":\"A1\"}"))
+        mvc.perform(post("/spots").header("Authorization", bearer("spot:write")).contentType(MediaType.APPLICATION_JSON).content("{\"sectionId\":\"section-1\",\"location\":\"A1\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/spots/spot-1"))
                 .andExpect(jsonPath("$.id").value("spot-1"));

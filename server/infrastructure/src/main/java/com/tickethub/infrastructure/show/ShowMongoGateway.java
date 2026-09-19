@@ -93,8 +93,26 @@ public class ShowMongoGateway implements ShowGateway {
     }
 
     @Override
+    public List<ShowID> existsByIds(final List<ShowID> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return MongoGatewaySupport
+                .existingIds(mongoTemplate, ids.stream().map(ShowID::getValue).toList(),
+                        ShowDocument.COLLECTION)
+                .stream()
+                .map(ShowID::from)
+                .toList();
+    }
+
+    @Override
     public void appendSpots(final ShowID showId, final SectionID sectionId, final Set<Spot> spots) {
         if (spots == null || spots.isEmpty()) {
+            return;
+        }
+        // Skip orphan writes when the parent section no longer exists.
+        if (!MongoGatewaySupport.existingIds(mongoTemplate, List.of(sectionId.getValue()),
+                SectionDocument.COLLECTION).contains(sectionId.getValue())) {
             return;
         }
         final String partnerId = Optional

@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.query.Query;
 
 import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.core.show.Show;
+import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.domain.pagination.SearchQuery;
 import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.shared.Money;
@@ -145,5 +146,20 @@ class ShowMongoGatewayIT extends ContainerSupport {
         assertEquals(1, search.totalItems());
         assertEquals("Jazz Fest", search.items().get(0).getName().getValue());
         assertTrue(search.items().get(0).getSections().isEmpty());
+    }
+
+    @Test
+    void givenShowIds_whenExistsByIds_thenReturnsOnlyPersistedIds() {
+        final var first = gateway.create(sample());
+        final var second = gateway.create(Show.create("Jazz Fest", "Suave", DATE, ADDRESS, 0,
+                PartnerID.generate()));
+        final var missing = ShowID.generate();
+
+        final var existing = gateway.existsByIds(List.of(first.getId(), second.getId(), missing));
+
+        assertEquals(2, existing.size());
+        assertTrue(existing.contains(first.getId()));
+        assertTrue(existing.contains(second.getId()));
+        assertEquals(List.of(), gateway.existsByIds(List.of()));
     }
 }

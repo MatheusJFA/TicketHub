@@ -2,6 +2,7 @@ package com.tickethub.infrastructure.shared.persistence;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -118,5 +119,18 @@ public final class MongoGatewaySupport {
         }
         mongoTemplate.remove(Query.query(Criteria.where("sectionId").is(sectionId)),
                 SpotDocument.class, SpotDocument.COLLECTION);
+    }
+
+    public static List<String> existingIds(final MongoTemplate mongoTemplate, final List<String> ids,
+            final String collection) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        final var query = Query.query(Criteria.where("_id").in(ids));
+        query.fields().include("_id");
+        return mongoTemplate.find(query, org.bson.Document.class, collection).stream()
+                .map(document -> document.getString("_id"))
+                .filter(Objects::nonNull)
+                .toList();
     }
 }

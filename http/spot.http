@@ -3,6 +3,7 @@
 # The token must carry the ownerId claim matching the resource being managed.
 @token = PASTE_JWT_HERE
 @spotId = REPLACE_WITH_SPOT_ID
+@sectionId = REPLACE_WITH_SECTION_ID
 
 ### Create spot
 # @name createSpot
@@ -11,6 +12,7 @@ Content-Type: application/json
 X-Correlation-ID: spot-create-1
 
 {
+  "sectionId": "{{sectionId}}",
   "location": "A1"
 }
 

@@ -8,16 +8,52 @@ import io.cucumber.java.pt.Quando;
 
 public class SpotSteps extends BaseSteps {
 
+    private void ensureParentSection() throws Exception {
+        if (world.sectionId() != null) {
+            return;
+        }
+        asAdmin();
+        post("/partners", """
+                {"name":"Spot Fixtures","cnpj":"99999999000191","address":%s}\
+                """.formatted(addressJson()));
+        assertStatus(201);
+        final String partnerId = body().get("id").asText();
+        post("/shows", """
+                {"partnerId":"%s","name":"Spot Fest","description":"Festival",\
+                "date":"2027-01-15T20:00:00-03:00","address":%s,"totalSpots":0}\
+                """.formatted(partnerId, addressJson()));
+        assertStatus(201);
+        final String showId = body().get("id").asText();
+        post("/sections", """
+                {"showId":"%s","name":"Avulsa","description":"Setor",\
+                "totalSpots":0,"price":{"value":50.00,"currency":"BRL"}}\
+                """.formatted(showId));
+        assertStatus(201);
+        world.sectionId(body().get("id").asText());
+    }
+
     @Quando("crio o spot sem localização")
     public void crioSpotSemLocalizacao() throws Exception {
-        post("/spots", "{}");
+        ensureParentSection();
+        post("/spots", """
+                {"sectionId":"%s"}\
+                """.formatted(world.sectionId()));
     }
 
     @Quando("crio o spot na localização {string}")
     public void crioSpotComLocalizacao(final String location) throws Exception {
+        ensureParentSection();
         post("/spots", """
-                {"location":"%s"}\
-                """.formatted(location));
+                {"sectionId":"%s","location":"%s"}\
+                """.formatted(world.sectionId(), location));
+    }
+
+    @Quando("crio o spot na seção inexistente")
+    public void crioSpotSecaoInexistente() throws Exception {
+        asAdmin();
+        post("/spots", """
+                {"sectionId":"secao-inexistente","location":"Z9"}\
+                """);
     }
 
     @Quando("guardo o spot criado")

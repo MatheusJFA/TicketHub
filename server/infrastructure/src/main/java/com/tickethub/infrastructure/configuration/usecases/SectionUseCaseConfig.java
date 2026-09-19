@@ -23,17 +23,20 @@ import com.tickethub.application.section.unpublish.DefaultUnpublishSectionUseCas
 import com.tickethub.application.section.unpublishall.UnpublishAllSectionUseCase;
 import com.tickethub.application.section.unpublishall.DefaultUnpublishAllSectionUseCase;
 import com.tickethub.domain.core.section.SectionGateway;
+import com.tickethub.domain.core.show.ShowGateway;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 
 @Configuration(proxyBeanMethods = false)
-@ConditionalOnBean({SectionGateway.class})
+@ConditionalOnBean({SectionGateway.class, ShowGateway.class})
 public class SectionUseCaseConfig {
     private final SectionGateway sectionGateway;
+    private final ShowGateway showGateway;
 
-    public SectionUseCaseConfig(final SectionGateway sectionGateway) {
+    public SectionUseCaseConfig(final SectionGateway sectionGateway, final ShowGateway showGateway) {
         this.sectionGateway = sectionGateway;
+        this.showGateway = showGateway;
     }
 
     @Bean
@@ -53,7 +56,7 @@ public class SectionUseCaseConfig {
 
     @Bean
     public CreateSectionUseCase createSectionUseCase() {
-        return new DefaultCreateSectionUseCase(sectionGateway);
+        return new DefaultCreateSectionUseCase(sectionGateway, showGateway);
     }
 
     @Bean

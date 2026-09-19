@@ -11,10 +11,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import com.tickethub.application.UseCaseTest;
+import com.tickethub.domain.core.section.SectionGateway;
+import com.tickethub.domain.core.section.SectionID;
 import com.tickethub.domain.core.spot.SpotGateway;
 import com.tickethub.domain.shared.Location;
 
 public class CreateSpotUseCaseTest extends UseCaseTest {
+
+    private static final SectionID SECTION_ID = SectionID.generate();
 
     @InjectMocks
     private DefaultCreateSpotUseCase useCase;
@@ -22,19 +26,24 @@ public class CreateSpotUseCaseTest extends UseCaseTest {
     @Mock
     private SpotGateway spotGateway;
 
+    @Mock
+    private SectionGateway sectionGateway;
+
     @Override
     protected List<Object> getMocks() {
-        return List.of(spotGateway);
+        return List.of(spotGateway, sectionGateway);
     }
 
     @Test
     public void givenValidCommand_whenExecute_shouldPersistAndReturnId() {
-        final var command = CreateSpotCommand.with(Location.create("A1"));
-        when(spotGateway.create(any())).thenAnswer(returnsFirstArg());
+        final var command = CreateSpotCommand.with(SECTION_ID.getValue(), Location.create("A1"));
+        when(sectionGateway.existsByIds(List.of(SECTION_ID))).thenReturn(List.of(SECTION_ID));
+        when(spotGateway.create(any(), eq(SECTION_ID))).thenAnswer(returnsFirstArg());
 
         final var output = useCase.execute(command).getRight();
 
         assertNotNull(output.id());
+        verify(sectionGateway, times(1)).existsByIds(List.of(SECTION_ID));
         verify(spotGateway, times(1)).create(argThat(saved ->
                 saved.getId() != null
                         && saved.getId().getValue().equals(output.id())
@@ -43,14 +52,27 @@ public class CreateSpotUseCaseTest extends UseCaseTest {
                         && saved.getDeletedAt() == null
                         && saved.getLocation().equals(Location.create("A1"))
                         && saved.isAvailable()
-                        && !saved.isPublished()));
+                        && !saved.isPublished()), eq(SECTION_ID));
+    }
+
+    @Test
+    public void givenMissingSection_whenExecute_shouldReturnNotFoundWithoutPersisting() {
+        final var command = CreateSpotCommand.with(SECTION_ID.getValue(), Location.create("A1"));
+        when(sectionGateway.existsByIds(List.of(SECTION_ID))).thenReturn(List.of());
+
+        final var notification = useCase.execute(command).getLeft();
+
+        assertEquals(1, notification.getErrors().size());
+        assertEquals("Section not found: " + SECTION_ID.getValue(), notification.firstError().message());
+        verify(spotGateway, never()).create(any(), any());
     }
 
     @Test
     public void givenGatewayFailure_whenExecute_shouldReturnNotification() {
-        final var command = CreateSpotCommand.with(Location.create("A1"));
+        final var command = CreateSpotCommand.with(SECTION_ID.getValue(), Location.create("A1"));
         final var expectedMessage = "Gateway error";
-        when(spotGateway.create(any())).thenThrow(new IllegalStateException(expectedMessage));
+        when(sectionGateway.existsByIds(List.of(SECTION_ID))).thenReturn(List.of(SECTION_ID));
+        when(spotGateway.create(any(), eq(SECTION_ID))).thenThrow(new IllegalStateException(expectedMessage));
 
         final var notification = useCase.execute(command).getLeft();
 
@@ -62,13 +84,14 @@ public class CreateSpotUseCaseTest extends UseCaseTest {
                         && saved.getDeletedAt() == null
                         && saved.getLocation().equals(Location.create("A1"))
                         && saved.isAvailable()
-                        && !saved.isPublished()));
+                        && !saved.isPublished()), eq(SECTION_ID));
     }
 
     @Test
     public void givenNoLocation_whenExecute_shouldCreateAvailableUnpublishedSpot() {
-        final var command = CreateSpotCommand.with(null);
-        when(spotGateway.create(any())).thenAnswer(returnsFirstArg());
+        final var command = CreateSpotCommand.with(SECTION_ID.getValue(), null);
+        when(sectionGateway.existsByIds(List.of(SECTION_ID))).thenReturn(List.of(SECTION_ID));
+        when(spotGateway.create(any(), eq(SECTION_ID))).thenAnswer(returnsFirstArg());
 
         final var output = useCase.execute(command).getRight();
 
@@ -77,6 +100,6 @@ public class CreateSpotUseCaseTest extends UseCaseTest {
                 spot.getLocation() != null
                         && spot.getLocation().getValue().matches("[A-Z]\\d{5}")
                         && spot.isAvailable()
-                        && !spot.isPublished()));
+                        && !spot.isPublished()), eq(SECTION_ID));
     }
 }

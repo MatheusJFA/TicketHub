@@ -63,6 +63,15 @@ public class CatalogSteps extends BaseSteps {
         post("/shows/" + world.showId() + "/sections", json);
     }
 
+    @Quando("crio a seção avulsa do show inexistente")
+    public void crioSecaoShowInexistente() throws Exception {
+        asAdmin();
+        post("/sections", """
+                {"showId":"show-inexistente","name":"Avulsa","description":"Setor",\
+                "totalSpots":0,"price":{"value":50.00,"currency":"BRL"}}\
+                """);
+    }
+
     @Quando("guardo o show criado")
     public void guardoShow() throws Exception {
         world.showId(body().get("id").asText());
