@@ -13,5 +13,7 @@ public final class PartnerValidator extends Validator {
         if (partner.getAddress() == null) handler.append(new Error("'address' should not be null"));
         if (partner.getName() == null) handler.append(new Error("'name' should not be null"));
         if (partner.getCnpj() == null) handler.append(new Error("'cnpj' should not be null"));
+        if (partner.getEmail() == null) handler.append(new Error("'email' should not be null"));
+        if (partner.getPasswordHash() == null) handler.append(new Error("'passwordHash' should not be null"));
     }
 }

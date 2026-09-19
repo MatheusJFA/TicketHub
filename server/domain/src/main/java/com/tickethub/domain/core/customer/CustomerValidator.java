@@ -12,5 +12,7 @@ public final class CustomerValidator extends Validator {
 
         if (customer.getCpf() == null) handler.append(new Error("'cpf' should not be null"));
         if (customer.getName() == null) handler.append(new Error("'name' should not be null"));
+        if (customer.getEmail() == null) handler.append(new Error("'email' should not be null"));
+        if (customer.getPasswordHash() == null) handler.append(new Error("'passwordHash' should not be null"));
     }
 }
