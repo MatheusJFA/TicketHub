@@ -1,4 +1,4 @@
-package com.tickethub.infrastructure.persistence;
+package com.tickethub.infrastructure.spot.persistence;
 
 import java.time.Instant;
 

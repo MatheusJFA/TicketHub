@@ -10,7 +10,7 @@ import com.tickethub.application.spot.retrieve.get.*;
 import com.tickethub.application.spot.retrieve.list.*;
 import com.tickethub.application.spot.unpublish.*;
 import com.tickethub.infrastructure.spot.models.*;
-import com.tickethub.infrastructure.mapping.SpotMapper;
+import com.tickethub.infrastructure.spot.presenters.SpotMapper;
 import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import com.tickethub.infrastructure.api.SpotAPI;

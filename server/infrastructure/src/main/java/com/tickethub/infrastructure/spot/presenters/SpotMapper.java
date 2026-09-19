@@ -1,6 +1,8 @@
-package com.tickethub.infrastructure.mapping;
+package com.tickethub.infrastructure.spot.presenters;
 
 import org.mapstruct.Mapper;
+
+import com.tickethub.infrastructure.shared.presenters.SharedMapper;
 
 import com.tickethub.application.spot.changelocation.ChangeSpotLocationCommand;
 import com.tickethub.application.spot.create.CreateSpotCommand;
