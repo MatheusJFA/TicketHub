@@ -4,17 +4,17 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.tickethub.application.auth.login.DefaultLoginUseCase;
-import com.tickethub.application.auth.login.LoginUseCase;
-import com.tickethub.application.auth.logout.DefaultLogoutUseCase;
-import com.tickethub.application.auth.logout.LogoutUseCase;
-import com.tickethub.application.auth.refresh.DefaultRefreshTokenUseCase;
-import com.tickethub.application.auth.refresh.RefreshTokenUseCase;
-import com.tickethub.domain.auth.AuthAccountGateway;
-import com.tickethub.domain.auth.PasswordHasher;
-import com.tickethub.domain.auth.RefreshSessionGateway;
-import com.tickethub.domain.auth.TokenIssuer;
-import com.tickethub.infrastructure.auth.AuthSessionProperties;
+import com.tickethub.application.authentication.login.DefaultLoginUseCase;
+import com.tickethub.application.authentication.login.LoginUseCase;
+import com.tickethub.application.authentication.logout.DefaultLogoutUseCase;
+import com.tickethub.application.authentication.logout.LogoutUseCase;
+import com.tickethub.application.authentication.refresh.DefaultRefreshTokenUseCase;
+import com.tickethub.application.authentication.refresh.RefreshTokenUseCase;
+import com.tickethub.domain.authentication.AuthAccountGateway;
+import com.tickethub.domain.authentication.PasswordHasher;
+import com.tickethub.domain.authentication.RefreshSessionGateway;
+import com.tickethub.domain.authentication.TokenIssuer;
+import com.tickethub.infrastructure.authentication.AuthSessionProperties;
 
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnBean({ AuthAccountGateway.class, RefreshSessionGateway.class })

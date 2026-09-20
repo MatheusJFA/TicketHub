@@ -2,7 +2,7 @@ package com.tickethub.infrastructure.configuration;
 
 import com.tickethub.application.customer.create.CreateCustomerUseCase;
 import com.tickethub.application.show.create.CreateShowUseCase;
-import com.tickethub.domain.auth.PasswordHasher;
+import com.tickethub.domain.authentication.PasswordHasher;
 import com.tickethub.domain.core.customer.CustomerGateway;
 import com.tickethub.domain.core.partner.PartnerGateway;
 import com.tickethub.domain.core.show.ShowGateway;

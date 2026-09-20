@@ -18,12 +18,12 @@ adapters.
   `getOptional` (fail-open: loga e retorna vazio em 4xx/5xx/timeout) e
   `getRequired` (fail-closed via `HttpUpstreamException`). A fábrica de
   request fica com o chamador para permitir `MockRestServiceServer` nos testes.
-- **Domínio (`domain.geo`):** porta `CepLookup` (contrato fail-open: nunca
-  lança, vazio = segue com dados do usuário) + `CepAddress` (normaliza o CEP
+- **Domínio (`domain.geography`):** porta `ZipCodeLookup` (contrato fail-open: nunca
+  lança, vazio = segue com dados do usuário) + `ZipCodeAddress` (normaliza o CEP
   para 8 dígitos) + `Address.enrichedWith` (sobrescreve rua/bairro/cidade/UF/
   país/CEP, preserva número e complemento; campos em branco do provedor mantêm
   o valor atual).
-- **Adapter (`cep/ViaCepLookup` + `ViaCepClient`):** `tickethub.cep.*`
+- **Adapter (`zipcode/ViaCepLookup` + `ViaCepClient`):** `tickethub.zipcode.*`
   (`enabled`, `base-url`, timeouts); `erro:true`/400/desabilitado = vazio.
 - **Aplicação:** criação de parceiro/show, alteração e update de endereço do
   parceiro enriquecem antes de persistir. Falha do provedor não quebra o

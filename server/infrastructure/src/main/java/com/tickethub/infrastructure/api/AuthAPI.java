@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.tickethub.infrastructure.auth.models.LoginRequest;
-import com.tickethub.infrastructure.auth.models.RefreshRequest;
-import com.tickethub.infrastructure.auth.models.SessionResponse;
+import com.tickethub.infrastructure.authentication.models.LoginRequest;
+import com.tickethub.infrastructure.authentication.models.RefreshRequest;
+import com.tickethub.infrastructure.authentication.models.SessionResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

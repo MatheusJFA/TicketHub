@@ -14,15 +14,15 @@ persistir.
 
 ## Decisão
 
-- **Removido** `CepLookup` de `DefaultCreatePartnerUseCase`,
+- **Removido** `ZipCodeLookup` de `DefaultCreatePartnerUseCase`,
   `DefaultUpdatePartnerUseCase`, `DefaultChangePartnerAddressUseCase` e
   `DefaultCreateShowUseCase` (e das configs): create/update persistem o
   endereço exatamente como enviado.
-- **Novo caso de uso** `cep/lookup/DefaultLookupCepUseCase` + endpoint
-  público `GET /cep/{zipCode}` (200 com o endereço, 404 se
+- **Novo caso de uso** `zipcode/lookup/DefaultLookupZipCodeUseCase` + endpoint
+  público `GET /zipcode/{zipCode}` (200 com o endereço, 404 se
   desconhecido/inválido): o front usa para autofill do formulário *antes*
   do cadastro.
-- **Mantidos** `CepLookup`/`ViaCepLookup`/`CepAddress`/`Address.enrichedWith`
+- **Mantidos** `ZipCodeLookup`/`ViaCepLookup`/`ZipCodeAddress`/`Address.enrichedWith`
   como porta + adapter do lookup dedicado (contrato fail-open continua
   valendo).
 
@@ -32,6 +32,6 @@ persistir.
   preservada via endpoint dedicado; testes de create/update sem mocks de
   CEP.
 - **Contra:** clientes que dependiam do enriquecimento automático passam a
-  receber o endereço cru — precisam chamar `GET /cep` antes, se quiserem.
+  receber o endereço cru — precisam chamar `GET /zipcode` antes, se quiserem.
 - **Evolução:** cache com TTL no lookup dedicado (mesma evolução já prevista
   no ADR-011).

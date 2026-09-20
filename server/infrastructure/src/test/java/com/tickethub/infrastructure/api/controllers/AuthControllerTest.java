@@ -15,12 +15,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.tickethub.application.Either;
-import com.tickethub.application.auth.login.LoginOutput;
-import com.tickethub.application.auth.login.LoginUseCase;
-import com.tickethub.application.auth.logout.LogoutUseCase;
-import com.tickethub.application.auth.refresh.RefreshTokenOutput;
-import com.tickethub.application.auth.refresh.RefreshTokenUseCase;
-import com.tickethub.domain.auth.AuthenticationException;
+import com.tickethub.application.authentication.login.LoginOutput;
+import com.tickethub.application.authentication.login.LoginUseCase;
+import com.tickethub.application.authentication.logout.LogoutUseCase;
+import com.tickethub.application.authentication.refresh.RefreshTokenOutput;
+import com.tickethub.application.authentication.refresh.RefreshTokenUseCase;
+import com.tickethub.domain.authentication.AuthenticationException;
 import com.tickethub.domain.validation.Notification;
 import com.tickethub.infrastructure.ControllerTest;
 

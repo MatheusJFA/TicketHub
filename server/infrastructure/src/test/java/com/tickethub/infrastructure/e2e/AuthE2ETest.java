@@ -20,7 +20,7 @@ import tools.jackson.databind.ObjectMapper;
 import com.tickethub.infrastructure.ContainerSupport;
 import com.tickethub.infrastructure.E2ETest;
 import com.tickethub.infrastructure.MongoCleanUpExtension;
-import com.tickethub.infrastructure.auth.persistence.RefreshSessionDocument;
+import com.tickethub.infrastructure.authentication.persistence.RefreshSessionDocument;
 import com.tickethub.infrastructure.customer.persistence.CustomerDocument;
 
 @E2ETest

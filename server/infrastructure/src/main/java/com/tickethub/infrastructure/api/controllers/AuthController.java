@@ -5,17 +5,17 @@ import java.util.Objects;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tickethub.application.auth.login.LoginCommand;
-import com.tickethub.application.auth.login.LoginUseCase;
-import com.tickethub.application.auth.logout.LogoutCommand;
-import com.tickethub.application.auth.logout.LogoutUseCase;
-import com.tickethub.application.auth.refresh.RefreshTokenCommand;
-import com.tickethub.application.auth.refresh.RefreshTokenUseCase;
+import com.tickethub.application.authentication.login.LoginCommand;
+import com.tickethub.application.authentication.login.LoginUseCase;
+import com.tickethub.application.authentication.logout.LogoutCommand;
+import com.tickethub.application.authentication.logout.LogoutUseCase;
+import com.tickethub.application.authentication.refresh.RefreshTokenCommand;
+import com.tickethub.application.authentication.refresh.RefreshTokenUseCase;
 import com.tickethub.infrastructure.api.AuthAPI;
 import com.tickethub.infrastructure.api.HttpResults;
-import com.tickethub.infrastructure.auth.models.LoginRequest;
-import com.tickethub.infrastructure.auth.models.RefreshRequest;
-import com.tickethub.infrastructure.auth.models.SessionResponse;
+import com.tickethub.infrastructure.authentication.models.LoginRequest;
+import com.tickethub.infrastructure.authentication.models.RefreshRequest;
+import com.tickethub.infrastructure.authentication.models.SessionResponse;
 
 @RestController
 public class AuthController implements AuthAPI {

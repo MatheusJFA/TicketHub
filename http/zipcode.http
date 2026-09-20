@@ -1,0 +1,6 @@
+@baseUrl = http://localhost:8080
+
+### Lookup CEP (address autofill before registration)
+# @name lookupZipCode
+GET {{baseUrl}}/zipcode/01305-000
+Accept: application/json

@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 
-import com.tickethub.domain.geo.CepAddress;import org.junit.jupiter.params.provider.MethodSource;
+import com.tickethub.domain.geography.ZipCodeAddress;import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.jupiter.api.DisplayName;
@@ -117,13 +117,13 @@ class AddressTest {
     }
 
     @Test
-    @DisplayName("Given CEP data, when enriched with, then overwrites except number and complement")
-    void givenCepData_whenEnrichedWith_thenOverwritesExceptNumberAndComplement() {
+    @DisplayName("Given ZIP code data, when enriched with, then overwrites except number and complement")
+    void givenZipCodeData_whenEnrichedWith_thenOverwritesExceptNumberAndComplement() {
         final var address = create(validFields());
-        final var cep = new CepAddress("01305000", "Avenida Paulista", "Bela Vista", "São Paulo", "SP",
+        final var zipCode = new ZipCodeAddress("01305000", "Avenida Paulista", "Bela Vista", "São Paulo", "SP",
                 "Brasil");
 
-        final var enriched = address.enrichedWith(cep);
+        final var enriched = address.enrichedWith(zipCode);
 
         assertEquals("Avenida Paulista", enriched.getStreet());
         assertEquals("Bela Vista", enriched.getNeighborhood());
@@ -133,12 +133,12 @@ class AddressTest {
     }
 
     @Test
-    @DisplayName("Given blank CEP fields, when enriched with, then keeps current values")
-    void givenBlankCepFields_whenEnrichedWith_thenKeepsCurrentValues() {
+    @DisplayName("Given blank ZIP code fields, when enriched with, then keeps current values")
+    void givenBlankZipCodeFields_whenEnrichedWith_thenKeepsCurrentValues() {
         final var address = create(validFields());
-        final var cep = new CepAddress("01305000", "", null, "São Paulo", "", null);
+        final var zipCode = new ZipCodeAddress("01305000", "", null, "São Paulo", "", null);
 
-        final var enriched = address.enrichedWith(cep);
+        final var enriched = address.enrichedWith(zipCode);
 
         assertEquals("Rua Augusta", enriched.getStreet());
         assertEquals("Centro", enriched.getNeighborhood());

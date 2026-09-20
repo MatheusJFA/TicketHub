@@ -7,7 +7,7 @@ import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 
 import com.tickethub.domain.ValueObject;
 import com.tickethub.domain.exception.DomainException;
-import com.tickethub.domain.geo.CepAddress;
+import com.tickethub.domain.geography.ZipCodeAddress;
 
 public final class Address extends ValueObject {
     private static final String SPACE = " ";
@@ -42,17 +42,17 @@ public final class Address extends ValueObject {
      * from the provider, keeping number and complement typed by the user.
      * Blank provider fields fall back to the current values.
      */
-    public Address enrichedWith(final CepAddress cep) {
-        Objects.requireNonNull(cep, "'cep' should not be null");
+    public Address enrichedWith(final ZipCodeAddress zipCode) {
+        Objects.requireNonNull(zipCode, "'zipCode' should not be null");
         return new Address(
-                defaultIfBlank(cep.street(), street),
+                defaultIfBlank(zipCode.street(), street),
                 number,
                 complement,
-                defaultIfBlank(cep.neighborhood(), neighborhood),
-                defaultIfBlank(cep.city(), city),
-                defaultIfBlank(cep.state(), state),
-                defaultIfBlank(cep.country(), country),
-                defaultIfBlank(cep.zipCode(), zipCode));
+                defaultIfBlank(zipCode.neighborhood(), neighborhood),
+                defaultIfBlank(zipCode.city(), city),
+                defaultIfBlank(zipCode.state(), state),
+                defaultIfBlank(zipCode.country(), country),
+                defaultIfBlank(zipCode.zipCode(), this.zipCode));
     }
 
     private static String required(String value, String field) {

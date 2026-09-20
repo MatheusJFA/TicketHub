@@ -16,8 +16,8 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.stereotype.Component;
 
-import com.tickethub.domain.auth.IssuedToken;
-import com.tickethub.domain.auth.TokenIssuer;
+import com.tickethub.domain.authentication.IssuedToken;
+import com.tickethub.domain.authentication.TokenIssuer;
 
 @Component
 public class JwtTokenIssuer implements TokenIssuer {

@@ -15,7 +15,7 @@ import com.tickethub.application.partner.retrieve.list.DefaultListPartnersUseCas
 import com.tickethub.application.partner.update.UpdatePartnerUseCase;
 import com.tickethub.application.partner.update.DefaultUpdatePartnerUseCase;
 import com.tickethub.domain.core.partner.PartnerGateway;
-import com.tickethub.domain.auth.PasswordHasher;
+import com.tickethub.domain.authentication.PasswordHasher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;

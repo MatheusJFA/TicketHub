@@ -12,7 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import com.tickethub.application.UseCaseTest;
-import com.tickethub.domain.auth.PasswordHasher;
+import com.tickethub.domain.authentication.PasswordHasher;
 import com.tickethub.domain.core.customer.CustomerGateway;
 
 @DisplayName("Create customer use case")

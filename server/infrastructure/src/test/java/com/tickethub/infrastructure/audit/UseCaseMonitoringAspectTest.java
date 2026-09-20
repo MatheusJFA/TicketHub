@@ -29,7 +29,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.tickethub.application.Either;
 import com.tickethub.application.UnitUseCase;
 import com.tickethub.application.UseCase;
-import com.tickethub.domain.auth.AuthenticationException;
+import com.tickethub.domain.authentication.AuthenticationException;
 import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.Notification;
 import com.tickethub.infrastructure.api.ResiliencePolicy;

@@ -3,7 +3,7 @@ package com.tickethub.application.customer.create;
 import java.util.Objects;
 
 import com.tickethub.application.Either;
-import com.tickethub.domain.auth.PasswordHasher;
+import com.tickethub.domain.authentication.PasswordHasher;
 import com.tickethub.domain.core.customer.Customer;
 import com.tickethub.domain.core.customer.CustomerGateway;
 import com.tickethub.domain.validation.Notification;

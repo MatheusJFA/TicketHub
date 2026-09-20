@@ -9,7 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import com.tickethub.infrastructure.auth.AuthSessionProperties;
+import com.tickethub.infrastructure.authentication.AuthSessionProperties;
 
 import jakarta.servlet.FilterChain;
 

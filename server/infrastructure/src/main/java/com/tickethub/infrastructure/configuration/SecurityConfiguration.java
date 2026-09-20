@@ -28,7 +28,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
-import com.tickethub.infrastructure.auth.AuthSessionProperties;
+import com.tickethub.infrastructure.authentication.AuthSessionProperties;
 import com.tickethub.infrastructure.security.SecurityProperties;
 
 @Configuration(proxyBeanMethods = false)
@@ -46,7 +46,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/auth/login", "/auth/refresh", "/auth/logout", "/actuator/health",
                                 "/swagger-ui/**", "/v3/api-docs/**")
                         .permitAll()
-                        .requestMatchers(HttpMethod.GET, "/shows/**", "/sections/**", "/spots/**", "/cep/**")
+                        .requestMatchers(HttpMethod.GET, "/shows/**", "/sections/**", "/spots/**", "/zipcode/**")
                         .permitAll()
                         .requestMatchers(HttpMethod.POST, "/customers/**", "/partners/**")
                         .permitAll()

@@ -9,8 +9,8 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import com.tickethub.domain.auth.AuthAccount;
-import com.tickethub.domain.auth.AuthAccountGateway;
+import com.tickethub.domain.authentication.AuthAccount;
+import com.tickethub.domain.authentication.AuthAccountGateway;
 import com.tickethub.domain.core.customer.CustomerGateway;
 import com.tickethub.domain.core.partner.PartnerGateway;
 import com.tickethub.domain.exception.DomainException;

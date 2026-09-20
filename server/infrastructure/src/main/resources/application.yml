@@ -47,11 +47,11 @@ tickethub:
   auth:
     refresh-ttl: ${TICKETHUB_AUTH_REFRESH_TTL:7d}
     login-rate-limit-per-minute: ${TICKETHUB_AUTH_LOGIN_RATE_LIMIT_PER_MINUTE:10}
-  cep:
-    enabled: ${TICKETHUB_CEP_ENABLED:true}
-    base-url: ${TICKETHUB_CEP_BASE_URL:https://viacep.com.br}
-    connect-timeout: ${TICKETHUB_CEP_CONNECT_TIMEOUT:5s}
-    read-timeout: ${TICKETHUB_CEP_READ_TIMEOUT:5s}
+  zipcode:
+    enabled: ${TICKETHUB_ZIPCODE_ENABLED:true}
+    base-url: ${TICKETHUB_ZIPCODE_BASE_URL:https://viacep.com.br}
+    connect-timeout: ${TICKETHUB_ZIPCODE_CONNECT_TIMEOUT:5s}
+    read-timeout: ${TICKETHUB_ZIPCODE_READ_TIMEOUT:5s}
   security:
     jwt:
       secret: ${TICKETHUB_JWT_SECRET:dev-only-change-me-in-production-0123456789abcdef}

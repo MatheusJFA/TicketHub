@@ -2,7 +2,7 @@ package com.tickethub.infrastructure.api.controllers;
 
 import static java.util.Objects.nonNull;
 
-import com.tickethub.domain.auth.AuthenticationException;
+import com.tickethub.domain.authentication.AuthenticationException;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.infrastructure.api.ApiValidationException;
 import com.tickethub.infrastructure.api.models.ErrorResponse;

@@ -49,13 +49,13 @@ não conhece framework (verificado por `ArchitectureTest`).
 | Fluxo de uma requisição (`POST /spots`) | `architecture.md` §2, `SpotController`, `UseCaseMonitoringAspect`, `ResiliencePolicy` |
 | Erros (`Either`, 404/422/503) | `adr/0004-either-notification-erros.md`, `HttpResults.java`, `GlobalExceptionHandler.java` |
 | Autorização (RBAC + dono) | `adr/0007-jwt-rbac-ownership.md`, `Permission.java`, `ShowAccess.java`, `ApiAuthorizationTest.java` |
-| Login, refresh rotativo, logout | `adr/0010-login-email-refresh-logout.md`, `application/auth/`, `http/auth.http` |
+| Login, refresh rotativo, logout | `adr/0010-login-email-refresh-logout.md`, `application/authentication/`, `http/auth.http` |
 | Trilha de auditoria | `adr/0006-trilha-de-auditoria.md`, `infrastructure/audit/`, `GET /audit-logs`, `http/audit-logs.http` |
 | Resiliência (retry/circuito) | `adr/0005-resilience4j-retry-circuit-breaker.md`, `ResiliencePolicy.java` |
 | MongoDB e migrações | `adr/0002-mongodb-como-banco-principal.md`, `MongoConfiguration.java`, `db/changelog/`, `LiquibaseMigrationIT.java` |
 | Kafka e eventos | `adr/0003-kafka-para-eventos-de-dominio.md`, `KafkaConfiguration.java`, `SpotGenerationListener.java` |
 | Estratégia de testes | `adr/0008-testcontainers-testes-integracao.md`, `adr/0009-cucumber-testes-aceitacao.md`, `ControllerTest.java`, `ContainerSupport.java` |
-| Enriquecimento de endereço (CEP) | `adr/0011-enriquecimento-endereco-cep.md`, `ViaCepLookup.java` |
+| Enriquecimento de endereço (ZIP code) | `adr/0011-enriquecimento-endereco-cep.md`, `ViaCepLookup.java` |
 | Estilo de código | `Optional` em vez de ternário de `null`; `isNull`/`nonNull` (`java.util.Objects`, import estático); `StringUtils`/`CollectionUtils` (Apache Commons, import estático); sem nomes abreviados (`INFRASTRUCTURE_ERROR`, não `INFRA_ERROR`) |
 
 ## 4. Comandos úteis

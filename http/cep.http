@@ -1,6 +1,0 @@
-@baseUrl = http://localhost:8080
-
-### Lookup CEP (address autofill before registration)
-# @name lookupCep
-GET {{baseUrl}}/cep/01305-000
-Accept: application/json

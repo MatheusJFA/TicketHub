@@ -17,7 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.tickethub.application.UseCaseTest;
-import com.tickethub.domain.auth.PasswordHasher;
+import com.tickethub.domain.authentication.PasswordHasher;
 import com.tickethub.domain.core.partner.PartnerGateway;
 
 @DisplayName("Create partner use case")
