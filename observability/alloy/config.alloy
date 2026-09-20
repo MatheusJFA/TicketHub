@@ -1,0 +1,54 @@
+// Grafana Alloy: single collector for the LGTM stack.
+// Traces (OTLP) -> Tempo | Docker logs -> Loki | Scraped metrics -> Mimir.
+
+otelcol.receiver.otlp "default" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+
+  output {
+    traces = [otelcol.exporter.otlphttp.tempo.input]
+  }
+}
+
+otelcol.exporter.otlphttp "tempo" {
+  client {
+    endpoint = "http://tempo:4318"
+  }
+}
+
+prometheus.scrape "server" {
+  targets = [{
+    __address__ = "server:8080",
+  }]
+  metrics_path = "/actuator/prometheus"
+  scrape_interval = "15s"
+
+  forward_to = [prometheus.remote_write.mimir.receiver]
+}
+
+prometheus.remote_write "mimir" {
+  endpoint {
+    url = "http://mimir:8080/api/v1/push"
+  }
+}
+
+discovery.docker "containers" {
+  host = "unix:///var/run/docker.sock"
+}
+
+loki.source.docker "default" {
+  host    = "unix:///var/run/docker.sock"
+  targets = discovery.docker.containers.targets
+
+  forward_to = [loki.write.default.receiver]
+}
+
+loki.write "default" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}

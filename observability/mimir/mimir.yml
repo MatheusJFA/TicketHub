@@ -1,0 +1,20 @@
+multitenancy_enabled: false
+
+ingester:
+  ring:
+    replication_factor: 1
+
+blocks_storage:
+  backend: filesystem
+  filesystem:
+    dir: /mimir/blocks
+
+alertmanager_storage:
+  backend: filesystem
+  filesystem:
+    dir: /mimir/alertmanager
+
+ruler_storage:
+  backend: filesystem
+  filesystem:
+    dir: /mimir/ruler

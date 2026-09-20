@@ -12,6 +12,8 @@ services:
     environment:
       MONGO_HOST: mongo
       LIQUIBASE_ENABLED: ${LIQUIBASE_ENABLED:-true}
+      OTEL_EXPORTER_OTLP_TRACING_ENDPOINT: ${OTEL_EXPORTER_OTLP_TRACING_ENDPOINT:-http://alloy:4318/v1/traces}
+      TRACING_SAMPLING_PROBABILITY: ${TRACING_SAMPLING_PROBABILITY:-1.0}
       KAFKA_BOOTSTRAP_SERVERS: kafka:19092
       KAFKA_CONSUMER_GROUP: ${KAFKA_CONSUMER_GROUP:-tickethub}
       KAFKA_TOPIC: ${KAFKA_TOPIC:-tickethub.events}
@@ -87,6 +89,75 @@ services:
       retries: 5
       start_period: 30s
 
+  alloy:
+    image: grafana/alloy:latest
+    command: ["run", "--server.http.listen-addr=0.0.0.0:12345", "/etc/alloy/config.alloy"]
+    volumes:
+      - ./observability/alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "127.0.0.1:${ALLOY_PORT:-12345}:12345"
+      - "127.0.0.1:${OTEL_GRPC_PORT:-4317}:4317"
+      - "127.0.0.1:${OTEL_HTTP_PORT:-4318}:4318"
+    depends_on:
+      - loki
+      - tempo
+      - mimir
+    restart: unless-stopped
+
+  loki:
+    image: grafana/loki:latest
+    command: ["-config.file=/etc/loki/loki.yml"]
+    volumes:
+      - ./observability/loki/loki.yml:/etc/loki/loki.yml:ro
+      - loki_data:/loki
+    ports:
+      - "127.0.0.1:${LOKI_PORT:-3100}:3100"
+    restart: unless-stopped
+
+  tempo:
+    image: grafana/tempo:latest
+    # Tempo runs non-root and cannot mkdir on a root-owned named volume.
+    user: "0:0"
+    command: ["-config.file=/etc/tempo/tempo.yml"]
+    volumes:
+      - ./observability/tempo/tempo.yml:/etc/tempo/tempo.yml:ro
+      - tempo_data:/tmp/tempo
+    ports:
+      - "127.0.0.1:${TEMPO_PORT:-3200}:3200"
+    restart: unless-stopped
+
+  mimir:
+    image: grafana/mimir:latest
+    command: ["-config.file=/etc/mimir/mimir.yml", "-target=all"]
+    volumes:
+      - ./observability/mimir/mimir.yml:/etc/mimir/mimir.yml:ro
+      - mimir_data:/mimir
+    ports:
+      - "127.0.0.1:${MIMIR_PORT:-9009}:8080"
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin-local}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "127.0.0.1:${GRAFANA_PORT:-3000}:3000"
+    depends_on:
+      - loki
+      - tempo
+      - mimir
+    restart: unless-stopped
+
 volumes:
   mongo_data:
   kafka_data:
+  loki_data:
+  tempo_data:
+  mimir_data:
+  grafana_data:
