@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import com.tickethub.infrastructure.api.AuditAPI;
 import com.tickethub.infrastructure.api.CustomerAPI;
 import com.tickethub.infrastructure.api.PartnerAPI;
 import com.tickethub.infrastructure.api.SectionAPI;
@@ -40,7 +41,7 @@ class ApiAuthorizationTest {
                 .collect(Collectors.toSet());
         final var unknown = new HashSet<String>();
         var expressions = 0;
-        for (final Class<?> api : Set.of(CustomerAPI.class, PartnerAPI.class, ShowAPI.class,
+        for (final Class<?> api : Set.of(AuditAPI.class, CustomerAPI.class, PartnerAPI.class, ShowAPI.class,
                 SectionAPI.class, SpotAPI.class)) {
             for (final Method method : api.getDeclaredMethods()) {
                 final PreAuthorize authorize = method.getAnnotation(PreAuthorize.class);

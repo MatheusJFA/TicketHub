@@ -19,7 +19,9 @@ public enum Permission {
 
     SPOT_WRITE("spot:write"),
     SPOT_PUBLISH("spot:publish"),
-    SPOT_DELETE("spot:delete");
+    SPOT_DELETE("spot:delete"),
+
+    AUDIT_READ("audit:read");
 
     private final String authority;
 

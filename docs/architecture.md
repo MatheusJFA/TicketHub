@@ -85,7 +85,7 @@ sequenceDiagram
 Notas do fluxo:
 
 - **Resiliência**: só falha transitória entra no retry/circuito — `Left` cuja causa **não** é `DomainException`. Erro de validação (404/422) passa direto, sem retry.
-- **Auditoria**: toda execução gera `AuditEntry` (action, correlationId, actor, input, outcome, error, durationMs). A escrita na trilha é best-effort: nunca quebra a requisição.
+- **Auditoria**: toda execução gera `AuditEntry` (action, correlationId, actor, input, outcome, error, durationMs). A escrita na trilha é best-effort e assíncrona: nunca quebra a requisição. O `input` é sanitizado (senhas/tokens mascarados, truncado em 2000 caracteres). Leitura via `GET /audit-logs` (só `ADMIN`), com filtros por ação, ator, resultado, correlação e período.
 - **Segurança**: JWT `sub` vira o ator da auditoria (precedência sobre `X-Actor`).
 
 ## 3. Modelo de domínio

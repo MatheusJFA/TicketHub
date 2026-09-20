@@ -1,0 +1,21 @@
+@baseUrl = http://localhost:8080
+# Login via auth.http first, then paste an ADMIN token below.
+@token = PASTE_ADMIN_JWT_HERE
+
+### List recent audit entries
+# @name listAuditLogs
+GET {{baseUrl}}/audit-logs?page=0&perPage=10&sort=occurredAt&dir=desc
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Filter by action and actor
+# @name filterAuditLogs
+GET {{baseUrl}}/audit-logs?action=DefaultCreateSpotUseCase&actor=admin&page=0&perPage=10
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Filter by outcome and date range
+# @name filterAuditOutcome
+GET {{baseUrl}}/audit-logs?outcome=VALIDATION_ERROR&from=2027-01-01T00:00:00Z&to=2027-02-01T00:00:00Z
+Authorization: Bearer {{token}}
+Accept: application/json
