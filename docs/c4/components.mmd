@@ -1,12 +1,3 @@
-# TicketHub — Componentes da API (nível 3)
-
-Camadas: `api` (HTTP) → `application` (casos de uso) → `domain`
-(puro, portas = gateways) → `infrastructure` (adapters). Dependências
-apontam para dentro (Clean Architecture, verificado pelo `ArchitectureTest`).
-
-![Diagrama C4](components.svg)
-
-```mermaid
 C4Component
     title TicketHub API - Componentes
 
@@ -40,4 +31,3 @@ C4Component
     Rel(kafkaadapters, kafka, "publica/consome")
     Rel(cep, viacep, "consulta")
     Rel(controllers, alloy, "métricas, traces e logs")
-```

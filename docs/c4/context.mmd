@@ -1,13 +1,3 @@
-# TicketHub — Modelo C4
-
-Diagramas em Mermaid (`mermaid` + `C4*`): renderizam no GitHub. Nível 1
-(contexto), 2 (containers) e 3 (componentes da API).
-
-## 1. Contexto
-
-![Diagrama C4](context.svg)
-
-```mermaid
 C4Context
     title TicketHub - Contexto do sistema
 
@@ -26,4 +16,3 @@ C4Context
     Rel(admin, tickethub, "Administra e audita")
     Rel(tickethub, viacep, "Consulta endereço (GET /ws/{cep}/json)")
     Rel(tickethub, lgtm, "Exporta OTLP, Prometheus e logs")
-```
