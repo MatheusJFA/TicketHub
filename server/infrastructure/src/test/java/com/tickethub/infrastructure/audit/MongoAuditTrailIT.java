@@ -30,11 +30,22 @@ class MongoAuditTrailIT extends ContainerSupport {
                 "CreateSpotUseCase", "CreateSpotCommand[A1]", AuditOutcome.SUCCESS, null, 12);
     }
 
+    private List<Document> awaitEntries(final int expected) throws InterruptedException {
+        final var deadline = System.currentTimeMillis() + 10_000;
+        while (true) {
+            final var stored = mongoTemplate.findAll(Document.class, MongoAuditTrail.COLLECTION);
+            if (stored.size() >= expected || System.currentTimeMillis() > deadline) {
+                return stored;
+            }
+            Thread.sleep(100);
+        }
+    }
+
     @Test
-    void givenAnEntry_whenRecord_thenPersistsAllFields() {
+    void givenAnEntry_whenRecord_thenPersistsAllFields() throws InterruptedException {
         trail.record(entry("corr-1"));
 
-        final var stored = mongoTemplate.findAll(Document.class, MongoAuditTrail.COLLECTION);
+        final var stored = awaitEntries(1);
         assertEquals(1, stored.size());
         final var document = stored.get(0);
         assertNotNull(document.getObjectId("_id"));
@@ -48,15 +59,16 @@ class MongoAuditTrailIT extends ContainerSupport {
     }
 
     @Test
-    void givenEntriesFromPreviousTests_whenStarting_thenCollectionIsClean() {
+    void givenEntriesFromPreviousTests_whenStarting_thenCollectionIsClean() throws InterruptedException {
         assertTrue(mongoTemplate.findAll(Document.class, MongoAuditTrail.COLLECTION).isEmpty());
 
         trail.record(entry("corr-2"));
         trail.record(entry("corr-3"));
 
-        final var correlationIds = mongoTemplate.findAll(Document.class, MongoAuditTrail.COLLECTION)
-                .stream()
+        // Background writes may land in any order.
+        final var correlationIds = awaitEntries(2).stream()
                 .map(document -> document.getString("correlationId"))
+                .sorted()
                 .toList();
         assertEquals(List.of("corr-2", "corr-3"), correlationIds);
     }

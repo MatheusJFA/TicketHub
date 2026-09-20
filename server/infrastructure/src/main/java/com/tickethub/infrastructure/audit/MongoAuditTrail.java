@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import org.bson.Document;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,6 +21,7 @@ public class MongoAuditTrail implements AuditTrail {
     }
 
     @Override
+    @Async("auditExecutor")
     public void record(final AuditEntry entry) {
         requireNonNull(entry, "'entry' should not be null");
         final var document = new Document()
