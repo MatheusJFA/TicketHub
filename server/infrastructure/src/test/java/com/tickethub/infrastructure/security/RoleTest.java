@@ -8,15 +8,19 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 
+@DisplayName("Role")
 class RoleTest {
 
     @Test
+    @DisplayName("Given admin, when permissions, then has all permissions")
     void givenAdmin_whenPermissions_thenHasAllPermissions() {
         assertEquals(EnumSet.allOf(Permission.class), Role.ADMIN.permissions());
     }
 
     @Test
+    @DisplayName("Given partner, when permissions, then manages catalog and own account")
     void givenPartner_whenPermissions_thenManagesCatalogAndOwnAccount() {
         final var permissions = Role.PARTNER.permissions();
 
@@ -24,16 +28,19 @@ class RoleTest {
         assertTrue(permissions.contains(Permission.SHOW_PUBLISH));
         assertTrue(permissions.contains(Permission.SECTION_WRITE));
         assertTrue(permissions.contains(Permission.SPOT_DELETE));
+        assertTrue(permissions.contains(Permission.TICKET_VALIDATE));
         assertTrue(permissions.contains(Permission.PARTNER_DELETE));
         assertFalse(permissions.contains(Permission.CUSTOMER_DELETE));
     }
 
     @Test
+    @DisplayName("Given customer, when permissions, then manages own account")
     void givenCustomer_whenPermissions_thenManagesOwnAccount() {
         assertEquals(Set.of(Permission.CUSTOMER_WRITE, Permission.CUSTOMER_DELETE), Role.CUSTOMER.permissions());
     }
 
     @Test
+    @DisplayName("Given user without roles, when create, then defaults to customer")
     void givenUserWithoutRoles_whenCreate_thenDefaultsToCustomer() {
         final var user = new SecurityUser("maria", "hash", null, null);
 
@@ -41,6 +48,7 @@ class RoleTest {
     }
 
     @Test
+    @DisplayName("Given partner user, when authorities, then includes role and permissions")
     void givenPartnerUser_whenAuthorities_thenIncludesRoleAndPermissions() {
         final var user = new SecurityUser("cinema", "hash", Set.of(Role.PARTNER), "partner-1");
 

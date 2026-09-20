@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.core.spot.SpotGateway;
 import com.tickethub.domain.core.spot.SpotID;
+import com.tickethub.domain.core.spot.SpotPlacement;
 import com.tickethub.domain.core.section.SectionID;
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.domain.pagination.SearchQuery;
@@ -57,6 +58,14 @@ public class SpotMongoGateway implements SpotGateway {
     @Override
     public Optional<Spot> findById(final SpotID id) {
         return repository.findById(id.getValue()).map(SpotDocument::toDomain);
+    }
+
+    @Override
+    public Optional<SpotPlacement> findPlacement(final SpotID id) {
+        Objects.requireNonNull(id, "'id' should not be null");
+        return repository.findById(id.getValue())
+                .map(document -> new SpotPlacement(document.toDomain(), document.showId(),
+                        document.sectionId()));
     }
 
     @Override

@@ -21,6 +21,8 @@ public enum Permission {
     SPOT_PUBLISH("spot:publish"),
     SPOT_DELETE("spot:delete"),
 
+    TICKET_VALIDATE("ticket:validate"),
+
     AUDIT_READ("audit:read");
 
     private final String authority;

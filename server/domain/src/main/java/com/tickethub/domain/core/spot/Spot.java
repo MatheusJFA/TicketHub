@@ -55,6 +55,18 @@ public class Spot extends Entity<SpotID> {
         this.markAsUpdated();
     }
 
+    /**
+     * Marks the spot as used at check-in (door validation). A spot can only
+     * be checked in once; a second scan fails so a ticket cannot be reused.
+     */
+    public void checkIn() {
+        if (!isAvailable) {
+            throw new DomainException("Spot is already used");
+        }
+        this.isAvailable = false;
+        this.markAsUpdated();
+    }
+
     public Spot changeLocation(final Location location) {
         if (isNull(location)) {
             throw new DomainException("'location' should not be null");

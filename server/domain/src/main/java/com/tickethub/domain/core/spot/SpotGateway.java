@@ -11,6 +11,11 @@ public interface SpotGateway {
     Spot create(Spot spot, SectionID sectionId);
     void deleteById(SpotID id);
     Optional<Spot> findById(SpotID id);
+    /**
+     * Loads the spot together with the show/section it belongs to, for
+     * ticket (QR code) validation at the door.
+     */
+    Optional<SpotPlacement> findPlacement(SpotID id);
     Spot update(Spot spot);
     Pagination<Spot> findAll(SearchQuery query);
     List<SpotID> existsByIds(List<SpotID> ids);

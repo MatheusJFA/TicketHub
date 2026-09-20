@@ -22,7 +22,8 @@ public enum Role {
             Permission.SECTION_DELETE,
             Permission.SPOT_WRITE,
             Permission.SPOT_PUBLISH,
-            Permission.SPOT_DELETE)),
+            Permission.SPOT_DELETE,
+            Permission.TICKET_VALIDATE)),
 
     ADMIN(EnumSet.allOf(Permission.class));
 

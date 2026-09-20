@@ -1,0 +1,21 @@
+@baseUrl = http://localhost:8080
+# Login via auth.http as partner/admin, then paste a token carrying
+# ticket:validate authority and the ownerId of the show's partner.
+@token = PASTE_JWT_HERE
+@showId = REPLACE_WITH_SHOW_ID
+@sectionId = REPLACE_WITH_SECTION_ID
+@spotId = REPLACE_WITH_SPOT_ID
+
+### Validate ticket (door check-in)
+# The security guard scans the guest QR code (payload format
+# showId:sectionId:spotId) and submits the three identifiers.
+# @name validateTicket
+POST {{baseUrl}}/shows/{{showId}}/tickets/validate
+Content-Type: application/json
+Authorization: Bearer {{token}}
+X-Correlation-ID: ticket-validate-1
+
+{
+  "sectionId": "{{sectionId}}",
+  "spotId": "{{spotId}}"
+}
