@@ -33,10 +33,15 @@ public class Spot extends Entity<SpotID> {
         return new Spot(id, location, true, false, now, now, null, null, null);
     }
 
-    public static Spot create() {
+    /**
+     * Creates a spot with a random human-readable code. The seat number
+     * width always comes from the caller (see
+     * {@code tickethub.spots.seat-number-width}); it is never assumed here.
+     */
+    public static Spot create(int seatNumberWidth) {
         final SpotID id = SpotID.generate();
         final var now = Instant.now();
-        return new Spot(id, Location.generateRandom(), true, false, now, now, null, null, null);
+        return new Spot(id, Location.generateRandom(seatNumberWidth), true, false, now, now, null, null, null);
     }
 
     public static Spot reconstitute(SpotID id, Location location, boolean isAvailable, boolean isPublished,

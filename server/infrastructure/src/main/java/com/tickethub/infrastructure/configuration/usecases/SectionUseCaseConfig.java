@@ -26,9 +26,11 @@ import com.tickethub.application.section.update.UpdateSectionUseCase;
 import com.tickethub.application.section.update.DefaultUpdateSectionUseCase;
 import com.tickethub.domain.core.section.SectionGateway;
 import com.tickethub.domain.core.show.ShowGateway;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.util.Assert;
 
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnBean({SectionGateway.class, ShowGateway.class})
@@ -57,8 +59,10 @@ public class SectionUseCaseConfig {
     }
 
     @Bean
-    public CreateSectionUseCase createSectionUseCase() {
-        return new DefaultCreateSectionUseCase(sectionGateway, showGateway);
+    public CreateSectionUseCase createSectionUseCase(
+            @Value("${tickethub.spots.seat-number-width:5}") final int seatNumberWidth) {
+        Assert.isTrue(seatNumberWidth > 0, "tickethub.spots.seat-number-width must be positive");
+        return new DefaultCreateSectionUseCase(sectionGateway, showGateway, seatNumberWidth);
     }
 
     @Bean

@@ -16,7 +16,7 @@ import com.tickethub.domain.core.section.*;
 
 @DisplayName("Change section description use case")
 class ChangeSectionDescriptionUseCaseTest {
-    private final Section entity = Section.create("Setor original", "Descricao original", 2, Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL")));
+    private final Section entity = Section.create("Setor original", "Descricao original", 2, Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL")), "A", 5);
     private final SectionGateway gateway = mock(SectionGateway.class);
     private final DefaultChangeSectionDescriptionUseCase useCase = new DefaultChangeSectionDescriptionUseCase(gateway);
     private final String id = entity.getId().getValue();

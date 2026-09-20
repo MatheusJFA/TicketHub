@@ -33,11 +33,11 @@ class GenerateSectionSpotsUseCaseTest {
     private static final Money PRICE = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
 
     private final ShowGateway gateway = mock(ShowGateway.class);
-    private final DefaultGenerateSectionSpotsUseCase useCase = new DefaultGenerateSectionSpotsUseCase(gateway);
+    private final DefaultGenerateSectionSpotsUseCase useCase = new DefaultGenerateSectionSpotsUseCase(gateway, 5);
 
     private static Show entity() {
         final var show = Show.create("Concert", "Description", DATE, ADDRESS, 0, PartnerID.generate());
-        show.addSection("VIP", "Description", 2, PRICE);
+        show.addSection("VIP", "Description", 2, PRICE, 5);
         return show;
     }
 

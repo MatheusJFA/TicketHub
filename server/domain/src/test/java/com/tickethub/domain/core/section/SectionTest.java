@@ -31,7 +31,7 @@ class SectionTest {
     @DisplayName("Given spots with mixed publication, when publish all, then publish section and every spot")
     void givenSpotsWithMixedPublication_whenPublishAll_thenPublishSectionAndEverySpot(long capacity) throws Exception {
         final var price = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
-        final var section = Section.create("VIP", "Description", capacity, price);
+        final var section = Section.create("VIP", "Description", capacity, price, "A", 5);
         if (capacity > 0) section.getSpots().iterator().next().publish();
         final var entities = new ArrayList<Entity<?>>();
         entities.add(section);
@@ -59,7 +59,7 @@ class SectionTest {
     @DisplayName("Given published section, when unpublish all, then unpublish section and every spot")
     void givenPublishedSection_whenUnpublishAll_thenUnpublishSectionAndEverySpot(long capacity) throws Exception {
         final var price = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
-        final var section = Section.create("VIP", "Description", capacity, price);
+        final var section = Section.create("VIP", "Description", capacity, price, "A", 5);
         section.publish();
         section.getSpots().forEach(Spot::publish);
         final var entities = new ArrayList<Entity<?>>();
@@ -129,7 +129,7 @@ class SectionTest {
         final var expectedPrice = Money.create(new BigDecimal("20.00"), Currency.getInstance("BRL"));
         final var expectedSpots = new HashSet<Spot>();
 
-        final var actualSection = Section.create(expectedName, expectedDescription, expectedTotalSpots, expectedPrice);
+        final var actualSection = Section.create(expectedName, expectedDescription, expectedTotalSpots, expectedPrice, "A", 5);
 
         assertNotNull(actualSection);
         assertNotNull(actualSection.getId());
@@ -173,7 +173,7 @@ class SectionTest {
     void givenCapacity_whenCreate_thenGenerateSequentialSeatCodes() {
         final var price = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
 
-        final var section = Section.create("VIP", "Front stage", 3, price, "B");
+        final var section = Section.create("VIP", "Front stage", 3, price, "B", 5);
 
         final var codes = section.getSpots().stream()
                 .map(spot -> spot.getLocation().getValue())
@@ -187,7 +187,7 @@ class SectionTest {
     void givenCapacity_whenCreateWithoutCode_thenDefaultToFirstSection() {
         final var price = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
 
-        final var section = Section.create("VIP", "Front stage", 2, price);
+        final var section = Section.create("VIP", "Front stage", 2, price, "A", 5);
 
         final var codes = section.getSpots().stream()
                 .map(spot -> spot.getLocation().getValue())
@@ -204,7 +204,7 @@ class SectionTest {
 
         assertTrue(section.getSpots().isEmpty());
 
-        section.generateMissingSpots("C");
+        section.generateMissingSpots("C", 5);
 
         final var codes = section.getSpots().stream()
                 .map(spot -> spot.getLocation().getValue())
@@ -212,7 +212,7 @@ class SectionTest {
                 .toList();
         assertEquals(List.of("C00001", "C00002", "C00003"), codes);
 
-        section.generateMissingSpots("C");
+        section.generateMissingSpots("C", 5);
         assertEquals(3, section.getSpots().size());
     }
 }

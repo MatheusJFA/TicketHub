@@ -49,17 +49,13 @@ public class Section extends Entity<SectionID> {
                 price, spotList, now, now, null, null, null);
     }
 
-    public static Section create(String name, String description, long totalSpots, Money price) {
-        return create(name, description, totalSpots, price, Location.sectionCode(0));
-    }
-
     public static Section create(String name, String description, long totalSpots, Money price,
-            String sectionCode) {
+            String sectionCode, int seatNumberWidth) {
         if (totalSpots < 0) {
             throw new DomainException("'totalSpots' should not be negative");
         }
         final SectionID id = SectionID.generate();
-        final Set<Spot> spots = generateSpots(totalSpots, sectionCode);
+        final Set<Spot> spots = generateSpots(totalSpots, sectionCode, seatNumberWidth);
         final var now = Instant.now();
         final Section section = new Section(id, Name.create(name), Text.create(description), false, totalSpots, 0,
                 price, spots, now, now, null, null, null);
@@ -89,13 +85,13 @@ public class Section extends Entity<SectionID> {
                 price, spotList, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
     }
 
-    private static Set<Spot> generateSpots(long totalSpots, String sectionCode) {
+    private static Set<Spot> generateSpots(long totalSpots, String sectionCode, int seatNumberWidth) {
         if (totalSpots < 0) {
             throw new DomainException("'totalSpots' should not be negative");
         }
         return Stream.iterate(0, i -> i + 1)
                 .limit(totalSpots)
-                .map(i -> Spot.create(Location.generateSeat(sectionCode, i + 1)))
+                .map(i -> Spot.create(Location.generateSeat(sectionCode, i + 1, seatNumberWidth)))
                 .collect(Collectors.toCollection(HashSet::new));
     }
 
@@ -103,16 +99,17 @@ public class Section extends Entity<SectionID> {
      * Materializes the spots still missing to reach {@code totalSpots},
      * continuing the seat numbering after the spots already present, and
      * returns the newly created spots. Idempotent: returns an empty set when
-     * the section is already complete.
+     * the section is already complete. The seat number width always comes
+     * from the caller (see {@code tickethub.spots.seat-number-width}).
      */
-    public Set<Spot> generateMissingSpots(final String sectionCode) {
+    public Set<Spot> generateMissingSpots(final String sectionCode, final int seatNumberWidth) {
         final long existing = spots.size();
         if (existing >= totalSpots) {
             return Set.of();
         }
         final Set<Spot> generated = new HashSet<>();
         for (long seatNumber = existing + 1; seatNumber <= totalSpots; seatNumber++) {
-            final Spot spot = Spot.create(Location.generateSeat(sectionCode, seatNumber));
+            final Spot spot = Spot.create(Location.generateSeat(sectionCode, seatNumber, seatNumberWidth));
             spots.add(spot);
             generated.add(spot);
         }

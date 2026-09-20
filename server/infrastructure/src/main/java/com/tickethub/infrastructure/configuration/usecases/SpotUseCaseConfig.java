@@ -18,9 +18,11 @@ import com.tickethub.application.spot.update.UpdateSpotUseCase;
 import com.tickethub.application.spot.update.DefaultUpdateSpotUseCase;
 import com.tickethub.domain.core.spot.SpotGateway;
 import com.tickethub.domain.core.section.SectionGateway;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.util.Assert;
 
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnBean({SpotGateway.class, SectionGateway.class})
@@ -39,8 +41,10 @@ public class SpotUseCaseConfig {
     }
 
     @Bean
-    public CreateSpotUseCase createSpotUseCase() {
-        return new DefaultCreateSpotUseCase(spotGateway, sectionGateway);
+    public CreateSpotUseCase createSpotUseCase(
+            @Value("${tickethub.spots.seat-number-width:5}") final int seatNumberWidth) {
+        Assert.isTrue(seatNumberWidth > 0, "tickethub.spots.seat-number-width must be positive");
+        return new DefaultCreateSpotUseCase(spotGateway, sectionGateway, seatNumberWidth);
     }
 
     @Bean

@@ -75,7 +75,7 @@ class SpotMongoGatewayIT extends ContainerSupport {
     @Test
     @DisplayName("Given a spot without location, when create, then generates and round trips code")
     void givenASpotWithoutLocation_whenCreate_thenGeneratesAndRoundTripsCode() {
-        final var spot = Spot.create();
+        final var spot = Spot.create(5);
 
         gateway.create(spot, givenSection());
 

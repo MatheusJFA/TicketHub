@@ -19,15 +19,21 @@ public class DefaultAddSectionToShowUseCase extends AddSectionToShowUseCase {
     private final ShowGateway showGateway;
     private final DomainEventPublisher eventPublisher;
     private final long asyncSpotThreshold;
+    private final int seatNumberWidth;
 
     public DefaultAddSectionToShowUseCase(final ShowGateway showGateway,
-            final DomainEventPublisher eventPublisher, final long asyncSpotThreshold) {
+            final DomainEventPublisher eventPublisher, final long asyncSpotThreshold,
+            final int seatNumberWidth) {
         this.showGateway = Objects.requireNonNull(showGateway);
         this.eventPublisher = Objects.requireNonNull(eventPublisher);
         if (asyncSpotThreshold < 1) {
             throw new IllegalArgumentException("'asyncSpotThreshold' should be positive");
         }
         this.asyncSpotThreshold = asyncSpotThreshold;
+        if (seatNumberWidth < 1) {
+            throw new IllegalArgumentException("'seatNumberWidth' should be positive");
+        }
+        this.seatNumberWidth = seatNumberWidth;
     }
 
     @Override
@@ -53,7 +59,8 @@ public class DefaultAddSectionToShowUseCase extends AddSectionToShowUseCase {
             }
 
             final Section candidate = Section.create(command.name(), command.description(),
-                    command.totalSpots(), command.price());
+                    command.totalSpots(), command.price(), Location.sectionCode(0),
+                    seatNumberWidth);
             candidate.validate(notification);
             if (notification.hasError()) {
                 return Either.left(notification);
@@ -63,7 +70,8 @@ public class DefaultAddSectionToShowUseCase extends AddSectionToShowUseCase {
                     command.name(),
                     command.description(),
                     command.totalSpots(),
-                    command.price());
+                    command.price(),
+                    seatNumberWidth);
 
             final Notification afterMutation = Notification.create();
             entity.validate(afterMutation);
@@ -111,7 +119,7 @@ public class DefaultAddSectionToShowUseCase extends AddSectionToShowUseCase {
                     command.totalSpots(),
                     Instant.now()));
         } catch (final RuntimeException publishFailure) {
-            final var generated = shell.generateMissingSpots(sectionCode);
+            final var generated = shell.generateMissingSpots(sectionCode, seatNumberWidth);
             showGateway.appendSpots(entity.getId(), shell.getId(), generated);
         }
         return Either.right(AddSectionToShowOutput.from(updatedShow));

@@ -15,7 +15,7 @@ import com.tickethub.domain.core.section.*;
 class UpdateSectionUseCaseTest {
     private static final Money PRICE = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
     private static final Money NEW_PRICE = Money.create(new BigDecimal("99.90"), Currency.getInstance("BRL"));
-    private final Section entity = Section.create("VIP", "Front stage", 2, PRICE);
+    private final Section entity = Section.create("VIP", "Front stage", 2, PRICE, "A", 5);
     private final SectionGateway gateway = mock(SectionGateway.class);
     private final DefaultUpdateSectionUseCase useCase = new DefaultUpdateSectionUseCase(gateway);
     private final String id = entity.getId().getValue();

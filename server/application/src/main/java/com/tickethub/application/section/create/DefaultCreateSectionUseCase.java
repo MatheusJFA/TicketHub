@@ -9,16 +9,20 @@ import com.tickethub.domain.core.section.SectionGateway;
 import com.tickethub.domain.core.show.Show;
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.show.ShowID;
+import com.tickethub.domain.shared.Location;
 import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.Notification;
 
 public class DefaultCreateSectionUseCase extends CreateSectionUseCase {
     private final SectionGateway sectionGateway;
     private final ShowGateway showGateway;
+    private final int seatNumberWidth;
 
-    public DefaultCreateSectionUseCase(final SectionGateway sectionGateway, final ShowGateway showGateway) {
+    public DefaultCreateSectionUseCase(final SectionGateway sectionGateway, final ShowGateway showGateway,
+            final int seatNumberWidth) {
         this.sectionGateway = Objects.requireNonNull(sectionGateway);
         this.showGateway = Objects.requireNonNull(showGateway);
+        this.seatNumberWidth = seatNumberWidth;
     }
 
     @Override
@@ -34,8 +38,9 @@ public class DefaultCreateSectionUseCase extends CreateSectionUseCase {
                 command.name(),
                 command.description(),
                 command.totalSpots(),
-                command.price()
-            );
+                command.price(),
+                Location.sectionCode(0),
+                seatNumberWidth);
 
             final Notification notification = Notification.create();
 

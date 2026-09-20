@@ -110,7 +110,7 @@ public class PublishSectionUseCaseTest extends UseCaseTest {
     }
 
     private static Section entity() {
-        final var entity = Section.create("VIP", "Description", 2, PRICE);
+        final var entity = Section.create("VIP", "Description", 2, PRICE, "A", 5);
         return entity;
     }
 }

@@ -71,7 +71,7 @@ class SpotTest {
     @Test
     @DisplayName("Given no location, when create, then generate short code")
     void givenNoLocation_whenCreate_thenGenerateShortCode() {
-        final var actualSpot = Spot.create();
+        final var actualSpot = Spot.create(5);
 
         assertNotNull(actualSpot.getLocation());
         assertTrue(actualSpot.getLocation().getValue().matches("[A-Z]\\d{5}"));

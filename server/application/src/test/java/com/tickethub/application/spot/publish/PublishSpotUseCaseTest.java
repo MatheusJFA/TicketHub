@@ -104,7 +104,7 @@ public class PublishSpotUseCaseTest extends UseCaseTest {
     }
 
     private static Spot entity() {
-        final var entity = Spot.create();
+        final var entity = Spot.create(5);
         return entity;
     }
 }

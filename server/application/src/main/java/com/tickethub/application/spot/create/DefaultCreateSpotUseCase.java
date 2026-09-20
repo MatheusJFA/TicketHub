@@ -16,10 +16,16 @@ import com.tickethub.domain.validation.Notification;
 public class DefaultCreateSpotUseCase extends CreateSpotUseCase {
     private final SpotGateway spotGateway;
     private final SectionGateway sectionGateway;
+    private final int seatNumberWidth;
 
-    public DefaultCreateSpotUseCase(final SpotGateway spotGateway, final SectionGateway sectionGateway) {
+    public DefaultCreateSpotUseCase(final SpotGateway spotGateway, final SectionGateway sectionGateway,
+            final int seatNumberWidth) {
         this.spotGateway = Objects.requireNonNull(spotGateway);
         this.sectionGateway = Objects.requireNonNull(sectionGateway);
+        if (seatNumberWidth < 1) {
+            throw new IllegalArgumentException("'seatNumberWidth' should be positive");
+        }
+        this.seatNumberWidth = seatNumberWidth;
     }
 
     @Override
@@ -33,7 +39,7 @@ public class DefaultCreateSpotUseCase extends CreateSpotUseCase {
 
             // A missing location generates a short hash-based code (see Location).
             final Spot entity = Optional.ofNullable(command.location()).map(Spot::create)
-                    .orElseGet(Spot::create);
+                    .orElseGet(() -> Spot.create(seatNumberWidth));
             final Notification notification = Notification.create();
             entity.validate(notification);
 

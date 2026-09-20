@@ -168,7 +168,7 @@ class ShowTest {
     @ValueSource(longs = {0, 1, 25})
     @DisplayName("Given capacity, when create section, then generate unique available unpublished spots")
     void givenCapacity_whenCreateSection_thenGenerateUniqueAvailableUnpublishedSpots(long capacity) {
-        final var section = Section.create("VIP", "Description", capacity, PRICE);
+        final var section = Section.create("VIP", "Description", capacity, PRICE, "A", 5);
 
         assertEquals(capacity, section.getSpots().size());
         assertEquals(capacity, section.getSpots().stream().map(Spot::getId).distinct().count());
@@ -187,7 +187,7 @@ class ShowTest {
     @Test
     @DisplayName("Given no location, when create spot, then allow validation with default flags")
     void givenNoLocation_whenCreateSpot_thenAllowValidationWithDefaultFlags() {
-        final var spot = Spot.create();
+        final var spot = Spot.create(5);
         assertNotNull(spot.getId());
         assertNotNull(spot.getLocation());
         assertTrue(spot.isAvailable());
@@ -204,7 +204,7 @@ class ShowTest {
         final var createdAt = show.getCreatedAt();
         resetUpdatedAt(show);
 
-        show.addSection("VIP", "Front seats", 3, PRICE);
+        show.addSection("VIP", "Front seats", 3, PRICE, 5);
         final var firstSection = show.getSections().iterator().next();
         assertEquals("VIP", firstSection.getName().getValue());
         assertEquals("Front seats", firstSection.getDescription().getValue());
@@ -214,7 +214,7 @@ class ShowTest {
         assertTrue(show.getUpdatedAt().isAfter(Instant.EPOCH));
         resetUpdatedAt(show);
 
-        show.addSection("General", "Back seats", 2, PRICE);
+        show.addSection("General", "Back seats", 2, PRICE, 5);
 
         assertEquals(2, show.getSections().size());
         assertTrue(show.getSections().contains(firstSection));
@@ -238,7 +238,7 @@ class ShowTest {
         final var updatedAt = show.getUpdatedAt();
 
         final var exception = assertThrows(DomainException.class,
-                () -> show.addSection("A", "Description", 2, PRICE));
+                () -> show.addSection("A", "Description", 2, PRICE, 5));
 
         assertEquals("Invalid name A", exception.getMessage());
         assertTrue(show.getSections().isEmpty());
@@ -265,7 +265,7 @@ class ShowTest {
     @Test
     @DisplayName("Given section, when publish and unpublish, then update state and audit")
     void givenSection_whenPublishAndUnpublish_thenUpdateStateAndAudit() throws Exception {
-        final var section = Section.create("VIP", "Description", 1, PRICE);
+        final var section = Section.create("VIP", "Description", 1, PRICE, "A", 5);
         final var createdAt = section.getCreatedAt();
         resetUpdatedAt(section);
         section.publish();
@@ -281,7 +281,7 @@ class ShowTest {
     @Test
     @DisplayName("Given spot, when publish and unpublish, then update state and audit")
     void givenSpot_whenPublishAndUnpublish_thenUpdateStateAndAudit() throws Exception {
-        final var spot = Spot.create();
+        final var spot = Spot.create(5);
         final var createdAt = spot.getCreatedAt();
         resetUpdatedAt(spot);
         spot.publish();
@@ -335,7 +335,7 @@ class ShowTest {
     void givenSectionsWithMixedPublication_whenPublishAll_thenPublishEntireShow(int sectionCount) throws Exception {
         final var show = Show.create("Concert", "Description", DATE, ADDRESS, 0, PartnerID.generate());
         for (int i = 0; i < sectionCount; i++) {
-            show.addSection("VIP", "Description", i + 1, PRICE);
+            show.addSection("VIP", "Description", i + 1, PRICE, 5);
         }
         final var entities = new ArrayList<Entity<?>>();
         entities.add(show);
@@ -372,7 +372,7 @@ class ShowTest {
     void givenPublishedShow_whenUnpublishAll_thenUnpublishEntireShow(int sectionCount) throws Exception {
         final var show = Show.create("Concert", "Description", DATE, ADDRESS, 0, PartnerID.generate());
         for (int i = 0; i < sectionCount; i++) {
-            show.addSection("VIP", "Description", i + 1, PRICE);
+            show.addSection("VIP", "Description", i + 1, PRICE, 5);
         }
         show.publish();
         final var entities = new ArrayList<Entity<?>>();

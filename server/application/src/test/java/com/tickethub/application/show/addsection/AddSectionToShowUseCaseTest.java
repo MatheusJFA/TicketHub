@@ -41,7 +41,7 @@ public class AddSectionToShowUseCaseTest extends UseCaseTest {
 
     @org.junit.jupiter.api.BeforeEach
     void setUp() {
-        useCase = new DefaultAddSectionToShowUseCase(showGateway, eventPublisher, ASYNC_THRESHOLD);
+        useCase = new DefaultAddSectionToShowUseCase(showGateway, eventPublisher, ASYNC_THRESHOLD, 5);
     }
 
     @Override
@@ -177,7 +177,7 @@ public class AddSectionToShowUseCaseTest extends UseCaseTest {
 
     private static Show entity() {
         final var entity = Show.create("Concert", "Description", DATE, ADDRESS, 0, PartnerID.generate());
-        entity.addSection("VIP", "Description", 2, PRICE);
+        entity.addSection("VIP", "Description", 2, PRICE, 5);
         return entity;
     }
 

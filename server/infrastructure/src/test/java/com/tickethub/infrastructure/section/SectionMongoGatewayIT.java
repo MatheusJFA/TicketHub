@@ -64,7 +64,7 @@ class SectionMongoGatewayIT extends ContainerSupport {
     @DisplayName("Given a section with spots, when create, then bulk persists everything with parent links")
     void givenASectionWithSpots_whenCreate_thenBulkPersistsEverythingWithParentLinks() {
         final var showId = givenShow();
-        final var section = Section.create("VIP", "Front stage", 3, PRICE);
+        final var section = Section.create("VIP", "Front stage", 3, PRICE, "A", 5);
 
         gateway.create(section, showId);
 
@@ -93,7 +93,7 @@ class SectionMongoGatewayIT extends ContainerSupport {
     @Test
     @DisplayName("Given a section, when update, then persists price and flags")
     void givenASection_whenUpdate_thenPersistsPriceAndFlags() {
-        final var section = gateway.create(Section.create("VIP", "Front stage", 2, PRICE), givenShow());
+        final var section = gateway.create(Section.create("VIP", "Front stage", 2, PRICE, "A", 5), givenShow());
 
         section.changePrice(Money.create(new BigDecimal("99.90"), Currency.getInstance("BRL")));
         section.publishAll();
@@ -108,7 +108,7 @@ class SectionMongoGatewayIT extends ContainerSupport {
     @Test
     @DisplayName("Given a section, when delete, then cascades spots")
     void givenASection_whenDelete_thenCascadesSpots() {
-        final var section = gateway.create(Section.create("VIP", "Front stage", 2, PRICE), givenShow());
+        final var section = gateway.create(Section.create("VIP", "Front stage", 2, PRICE, "A", 5), givenShow());
 
         gateway.deleteById(section.getId());
 
@@ -121,8 +121,8 @@ class SectionMongoGatewayIT extends ContainerSupport {
     @DisplayName("Given sections, when find all, then returns sections with spots")
     void givenSections_whenFindAll_thenReturnsSectionsWithSpots() {
         final var showId = givenShow();
-        gateway.create(Section.create("VIP", "Front stage", 2, PRICE), showId);
-        gateway.create(Section.create("Pista", "Geral", 1, PRICE), showId);
+        gateway.create(Section.create("VIP", "Front stage", 2, PRICE, "A", 5), showId);
+        gateway.create(Section.create("Pista", "Geral", 1, PRICE, "A", 5), showId);
 
         final var page = gateway.findAll(new SearchQuery(0, 10, "", "name", "asc"));
 
@@ -136,8 +136,8 @@ class SectionMongoGatewayIT extends ContainerSupport {
     @DisplayName("Given section ids, when exists by ids, then returns only persisted ids")
     void givenSectionIds_whenExistsByIds_thenReturnsOnlyPersistedIds() {
         final var showId = givenShow();
-        final var first = gateway.create(Section.create("VIP", "Front stage", 1, PRICE), showId);
-        final var second = gateway.create(Section.create("Pista", "Geral", 1, PRICE), showId);
+        final var first = gateway.create(Section.create("VIP", "Front stage", 1, PRICE, "A", 5), showId);
+        final var second = gateway.create(Section.create("Pista", "Geral", 1, PRICE, "A", 5), showId);
         final var missing = SectionID.generate();
 
         final var existing = gateway.existsByIds(List.of(first.getId(), second.getId(), missing));

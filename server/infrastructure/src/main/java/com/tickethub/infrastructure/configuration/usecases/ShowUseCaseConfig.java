@@ -53,14 +53,19 @@ public class ShowUseCaseConfig {
 
     @Bean
     public AddSectionToShowUseCase addSectionToShowUseCase(
-            @Value("${tickethub.spots.async-threshold:1000}") final long asyncSpotThreshold) {
+            @Value("${tickethub.spots.async-threshold:1000}") final long asyncSpotThreshold,
+            @Value("${tickethub.spots.seat-number-width:5}") final int seatNumberWidth) {
         Assert.isTrue(asyncSpotThreshold > 0, "tickethub.spots.async-threshold must be positive");
-        return new DefaultAddSectionToShowUseCase(showGateway, eventPublisher, asyncSpotThreshold);
+        Assert.isTrue(seatNumberWidth > 0, "tickethub.spots.seat-number-width must be positive");
+        return new DefaultAddSectionToShowUseCase(showGateway, eventPublisher, asyncSpotThreshold,
+                seatNumberWidth);
     }
 
     @Bean
-    public GenerateSectionSpotsUseCase generateSectionSpotsUseCase() {
-        return new DefaultGenerateSectionSpotsUseCase(showGateway);
+    public GenerateSectionSpotsUseCase generateSectionSpotsUseCase(
+            @Value("${tickethub.spots.seat-number-width:5}") final int seatNumberWidth) {
+        Assert.isTrue(seatNumberWidth > 0, "tickethub.spots.seat-number-width must be positive");
+        return new DefaultGenerateSectionSpotsUseCase(showGateway, seatNumberWidth);
     }
 
     @Bean

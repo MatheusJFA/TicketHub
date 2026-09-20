@@ -49,7 +49,7 @@ class DomainValidatorsTest {
     @DisplayName("Given section without price, when validate, then report error")
     void givenSectionWithoutPrice_whenValidate_thenReportError() {
         final var notification = Notification.create();
-        Section.create("VIP", "Description", 10, null).validate(notification);
+        Section.create("VIP", "Description", 10, null, "A", 5).validate(notification);
         assertEquals("'price' should not be null", notification.firstError().message());
     }
 

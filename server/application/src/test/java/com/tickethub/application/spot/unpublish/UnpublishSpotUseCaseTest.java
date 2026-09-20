@@ -104,7 +104,7 @@ public class UnpublishSpotUseCaseTest extends UseCaseTest {
     }
 
     private static Spot entity() {
-        final var entity = Spot.create();
+        final var entity = Spot.create(5);
         entity.publish();
         return entity;
     }

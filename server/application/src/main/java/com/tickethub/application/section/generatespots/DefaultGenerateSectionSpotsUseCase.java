@@ -11,9 +11,11 @@ import com.tickethub.domain.validation.Notification;
 
 public class DefaultGenerateSectionSpotsUseCase extends GenerateSectionSpotsUseCase {
     private final ShowGateway showGateway;
+    private final int seatNumberWidth;
 
-    public DefaultGenerateSectionSpotsUseCase(final ShowGateway showGateway) {
+    public DefaultGenerateSectionSpotsUseCase(final ShowGateway showGateway, final int seatNumberWidth) {
         this.showGateway = Objects.requireNonNull(showGateway);
+        this.seatNumberWidth = seatNumberWidth;
     }
 
     @Override
@@ -32,7 +34,7 @@ public class DefaultGenerateSectionSpotsUseCase extends GenerateSectionSpotsUseC
                 return Either.left(notFound(Section.class.getSimpleName(), command.sectionId()));
             }
             final long before = section.get().getSpots().size();
-            final var generated = section.get().generateMissingSpots(command.sectionCode());
+            final var generated = section.get().generateMissingSpots(command.sectionCode(), seatNumberWidth);
             if (!generated.isEmpty()) {
                 showGateway.appendSpots(show.getId(), section.get().getId(), generated);
             }

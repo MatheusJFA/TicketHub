@@ -10,8 +10,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import static org.mockito.Mockito.mock;
 
 import com.tickethub.application.UseCaseTest;
 import com.tickethub.domain.core.section.SectionGateway;
@@ -23,15 +22,12 @@ import com.tickethub.domain.shared.Money;
 public class CreateSectionUseCaseTest extends UseCaseTest {
     private static final Money PRICE = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
     private static final ShowID SHOW_ID = ShowID.generate();
+    private static final int SEAT_NUMBER_WIDTH = 5;
 
-    @InjectMocks
-    private DefaultCreateSectionUseCase useCase;
-
-    @Mock
-    private SectionGateway sectionGateway;
-
-    @Mock
-    private ShowGateway showGateway;
+    private final SectionGateway sectionGateway = mock(SectionGateway.class);
+    private final ShowGateway showGateway = mock(ShowGateway.class);
+    private final DefaultCreateSectionUseCase useCase =
+            new DefaultCreateSectionUseCase(sectionGateway, showGateway, SEAT_NUMBER_WIDTH);
 
     @Override
     protected List<Object> getMocks() {
@@ -73,6 +69,7 @@ public class CreateSectionUseCaseTest extends UseCaseTest {
 
         assertEquals(1, notification.getErrors().size());
         assertEquals("Show not found: " + SHOW_ID.getValue(), notification.firstError().message());
+        verify(showGateway, times(1)).existsByIds(List.of(SHOW_ID));
         verify(sectionGateway, never()).create(any(), any());
     }
 
@@ -88,6 +85,7 @@ public class CreateSectionUseCaseTest extends UseCaseTest {
 
         assertEquals(1, notification.getErrors().size());
         assertEquals(expectedMessage, notification.firstError().message());
+        verify(showGateway, times(1)).existsByIds(List.of(SHOW_ID));
         verify(sectionGateway, times(1)).create(argThat(saved -> saved.getId() != null
                         && saved.getCreatedAt() != null
                         && saved.getUpdatedAt() != null
@@ -110,6 +108,7 @@ public class CreateSectionUseCaseTest extends UseCaseTest {
 
         assertEquals(1, notification.getErrors().size());
         assertEquals("'price' should not be null", notification.firstError().message());
+        verify(showGateway, times(1)).existsByIds(List.of(SHOW_ID));
         verify(sectionGateway, never()).create(any(), any());
     }
 }

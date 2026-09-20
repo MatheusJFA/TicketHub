@@ -19,7 +19,7 @@ import com.tickethub.application.section.delete.*;
 
 @DisplayName("Section queries and deletion")
 class SectionQueriesAndDeletionTest {
-    private final Section entity = Section.create("Setor original", "Descricao original", 2, Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL")));
+    private final Section entity = Section.create("Setor original", "Descricao original", 2, Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL")), "A", 5);
     private final SectionGateway gateway = mock(SectionGateway.class);
     private final String id = entity.getId().getValue();
     private final SearchQuery query = new SearchQuery(2, 10, "search", "id", "asc");

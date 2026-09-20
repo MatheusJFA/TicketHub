@@ -42,6 +42,7 @@ tickethub:
     change-log: db/changelog/db.changelog-master.xml
   spots:
     async-threshold: ${SPOTS_ASYNC_THRESHOLD:1000}
+    seat-number-width: ${SPOTS_SEAT_NUMBER_WIDTH:5}
   audit:
     enabled: ${AUDIT_ENABLED:true}
   auth:

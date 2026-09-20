@@ -57,8 +57,8 @@ class ShowMongoGatewayIT extends ContainerSupport {
 
     private Show sample() {
         final var show = Show.create("Rock in Rio", "Festival", DATE, ADDRESS, 4, PartnerID.generate());
-        show.addSection("Pista Premium", "Perto do palco", 2, PRICE);
-        show.addSection("Camarote", "Open bar", 2, PRICE);
+        show.addSection("Pista Premium", "Perto do palco", 2, PRICE, 5);
+        show.addSection("Camarote", "Open bar", 2, PRICE, 5);
         return show;
     }
 
@@ -91,7 +91,7 @@ class ShowMongoGatewayIT extends ContainerSupport {
     void givenAShow_whenAddSectionAndUpdate_thenUpsertsNewChildren() {
         final var show = gateway.create(sample());
 
-        show.addSection("Backstage", "Acesso total", 3, PRICE);
+        show.addSection("Backstage", "Acesso total", 3, PRICE, 5);
         show.publishAll();
         gateway.update(show);
 
@@ -124,7 +124,7 @@ class ShowMongoGatewayIT extends ContainerSupport {
         final var shell = show.addSectionShell("Arena", "Pista", 3, PRICE);
         gateway.create(show);
 
-        final var generated = shell.generateMissingSpots("A");
+        final var generated = shell.generateMissingSpots("A", 5);
         gateway.appendSpots(show.getId(), shell.getId(), generated);
 
         assertEquals(3, count(SpotDocument.COLLECTION));

@@ -145,7 +145,7 @@ public class LocationTest {
     @CsvSource(value = {"A, 1, A00001", "A, 42, A00042", "B, 7, B00007", "AA, 3, AA00003", "Z, 100000, Z100000"})
     @DisplayName("Given section code and seat, when generateSeat, then formats code")
     void givenSectionCodeAndSeat_whenGenerateSeat_thenFormatCode(String code, long seat, String expected) {
-        assertEquals(expected, Location.generateSeat(code, seat).getValue(),
+        assertEquals(expected, Location.generateSeat(code, seat, 5).getValue(),
                 () -> "Seat [" + code + ", " + seat + "] should format to [" + expected + "]");
     }
 
@@ -154,7 +154,7 @@ public class LocationTest {
     @ValueSource(strings = {"a", "A1", "ABCD", "A-1"})
     @DisplayName("Given invalid section code, when generateSeat, then throws DomainException")
     void givenInvalidSectionCode_whenGenerateSeat_thenThrowDomainException(String code) {
-        final var exception = assertThrows(DomainException.class, () -> Location.generateSeat(code, 1),
+        final var exception = assertThrows(DomainException.class, () -> Location.generateSeat(code, 1, 5),
                 () -> "Generating seat with invalid section code [" + code + "] should throw DomainException");
 
         assertEquals("Invalid section code", exception.getMessage(),
@@ -164,7 +164,7 @@ public class LocationTest {
     @Test
     @DisplayName("Given zero seat number, when generateSeat, then throws DomainException")
     void givenZeroSeatNumber_whenGenerateSeat_thenThrowDomainException() {
-        final var exception = assertThrows(DomainException.class, () -> Location.generateSeat("A", 0),
+        final var exception = assertThrows(DomainException.class, () -> Location.generateSeat("A", 0, 5),
                 () -> "Generating seat with zero seat number should throw DomainException");
 
         assertEquals("'seatNumber' should be positive", exception.getMessage(),
@@ -174,12 +174,43 @@ public class LocationTest {
     @Test
     @DisplayName("Given no context, when generateRandom, then returns short code")
     void givenNoContext_whenGenerateRandom_thenReturnShortCode() {
-        final var first = Location.generateRandom();
-        final var second = Location.generateRandom();
+        final var first = Location.generateRandom(5);
+        final var second = Location.generateRandom(5);
 
         assertTrue(first.getValue().matches("[A-Z]\\d{5}"),
                 () -> "Random location should match pattern [A-Z] with 5 digits");
         assertTrue(second.getValue().matches("[A-Z]\\d{5}"),
                 () -> "Random location should match pattern [A-Z] with 5 digits");
+    }
+
+    @ParameterizedTest(name = "Given width \"{0}\", when generateSeat, then pads to width")
+    @CsvSource(value = {"A, 7, 3, A007", "B, 42, 6, B000042"})
+    @DisplayName("Given custom width, when generateSeat, then pads to width")
+    void givenCustomWidth_whenGenerateSeat_thenPadsToWidth(String code, long seat, int width,
+            String expected) {
+        assertEquals(expected, Location.generateSeat(code, seat, width).getValue(),
+                () -> "Seat [" + code + ", " + seat + "] with width " + width + " should format to ["
+                        + expected + "]");
+    }
+
+    @Test
+    @DisplayName("Given non-positive width, when generateSeat, then throws DomainException")
+    void givenNonPositiveWidth_whenGenerateSeat_thenThrowsDomainException() {
+        final var exception = assertThrows(DomainException.class,
+                () -> Location.generateSeat("A", 1, 0),
+                () -> "Generating seat with non-positive width should throw DomainException");
+
+        assertEquals("'seatNumberWidth' should be positive", exception.getMessage(),
+                () -> "Exception message should indicate that seatNumberWidth must be positive");
+    }
+
+    @Test
+    @DisplayName("Given non-positive width, when generateRandom, then throws DomainException")
+    void givenNonPositiveWidth_whenGenerateRandom_thenThrowsDomainException() {
+        final var exception = assertThrows(DomainException.class, () -> Location.generateRandom(0),
+                () -> "Generating random location with non-positive width should throw DomainException");
+
+        assertEquals("'seatNumberWidth' should be positive", exception.getMessage(),
+                () -> "Exception message should indicate that seatNumberWidth must be positive");
     }
 }

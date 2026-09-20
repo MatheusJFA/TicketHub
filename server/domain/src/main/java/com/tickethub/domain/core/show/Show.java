@@ -87,12 +87,13 @@ public class Show extends AggregateRoot<ShowID> {
                 partnerId, sectionList, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
     }
 
-    public void addSection(String name, String description, long totalSpots, Money price) {
+    public void addSection(String name, String description, long totalSpots, Money price,
+            int seatNumberWidth) {
         if (totalSpots < 0) {
             throw new DomainException("'totalSpots' should not be negative");
         }
         final Section section = Section.create(name, description, totalSpots, price,
-                Location.sectionCode(sections.size()));
+                Location.sectionCode(sections.size()), seatNumberWidth);
         this.sections.add(section);
         this.totalSpots += totalSpots;
         this.markAsUpdated();

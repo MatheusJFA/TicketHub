@@ -8,8 +8,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 
 import com.tickethub.application.UseCaseTest;
 import com.tickethub.domain.core.section.SectionGateway;
@@ -21,15 +19,12 @@ import com.tickethub.domain.shared.Location;
 public class CreateSpotUseCaseTest extends UseCaseTest {
 
     private static final SectionID SECTION_ID = SectionID.generate();
+    private static final int SEAT_NUMBER_WIDTH = 5;
 
-    @InjectMocks
-    private DefaultCreateSpotUseCase useCase;
-
-    @Mock
-    private SpotGateway spotGateway;
-
-    @Mock
-    private SectionGateway sectionGateway;
+    private final SpotGateway spotGateway = mock(SpotGateway.class);
+    private final SectionGateway sectionGateway = mock(SectionGateway.class);
+    private final DefaultCreateSpotUseCase useCase =
+            new DefaultCreateSpotUseCase(spotGateway, sectionGateway, SEAT_NUMBER_WIDTH);
 
     @Override
     protected List<Object> getMocks() {
@@ -68,6 +63,7 @@ public class CreateSpotUseCaseTest extends UseCaseTest {
 
         assertEquals(1, notification.getErrors().size());
         assertEquals("Section not found: " + SECTION_ID.getValue(), notification.firstError().message());
+        verify(sectionGateway, times(1)).existsByIds(List.of(SECTION_ID));
         verify(spotGateway, never()).create(any(), any());
     }
 
@@ -83,6 +79,7 @@ public class CreateSpotUseCaseTest extends UseCaseTest {
 
         assertEquals(1, notification.getErrors().size());
         assertEquals(expectedMessage, notification.firstError().message());
+        verify(sectionGateway, times(1)).existsByIds(List.of(SECTION_ID));
         verify(spotGateway, times(1)).create(argThat(saved -> saved.getId() != null
                         && saved.getCreatedAt() != null
                         && saved.getUpdatedAt() != null
@@ -102,6 +99,7 @@ public class CreateSpotUseCaseTest extends UseCaseTest {
         final var output = useCase.execute(command).getRight();
 
         assertNotNull(output.id());
+        verify(sectionGateway, times(1)).existsByIds(List.of(SECTION_ID));
         verify(spotGateway, times(1)).create(argThat(spot ->
                 spot.getLocation() != null
                         && spot.getLocation().getValue().matches("[A-Z]\\d{5}")

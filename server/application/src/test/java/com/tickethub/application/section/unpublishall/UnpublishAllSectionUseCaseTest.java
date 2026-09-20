@@ -110,7 +110,7 @@ public class UnpublishAllSectionUseCaseTest extends UseCaseTest {
     }
 
     private static Section entity() {
-        final var entity = Section.create("VIP", "Description", 2, PRICE);
+        final var entity = Section.create("VIP", "Description", 2, PRICE, "A", 5);
         entity.publishAll();
         return entity;
     }
