@@ -6,6 +6,7 @@ import java.time.Instant;
 
 import com.tickethub.domain.Entity;
 import com.tickethub.domain.exception.DomainException;
+import com.tickethub.domain.exception.SpotAlreadyUsedException;
 import com.tickethub.domain.shared.Location;
 
 public class Spot extends Entity<SpotID> {
@@ -66,7 +67,7 @@ public class Spot extends Entity<SpotID> {
      */
     public void checkIn() {
         if (!isAvailable) {
-            throw new DomainException("Spot is already used");
+            throw new SpotAlreadyUsedException();
         }
         this.isAvailable = false;
         this.markAsUpdated();

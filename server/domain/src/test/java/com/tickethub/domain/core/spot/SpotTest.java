@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 
 import com.tickethub.domain.exception.DomainException;
+import com.tickethub.domain.exception.SpotAlreadyUsedException;
 import com.tickethub.domain.shared.Location;
 
 @DisplayName("Spot")
@@ -94,7 +95,7 @@ class SpotTest {
         final var spot = Spot.create(Location.create("A1"));
         spot.checkIn();
 
-        final var exception = assertThrows(DomainException.class, spot::checkIn,
+        final var exception = assertThrows(SpotAlreadyUsedException.class, spot::checkIn,
                 () -> "Checking in an already used spot should throw");
 
         assertEquals("Spot is already used", exception.getMessage(),

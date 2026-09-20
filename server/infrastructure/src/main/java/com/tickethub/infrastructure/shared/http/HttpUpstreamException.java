@@ -1,6 +1,8 @@
 package com.tickethub.infrastructure.shared.http;
 
-public class HttpUpstreamException extends RuntimeException {
+import com.tickethub.infrastructure.exception.InfrastructureException;
+
+public class HttpUpstreamException extends InfrastructureException {
 
     private final String provider;
     private final int status;

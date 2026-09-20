@@ -22,6 +22,7 @@ import com.tickethub.application.Either;
 import com.tickethub.domain.authentication.AuthenticationException;
 import com.tickethub.domain.validation.Notification;
 import com.tickethub.infrastructure.api.ResiliencePolicy;
+import com.tickethub.infrastructure.exception.InfrastructureException;
 import com.tickethub.infrastructure.web.CorrelationIdFilter;
 
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
@@ -58,7 +59,7 @@ public class UseCaseMonitoringAspect {
                 } catch (final RuntimeException | Error e) {
                     throw e;
                 } catch (final Throwable t) {
-                    throw new IllegalStateException("Use case failed", t);
+                    throw new InfrastructureException("Use case failed", t);
                 }
             }).get();
         } catch (final CallNotPermittedException e) {

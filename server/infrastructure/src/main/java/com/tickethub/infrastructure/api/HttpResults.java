@@ -14,6 +14,7 @@ import com.tickethub.domain.authentication.AuthenticationException;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.pagination.SearchQuery;
 import com.tickethub.domain.validation.Notification;
+import com.tickethub.infrastructure.exception.InfrastructureException;
 
 /**
  * Pure translation between use case results and the HTTP layer: unwraps
@@ -46,13 +47,16 @@ public final class HttpResults {
         if (notification.getCause() instanceof ResponseStatusException status) {
             return status;
         }
+        
         if (notification.getCause() instanceof AuthenticationException authentication) {
             return authentication;
         }
+
         final var cause = notification.getCause();
         if (nonNull(cause) && !(cause instanceof DomainException)) {
-            return new IllegalStateException("Use case failed", cause);
+            return new InfrastructureException("Use case failed", cause);
         }
+
         return new ApiValidationException(notification);
     }
 

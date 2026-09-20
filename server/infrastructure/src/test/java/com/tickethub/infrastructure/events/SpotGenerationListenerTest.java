@@ -15,10 +15,11 @@ import org.junit.jupiter.api.Test;
 import com.tickethub.application.Either;
 import com.tickethub.application.section.generatespots.GenerateSectionSpotsOutput;
 import com.tickethub.application.section.generatespots.GenerateSectionSpotsUseCase;
-import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.Notification;
+import com.tickethub.infrastructure.exception.SpotGenerationException;
 
 import tools.jackson.databind.ObjectMapper;
+import com.tickethub.domain.validation.Error;
 
 @DisplayName("SpotGenerationListener")
 class SpotGenerationListenerTest {
@@ -53,8 +54,8 @@ class SpotGenerationListenerTest {
         when(useCase.execute(any()))
                 .thenReturn(Either.left(Notification.create(new Error("mongo down"))));
 
-        final var exception = assertThrows(IllegalStateException.class, () -> listener.onMessage(payload()),
-                () -> "Failing use case should throw IllegalStateException for retry");
+        final var exception = assertThrows(SpotGenerationException.class, () -> listener.onMessage(payload()),
+                () -> "Failing use case should throw SpotGenerationException for retry");
 
         assertEquals("Spot generation failed: mongo down", exception.getMessage(),
                 () -> "Exception message should include the use case failure detail");
@@ -74,8 +75,8 @@ class SpotGenerationListenerTest {
     @Test
     @DisplayName("Given malformed payload, when message, then throws")
     void givenMalformedPayload_whenMessage_thenThrows() {
-        final var exception = assertThrows(IllegalStateException.class, () -> listener.onMessage("not-json"),
-                () -> "Malformed payload should throw IllegalStateException");
+        final var exception = assertThrows(SpotGenerationException.class, () -> listener.onMessage("not-json"),
+                () -> "Malformed payload should throw SpotGenerationException");
 
         assertEquals("Invalid spot generation message", exception.getMessage(),
                 () -> "Exception message should indicate the invalid spot generation message");

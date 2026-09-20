@@ -1,6 +1,6 @@
 package com.tickethub.infrastructure.events;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 
 import org.springframework.kafka.annotation.KafkaListener;
@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.tickethub.application.section.generatespots.GenerateSectionSpotsCommand;
 import com.tickethub.application.section.generatespots.GenerateSectionSpotsUseCase;
+import com.tickethub.infrastructure.exception.SpotGenerationException;
 
 import tools.jackson.databind.ObjectMapper;
 
@@ -19,9 +20,9 @@ public class SpotGenerationListener {
 
     public SpotGenerationListener(final GenerateSectionSpotsUseCase generateSectionSpots,
             final ObjectMapper objectMapper) {
-        this.generateSectionSpots = Objects.requireNonNull(generateSectionSpots,
+        this.generateSectionSpots = requireNonNull(generateSectionSpots,
                 "'generateSectionSpots' should not be null");
-        this.objectMapper = Objects.requireNonNull(objectMapper, "'objectMapper' should not be null");
+        this.objectMapper = requireNonNull(objectMapper, "'objectMapper' should not be null");
     }
 
     @KafkaListener(topics = "${tickethub.kafka.topic.name}")
@@ -30,7 +31,7 @@ public class SpotGenerationListener {
         try {
             message = objectMapper.readValue(payload, SpotGenerationMessage.class);
         } catch (final RuntimeException e) {
-            throw new IllegalStateException("Invalid spot generation message", e);
+            throw new SpotGenerationException("Invalid spot generation message", e);
         }
         if (!SpotGenerationMessage.TYPE.equals(message.type())) {
             return;
@@ -41,7 +42,7 @@ public class SpotGenerationListener {
             final var notification = result.getLeft();
             final var detail = Optional.ofNullable(notification.firstError())
                     .map(first -> first.message()).orElse("unknown");
-            throw new IllegalStateException("Spot generation failed: " + detail,
+            throw new SpotGenerationException("Spot generation failed: " + detail,
                     notification.getCause());
         }
     }

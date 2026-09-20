@@ -20,6 +20,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 import com.tickethub.domain.core.section.SpotsGenerationRequested;
 import com.tickethub.domain.event.DomainEvent;
+import com.tickethub.infrastructure.exception.EventPublishException;
 
 import tools.jackson.databind.ObjectMapper;
 
@@ -63,8 +64,8 @@ class KafkaDomainEventPublisherTest {
         when(failingMapper.writeValueAsString(any())).thenThrow(new IllegalStateException("mapper down"));
         final var failing = new KafkaDomainEventPublisher(kafkaTemplate, failingMapper);
 
-        final var exception = assertThrows(IllegalStateException.class, () -> failing.publish(event),
-                () -> "Publishing with a failing mapper should throw IllegalStateException");
+        final var exception = assertThrows(EventPublishException.class, () -> failing.publish(event),
+                () -> "Publishing with a failing mapper should throw EventPublishException");
 
         assertEquals("Failed to publish spot generation event", exception.getMessage(),
                 () -> "Exception message should indicate the spot generation publish failure");

@@ -6,6 +6,7 @@ import com.tickethub.domain.authentication.AuthenticationException;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.infrastructure.api.ApiValidationException;
 import com.tickethub.infrastructure.api.models.ErrorResponse;
+import com.tickethub.infrastructure.exception.InfrastructureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -57,6 +58,13 @@ public class GlobalExceptionHandler {
     ResponseEntity<ErrorResponse> status(ResponseStatusException exception) {
         return ResponseEntity.status(exception.getStatusCode())
                 .body(ErrorResponse.from(exception.getReason()));
+    }
+
+    @ExceptionHandler(InfrastructureException.class)
+    ResponseEntity<ErrorResponse> infrastructure(InfrastructureException exception) {
+        LOG.error("Infrastructure failure: {}", exception.getMessage(), exception);
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(ErrorResponse.from(exception.getMessage()));
     }
 
     @ExceptionHandler(AccessDeniedException.class)

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,8 +27,8 @@ import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.core.spot.SpotGateway;
 import com.tickethub.domain.core.spot.SpotPlacement;
-import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.shared.Location;
+import com.tickethub.domain.shared.Address;
 
 @DisplayName("Validate ticket use case")
 class ValidateTicketUseCaseTest extends UseCaseTest {
@@ -39,8 +40,8 @@ class ValidateTicketUseCaseTest extends UseCaseTest {
     private static final Address ADDRESS = Address.create("Rua Augusta", "100", null, "Centro",
             "São Paulo", "SP", "Brasil", "01305-000");
 
-    private final SpotGateway spotGateway = org.mockito.Mockito.mock(SpotGateway.class);
-    private final ShowGateway showGateway = org.mockito.Mockito.mock(ShowGateway.class);
+    private final SpotGateway spotGateway = mock(SpotGateway.class);
+    private final ShowGateway showGateway = mock(ShowGateway.class);
     private final DefaultValidateTicketUseCase useCase =
             new DefaultValidateTicketUseCase(spotGateway, showGateway, CLOCK);
 
@@ -124,7 +125,8 @@ class ValidateTicketUseCaseTest extends UseCaseTest {
 
         final var notification = useCase.execute(command).getLeft();
 
-        assertEquals("Show is outside the check-in date", notification.firstError().message());
+        assertEquals("Show is outside the check-in date (showDate=2027-01-14T20:00-03:00)",
+                notification.firstError().message());
         verify(spotGateway, times(1)).findPlacement(spot.getId());
         verify(showGateway, times(1)).findById(show.getId());
         verify(spotGateway, times(0)).update(any());
