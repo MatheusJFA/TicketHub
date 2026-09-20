@@ -40,9 +40,34 @@ discovery.docker "containers" {
   host = "unix:///var/run/docker.sock"
 }
 
+// Keep a stable per-container identity on log streams. Docker container
+// names carry a leading slash ("/tickethub-server-1"), stripped below so
+// Grafana can filter by `container` instead of a single `unknown_service`
+// stream, and Tempo -> Loki trace jumps can be scoped per service.
+discovery.relabel "containers" {
+  targets = discovery.docker.containers.targets
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "container"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "service_name"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label  = "compose_service"
+  }
+}
+
 loki.source.docker "default" {
   host    = "unix:///var/run/docker.sock"
-  targets = discovery.docker.containers.targets
+  targets = discovery.relabel.containers.output
 
   forward_to = [loki.write.default.receiver]
 }

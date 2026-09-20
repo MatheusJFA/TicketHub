@@ -1,5 +1,13 @@
 auth_enabled: false
 
+# Tolerate Alloy restarts/backfill: loki.source.docker replays container
+# logs from the Docker daemon, and the default ~1h acceptance window made
+# Loki reject ("entry too far behind") everything older, spamming the Alloy
+# log and losing history. 168h keeps dev restarts lossless.
+limits_config:
+  reject_old_samples: true
+  reject_old_samples_max_age: 168h
+
 server:
   http_listen_port: 3100
   grpc_listen_port: 9096

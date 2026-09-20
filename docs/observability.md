@@ -33,7 +33,9 @@ Datasources Loki, Tempo e Mimir já vêm provisionados
 - Logs em console com `traceId`/`spanId` no padrão
   (`logging.pattern.console`), coletados do stdout dos containers pelo Alloy
   para o Loki — dá para saltar do trace (Tempo) para os logs (Loki) pelo
-  `traceId`.
+  `traceId`. Cada stream leva os labels `container` e `compose_service`
+  (via `discovery.relabel` no Alloy), então filtre por serviço no Grafana
+  em vez de um único stream genérico.
 
 ## Erros identificáveis
 

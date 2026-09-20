@@ -76,4 +76,26 @@ O módulo `infrastructure` configura o produtor, a fábrica de consumidores e cr
 
 Defina `KAFKA_TOPIC`, `KAFKA_TOPIC_PARTITIONS`, `KAFKA_TOPIC_REPLICAS` e `KAFKA_CONSUMER_GROUP` para personalizar a configuração. O ambiente local possui um único broker e usa uma réplica. Veja os clientes disponíveis e os testes de integração no [guia do servidor](server/README.md).
 
+## Observabilidade (stack LGTM)
+
+O mesmo `docker-compose up -d` sobe Loki (logs), Tempo (traces), Mimir (métricas) e Grafana, com o Alloy como coletor único:
+
+```text
+server --OTLP traces--> alloy --> tempo
+server --/actuator/prometheus--> alloy --> mimir
+docker logs ---------> alloy --> loki
+grafana --> loki / tempo / mimir
+```
+
+| Serviço | URL local | Variável de porta |
+| --- | --- | --- |
+| Grafana | http://localhost:3000 | `GRAFANA_PORT` |
+| Loki | http://localhost:3100 | `LOKI_PORT` |
+| Tempo | http://localhost:3200 | `TEMPO_PORT` |
+| Mimir | http://localhost:9009 | `MIMIR_PORT` |
+| Alloy UI | http://localhost:12345 | `ALLOY_PORT` |
+| OTLP gRPC/HTTP | localhost:4317 / localhost:4318 | `OTEL_GRPC_PORT` / `OTEL_HTTP_PORT` |
+
+O Grafana já vem com os datasources Loki, Tempo e Mimir provisionados (`observability/grafana/provisioning`). O login padrão é `admin` / `admin-local`, sobrescreva com `GRAFANA_ADMIN_USER` / `GRAFANA_ADMIN_PASSWORD`. Os logs carregam os labels `container` e `compose_service`, e as linhas da aplicação incluem `traceId`/`spanId`, permitindo saltar do trace (Tempo) para os logs (Loki). Amostragem de traces via `TRACING_SAMPLING_PROBABILITY` (padrão `1.0` em dev). Detalhes em [docs/observability.md](docs/observability.md).
+
 O build da imagem não executa testes por padrão. Para incluí-los, execute `docker compose build --build-arg SKIP_TESTS=false server`. Para desenvolvimento local e execução da suíte, consulte [server/README.md](server/README.md).
