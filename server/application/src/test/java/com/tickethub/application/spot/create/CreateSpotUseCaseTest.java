@@ -7,6 +7,7 @@ import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -16,6 +17,7 @@ import com.tickethub.domain.core.section.SectionID;
 import com.tickethub.domain.core.spot.SpotGateway;
 import com.tickethub.domain.shared.Location;
 
+@DisplayName("Create spot use case")
 public class CreateSpotUseCaseTest extends UseCaseTest {
 
     private static final SectionID SECTION_ID = SectionID.generate();
@@ -35,6 +37,7 @@ public class CreateSpotUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given valid command, when execute, should persist and return id")
     public void givenValidCommand_whenExecute_shouldPersistAndReturnId() {
         final var command = CreateSpotCommand.with(SECTION_ID.getValue(), Location.create("A1"));
         when(sectionGateway.existsByIds(List.of(SECTION_ID))).thenReturn(List.of(SECTION_ID));
@@ -56,6 +59,7 @@ public class CreateSpotUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given missing section, when execute, should return not found without persisting")
     public void givenMissingSection_whenExecute_shouldReturnNotFoundWithoutPersisting() {
         final var command = CreateSpotCommand.with(SECTION_ID.getValue(), Location.create("A1"));
         when(sectionGateway.existsByIds(List.of(SECTION_ID))).thenReturn(List.of());
@@ -68,6 +72,7 @@ public class CreateSpotUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given gateway failure, when execute, should return notification")
     public void givenGatewayFailure_whenExecute_shouldReturnNotification() {
         final var command = CreateSpotCommand.with(SECTION_ID.getValue(), Location.create("A1"));
         final var expectedMessage = "Gateway error";
@@ -88,6 +93,7 @@ public class CreateSpotUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given no location, when execute, should create available unpublished spot")
     public void givenNoLocation_whenExecute_shouldCreateAvailableUnpublishedSpot() {
         final var command = CreateSpotCommand.with(SECTION_ID.getValue(), null);
         when(sectionGateway.existsByIds(List.of(SECTION_ID))).thenReturn(List.of(SECTION_ID));

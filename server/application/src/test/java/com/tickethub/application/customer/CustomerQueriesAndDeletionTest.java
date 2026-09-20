@@ -6,6 +6,7 @@ import java.util.Currency;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import com.tickethub.domain.shared.*;
@@ -16,6 +17,7 @@ import com.tickethub.application.customer.retrieve.get.*;
 import com.tickethub.application.customer.retrieve.list.*;
 import com.tickethub.application.customer.delete.*;
 
+@DisplayName("Customer queries and deletion")
 class CustomerQueriesAndDeletionTest {
     private final Customer entity = Customer.create("52998224725", "Maria Silva", "maria@domain.com",
             "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
@@ -24,6 +26,7 @@ class CustomerQueriesAndDeletionTest {
     private final SearchQuery query = new SearchQuery(2, 10, "search", "id", "asc");
 
     @Test
+    @DisplayName("Gets entity with all output fields")
     void getsEntityWithAllOutputFields() {
         when(gateway.findById(entity.getId())).thenReturn(Optional.of(entity));
         final var output = new DefaultGetCustomerUseCase(gateway).execute(id).getRight();
@@ -37,6 +40,7 @@ class CustomerQueriesAndDeletionTest {
     }
 
     @Test
+    @DisplayName("Reports missing entity")
     void reportsMissingEntity() {
         when(gateway.findById(entity.getId())).thenReturn(Optional.empty());
         final var result = new DefaultGetCustomerUseCase(gateway).execute(id);
@@ -44,6 +48,7 @@ class CustomerQueriesAndDeletionTest {
     }
 
     @Test
+    @DisplayName("Reports lookup failure")
     void reportsLookupFailure() {
         when(gateway.findById(entity.getId())).thenThrow(new IllegalStateException("lookup failed"));
         final var result = new DefaultGetCustomerUseCase(gateway).execute(id);
@@ -51,6 +56,7 @@ class CustomerQueriesAndDeletionTest {
     }
 
     @Test
+    @DisplayName("Preserves page metadata and maps all fields")
     void preservesPageMetadataAndMapsAllFields() {
         when(gateway.findAll(query)).thenReturn(new Pagination<>(2, 10, 21, List.of(entity)));
         final var page = new DefaultListCustomersUseCase(gateway).execute(query).getRight();
@@ -66,6 +72,7 @@ class CustomerQueriesAndDeletionTest {
     }
 
     @Test
+    @DisplayName("Returns empty page")
     void returnsEmptyPage() {
         when(gateway.findAll(query)).thenReturn(new Pagination<>(2, 10, 0, List.of()));
         final var page = new DefaultListCustomersUseCase(gateway).execute(query).getRight();
@@ -74,6 +81,7 @@ class CustomerQueriesAndDeletionTest {
     }
 
     @Test
+    @DisplayName("Reports listing failure")
     void reportsListingFailure() {
         when(gateway.findAll(query)).thenThrow(new IllegalStateException("list failed"));
         final var result = new DefaultListCustomersUseCase(gateway).execute(query);
@@ -81,6 +89,7 @@ class CustomerQueriesAndDeletionTest {
     }
 
     @Test
+    @DisplayName("Delegates repeated deletion without lookup")
     void delegatesRepeatedDeletionWithoutLookup() {
         final var useCase = new DefaultDeleteCustomerUseCase(gateway);
         assertTrue(useCase.execute(id).isEmpty());
@@ -90,6 +99,7 @@ class CustomerQueriesAndDeletionTest {
     }
 
     @Test
+    @DisplayName("Reports deletion failure")
     void reportsDeletionFailure() {
         doThrow(new IllegalStateException("delete failed")).when(gateway).deleteById(entity.getId());
         final var result = new DefaultDeleteCustomerUseCase(gateway).execute(id);

@@ -8,9 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.api.DisplayName;
 
 import com.tickethub.domain.exception.DomainException;
 
+@DisplayName("Password hash")
 class PasswordHashTest {
 
     private static final String VALID_HASH = "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS";
@@ -23,17 +25,20 @@ class PasswordHashTest {
             "$2a$10$too-short",
             "$1$10$not-bcrypt-but-valid-crypt"
     })
+    @DisplayName("Given null empty or malformed hash, when from hash, then throw domain exception")
     void givenNullEmptyOrMalformedHash_whenFromHash_thenThrowDomainException(String value) {
         assertEquals("Invalid password hash", assertThrows(DomainException.class,
                 () -> PasswordHash.fromHash(value)).getMessage());
     }
 
     @Test
+    @DisplayName("Given valid bcrypt hash, when from hash, then store value")
     void givenValidBcryptHash_whenFromHash_thenStoreValue() {
         assertEquals(VALID_HASH, PasswordHash.fromHash(VALID_HASH).getValue());
     }
 
     @Test
+    @DisplayName("Given same hash, when compare, then be equal")
     void givenSameHash_whenCompare_thenBeEqual() {
         final PasswordHash first = PasswordHash.fromHash(VALID_HASH);
         final PasswordHash second = PasswordHash.fromHash(VALID_HASH);
@@ -43,6 +48,7 @@ class PasswordHashTest {
     }
 
     @Test
+    @DisplayName("Given different hashes, when compare, then not be equal")
     void givenDifferentHashes_whenCompare_thenNotBeEqual() {
         assertNotEquals(
                 PasswordHash.fromHash(VALID_HASH),
@@ -50,6 +56,7 @@ class PasswordHashTest {
     }
 
     @Test
+    @DisplayName("Given password hash, when to string, then do not expose hash")
     void givenPasswordHash_whenToString_thenDoNotExposeHash() {
         assertEquals("***", PasswordHash.fromHash(VALID_HASH).toString());
     }

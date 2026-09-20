@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
@@ -23,6 +24,7 @@ import com.tickethub.infrastructure.partner.PartnerMongoGateway;
 import com.tickethub.infrastructure.partner.persistence.PartnerDocument;
 
 @IntegrationTest
+@DisplayName("Partner Mongo gateway")
 class PartnerMongoGatewayIT extends ContainerSupport {
 
     private static final Address ADDRESS = Address.create("Rua Augusta", "100", "Sala 10", "Centro",
@@ -41,6 +43,7 @@ class PartnerMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given a partner, when create, then persists and finds")
     void givenAPartner_whenCreate_thenPersistsAndFinds() {
         final var partner = Partner.create("Cinema Nova", "11222333000181", ADDRESS, "cinema@domain.com", PASSWORD_HASH);
 
@@ -58,6 +61,7 @@ class PartnerMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given duplicate CNPJ, when create, then throws domain exception")
     void givenDuplicateCnpj_whenCreate_thenThrowsDomainException() {
         gateway.create(Partner.create("Cinema Nova", "11222333000181", ADDRESS, "cinema@domain.com", PASSWORD_HASH));
 
@@ -68,6 +72,7 @@ class PartnerMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given duplicate email, when create, then throws domain exception")
     void givenDuplicateEmail_whenCreate_thenThrowsDomainException() {
         gateway.create(Partner.create("Cinema Nova", "11222333000181", ADDRESS, "cinema@domain.com", PASSWORD_HASH));
 
@@ -78,6 +83,7 @@ class PartnerMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given a partner, when find by email, then returns partner")
     void givenAPartner_whenFindByEmail_thenReturnsPartner() {
         final var partner = gateway.create(
                 Partner.create("Cinema Nova", "11222333000181", ADDRESS, "cinema@domain.com", PASSWORD_HASH));
@@ -89,6 +95,7 @@ class PartnerMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given a partner, when update, then persists changes")
     void givenAPartner_whenUpdate_thenPersistsChanges() {
         final var partner = gateway.create(Partner.create("Cinema Nova", "11222333000181", ADDRESS, "cinema@domain.com", PASSWORD_HASH));
 
@@ -99,6 +106,7 @@ class PartnerMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given a partner, when delete, then removes")
     void givenAPartner_whenDelete_thenRemoves() {
         final var partner = gateway.create(Partner.create("Cinema Nova", "11222333000181", ADDRESS, "cinema@domain.com", PASSWORD_HASH));
 
@@ -108,6 +116,7 @@ class PartnerMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given partners, when find all, then searches")
     void givenPartners_whenFindAll_thenSearches() {
         gateway.create(Partner.create("Cinema Nova", "11222333000181", ADDRESS, "cinema@domain.com", PASSWORD_HASH));
         gateway.create(Partner.create("Teatro Velho", "04252011000110", ADDRESS, "teatro@domain.com", PASSWORD_HASH));

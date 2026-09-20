@@ -5,11 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import com.tickethub.domain.Entity;
 import com.tickethub.domain.Identifier;
 import com.tickethub.domain.exception.DomainException;
 
+@DisplayName("Entity")
 class EntityTest {
 
     static class DummyId extends Identifier {
@@ -34,6 +36,7 @@ class EntityTest {
     }
 
     @Test
+    @DisplayName("Entities with same id are equal")
     void entitiesWithSameIdAreEqual() {
         final var a = new DummyEntity(new DummyId("1"));
         final var b = new DummyEntity(new DummyId("1"));
@@ -43,6 +46,7 @@ class EntityTest {
     }
 
     @Test
+    @DisplayName("Entities with different ids are not equal")
     void entitiesWithDifferentIdsAreNotEqual() {
         final var a = new DummyEntity(new DummyId("1"));
         final var b = new DummyEntity(new DummyId("2"));
@@ -51,6 +55,7 @@ class EntityTest {
     }
 
     @Test
+    @DisplayName("Null id throws domain exception")
     void nullIdThrowsDomainException() {
         final var exception = assertThrows(DomainException.class, () -> new DummyEntity(null));
 
@@ -59,6 +64,7 @@ class EntityTest {
     }
 
     @Test
+    @DisplayName("Get id returns the id")
     void getIdReturnsTheId() {
         final var id = new DummyId("42");
 

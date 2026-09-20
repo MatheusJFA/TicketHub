@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
@@ -29,6 +30,7 @@ import com.tickethub.infrastructure.show.persistence.ShowDocument;
 import com.tickethub.infrastructure.spot.persistence.SpotDocument;
 
 @IntegrationTest
+@DisplayName("Section Mongo gateway")
 class SectionMongoGatewayIT extends ContainerSupport {
 
     private static final Money PRICE = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
@@ -59,6 +61,7 @@ class SectionMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given a section with spots, when create, then bulk persists everything with parent links")
     void givenASectionWithSpots_whenCreate_thenBulkPersistsEverythingWithParentLinks() {
         final var showId = givenShow();
         final var section = Section.create("VIP", "Front stage", 3, PRICE);
@@ -88,6 +91,7 @@ class SectionMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given a section, when update, then persists price and flags")
     void givenASection_whenUpdate_thenPersistsPriceAndFlags() {
         final var section = gateway.create(Section.create("VIP", "Front stage", 2, PRICE), givenShow());
 
@@ -102,6 +106,7 @@ class SectionMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given a section, when delete, then cascades spots")
     void givenASection_whenDelete_thenCascadesSpots() {
         final var section = gateway.create(Section.create("VIP", "Front stage", 2, PRICE), givenShow());
 
@@ -113,6 +118,7 @@ class SectionMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given sections, when find all, then returns sections with spots")
     void givenSections_whenFindAll_thenReturnsSectionsWithSpots() {
         final var showId = givenShow();
         gateway.create(Section.create("VIP", "Front stage", 2, PRICE), showId);
@@ -127,6 +133,7 @@ class SectionMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given section ids, when exists by ids, then returns only persisted ids")
     void givenSectionIds_whenExistsByIds_thenReturnsOnlyPersistedIds() {
         final var showId = givenShow();
         final var first = gateway.create(Section.create("VIP", "Front stage", 1, PRICE), showId);

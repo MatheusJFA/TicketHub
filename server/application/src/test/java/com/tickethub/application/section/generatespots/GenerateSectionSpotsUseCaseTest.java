@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.core.show.Show;
@@ -23,6 +24,7 @@ import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.shared.Money;
 
+@DisplayName("Generate section spots use case")
 class GenerateSectionSpotsUseCaseTest {
 
     private static final OffsetDateTime DATE = OffsetDateTime.parse("2027-01-15T20:00:00-03:00");
@@ -40,6 +42,7 @@ class GenerateSectionSpotsUseCaseTest {
     }
 
     @Test
+    @DisplayName("Given missing show, when execute, should not persist")
     void givenMissingShow_whenExecute_shouldNotPersist() {
         when(gateway.findById(any())).thenReturn(Optional.empty());
 
@@ -50,6 +53,7 @@ class GenerateSectionSpotsUseCaseTest {
     }
 
     @Test
+    @DisplayName("Given missing section, when execute, should not persist")
     void givenMissingSection_whenExecute_shouldNotPersist() {
         final var show = entity();
         when(gateway.findById(show.getId())).thenReturn(Optional.of(show));
@@ -62,6 +66,7 @@ class GenerateSectionSpotsUseCaseTest {
     }
 
     @Test
+    @DisplayName("Given shell section, when execute, should bulk append spots")
     void givenShellSection_whenExecute_shouldBulkAppendSpots() {
         final var show = entity();
         final var shell = show.addSectionShell("Arena", "Big", 3, PRICE);
@@ -84,6 +89,7 @@ class GenerateSectionSpotsUseCaseTest {
     }
 
     @Test
+    @DisplayName("Given complete section, when execute, should skip persistence")
     void givenCompleteSection_whenExecute_shouldSkipPersistence() {
         final var show = entity();
         final var section = show.getSections().iterator().next();
@@ -98,6 +104,7 @@ class GenerateSectionSpotsUseCaseTest {
     }
 
     @Test
+    @DisplayName("Given gateway failure, when execute, should return notification")
     void givenGatewayFailure_whenExecute_shouldReturnNotification() {
         final var show = entity();
         final var shell = show.addSectionShell("Arena", "Big", 3, PRICE);

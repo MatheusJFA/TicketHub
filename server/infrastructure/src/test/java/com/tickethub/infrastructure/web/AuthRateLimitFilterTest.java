@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -12,6 +13,7 @@ import com.tickethub.infrastructure.auth.AuthSessionProperties;
 
 import jakarta.servlet.FilterChain;
 
+@DisplayName("Auth rate limit filter")
 class AuthRateLimitFilterTest {
 
     private MockHttpServletRequest request(final String uri) {
@@ -21,6 +23,7 @@ class AuthRateLimitFilterTest {
     }
 
     @Test
+    @DisplayName("Given requests within limit, when filter, then forwards downstream")
     void givenRequestsWithinLimit_whenFilter_thenForwardsDownstream() throws Exception {
         final var properties = new AuthSessionProperties();
         properties.setLoginRateLimitPerMinute(2);
@@ -34,6 +37,7 @@ class AuthRateLimitFilterTest {
     }
 
     @Test
+    @DisplayName("Given requests beyond limit, when filter, then returns429")
     void givenRequestsBeyondLimit_whenFilter_thenReturns429() throws Exception {
         final var properties = new AuthSessionProperties();
         properties.setLoginRateLimitPerMinute(1);
@@ -49,6 +53,7 @@ class AuthRateLimitFilterTest {
     }
 
     @Test
+    @DisplayName("Given non auth path, when filter, then skips rate limit")
     void givenNonAuthPath_whenFilter_thenSkipsRateLimit() throws Exception {
         final var properties = new AuthSessionProperties();
         properties.setLoginRateLimitPerMinute(1);

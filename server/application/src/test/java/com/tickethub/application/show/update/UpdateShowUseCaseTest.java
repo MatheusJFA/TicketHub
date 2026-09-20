@@ -3,12 +3,14 @@ package com.tickethub.application.show.update;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import com.tickethub.domain.shared.*;
 import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.core.show.*;
 
+@DisplayName("Update show use case")
 class UpdateShowUseCaseTest {
     private final Address address = Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil",
             "01001000");
@@ -19,6 +21,7 @@ class UpdateShowUseCaseTest {
     private final String id = entity.getId().getValue();
 
     @Test
+    @DisplayName("Updates all fields and persists")
     void updatesAllFieldsAndPersists() {
         when(gateway.findById(entity.getId())).thenReturn(Optional.of(entity));
         when(gateway.update(entity)).thenReturn(entity);
@@ -33,6 +36,7 @@ class UpdateShowUseCaseTest {
     }
 
     @Test
+    @DisplayName("Reports missing entity without persistence")
     void reportsMissingEntityWithoutPersistence() {
         when(gateway.findById(entity.getId())).thenReturn(Optional.empty());
         final var command = UpdateShowCommand.with(id, "Show novo", "Descricao nova",

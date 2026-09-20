@@ -4,10 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 
+@DisplayName("Either")
 class EitherTest {
 
     @Test
+    @DisplayName("Left factory creates left")
     void leftFactoryCreatesLeft() {
         final Either<String, Integer> either = Either.left("err");
 
@@ -17,6 +20,7 @@ class EitherTest {
     }
 
     @Test
+    @DisplayName("Right factory creates right")
     void rightFactoryCreatesRight() {
         final Either<String, Integer> either = Either.right(42);
 
@@ -26,6 +30,7 @@ class EitherTest {
     }
 
     @Test
+    @DisplayName("Map transforms right")
     void mapTransformsRight() {
         final Either<String, Integer> either = Either.right(21);
 
@@ -33,6 +38,7 @@ class EitherTest {
     }
 
     @Test
+    @DisplayName("Map is no op on left")
     void mapIsNoOpOnLeft() {
         final Either<String, Integer> either = Either.left("err");
 
@@ -43,6 +49,7 @@ class EitherTest {
     }
 
     @Test
+    @DisplayName("Flat map chains right")
     void flatMapChainsRight() {
         final Either<String, Integer> either = Either.right(21);
 
@@ -51,6 +58,7 @@ class EitherTest {
     }
 
     @Test
+    @DisplayName("Flat map propagates left from function")
     void flatMapPropagatesLeftFromFunction() {
         final Either<String, Integer> either = Either.right(21);
 
@@ -60,6 +68,7 @@ class EitherTest {
     }
 
     @Test
+    @DisplayName("Flat map is no op on left")
     void flatMapIsNoOpOnLeft() {
         final Either<String, Integer> either = Either.left("err");
 
@@ -68,12 +77,14 @@ class EitherTest {
     }
 
     @Test
+    @DisplayName("Fold applies the matching side")
     void foldAppliesTheMatchingSide() {
         assertEquals("L:err", Either.<String, Integer>left("err").fold(l -> "L:" + l, r -> "R:" + r));
         assertEquals("R:42", Either.<String, Integer>right(42).fold(l -> "L:" + l, r -> "R:" + r));
     }
 
     @Test
+    @DisplayName("Supports exhaustive pattern matching")
     void supportsExhaustivePatternMatching() {
         final Either<String, Integer> either = Either.right(42);
 

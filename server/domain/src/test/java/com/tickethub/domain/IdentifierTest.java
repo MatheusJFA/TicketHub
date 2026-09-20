@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.api.DisplayName;
 
 import com.tickethub.domain.Identifier;
 import com.tickethub.domain.core.customer.CustomerID;
@@ -20,6 +21,7 @@ import com.tickethub.domain.core.section.SectionID;
 import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.domain.core.spot.SpotID;
 
+@DisplayName("Identifier")
 class IdentifierTest {
     private static final String VALUE = "cf4361d9-8e93-4c53-9ac5-629680d98469";
     private static final String OTHER_VALUE = "f2f50ac2-ef1e-42a5-89c1-b0527662b458";
@@ -31,6 +33,7 @@ class IdentifierTest {
 
     @ParameterizedTest
     @MethodSource("identifierFactories")
+    @DisplayName("Given same type and value, when compare, then be equal and have same hash code")
     void givenSameTypeAndValue_whenCompare_thenBeEqualAndHaveSameHashCode(Function<String, Identifier> factory) {
         Identifier first = factory.apply(VALUE);
         Identifier second = factory.apply(VALUE);
@@ -52,6 +55,7 @@ class IdentifierTest {
 
     @ParameterizedTest
     @MethodSource("identifierFactories")
+    @DisplayName("Given same type with different values, when compare, then not be equal")
     void givenSameTypeWithDifferentValues_whenCompare_thenNotBeEqual(Function<String, Identifier> factory) {
         Identifier first = factory.apply(VALUE);
         Identifier second = factory.apply(OTHER_VALUE);
@@ -62,6 +66,7 @@ class IdentifierTest {
 
     @ParameterizedTest
     @MethodSource("identifierFactories")
+    @DisplayName("Given null or string with same value, when compare, then not be equal")
     void givenNullOrStringWithSameValue_whenCompare_thenNotBeEqual(Function<String, Identifier> factory) {
         Identifier identifier = factory.apply(VALUE);
 
@@ -70,6 +75,7 @@ class IdentifierTest {
     }
 
     @Test
+    @DisplayName("Given different types with same value, when compare, then keep identities separate")
     void givenDifferentTypesWithSameValue_whenCompare_thenKeepIdentitiesSeparate() {
         var identifiers = identifierFactories().map(factory -> factory.apply(VALUE)).toList();
 

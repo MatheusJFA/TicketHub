@@ -8,10 +8,12 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import com.tickethub.domain.AggregateRoot;
 import com.tickethub.domain.event.DomainEvent;
 
+@DisplayName("Aggregate root")
 class AggregateRootTest {
 
     record DummyEvent(Instant occurredOn) implements DomainEvent {
@@ -27,11 +29,13 @@ class AggregateRootTest {
     }
 
     @Test
+    @DisplayName("Starts with no events")
     void startsWithNoEvents() {
         assertTrue(new DummyAggregate().domainEvents().isEmpty());
     }
 
     @Test
+    @DisplayName("Registers events")
     void registersEvents() {
         final var aggregate = new DummyAggregate();
         final var event = new DummyEvent();
@@ -43,6 +47,7 @@ class AggregateRootTest {
     }
 
     @Test
+    @DisplayName("Ignores null events")
     void ignoresNullEvents() {
         final var aggregate = new DummyAggregate();
 
@@ -52,6 +57,7 @@ class AggregateRootTest {
     }
 
     @Test
+    @DisplayName("Domain events list is unmodifiable")
     void domainEventsListIsUnmodifiable() {
         final var aggregate = new DummyAggregate();
 
@@ -64,6 +70,7 @@ class AggregateRootTest {
     }
 
     @Test
+    @DisplayName("Clear domain events empties the list")
     void clearDomainEventsEmptiesTheList() {
         final var aggregate = new DummyAggregate();
         aggregate.registerEvent(new DummyEvent());

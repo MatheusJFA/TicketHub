@@ -9,10 +9,12 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.DisplayName;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Via CEP lookup")
 class ViaCepLookupTest {
 
     @Mock
@@ -28,6 +30,7 @@ class ViaCepLookupTest {
     }
 
     @Test
+    @DisplayName("Given known CEP, when lookup, then returns CEP address")
     void givenKnownCep_whenLookup_thenReturnsCepAddress() {
         when(client.findByCep("01305000")).thenReturn(Optional.of(new ViaCepClient.ViaCepResponse(
                 "01305-000", "Rua Augusta", "", "Centro", "São Paulo", "SP", null)));
@@ -43,6 +46,7 @@ class ViaCepLookupTest {
     }
 
     @Test
+    @DisplayName("Given unknown CEP, when lookup, then returns empty")
     void givenUnknownCep_whenLookup_thenReturnsEmpty() {
         when(client.findByCep("00000000")).thenReturn(Optional.of(new ViaCepClient.ViaCepResponse(
                 "00000-000", "", "", "", "", "", true)));
@@ -51,12 +55,14 @@ class ViaCepLookupTest {
     }
 
     @Test
+    @DisplayName("Given invalid zip, when lookup, then returns empty without calling provider")
     void givenInvalidZip_whenLookup_thenReturnsEmptyWithoutCallingProvider() {
         assertTrue(lookup.lookup("abc").isEmpty());
         assertTrue(lookup.lookup(null).isEmpty());
     }
 
     @Test
+    @DisplayName("Given disabled provider, when lookup, then returns empty")
     void givenDisabledProvider_whenLookup_thenReturnsEmpty() {
         properties.setEnabled(false);
 
@@ -64,6 +70,7 @@ class ViaCepLookupTest {
     }
 
     @Test
+    @DisplayName("Given client failure, when lookup, then returns empty")
     void givenClientFailure_whenLookup_thenReturnsEmpty() {
         when(client.findByCep("01305000")).thenThrow(new IllegalStateException("boom"));
 

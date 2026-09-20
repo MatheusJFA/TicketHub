@@ -1,5 +1,6 @@
 package com.tickethub.infrastructure.events;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -8,6 +9,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.tickethub.application.Either;
@@ -18,6 +20,7 @@ import com.tickethub.domain.validation.Notification;
 
 import tools.jackson.databind.ObjectMapper;
 
+@DisplayName("SpotGenerationListener")
 class SpotGenerationListenerTest {
 
     private final GenerateSectionSpotsUseCase useCase = mock(GenerateSectionSpotsUseCase.class);
@@ -31,6 +34,7 @@ class SpotGenerationListenerTest {
     }
 
     @Test
+    @DisplayName("Given spots requested, when message, then generates section spots")
     void givenSpotsRequested_whenMessage_thenGeneratesSectionSpots() {
         when(useCase.execute(any()))
                 .thenReturn(Either.right(GenerateSectionSpotsOutput.from("section-1", 1500)));
@@ -44,14 +48,20 @@ class SpotGenerationListenerTest {
     }
 
     @Test
+    @DisplayName("Given use case failure, when message, then throws for retry")
     void givenUseCaseFailure_whenMessage_thenThrowsForRetry() {
         when(useCase.execute(any()))
                 .thenReturn(Either.left(Notification.create(new Error("mongo down"))));
 
-        assertThrows(IllegalStateException.class, () -> listener.onMessage(payload()));
+        final var exception = assertThrows(IllegalStateException.class, () -> listener.onMessage(payload()),
+                () -> "Failing use case should throw IllegalStateException for retry");
+
+        assertEquals("Spot generation failed: mongo down", exception.getMessage(),
+                () -> "Exception message should include the use case failure detail");
     }
 
     @Test
+    @DisplayName("Given unknown type, when message, then ignores")
     void givenUnknownType_whenMessage_thenIgnores() {
         listener.onMessage("""
                 {"type":"SomethingElse","showId":"show-1",\
@@ -62,7 +72,12 @@ class SpotGenerationListenerTest {
     }
 
     @Test
+    @DisplayName("Given malformed payload, when message, then throws")
     void givenMalformedPayload_whenMessage_thenThrows() {
-        assertThrows(IllegalStateException.class, () -> listener.onMessage("not-json"));
+        final var exception = assertThrows(IllegalStateException.class, () -> listener.onMessage("not-json"),
+                () -> "Malformed payload should throw IllegalStateException");
+
+        assertEquals("Invalid spot generation message", exception.getMessage(),
+                () -> "Exception message should indicate the invalid spot generation message");
     }
 }

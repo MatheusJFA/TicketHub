@@ -16,16 +16,19 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.api.DisplayName;
 
 import com.tickethub.domain.Entity;
 import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.shared.Money;
 
+@DisplayName("Section")
 class SectionTest {
 
     @ParameterizedTest
     @ValueSource(longs = {0, 1, 3})
+    @DisplayName("Given spots with mixed publication, when publish all, then publish section and every spot")
     void givenSpotsWithMixedPublication_whenPublishAll_thenPublishSectionAndEverySpot(long capacity) throws Exception {
         final var price = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
         final var section = Section.create("VIP", "Description", capacity, price);
@@ -53,6 +56,7 @@ class SectionTest {
 
     @ParameterizedTest
     @ValueSource(longs = {0, 1, 3})
+    @DisplayName("Given published section, when unpublish all, then unpublish section and every spot")
     void givenPublishedSection_whenUnpublishAll_thenUnpublishSectionAndEverySpot(long capacity) throws Exception {
         final var price = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
         final var section = Section.create("VIP", "Description", capacity, price);
@@ -86,6 +90,7 @@ class SectionTest {
     }
 
     @Test
+    @DisplayName("Given valid params, when create, then instantiate section")
     void givenValidParams_whenCreate_thenInstantiateSection() {
         final var expectedName = "VIP";
         final var expectedDescription = "A categoria mais assistida";
@@ -116,6 +121,7 @@ class SectionTest {
     }
 
     @Test
+    @DisplayName("Given valid params, when create without publish flag, then instantiate section with default publish false")
     void givenValidParams_whenCreateWithoutPublishFlag_thenInstantiateSectionWithDefaultPublishFalse() {
         final var expectedName = "Comum";
         final var expectedDescription = "Descrição";
@@ -136,6 +142,7 @@ class SectionTest {
     }
 
     @Test
+    @DisplayName("Given invalid name, when create, then throw domain exception")
     void givenInvalidName_whenCreate_thenThrowDomainException() {
         final var expectedName = "A";
         final var expectedDescription = "Descrição";
@@ -162,6 +169,7 @@ class SectionTest {
     }
 
     @Test
+    @DisplayName("Given capacity, when create, then generate sequential seat codes")
     void givenCapacity_whenCreate_thenGenerateSequentialSeatCodes() {
         final var price = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
 
@@ -175,6 +183,7 @@ class SectionTest {
     }
 
     @Test
+    @DisplayName("Given capacity, when create without code, then default to first section")
     void givenCapacity_whenCreateWithoutCode_thenDefaultToFirstSection() {
         final var price = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
 
@@ -188,6 +197,7 @@ class SectionTest {
     }
 
     @Test
+    @DisplayName("Given shell, when generate missing spots, then complete sequentially")
     void givenShell_whenGenerateMissingSpots_thenCompleteSequentially() {
         final var price = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
         final var section = Section.createShell("VIP", "Front stage", 3, price);

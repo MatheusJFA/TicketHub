@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.bson.Document;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.MediaType;
@@ -22,6 +23,7 @@ import com.tickethub.infrastructure.audit.MongoAuditTrail;
 import com.tickethub.infrastructure.section.persistence.SectionDocument;
 
 @E2ETest
+@DisplayName("Spot E2 e")
 class SpotE2ETest extends ContainerSupport {
 
     @Autowired
@@ -44,11 +46,13 @@ class SpotE2ETest extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given admin credentials, when login, then returns token")
     void givenAdminCredentials_whenLogin_thenReturnsToken() throws Exception {
         adminToken();
     }
 
     @Test
+    @DisplayName("Given no token, when create spot, then returns401")
     void givenNoToken_whenCreateSpot_thenReturns401() throws Exception {
         mvc.perform(post("/spots")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -57,6 +61,7 @@ class SpotE2ETest extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given admin token, when create spot, then persists and audits")
     void givenAdminToken_whenCreateSpot_thenPersistsAndAudits() throws Exception {
         // Standalone spot creation requires an existing parent section.
         mongoTemplate.insert(new SectionDocument("section-1", null, null, false, 0, 0, null,
@@ -90,6 +95,7 @@ class SpotE2ETest extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given public catalog, when list spots, then succeeds")
     void givenPublicCatalog_whenListSpots_thenSucceeds() throws Exception {
         mvc.perform(get("/spots"))
                 .andExpect(status().isOk());

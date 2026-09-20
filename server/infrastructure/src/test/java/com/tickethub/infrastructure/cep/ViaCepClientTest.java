@@ -8,12 +8,14 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 
 import com.tickethub.infrastructure.shared.http.BaseHttpClient;
 
+@DisplayName("Via CEP client")
 class ViaCepClientTest {
 
     private record Fixture(ViaCepClient client, MockRestServiceServer server) {
@@ -26,6 +28,7 @@ class ViaCepClientTest {
     }
 
     @Test
+    @DisplayName("Given known CEP, when find by CEP, then returns address data")
     void givenKnownCep_whenFindByCep_thenReturnsAddressData() {
         final var fixture = fixture();
         fixture.server().expect(requestTo("https://viacep.com.br/ws/01305000/json/"))
@@ -44,6 +47,7 @@ class ViaCepClientTest {
     }
 
     @Test
+    @DisplayName("Given unknown CEP, when find by CEP, then returns error flag")
     void givenUnknownCep_whenFindByCep_thenReturnsErrorFlag() {
         final var fixture = fixture();
         fixture.server().expect(requestTo("https://viacep.com.br/ws/00000000/json/"))
@@ -56,6 +60,7 @@ class ViaCepClientTest {
     }
 
     @Test
+    @DisplayName("Given malformed CEP, when find by CEP, then returns empty")
     void givenMalformedCep_whenFindByCep_thenReturnsEmpty() {
         final var fixture = fixture();
         fixture.server().expect(requestTo("https://viacep.com.br/ws/123/json/"))
@@ -66,6 +71,7 @@ class ViaCepClientTest {
     }
 
     @Test
+    @DisplayName("Given provider outage, when find by CEP, then returns empty")
     void givenProviderOutage_whenFindByCep_thenReturnsEmpty() {
         final var fixture = fixture();
         fixture.server().expect(requestTo("https://viacep.com.br/ws/01305000/json/"))

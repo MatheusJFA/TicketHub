@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -19,6 +20,7 @@ import com.tickethub.infrastructure.spot.persistence.SpotDocument;
 import com.tickethub.infrastructure.web.CorrelationIdFilter;
 
 @IntegrationTest
+@DisplayName("Document auditing")
 class DocumentAuditingIT extends ContainerSupport {
 
     @Autowired
@@ -42,6 +44,7 @@ class DocumentAuditingIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given actor in mdc, when insert, then fills actors")
     void givenActorInMdc_whenInsert_thenFillsActors() {
         MDC.put(CorrelationIdFilter.ACTOR_KEY, "alice");
         final var spot = Spot.create(Location.create("A1"));
@@ -56,6 +59,7 @@ class DocumentAuditingIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given no actor in mdc, when insert, then falls back to system")
     void givenNoActorInMdc_whenInsert_thenFallsBackToSystem() {
         final var spot = Spot.create(Location.create("A1"));
 
@@ -69,6 +73,7 @@ class DocumentAuditingIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given existing document, when save, then preserves created by and updates last modified by")
     void givenExistingDocument_whenSave_thenPreservesCreatedByAndUpdatesLastModifiedBy() {
         MDC.put(CorrelationIdFilter.ACTOR_KEY, "alice");
         final var spot = Spot.create(Location.create("A1"));

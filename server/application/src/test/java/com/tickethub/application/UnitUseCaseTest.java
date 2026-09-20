@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.Notification;
@@ -12,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@DisplayName("Unit use case")
 class UnitUseCaseTest {
 
     static class StoreUseCase extends UnitUseCase<String> {
@@ -32,6 +34,7 @@ class UnitUseCaseTest {
     }
 
     @Test
+    @DisplayName("Executes without output")
     void executesWithoutOutput() {
         final var useCase = new StoreUseCase();
 
@@ -42,6 +45,7 @@ class UnitUseCaseTest {
     }
 
     @Test
+    @DisplayName("Stub receives null input")
     void stubReceivesNullInput() {
         final var useCase = new StoreUseCase();
 
@@ -51,6 +55,7 @@ class UnitUseCaseTest {
     }
 
     @Test
+    @DisplayName("Reports failure as notification")
     void reportsFailureAsNotification() {
         final var result = new FailingUseCase().execute("value");
 

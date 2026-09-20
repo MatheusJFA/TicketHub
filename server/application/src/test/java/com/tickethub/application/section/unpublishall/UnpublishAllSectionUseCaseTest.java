@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -18,6 +19,7 @@ import com.tickethub.domain.core.section.Section;
 import com.tickethub.domain.core.section.SectionGateway;
 import com.tickethub.domain.shared.Money;
 
+@DisplayName("Unpublish all section use case")
 public class UnpublishAllSectionUseCaseTest extends UseCaseTest {
     private static final Money PRICE = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
 
@@ -33,6 +35,7 @@ public class UnpublishAllSectionUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given valid command, when execute, should persist and return id")
     public void givenValidCommand_whenExecute_shouldPersistAndReturnId() {
         final var entity = entity();
         final var command = UnpublishAllSectionCommand.with(entity.getId().getValue());
@@ -55,6 +58,7 @@ public class UnpublishAllSectionUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given gateway failure, when execute, should return notification")
     public void givenGatewayFailure_whenExecute_shouldReturnNotification() {
         final var entity = entity();
         final var command = UnpublishAllSectionCommand.with(entity.getId().getValue());
@@ -76,6 +80,7 @@ public class UnpublishAllSectionUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given missing section, when execute, should not persist")
     public void givenMissingSection_whenExecute_shouldNotPersist() {
         final var entity = entity();
         final var command = UnpublishAllSectionCommand.with(entity.getId().getValue());
@@ -90,6 +95,7 @@ public class UnpublishAllSectionUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given lookup failure, when execute, should return notification")
     public void givenLookupFailure_whenExecute_shouldReturnNotification() {
         final var entity = entity();
         final var command = UnpublishAllSectionCommand.with(entity.getId().getValue());

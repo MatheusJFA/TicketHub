@@ -16,6 +16,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.DisplayName;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +29,7 @@ import com.tickethub.domain.auth.RefreshSessionGateway;
 import com.tickethub.domain.auth.TokenIssuer;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Login use case")
 class LoginUseCaseTest {
 
     private static final AuthAccount ACCOUNT = new AuthAccount("maria@domain.com", "hash",
@@ -54,6 +56,7 @@ class LoginUseCaseTest {
     }
 
     @Test
+    @DisplayName("Given valid credentials, when execute, then returns access and refresh tokens")
     void givenValidCredentials_whenExecute_thenReturnsAccessAndRefreshTokens() {
         when(authAccounts.findByIdentifier("maria@domain.com")).thenReturn(Optional.of(ACCOUNT));
         when(passwordHasher.matches("secret-123", "hash")).thenReturn(true);
@@ -76,6 +79,7 @@ class LoginUseCaseTest {
     }
 
     @Test
+    @DisplayName("Given unknown identifier, when execute, then returns401 without leaking")
     void givenUnknownIdentifier_whenExecute_thenReturns401WithoutLeaking() {
         when(authAccounts.findByIdentifier("ghost@domain.com")).thenReturn(Optional.empty());
 
@@ -90,6 +94,7 @@ class LoginUseCaseTest {
     }
 
     @Test
+    @DisplayName("Given wrong password, when execute, then returns401 without issuing tokens")
     void givenWrongPassword_whenExecute_thenReturns401WithoutIssuingTokens() {
         when(authAccounts.findByIdentifier("maria@domain.com")).thenReturn(Optional.of(ACCOUNT));
         when(passwordHasher.matches("wrong", "hash")).thenReturn(false);
@@ -103,6 +108,7 @@ class LoginUseCaseTest {
     }
 
     @Test
+    @DisplayName("Given issuer failure, when execute, then returns notification")
     void givenIssuerFailure_whenExecute_thenReturnsNotification() {
         when(authAccounts.findByIdentifier("maria@domain.com")).thenReturn(Optional.of(ACCOUNT));
         when(passwordHasher.matches("secret-123", "hash")).thenReturn(true);

@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.slf4j.MDC;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.data.domain.AuditorAware;
@@ -14,6 +15,7 @@ import com.tickethub.infrastructure.audit.AuditTrail;
 import com.tickethub.infrastructure.audit.MongoAuditTrail;
 import com.tickethub.infrastructure.web.CorrelationIdFilter;
 
+@DisplayName("Audit configuration")
 class AuditConfigurationTest {
 
     private final ApplicationContextRunner runner = new ApplicationContextRunner()
@@ -25,6 +27,7 @@ class AuditConfigurationTest {
     }
 
     @Test
+    @DisplayName("Wires auditor aware")
     void wiresAuditorAware() {
         runner.run(context -> {
             assertThat(context).hasNotFailed();
@@ -33,6 +36,7 @@ class AuditConfigurationTest {
     }
 
     @Test
+    @DisplayName("Given no actor in mdc, when get current auditor, then returns system")
     void givenNoActorInMdc_whenGetCurrentAuditor_thenReturnsSystem() {
         runner.run(context -> {
             final var auditor = context.getBean("auditorAware", AuditorAware.class);
@@ -41,6 +45,7 @@ class AuditConfigurationTest {
     }
 
     @Test
+    @DisplayName("Given actor in mdc, when get current auditor, then returns actor")
     void givenActorInMdc_whenGetCurrentAuditor_thenReturnsActor() {
         MDC.put(CorrelationIdFilter.ACTOR_KEY, "alice");
 
@@ -51,6 +56,7 @@ class AuditConfigurationTest {
     }
 
     @Test
+    @DisplayName("Given Mongo template, when run, then wires Mongo trail")
     void givenMongoTemplate_whenRun_thenWiresMongoTrail() {
         runner.withUserConfiguration(AuditConfiguration.class, MongoAuditTrail.class)
                 .withBean(MongoTemplate.class, () -> mock(MongoTemplate.class))
@@ -62,6 +68,7 @@ class AuditConfigurationTest {
     }
 
     @Test
+    @DisplayName("Given audit disabled, when run, then skips Mongo trail")
     void givenAuditDisabled_whenRun_thenSkipsMongoTrail() {
         runner.withUserConfiguration(AuditConfiguration.class, MongoAuditTrail.class)
                 .withBean(MongoTemplate.class, () -> mock(MongoTemplate.class))

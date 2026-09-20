@@ -12,6 +12,7 @@ import org.bson.Document;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
@@ -20,6 +21,7 @@ import com.tickethub.infrastructure.ContainerSupport;
 import com.tickethub.infrastructure.IntegrationTest;
 
 @IntegrationTest
+@DisplayName("Mongo audit log reader")
 class MongoAuditLogReaderIT extends ContainerSupport {
 
     @Autowired
@@ -60,6 +62,7 @@ class MongoAuditLogReaderIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given no filters, when search, then returns all entries")
     void givenNoFilters_whenSearch_thenReturnsAllEntries() {
         final var page = reader.search(unfiltered());
 
@@ -68,6 +71,7 @@ class MongoAuditLogReaderIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given action and actor, when search, then filters")
     void givenActionAndActor_whenSearch_thenFilters() {
         final var query = new AuditLogQuery(Optional.of("DefaultCreateSpotUseCase"),
                 Optional.of("alice"), Optional.empty(), Optional.empty(), Optional.empty(),
@@ -81,6 +85,7 @@ class MongoAuditLogReaderIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given outcome, when search, then filters")
     void givenOutcome_whenSearch_thenFilters() {
         final var query = new AuditLogQuery(Optional.empty(), Optional.empty(),
                 Optional.of(AuditOutcome.UNAUTHORIZED), Optional.empty(), Optional.empty(),
@@ -93,6 +98,7 @@ class MongoAuditLogReaderIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given date range, when search, then filters")
     void givenDateRange_whenSearch_thenFilters() {
         final var query = new AuditLogQuery(Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.of(Instant.parse("2027-01-11T00:00:00Z")),
@@ -105,6 +111,7 @@ class MongoAuditLogReaderIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given pagination, when search, then returns requested page")
     void givenPagination_whenSearch_thenReturnsRequestedPage() {
         final var query = new AuditLogQuery(Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), "", 1, 2, "occurredAt", "asc");

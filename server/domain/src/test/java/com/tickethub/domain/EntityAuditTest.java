@@ -6,10 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 
+@DisplayName("Entity audit")
 class EntityAuditTest {
 
     @Test
+    @DisplayName("Given an entity, when created, then initialize audit dates")
     void givenAnEntity_whenCreated_thenInitializeAuditDates() {
         final var entity = new TestEntity(TestEntityId.generate());
 
@@ -20,6 +23,7 @@ class EntityAuditTest {
     }
 
     @Test
+    @DisplayName("Given an active entity, when deleted, then set deleted at and update timestamp")
     void givenAnActiveEntity_whenDeleted_thenSetDeletedAtAndUpdateTimestamp() throws InterruptedException {
         final var entity = new TestEntity(TestEntityId.generate());
         final var previousUpdate = entity.getUpdatedAt();
@@ -33,6 +37,7 @@ class EntityAuditTest {
     }
 
     @Test
+    @DisplayName("Given a deleted entity, when restored, then clear deleted at and update timestamp")
     void givenADeletedEntity_whenRestored_thenClearDeletedAtAndUpdateTimestamp() throws InterruptedException {
         final var entity = new TestEntity(TestEntityId.generate());
         entity.delete();

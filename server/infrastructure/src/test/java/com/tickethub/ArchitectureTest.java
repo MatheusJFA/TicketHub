@@ -4,6 +4,7 @@ import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
@@ -12,6 +13,7 @@ import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 // ponytail: plain @Test + ClassFileImporter instead of @ArchTest fields — the
 // archunit-junit5 engine silently discovered 0 tests under this surefire/JUnit
 // platform combo. Revisit @ArchTest if the engine gets fixed upstream.
+@DisplayName("Architecture")
 class ArchitectureTest {
 
     private static final JavaClasses CLASSES = new ClassFileImporter()
@@ -19,6 +21,7 @@ class ArchitectureTest {
             .importPackages("com.tickethub");
 
     @Test
+    @DisplayName("Domain does not depend on outer layers")
     void domainDoesNotDependOnOuterLayers() {
         noClasses()
                 .that().resideInAPackage("..domain..")
@@ -28,6 +31,7 @@ class ArchitectureTest {
     }
 
     @Test
+    @DisplayName("Domain and application are framework free")
     void domainAndApplicationAreFrameworkFree() {
         // commons-lang3/collections4 are pure utility libraries (no framework,
         // no I/O), allowed alongside the JDK for null/string/collection guards.
@@ -40,6 +44,7 @@ class ArchitectureTest {
     }
 
     @Test
+    @DisplayName("Production classes belong to a layer")
     void productionClassesBelongToALayer() {
         classes()
                 .should().resideInAnyPackage(
@@ -50,6 +55,7 @@ class ArchitectureTest {
     }
 
     @Test
+    @DisplayName("Application does not depend on infrastructure")
     void applicationDoesNotDependOnInfrastructure() {
         noClasses()
                 .that().resideInAPackage("..application..")
@@ -59,6 +65,7 @@ class ArchitectureTest {
     }
 
     @Test
+    @DisplayName("Layers are respected")
     void layersAreRespected() {
         layeredArchitecture()
                 .consideringOnlyDependenciesInLayers()

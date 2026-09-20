@@ -10,6 +10,7 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.DisplayName;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,6 +23,7 @@ import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.shared.Email;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Mongo auth account gateway")
 class MongoAuthAccountGatewayTest {
 
     private static final String PASSWORD_HASH = "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS";
@@ -47,6 +49,7 @@ class MongoAuthAccountGatewayTest {
     }
 
     @Test
+    @DisplayName("Given customer email, when find by identifier, then returns customer account")
     void givenCustomerEmail_whenFindByIdentifier_thenReturnsCustomerAccount() {
         final var customer = Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH);
         when(customers.findByEmail(Email.create("maria@domain.com"))).thenReturn(Optional.of(customer));
@@ -61,6 +64,7 @@ class MongoAuthAccountGatewayTest {
     }
 
     @Test
+    @DisplayName("Given partner email, when find by identifier, then returns partner account")
     void givenPartnerEmail_whenFindByIdentifier_thenReturnsPartnerAccount() {
         final var address = Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000");
         final var partner = Partner.create("Cinema Nova", "11222333000181", address, "cinema@domain.com",
@@ -77,6 +81,7 @@ class MongoAuthAccountGatewayTest {
     }
 
     @Test
+    @DisplayName("Given bootstrap username, when find by identifier, then returns bootstrap account")
     void givenBootstrapUsername_whenFindByIdentifier_thenReturnsBootstrapAccount() {
         final var account = gateway.findByIdentifier("admin").orElseThrow();
 
@@ -86,6 +91,7 @@ class MongoAuthAccountGatewayTest {
     }
 
     @Test
+    @DisplayName("Given unknown identifier, when find by identifier, then returns empty")
     void givenUnknownIdentifier_whenFindByIdentifier_thenReturnsEmpty() {
         when(customers.findByEmail(Email.create("ghost@domain.com"))).thenReturn(Optional.empty());
         when(partners.findByEmail(Email.create("ghost@domain.com"))).thenReturn(Optional.empty());

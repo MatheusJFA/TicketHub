@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -23,6 +24,7 @@ import com.tickethub.infrastructure.audit.AuditOutcome;
 import com.tickethub.infrastructure.security.TestTokens;
 
 @ControllerTest(controllers = AuditController.class)
+@DisplayName("Audit controller")
 class AuditControllerTest {
 
     @Autowired
@@ -44,6 +46,7 @@ class AuditControllerTest {
     }
 
     @Test
+    @DisplayName("Given admin, when list, then returns page")
     void givenAdmin_whenList_thenReturnsPage() throws Exception {
         when(reader.search(any()))
                 .thenReturn(new Pagination<>(0, 10, 1, List.of(response())));
@@ -56,6 +59,7 @@ class AuditControllerTest {
     }
 
     @Test
+    @DisplayName("Given filters, when list, then delegates to reader")
     void givenFilters_whenList_thenDelegatesToReader() throws Exception {
         when(reader.search(any()))
                 .thenReturn(new Pagination<>(0, 10, 0, List.of()));
@@ -72,18 +76,21 @@ class AuditControllerTest {
     }
 
     @Test
+    @DisplayName("Given non admin, when list, then returns forbidden")
     void givenNonAdmin_whenList_thenReturnsForbidden() throws Exception {
         mvc.perform(get("/audit-logs").header("Authorization", bearer("spot:write")))
                 .andExpect(status().isForbidden());
     }
 
     @Test
+    @DisplayName("Given no token, when list, then returns unauthorized")
     void givenNoToken_whenList_thenReturnsUnauthorized() throws Exception {
         mvc.perform(get("/audit-logs"))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
+    @DisplayName("Given unknown outcome, when list, then returns unprocessable")
     void givenUnknownOutcome_whenList_thenReturnsUnprocessable() throws Exception {
         mvc.perform(get("/audit-logs")
                         .header("Authorization", bearer("ROLE_ADMIN"))
@@ -92,6 +99,7 @@ class AuditControllerTest {
     }
 
     @Test
+    @DisplayName("Given invalid pagination, when list, then returns unprocessable")
     void givenInvalidPagination_whenList_thenReturnsUnprocessable() throws Exception {
         mvc.perform(get("/audit-logs")
                         .header("Authorization", bearer("ROLE_ADMIN"))
@@ -100,6 +108,7 @@ class AuditControllerTest {
     }
 
     @Test
+    @DisplayName("Given invalid sort, when list, then returns unprocessable")
     void givenInvalidSort_whenList_thenReturnsUnprocessable() throws Exception {
         mvc.perform(get("/audit-logs")
                         .header("Authorization", bearer("ROLE_ADMIN"))

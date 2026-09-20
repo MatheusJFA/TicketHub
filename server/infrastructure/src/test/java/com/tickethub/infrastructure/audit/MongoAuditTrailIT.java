@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.bson.Document;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
@@ -17,6 +18,7 @@ import com.tickethub.infrastructure.ContainerSupport;
 import com.tickethub.infrastructure.IntegrationTest;
 
 @IntegrationTest
+@DisplayName("Mongo audit trail")
 class MongoAuditTrailIT extends ContainerSupport {
 
     @Autowired
@@ -42,6 +44,7 @@ class MongoAuditTrailIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given an entry, when record, then persists all fields")
     void givenAnEntry_whenRecord_thenPersistsAllFields() throws InterruptedException {
         trail.record(entry("corr-1"));
 
@@ -59,6 +62,7 @@ class MongoAuditTrailIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given entries from previous tests, when starting, then collection is clean")
     void givenEntriesFromPreviousTests_whenStarting_thenCollectionIsClean() throws InterruptedException {
         assertTrue(mongoTemplate.findAll(Document.class, MongoAuditTrail.COLLECTION).isEmpty());
 

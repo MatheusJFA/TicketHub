@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import com.tickethub.infrastructure.api.AuditAPI;
@@ -21,6 +22,7 @@ import com.tickethub.infrastructure.api.SectionAPI;
 import com.tickethub.infrastructure.api.ShowAPI;
 import com.tickethub.infrastructure.api.SpotAPI;
 
+@DisplayName("API authorization")
 class ApiAuthorizationTest {
 
     private static final Pattern AUTHORITY = Pattern.compile("hasAuthority\\('([^']+)'\\)");
@@ -35,6 +37,7 @@ class ApiAuthorizationTest {
     private static final Set<String> ROLES = Set.of("ADMIN");
 
     @Test
+    @DisplayName("Every pre authorize expression uses known authorities beans and roles")
     void everyPreAuthorizeExpressionUsesKnownAuthoritiesBeansAndRoles() {
         final var knownAuthorities = Arrays.stream(Permission.values())
                 .map(Permission::authority)

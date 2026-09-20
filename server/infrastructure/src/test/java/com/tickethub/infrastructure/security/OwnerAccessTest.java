@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
+@DisplayName("Owner access")
 class OwnerAccessTest {
 
     private final OwnerAccess access = new OwnerAccess();
@@ -38,6 +40,7 @@ class OwnerAccessTest {
     }
 
     @Test
+    @DisplayName("Given owner, when is self or admin, then returns true")
     void givenOwner_whenIsSelfOrAdmin_thenReturnsTrue() {
         authenticateAs("customer-1", "customer:delete");
 
@@ -45,6 +48,7 @@ class OwnerAccessTest {
     }
 
     @Test
+    @DisplayName("Given another account, when is self or admin, then returns false")
     void givenAnotherAccount_whenIsSelfOrAdmin_thenReturnsFalse() {
         authenticateAs("customer-9", "customer:delete");
 
@@ -52,6 +56,7 @@ class OwnerAccessTest {
     }
 
     @Test
+    @DisplayName("Given admin without owner, when is self or admin, then returns true")
     void givenAdminWithoutOwner_whenIsSelfOrAdmin_thenReturnsTrue() {
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
                 "admin", null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
@@ -60,11 +65,13 @@ class OwnerAccessTest {
     }
 
     @Test
+    @DisplayName("Given anonymous, when is self or admin, then returns false")
     void givenAnonymous_whenIsSelfOrAdmin_thenReturnsFalse() {
         assertFalse(access.isSelfOrAdmin("customer-1"));
     }
 
     @Test
+    @DisplayName("Given null id, when is self or admin, then returns false")
     void givenNullId_whenIsSelfOrAdmin_thenReturnsFalse() {
         authenticateAs("customer-1", "customer:delete");
 

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.mockito.Mock;
 
 import com.tickethub.application.UseCaseTest;
@@ -22,6 +23,7 @@ import com.tickethub.domain.event.DomainEventPublisher;
 import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.shared.Money;
 
+@DisplayName("Add section to show use case")
 public class AddSectionToShowUseCaseTest extends UseCaseTest {
     private static final OffsetDateTime DATE = OffsetDateTime.parse("2027-01-15T20:00:00-03:00");
     private static final Address ADDRESS = Address.create("Rua Augusta", "100", null, "Centro", "São Paulo", "SP", "Brasil", "01305-000");
@@ -48,6 +50,7 @@ public class AddSectionToShowUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given valid command, when execute, should persist and return id")
     public void givenValidCommand_whenExecute_shouldPersistAndReturnId() {
         final var entity = entity();
         final var command = AddSectionToShowCommand.with(entity.getId().getValue(), "General", "Description", 3, PRICE);
@@ -73,6 +76,7 @@ public class AddSectionToShowUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given gateway failure, when execute, should return notification")
     public void givenGatewayFailure_whenExecute_shouldReturnNotification() {
         final var entity = entity();
         final var command = AddSectionToShowCommand.with(entity.getId().getValue(), "General", "Description", 3, PRICE);
@@ -97,6 +101,7 @@ public class AddSectionToShowUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given missing show, when execute, should not persist")
     public void givenMissingShow_whenExecute_shouldNotPersist() {
         final var entity = entity();
         final var command = AddSectionToShowCommand.with(entity.getId().getValue(), "General", "Description", 3, PRICE);
@@ -111,6 +116,7 @@ public class AddSectionToShowUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given lookup failure, when execute, should return notification")
     public void givenLookupFailure_whenExecute_shouldReturnNotification() {
         final var entity = entity();
         final var command = AddSectionToShowCommand.with(entity.getId().getValue(), "General", "Description", 3, PRICE);
@@ -125,6 +131,7 @@ public class AddSectionToShowUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given large section, when execute, should persist shell and publish event")
     public void givenLargeSection_whenExecute_shouldPersistShellAndPublishEvent() {
         final var entity = entity();
         final var command = AddSectionToShowCommand.with(entity.getId().getValue(), "Arena", "Description", 1500, PRICE);
@@ -150,6 +157,7 @@ public class AddSectionToShowUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given publish failure, when execute, should degrade to bulk append")
     public void givenPublishFailure_whenExecute_shouldDegradeToBulkAppend() {
         final var entity = entity();
         final var command = AddSectionToShowCommand.with(entity.getId().getValue(), "Arena", "Description", 1500, PRICE);
@@ -174,6 +182,7 @@ public class AddSectionToShowUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given invalid command, when execute, should return validation errors without persisting")
     public void givenInvalidCommand_whenExecute_shouldReturnValidationErrorsWithoutPersisting() {
         final var entity = entity();
         final var command = AddSectionToShowCommand.with(entity.getId().getValue(), "General", "Description", 3, null);

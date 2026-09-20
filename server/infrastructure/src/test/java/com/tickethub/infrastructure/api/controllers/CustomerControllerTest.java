@@ -18,6 +18,7 @@ import com.tickethub.infrastructure.security.OwnerAccess;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -38,6 +39,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 @ControllerTest(controllers = CustomerController.class)
 @Import({SharedMapperImpl.class, CustomerMapperImpl.class})
+@DisplayName("Customer controller")
 class CustomerControllerTest {
     @Autowired MockMvc mvc;
     @MockitoBean ChangeCustomerNameUseCase changeCustomerName;
@@ -56,6 +58,7 @@ class CustomerControllerTest {
     }
 
     @Test
+    @DisplayName("Given a valid command, when calls create customer, should return customer id")
     void givenAValidCommand_whenCallsCreateCustomer_shouldReturnCustomerId() throws Exception {
         when(createCustomer.execute(any())).thenReturn(Either.right(new CreateCustomerOutput("customer-1")));
 
@@ -71,6 +74,7 @@ class CustomerControllerTest {
     }
 
     @Test
+    @DisplayName("Given an invalid command, when calls create customer, should return notification")
     void givenAnInvalidCommand_whenCallsCreateCustomer_shouldReturnNotification() throws Exception {
         when(createCustomer.execute(any())).thenReturn(Either.left(Notification.create(new Error("Invalid CPF"))));
 
@@ -81,6 +85,7 @@ class CustomerControllerTest {
     }
 
     @Test
+    @DisplayName("Given a valid command, when calls change name, should return customer id")
     void givenAValidCommand_whenCallsChangeName_shouldReturnCustomerId() throws Exception {
         when(changeCustomerName.execute(any())).thenReturn(Either.right(new ChangeCustomerNameOutput("customer-1")));
         when(ownerAccess.isSelfOrAdmin("customer-1")).thenReturn(true);
@@ -92,6 +97,7 @@ class CustomerControllerTest {
     }
 
     @Test
+    @DisplayName("Given a valid id, when calls delete customer, should return no content")
     void givenAValidId_whenCallsDeleteCustomer_shouldReturnNoContent() throws Exception {
         when(deleteCustomer.execute("customer-1")).thenReturn(Optional.empty());
         when(ownerAccess.isSelfOrAdmin("customer-1")).thenReturn(true);
@@ -101,6 +107,7 @@ class CustomerControllerTest {
     }
 
     @Test
+    @DisplayName("Given valid params, when calls list customers, should return customers")
     void givenValidParams_whenCallsListCustomers_shouldReturnCustomers() throws Exception {
         when(listCustomers.execute(any())).thenReturn(Either.right(new Pagination<>(0, 10, 0, List.of())));
 
@@ -109,6 +116,7 @@ class CustomerControllerTest {
     }
 
     @Test
+    @DisplayName("Given another account, when calls delete customer, then returns forbidden")
     void givenAnotherAccount_whenCallsDeleteCustomer_thenReturnsForbidden() throws Exception {
         mvc.perform(delete("/customers/customer-1")
                         .header("Authorization", bearer("customer-9", "customer:delete")))
@@ -116,6 +124,7 @@ class CustomerControllerTest {
     }
 
     @Test
+    @DisplayName("Given owner, when calls update customer, then succeeds")
     void givenOwner_whenCallsUpdateCustomer_thenSucceeds() throws Exception {
         when(updateCustomer.execute(any())).thenReturn(Either.right(new UpdateCustomerOutput("customer-1")));
         when(ownerAccess.isSelfOrAdmin("customer-1")).thenReturn(true);
@@ -127,6 +136,7 @@ class CustomerControllerTest {
     }
 
     @Test
+    @DisplayName("Given another account, when calls update customer, then returns forbidden")
     void givenAnotherAccount_whenCallsUpdateCustomer_thenReturnsForbidden() throws Exception {
         mvc.perform(put("/customers/customer-1").contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", bearer("customer-9", "customer:write"))
@@ -135,6 +145,7 @@ class CustomerControllerTest {
     }
 
     @Test
+    @DisplayName("Given admin, when calls delete another customer, then returns no content")
     void givenAdmin_whenCallsDeleteAnotherCustomer_thenReturnsNoContent() throws Exception {
         when(deleteCustomer.execute("customer-1")).thenReturn(Optional.empty());
 
@@ -145,6 +156,7 @@ class CustomerControllerTest {
     }
 
     @Test
+    @DisplayName("Given customer, when calls list customers, then returns forbidden")
     void givenCustomer_whenCallsListCustomers_thenReturnsForbidden() throws Exception {
         mvc.perform(get("/customers").header("Authorization", bearer("customer-1", "customer:write")))
                 .andExpect(status().isForbidden());

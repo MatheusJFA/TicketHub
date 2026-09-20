@@ -9,6 +9,7 @@ import java.util.Currency;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -18,6 +19,7 @@ import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.domain.shared.Money;
 
+@DisplayName("Create section use case")
 public class CreateSectionUseCaseTest extends UseCaseTest {
     private static final Money PRICE = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
     private static final ShowID SHOW_ID = ShowID.generate();
@@ -37,6 +39,7 @@ public class CreateSectionUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given valid command, when execute, should persist and return id")
     public void givenValidCommand_whenExecute_shouldPersistAndReturnId() {
         final var command = CreateSectionCommand.with(SHOW_ID.getValue(), "VIP", "Description", 3, PRICE);
         when(showGateway.existsByIds(List.of(SHOW_ID))).thenReturn(List.of(SHOW_ID));
@@ -61,6 +64,7 @@ public class CreateSectionUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given missing show, when execute, should return not found without persisting")
     public void givenMissingShow_whenExecute_shouldReturnNotFoundWithoutPersisting() {
         final var command = CreateSectionCommand.with(SHOW_ID.getValue(), "VIP", "Description", 3, PRICE);
         when(showGateway.existsByIds(List.of(SHOW_ID))).thenReturn(List.of());
@@ -73,6 +77,7 @@ public class CreateSectionUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given gateway failure, when execute, should return notification")
     public void givenGatewayFailure_whenExecute_shouldReturnNotification() {
         final var command = CreateSectionCommand.with(SHOW_ID.getValue(), "VIP", "Description", 3, PRICE);
         final var expectedMessage = "Gateway error";
@@ -96,6 +101,7 @@ public class CreateSectionUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given invalid command, when execute, should return validation errors without persisting")
     public void givenInvalidCommand_whenExecute_shouldReturnValidationErrorsWithoutPersisting() {
         final var command = CreateSectionCommand.with(SHOW_ID.getValue(), "VIP", "Description", 3, null);
         when(showGateway.existsByIds(List.of(SHOW_ID))).thenReturn(List.of(SHOW_ID));

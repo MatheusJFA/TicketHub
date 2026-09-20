@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
@@ -21,6 +22,7 @@ import com.tickethub.infrastructure.customer.CustomerMongoGateway;
 import com.tickethub.infrastructure.customer.persistence.CustomerDocument;
 
 @IntegrationTest
+@DisplayName("Customer Mongo gateway")
 class CustomerMongoGatewayIT extends ContainerSupport {
 
     @Autowired
@@ -37,6 +39,7 @@ class CustomerMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given a customer, when create, then persists and finds")
     void givenACustomer_whenCreate_thenPersistsAndFinds() {
         final var customer = Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH);
 
@@ -54,6 +57,7 @@ class CustomerMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given duplicate CPF, when create, then throws domain exception")
     void givenDuplicateCpf_whenCreate_thenThrowsDomainException() {
         gateway.create(Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH));
 
@@ -64,6 +68,7 @@ class CustomerMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given duplicate email, when create, then throws domain exception")
     void givenDuplicateEmail_whenCreate_thenThrowsDomainException() {
         gateway.create(Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH));
 
@@ -74,6 +79,7 @@ class CustomerMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given a customer, when find by email, then returns customer")
     void givenACustomer_whenFindByEmail_thenReturnsCustomer() {
         final var customer = gateway.create(
                 Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH));
@@ -85,6 +91,7 @@ class CustomerMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given a customer, when update, then persists changes")
     void givenACustomer_whenUpdate_thenPersistsChanges() {
         final var customer = gateway.create(Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH));
 
@@ -96,6 +103,7 @@ class CustomerMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given a customer, when delete, then removes")
     void givenACustomer_whenDelete_thenRemoves() {
         final var customer = gateway.create(Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH));
 
@@ -106,6 +114,7 @@ class CustomerMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given customers, when find all, then paginates and searches")
     void givenCustomers_whenFindAll_thenPaginatesAndSearches() {
         gateway.create(Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH));
         gateway.create(Customer.create("12345678909", "João Souza", "joao@domain.com", PASSWORD_HASH));
@@ -128,6 +137,7 @@ class CustomerMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given missing customer, when find by id, then returns empty")
     void givenMissingCustomer_whenFindById_thenReturnsEmpty() {
         assertFalse(gateway
                 .findById(com.tickethub.domain.core.customer.CustomerID.generate()).isPresent());

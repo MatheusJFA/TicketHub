@@ -17,6 +17,7 @@ import org.bson.Document;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.kafka.core.ConsumerFactory;
@@ -30,6 +31,7 @@ import com.tickethub.infrastructure.IntegrationTest;
 
 @IntegrationTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@DisplayName("Infrastructure connection")
 class InfrastructureConnectionIT extends ContainerSupport {
 
     private static final String TEST_ID = UUID.randomUUID().toString().replace("-", "");
@@ -56,6 +58,7 @@ class InfrastructureConnectionIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Writes reads and deletes using auto configured Mongo template")
     void writesReadsAndDeletesUsingAutoConfiguredMongoTemplate() {
         final var document = new Document("_id", TEST_ID).append("message", "mongo-configured");
         mongoTemplate.insert(document, COLLECTION);
@@ -67,6 +70,7 @@ class InfrastructureConnectionIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Creates topic and sends and receives using spring clients")
     void createsTopicAndSendsAndReceivesUsingSpringClients() throws Exception {
         final var topics = kafkaAdmin.describeTopics(TOPIC);
         assertEquals(eventsTopic.numPartitions(), topics.get(TOPIC).partitions().size());

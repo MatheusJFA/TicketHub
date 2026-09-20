@@ -16,6 +16,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.DisplayName;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,6 +28,7 @@ import com.tickethub.domain.auth.SecureTokens;
 import com.tickethub.domain.auth.TokenIssuer;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Refresh token use case")
 class RefreshTokenUseCaseTest {
 
     @Mock
@@ -43,6 +45,7 @@ class RefreshTokenUseCaseTest {
     }
 
     @Test
+    @DisplayName("Given active session, when execute, then rotates and returns new tokens")
     void givenActiveSession_whenExecute_thenRotatesAndReturnsNewTokens() {
         final var presented = SecureTokens.generateOpaqueToken();
         final var session = RefreshSession.issue(SecureTokens.sha256Hex(presented), "maria@domain.com",
@@ -64,6 +67,7 @@ class RefreshTokenUseCaseTest {
     }
 
     @Test
+    @DisplayName("Given unknown token, when execute, then returns401")
     void givenUnknownToken_whenExecute_thenReturns401() {
         when(refreshSessions.findByTokenHash(any())).thenReturn(Optional.empty());
 
@@ -75,6 +79,7 @@ class RefreshTokenUseCaseTest {
     }
 
     @Test
+    @DisplayName("Given revoked session, when execute, then returns401")
     void givenRevokedSession_whenExecute_thenReturns401() {
         final var presented = SecureTokens.generateOpaqueToken();
         final var session = RefreshSession.issue(SecureTokens.sha256Hex(presented), "maria@domain.com",
@@ -89,6 +94,7 @@ class RefreshTokenUseCaseTest {
     }
 
     @Test
+    @DisplayName("Given rotated token reuse, when execute, then revokes family and returns401")
     void givenRotatedTokenReuse_whenExecute_thenRevokesFamilyAndReturns401() {
         final var first = SecureTokens.generateOpaqueToken();
         final var session = RefreshSession.issue(SecureTokens.sha256Hex(first), "maria@domain.com",

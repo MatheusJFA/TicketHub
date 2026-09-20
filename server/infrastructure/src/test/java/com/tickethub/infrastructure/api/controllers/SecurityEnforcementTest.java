@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -35,6 +36,7 @@ import com.tickethub.infrastructure.security.TestTokens;
 
 @ControllerTest(controllers = SpotController.class)
 @Import({SharedMapperImpl.class, SpotMapperImpl.class})
+@DisplayName("Security enforcement")
 class SecurityEnforcementTest {
 
     @Autowired
@@ -64,6 +66,7 @@ class SecurityEnforcementTest {
     }
 
     @Test
+    @DisplayName("Given no token, when calls protected endpoint, then returns401")
     void givenNoToken_whenCallsProtectedEndpoint_thenReturns401() throws Exception {
         mvc.perform(post("/spots").contentType(MediaType.APPLICATION_JSON)
                         .content("{\"location\":\"A1\"}"))
@@ -71,6 +74,7 @@ class SecurityEnforcementTest {
     }
 
     @Test
+    @DisplayName("Given token without authority, when calls protected endpoint, then returns403")
     void givenTokenWithoutAuthority_whenCallsProtectedEndpoint_thenReturns403() throws Exception {
         mvc.perform(post("/spots").header("Authorization", bearer("spot:read"))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -80,6 +84,7 @@ class SecurityEnforcementTest {
     }
 
     @Test
+    @DisplayName("Given token with authority, when calls protected endpoint, then succeeds")
     void givenTokenWithAuthority_whenCallsProtectedEndpoint_thenSucceeds() throws Exception {
         when(createSpot.execute(any())).thenReturn(Either.right(new CreateSpotOutput("spot-1")));
 
@@ -91,6 +96,7 @@ class SecurityEnforcementTest {
     }
 
     @Test
+    @DisplayName("Given no token, when calls public catalog, then succeeds")
     void givenNoToken_whenCallsPublicCatalog_thenSucceeds() throws Exception {
         when(listSpots.execute(any()))
                 .thenReturn(Either.right(new Pagination<>(0, 10, 0, List.of())));

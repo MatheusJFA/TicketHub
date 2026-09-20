@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -15,6 +16,7 @@ import com.tickethub.application.UseCaseTest;
 import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.core.spot.SpotGateway;
 
+@DisplayName("Unpublish spot use case")
 public class UnpublishSpotUseCaseTest extends UseCaseTest {
 
     @InjectMocks
@@ -29,6 +31,7 @@ public class UnpublishSpotUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given valid command, when execute, should persist and return id")
     public void givenValidCommand_whenExecute_shouldPersistAndReturnId() {
         final var entity = entity();
         final var command = UnpublishSpotCommand.with(entity.getId().getValue());
@@ -50,6 +53,7 @@ public class UnpublishSpotUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given gateway failure, when execute, should return notification")
     public void givenGatewayFailure_whenExecute_shouldReturnNotification() {
         final var entity = entity();
         final var command = UnpublishSpotCommand.with(entity.getId().getValue());
@@ -70,6 +74,7 @@ public class UnpublishSpotUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given missing spot, when execute, should not persist")
     public void givenMissingSpot_whenExecute_shouldNotPersist() {
         final var entity = entity();
         final var command = UnpublishSpotCommand.with(entity.getId().getValue());
@@ -84,6 +89,7 @@ public class UnpublishSpotUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given lookup failure, when execute, should return notification")
     public void givenLookupFailure_whenExecute_shouldReturnNotification() {
         final var entity = entity();
         final var command = UnpublishSpotCommand.with(entity.getId().getValue());

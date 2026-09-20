@@ -6,6 +6,7 @@ import java.util.Currency;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import com.tickethub.domain.shared.*;
@@ -13,6 +14,7 @@ import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.pagination.*;
 import com.tickethub.domain.core.section.*;
 
+@DisplayName("Change section price use case")
 class ChangeSectionPriceUseCaseTest {
     private final Section entity = Section.create("Setor original", "Descricao original", 2, Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL")));
     private final SectionGateway gateway = mock(SectionGateway.class);
@@ -21,6 +23,7 @@ class ChangeSectionPriceUseCaseTest {
     private final Money value = Money.create(new BigDecimal("75.00"), Currency.getInstance("BRL"));
 
     @Test
+    @DisplayName("Changes only requested field and persists")
     void changesOnlyRequestedFieldAndPersists() {
         final var createdAt = entity.getCreatedAt();
         final var updatedAt = entity.getUpdatedAt();
@@ -46,6 +49,7 @@ class ChangeSectionPriceUseCaseTest {
     }
 
     @Test
+    @DisplayName("Rejects invalid value without mutation or persistence")
     void rejectsInvalidValueWithoutMutationOrPersistence() {
         final var original = entity.getPrice();
         final var updatedAt = entity.getUpdatedAt();
@@ -59,6 +63,7 @@ class ChangeSectionPriceUseCaseTest {
     }
 
     @Test
+    @DisplayName("Reports missing entity without persistence")
     void reportsMissingEntityWithoutPersistence() {
         when(gateway.findById(entity.getId())).thenReturn(Optional.empty());
         final var command = ChangeSectionPriceCommand.with(id, value);
@@ -68,6 +73,7 @@ class ChangeSectionPriceUseCaseTest {
     }
 
     @Test
+    @DisplayName("Reports lookup failure without persistence")
     void reportsLookupFailureWithoutPersistence() {
         when(gateway.findById(entity.getId())).thenThrow(new IllegalStateException("lookup failed"));
         final var command = ChangeSectionPriceCommand.with(id, value);
@@ -77,6 +83,7 @@ class ChangeSectionPriceUseCaseTest {
     }
 
     @Test
+    @DisplayName("Reports persistence failure")
     void reportsPersistenceFailure() {
         when(gateway.findById(entity.getId())).thenReturn(Optional.of(entity));
         when(gateway.update(entity)).thenThrow(new IllegalStateException("save failed"));

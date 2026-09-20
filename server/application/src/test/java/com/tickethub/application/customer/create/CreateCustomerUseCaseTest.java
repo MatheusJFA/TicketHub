@@ -7,6 +7,7 @@ import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -14,6 +15,7 @@ import com.tickethub.application.UseCaseTest;
 import com.tickethub.domain.auth.PasswordHasher;
 import com.tickethub.domain.core.customer.CustomerGateway;
 
+@DisplayName("Create customer use case")
 public class CreateCustomerUseCaseTest extends UseCaseTest {
 
     private static final String VALID_EMAIL = "john@domain.com";
@@ -35,6 +37,7 @@ public class CreateCustomerUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given valid command, when execute, should persist and return id")
     public void givenValidCommand_whenExecute_shouldPersistAndReturnId() {
         final var command = CreateCustomerCommand.with("12345678909", "John Doe", VALID_EMAIL, RAW_PASSWORD);
         when(passwordHasher.hash(RAW_PASSWORD)).thenReturn(PASSWORD_HASH);
@@ -57,6 +60,7 @@ public class CreateCustomerUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given gateway failure, when execute, should return notification")
     public void givenGatewayFailure_whenExecute_shouldReturnNotification() {
         final var command = CreateCustomerCommand.with("12345678909", "John Doe", VALID_EMAIL, RAW_PASSWORD);
         final var expectedMessage = "Gateway error";
@@ -79,6 +83,7 @@ public class CreateCustomerUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given invalid command, when execute, should return validation errors without persisting")
     public void givenInvalidCommand_whenExecute_shouldReturnValidationErrorsWithoutPersisting() {
         final var command = CreateCustomerCommand.with("invalid", "John Doe", VALID_EMAIL, RAW_PASSWORD);
         when(passwordHasher.hash(RAW_PASSWORD)).thenReturn(PASSWORD_HASH);
@@ -92,6 +97,7 @@ public class CreateCustomerUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given invalid email, when execute, should return validation errors without persisting")
     public void givenInvalidEmail_whenExecute_shouldReturnValidationErrorsWithoutPersisting() {
         final var command = CreateCustomerCommand.with("12345678909", "John Doe", "not-an-email", RAW_PASSWORD);
         when(passwordHasher.hash(RAW_PASSWORD)).thenReturn(PASSWORD_HASH);

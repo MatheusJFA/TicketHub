@@ -12,6 +12,7 @@ import com.tickethub.application.spot.update.*;
 import com.tickethub.infrastructure.ControllerTest;
 import com.tickethub.infrastructure.security.ShowAccess;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -30,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ControllerTest(controllers = SpotController.class)
 @Import({SharedMapperImpl.class, SpotMapperImpl.class})
+@DisplayName("Spot controller")
 class SpotControllerTest {
     @Autowired MockMvc mvc;
     @Value("${tickethub.security.jwt.secret}")
@@ -54,6 +56,7 @@ class SpotControllerTest {
     ShowAccess showAccess;
 
     @Test
+    @DisplayName("Given a valid command, when calls create spot, should return spot id")
     void givenAValidCommand_whenCallsCreateSpot_shouldReturnSpotId() throws Exception {
         when(createSpot.execute(any())).thenReturn(Either.right(new CreateSpotOutput("spot-1")));
 
@@ -64,6 +67,7 @@ class SpotControllerTest {
     }
 
     @Test
+    @DisplayName("Given non owner, when changes spot location, then returns forbidden")
     void givenNonOwner_whenChangesSpotLocation_thenReturnsForbidden() throws Exception {
         when(showAccess.canWriteSpot("spot-1")).thenReturn(false);
 
@@ -75,6 +79,7 @@ class SpotControllerTest {
     }
 
     @Test
+    @DisplayName("Given owner, when changes spot location, then succeeds")
     void givenOwner_whenChangesSpotLocation_thenSucceeds() throws Exception {
         when(showAccess.canWriteSpot("spot-1")).thenReturn(true);
         when(changeSpotLocation.execute(any()))
@@ -89,6 +94,7 @@ class SpotControllerTest {
     }
 
     @Test
+    @DisplayName("Given owner, when calls update spot, then succeeds")
     void givenOwner_whenCallsUpdateSpot_thenSucceeds() throws Exception {
         when(showAccess.canWriteSpot("spot-1")).thenReturn(true);
         when(updateSpot.execute(any()))
@@ -103,6 +109,7 @@ class SpotControllerTest {
     }
 
     @Test
+    @DisplayName("Given non owner, when calls update spot, then returns forbidden")
     void givenNonOwner_whenCallsUpdateSpot_thenReturnsForbidden() throws Exception {
         when(showAccess.canWriteSpot("spot-1")).thenReturn(false);
 

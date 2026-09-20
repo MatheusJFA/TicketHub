@@ -13,6 +13,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +27,7 @@ import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.infrastructure.section.persistence.SectionDocument;
 import com.tickethub.infrastructure.spot.persistence.SpotDocument;
 
+@DisplayName("Show access")
 class ShowAccessTest {
 
     private final ShowGateway gateway = mock(ShowGateway.class);
@@ -55,6 +57,7 @@ class ShowAccessTest {
     }
 
     @Test
+    @DisplayName("Given owner, when can write, then returns true")
     void givenOwner_whenCanWrite_thenReturnsTrue() {
         authenticateAsPartner("partner-1");
         final var showId = ShowID.generate();
@@ -64,6 +67,7 @@ class ShowAccessTest {
     }
 
     @Test
+    @DisplayName("Given another partner, when can write, then returns false")
     void givenAnotherPartner_whenCanWrite_thenReturnsFalse() {
         authenticateAsPartner("partner-9");
         final var showId = ShowID.generate();
@@ -73,6 +77,7 @@ class ShowAccessTest {
     }
 
     @Test
+    @DisplayName("Given admin, when can delete, then returns true without lookup")
     void givenAdmin_whenCanDelete_thenReturnsTrueWithoutLookup() {
         authenticateAsAdmin();
 
@@ -80,6 +85,7 @@ class ShowAccessTest {
     }
 
     @Test
+    @DisplayName("Given missing show, when can publish, then returns false")
     void givenMissingShow_whenCanPublish_thenReturnsFalse() {
         authenticateAsPartner("partner-1");
         when(gateway.findById(any())).thenReturn(Optional.empty());
@@ -88,6 +94,7 @@ class ShowAccessTest {
     }
 
     @Test
+    @DisplayName("Given gateway failure, when can write, then returns false")
     void givenGatewayFailure_whenCanWrite_thenReturnsFalse() {
         authenticateAsPartner("partner-1");
         when(gateway.findById(any())).thenThrow(new IllegalStateException("db down"));
@@ -96,6 +103,7 @@ class ShowAccessTest {
     }
 
     @Test
+    @DisplayName("Given owner, when can create, then returns true")
     void givenOwner_whenCanCreate_thenReturnsTrue() {
         authenticateAsPartner("partner-1");
 
@@ -104,6 +112,7 @@ class ShowAccessTest {
     }
 
     @Test
+    @DisplayName("Given anonymous, when can write, then returns false")
     void givenAnonymous_whenCanWrite_thenReturnsFalse() {
         assertFalse(access.canWrite("show-1"));
     }
@@ -119,6 +128,7 @@ class ShowAccessTest {
     }
 
     @Test
+    @DisplayName("Given owner, when can write section, then returns true with single read")
     void givenOwner_whenCanWriteSection_thenReturnsTrueWithSingleRead() {
         authenticateAsPartner("partner-1");
         when(mongoTemplate.findById("section-1", SectionDocument.class, SectionDocument.COLLECTION))
@@ -128,6 +138,7 @@ class ShowAccessTest {
     }
 
     @Test
+    @DisplayName("Given another partner, when can write section, then returns false")
     void givenAnotherPartner_whenCanWriteSection_thenReturnsFalse() {
         authenticateAsPartner("partner-9");
         when(mongoTemplate.findById("section-1", SectionDocument.class, SectionDocument.COLLECTION))
@@ -139,6 +150,7 @@ class ShowAccessTest {
     }
 
     @Test
+    @DisplayName("Given orphan section, when can write section, then returns false")
     void givenOrphanSection_whenCanWriteSection_thenReturnsFalse() {
         authenticateAsPartner("partner-1");
         when(mongoTemplate.findById("section-1", SectionDocument.class, SectionDocument.COLLECTION))
@@ -150,6 +162,7 @@ class ShowAccessTest {
     }
 
     @Test
+    @DisplayName("Given owner, when can write spot, then returns true with single read")
     void givenOwner_whenCanWriteSpot_thenReturnsTrueWithSingleRead() {
         authenticateAsPartner("partner-1");
         when(mongoTemplate.findById("spot-1", SpotDocument.class, SpotDocument.COLLECTION))
@@ -159,6 +172,7 @@ class ShowAccessTest {
     }
 
     @Test
+    @DisplayName("Given another partner, when can publish spot, then returns false")
     void givenAnotherPartner_whenCanPublishSpot_thenReturnsFalse() {
         authenticateAsPartner("partner-9");
         when(mongoTemplate.findById("spot-1", SpotDocument.class, SpotDocument.COLLECTION))
@@ -169,6 +183,7 @@ class ShowAccessTest {
     }
 
     @Test
+    @DisplayName("Given admin, when can write section or spot, then returns true without lookup")
     void givenAdmin_whenCanWriteSectionOrSpot_thenReturnsTrueWithoutLookup() {
         authenticateAsAdmin();
 

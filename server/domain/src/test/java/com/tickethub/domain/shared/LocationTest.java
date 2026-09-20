@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -16,117 +17,169 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import com.tickethub.domain.exception.DomainException;
 
+@DisplayName("Location")
 public class LocationTest {
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "Given null, empty or blank location \"{0}\", when create, then throws DomainException")
     @NullAndEmptySource
     @ValueSource(strings = {" ", "\t", "\n"})
+    @DisplayName("Given null, empty or blank location, when create, then throws DomainException")
     void givenNullEmptyOrBlankLocation_whenCreate_thenThrowDomainException(String value) {
-        assertEquals("Invalid location", assertThrows(DomainException.class,
-                () -> Location.create(value)).getMessage());
+        final var exception = assertThrows(DomainException.class,
+                () -> Location.create(value),
+                () -> "Creating Location with value [" + value + "] should throw DomainException");
+
+        assertEquals("Invalid location", exception.getMessage(),
+                () -> "Exception message should be \"Invalid location\"");
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "Given valid seat label \"{0}\", when create, then stores value")
     @ValueSource(strings = {"A12", "Mesa 5", "Camarote VIP", "B-07", "Balcão 2", "5"})
+    @DisplayName("Given valid seat label, when create, then stores value")
     void givenAValidSeatLabel_whenCreate_thenStoreValue(String value) {
-        assertEquals(value, Location.create(value).getValue());
+        assertEquals(value, Location.create(value).getValue(),
+                () -> "Valid seat label [" + value + "] should be stored as provided");
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "Given label with extra spaces \"{0}\", when create, then normalizes to \"{1}\"")
     @CsvSource(value = {"'  A12  ', A12", "'  Mesa    5  ', Mesa 5", "'  Balcão   2 ', Balcão 2"})
+    @DisplayName("Given label with extra spaces, when create, then normalizes value")
     void givenALabelWithExtraSpaces_whenCreate_thenNormalizeValue(String input, String expected) {
-        assertEquals(expected, Location.create(input).getValue());
+        assertEquals(expected, Location.create(input).getValue(),
+                () -> "Label [" + input + "] should normalize to [" + expected + "]");
     }
 
     @Test
+    @DisplayName("Given label with whitespace, when create, then stores single line")
     void givenALabelWithWhitespace_whenCreate_thenStoreSingleLine() {
-        assertEquals("Mesa 5", Location.create("\tMesa\n\u00A0 5\r\n").getValue());
+        assertEquals("Mesa 5", Location.create("\tMesa\n  5\r\n").getValue(),
+                () -> "Label with whitespace should be stored as single line");
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "Given null or blank location \"{0}\", when create, then throws DomainException")
     @NullAndEmptySource
-    @ValueSource(strings = {"   ", "\t", "\n\r", "\u2003", "\u00A0"})
+    @ValueSource(strings = {"   ", "\t", "\n\r", " ", " "})
+    @DisplayName("Given null or blank location, when create, then throws DomainException")
     void givenANullOrBlankLocation_whenCreate_thenThrowDomainException(String value) {
-        DomainException exception = assertThrows(DomainException.class, () -> Location.create(value));
+        final var exception = assertThrows(DomainException.class, () -> Location.create(value),
+                () -> "Creating Location with blank value [" + value + "] should throw DomainException");
 
-        assertEquals("Invalid location", exception.getMessage());
+        assertEquals("Invalid location", exception.getMessage(),
+                () -> "Exception message should be \"Invalid location\"");
     }
 
     @Test
+    @DisplayName("Given location, when toString, then returns normalized label")
     void givenALocation_whenToString_thenReturnNormalizedLabel() {
-        assertEquals("Mesa 5", Location.create("  Mesa   5  ").toString());
+        assertEquals("Mesa 5", Location.create("  Mesa   5  ").toString(),
+                () -> "Location toString should return normalized label");
     }
 
     @Test
+    @DisplayName("Given same normalized labels, when compare, then are equal with same hashCode")
     void givenSameNormalizedLabels_whenCompare_thenBeEqualAndHaveSameHashCode() {
         Location first = Location.create("Mesa 5");
         Location second = Location.create("  Mesa   5  ");
 
-        assertEquals(first, second);
-        assertEquals(second, first);
-        assertEquals(first.hashCode(), second.hashCode());
+        assertEquals(first, second,
+                () -> "Same normalized labels should be equal");
+        assertEquals(second, first,
+                () -> "Location equality should be symmetric");
+        assertEquals(first.hashCode(), second.hashCode(),
+                () -> "Equal Locations should have the same hashCode");
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "Given different label \"{0}\", when compare, then are not equal")
     @ValueSource(strings = {"A13", "B12", "a12"})
+    @DisplayName("Given different labels, when compare, then are not equal")
     void givenDifferentLabels_whenCompare_thenNotBeEqual(String value) {
-        assertNotEquals(Location.create("A12"), Location.create(value));
+        assertNotEquals(Location.create("A12"), Location.create(value),
+                () -> "Different labels [A12] and [" + value + "] should not be equal");
     }
 
     @Test
+    @DisplayName("Given equivalent locations, when use in set, then find same seat label")
     void givenEquivalentLocations_whenUseInSet_thenFindSameSeatLabel() {
         Set<Location> locations = new HashSet<>();
         locations.add(Location.create("Mesa 5"));
         locations.add(Location.create("  Mesa   5  "));
 
-        assertEquals(1, locations.size());
-        assertTrue(locations.contains(Location.create("Mesa 5")));
+        assertEquals(1, locations.size(),
+                () -> "Equivalent Locations should collapse to a single set entry");
+        assertTrue(locations.contains(Location.create("Mesa 5")),
+                () -> "Set should contain Location [Mesa 5]");
     }
 
     @Test
+    @DisplayName("Given null or different type, when compare, then are not equal")
     void givenANullOrDifferentType_whenCompare_thenNotBeEqual() {
         Location location = Location.create("A12");
 
-        assertFalse(location.equals(null));
-        assertFalse(location.equals("A12"));
-        assertFalse(location.equals(Text.create("A12")));
+        assertFalse(location.equals(null),
+                () -> "Location should not be equal to null");
+        assertFalse(location.equals("A12"),
+                () -> "Location should not be equal to a String");
+        assertFalse(location.equals(Text.create("A12")),
+                () -> "Location should not be equal to a different type");
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "Given section index \"{0}\", when sectionCode, then derives code \"{1}\"")
     @CsvSource(value = {"0, A", "1, B", "25, Z", "26, AA", "27, AB", "51, AZ", "52, BA"})
+    @DisplayName("Given section index, when sectionCode, then derives spreadsheet-style code")
     void givenSectionIndex_whenSectionCode_thenDeriveSpreadsheetStyleCode(int index, String expected) {
-        assertEquals(expected, Location.sectionCode(index));
+        assertEquals(expected, Location.sectionCode(index),
+                () -> "Section index [" + index + "] should derive code [" + expected + "]");
     }
 
     @Test
+    @DisplayName("Given negative section index, when sectionCode, then throws DomainException")
     void givenNegativeSectionIndex_whenSectionCode_thenThrowDomainException() {
-        assertThrows(DomainException.class, () -> Location.sectionCode(-1));
+        final var exception = assertThrows(DomainException.class, () -> Location.sectionCode(-1),
+                () -> "Calling sectionCode with negative index should throw DomainException");
+
+        assertEquals("'sectionIndex' should not be negative", exception.getMessage(),
+                () -> "Exception message should indicate that sectionIndex must not be negative");
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "Given section code \"{0}\" and seat \"{1}\", when generateSeat, then formats code \"{2}\"")
     @CsvSource(value = {"A, 1, A00001", "A, 42, A00042", "B, 7, B00007", "AA, 3, AA00003", "Z, 100000, Z100000"})
+    @DisplayName("Given section code and seat, when generateSeat, then formats code")
     void givenSectionCodeAndSeat_whenGenerateSeat_thenFormatCode(String code, long seat, String expected) {
-        assertEquals(expected, Location.generateSeat(code, seat).getValue());
+        assertEquals(expected, Location.generateSeat(code, seat).getValue(),
+                () -> "Seat [" + code + ", " + seat + "] should format to [" + expected + "]");
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "Given invalid section code \"{0}\", when generateSeat, then throws DomainException")
     @NullAndEmptySource
     @ValueSource(strings = {"a", "A1", "ABCD", "A-1"})
+    @DisplayName("Given invalid section code, when generateSeat, then throws DomainException")
     void givenInvalidSectionCode_whenGenerateSeat_thenThrowDomainException(String code) {
-        assertThrows(DomainException.class, () -> Location.generateSeat(code, 1));
+        final var exception = assertThrows(DomainException.class, () -> Location.generateSeat(code, 1),
+                () -> "Generating seat with invalid section code [" + code + "] should throw DomainException");
+
+        assertEquals("Invalid section code", exception.getMessage(),
+                () -> "Exception message should be \"Invalid section code\" for [" + code + "]");
     }
 
     @Test
+    @DisplayName("Given zero seat number, when generateSeat, then throws DomainException")
     void givenZeroSeatNumber_whenGenerateSeat_thenThrowDomainException() {
-        assertThrows(DomainException.class, () -> Location.generateSeat("A", 0));
+        final var exception = assertThrows(DomainException.class, () -> Location.generateSeat("A", 0),
+                () -> "Generating seat with zero seat number should throw DomainException");
+
+        assertEquals("'seatNumber' should be positive", exception.getMessage(),
+                () -> "Exception message should indicate that seatNumber must be positive");
     }
 
     @Test
+    @DisplayName("Given no context, when generateRandom, then returns short code")
     void givenNoContext_whenGenerateRandom_thenReturnShortCode() {
         final var first = Location.generateRandom();
         final var second = Location.generateRandom();
 
-        assertTrue(first.getValue().matches("[A-Z]\\d{5}"));
-        assertTrue(second.getValue().matches("[A-Z]\\d{5}"));
+        assertTrue(first.getValue().matches("[A-Z]\\d{5}"),
+                () -> "Random location should match pattern [A-Z] with 5 digits");
+        assertTrue(second.getValue().matches("[A-Z]\\d{5}"),
+                () -> "Random location should match pattern [A-Z] with 5 digits");
     }
 }

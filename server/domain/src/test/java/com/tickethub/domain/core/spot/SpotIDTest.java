@@ -6,10 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 
+@DisplayName("Spot ID")
 class SpotIDTest {
 
     @Test
+    @DisplayName("Given no value, when generate, then return valid uuid")
     void givenNoValue_whenGenerate_thenReturnValidUUID() {
         SpotID id = SpotID.generate();
 
@@ -17,11 +20,13 @@ class SpotIDTest {
     }
 
     @Test
+    @DisplayName("Given two generated i ds, when compare, then not be equal")
     void givenTwoGeneratedIDs_whenCompare_thenNotBeEqual() {
         assertNotEquals(SpotID.generate(), SpotID.generate());
     }
 
     @Test
+    @DisplayName("Given a value, when from, then preserve value")
     void givenAValue_whenFrom_thenPreserveValue() {
         String value = "cf4361d9-8e93-4c53-9ac5-629680d98469";
 
@@ -29,6 +34,7 @@ class SpotIDTest {
     }
 
     @Test
+    @DisplayName("Given a null value, when from, then throw null pointer exception")
     void givenANullValue_whenFrom_thenThrowNullPointerException() {
         NullPointerException exception = assertThrows(NullPointerException.class, () -> SpotID.from(null));
 

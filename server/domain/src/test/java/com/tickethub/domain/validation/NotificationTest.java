@@ -2,12 +2,15 @@ package com.tickethub.domain.validation;
 
 import com.tickethub.domain.exception.DomainException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayName("Notification")
 class NotificationTest {
 
     @Test
+    @DisplayName("Starts empty")
     void startsEmpty() {
         final var notification = Notification.create();
 
@@ -17,6 +20,7 @@ class NotificationTest {
     }
 
     @Test
+    @DisplayName("Create with error starts with that error")
     void createWithErrorStartsWithThatError() {
         final var error = new Error("boom");
 
@@ -27,6 +31,7 @@ class NotificationTest {
     }
 
     @Test
+    @DisplayName("Create with throwable wraps its message")
     void createWithThrowableWrapsItsMessage() {
         final var notification = Notification.create(new RuntimeException("kaput"));
 
@@ -34,6 +39,7 @@ class NotificationTest {
     }
 
     @Test
+    @DisplayName("Append accumulates and returns this")
     void appendAccumulatesAndReturnsThis() {
         final var notification = Notification.create();
 
@@ -44,6 +50,7 @@ class NotificationTest {
     }
 
     @Test
+    @DisplayName("Append handler merges its errors")
     void appendHandlerMergesItsErrors() {
         final var other = Notification.create(new Error("a")).append(new Error("b"));
         final var notification = Notification.create();
@@ -54,6 +61,7 @@ class NotificationTest {
     }
 
     @Test
+    @DisplayName("Validate returns value on success")
     void validateReturnsValueOnSuccess() {
         final var notification = Notification.create();
 
@@ -64,6 +72,7 @@ class NotificationTest {
     }
 
     @Test
+    @DisplayName("Validate captures domain exception as error")
     void validateCapturesDomainExceptionAsError() {
         final var notification = Notification.create();
 
@@ -76,6 +85,7 @@ class NotificationTest {
     }
 
     @Test
+    @DisplayName("Validate captures any throwable as error")
     void validateCapturesAnyThrowableAsError() {
         final var notification = Notification.create();
 

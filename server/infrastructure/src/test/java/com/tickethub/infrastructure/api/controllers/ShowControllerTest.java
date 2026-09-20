@@ -17,6 +17,7 @@ import com.tickethub.application.show.update.*;
 import com.tickethub.infrastructure.ControllerTest;
 import com.tickethub.infrastructure.security.ShowAccess;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -34,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ControllerTest(controllers = ShowController.class)
 @Import({SharedMapperImpl.class, ShowMapperImpl.class})
+@DisplayName("Show controller")
 class ShowControllerTest {
     @Autowired MockMvc mvc;
     @Value("${tickethub.security.jwt.secret}")
@@ -58,6 +60,7 @@ class ShowControllerTest {
     @MockitoBean(name = "showAccess") ShowAccess showAccess;
 
     @Test
+    @DisplayName("Given a valid command, when calls create show, should return show id")
     void givenAValidCommand_whenCallsCreateShow_shouldReturnShowId() throws Exception {
         when(createShow.execute(any())).thenReturn(Either.right(new CreateShowOutput("show-1")));
         when(showAccess.canCreate("partner-1")).thenReturn(true);
@@ -71,6 +74,7 @@ class ShowControllerTest {
     }
 
     @Test
+    @DisplayName("Given owner, when calls update show, then succeeds")
     void givenOwner_whenCallsUpdateShow_thenSucceeds() throws Exception {
         when(showAccess.canWrite("show-1")).thenReturn(true);
         when(updateShow.execute(any()))
@@ -84,6 +88,7 @@ class ShowControllerTest {
     }
 
     @Test
+    @DisplayName("Given non owner, when calls update show, then returns forbidden")
     void givenNonOwner_whenCallsUpdateShow_thenReturnsForbidden() throws Exception {
         when(showAccess.canWrite("show-1")).thenReturn(false);
 

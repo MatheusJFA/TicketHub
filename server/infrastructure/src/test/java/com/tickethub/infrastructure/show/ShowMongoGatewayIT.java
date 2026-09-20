@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
@@ -30,6 +31,7 @@ import com.tickethub.infrastructure.section.persistence.SectionDocument;
 import com.tickethub.infrastructure.spot.persistence.SpotDocument;
 
 @IntegrationTest
+@DisplayName("Show Mongo gateway")
 class ShowMongoGatewayIT extends ContainerSupport {
 
     private static final Address ADDRESS = Address.create("Rua do Rock", "s/n", null, "Barra da Tijuca",
@@ -61,6 +63,7 @@ class ShowMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given a show with sections, when create, then bulk persists whole graph")
     void givenAShowWithSections_whenCreate_thenBulkPersistsWholeGraph() {
         final var show = sample();
 
@@ -84,6 +87,7 @@ class ShowMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given a show, when add section and update, then upserts new children")
     void givenAShow_whenAddSectionAndUpdate_thenUpsertsNewChildren() {
         final var show = gateway.create(sample());
 
@@ -101,6 +105,7 @@ class ShowMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given a show, when delete, then cascades whole graph")
     void givenAShow_whenDelete_thenCascadesWholeGraph() {
         final var show = gateway.create(sample());
 
@@ -113,6 +118,7 @@ class ShowMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given shell section, when append spots, then bulk inserts and links")
     void givenShellSection_whenAppendSpots_thenBulkInsertsAndLinks() {
         final var show = Show.create("Mega Fest", "Grande", DATE, ADDRESS, 0, PartnerID.generate());
         final var shell = show.addSectionShell("Arena", "Pista", 3, PRICE);
@@ -132,6 +138,7 @@ class ShowMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given shows, when find all, then paginates and searches")
     void givenShows_whenFindAll_thenPaginatesAndSearches() {
         gateway.create(sample());
         gateway.create(Show.create("Jazz Fest", "Suave", DATE, ADDRESS, 0, PartnerID.generate()));
@@ -149,6 +156,7 @@ class ShowMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given show ids, when exists by ids, then returns only persisted ids")
     void givenShowIds_whenExistsByIds_thenReturnsOnlyPersistedIds() {
         final var first = gateway.create(sample());
         final var second = gateway.create(Show.create("Jazz Fest", "Suave", DATE, ADDRESS, 0,

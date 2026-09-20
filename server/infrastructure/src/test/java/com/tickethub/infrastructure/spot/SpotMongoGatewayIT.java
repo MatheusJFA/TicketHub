@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
@@ -26,6 +27,7 @@ import com.tickethub.infrastructure.spot.SpotMongoGateway;
 import com.tickethub.infrastructure.spot.persistence.SpotDocument;
 
 @IntegrationTest
+@DisplayName("Spot Mongo gateway")
 class SpotMongoGatewayIT extends ContainerSupport {
 
     @Autowired
@@ -50,6 +52,7 @@ class SpotMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given a spot, when create, then persists and finds with parent links")
     void givenASpot_whenCreate_thenPersistsAndFindsWithParentLinks() {
         final var sectionId = givenSection();
         final var spot = Spot.create(Location.create("A1"));
@@ -70,6 +73,7 @@ class SpotMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given a spot without location, when create, then generates and round trips code")
     void givenASpotWithoutLocation_whenCreate_thenGeneratesAndRoundTripsCode() {
         final var spot = Spot.create();
 
@@ -82,6 +86,7 @@ class SpotMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given a spot, when update, then persists changes")
     void givenASpot_whenUpdate_thenPersistsChanges() {
         final var spot = gateway.create(Spot.create(Location.create("A1")), givenSection());
 
@@ -95,6 +100,7 @@ class SpotMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given a spot, when delete, then removes")
     void givenASpot_whenDelete_thenRemoves() {
         final var spot = gateway.create(Spot.create(Location.create("A1")), givenSection());
 
@@ -105,6 +111,7 @@ class SpotMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given spots, when find all, then searches by location")
     void givenSpots_whenFindAll_thenSearchesByLocation() {
         final var sectionId = givenSection();
         gateway.create(Spot.create(Location.create("A1")), sectionId);
@@ -121,6 +128,7 @@ class SpotMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given spot ids, when exists by ids, then returns only persisted ids")
     void givenSpotIds_whenExistsByIds_thenReturnsOnlyPersistedIds() {
         final var sectionId = givenSection();
         final var first = gateway.create(Spot.create(Location.create("A1")), sectionId);

@@ -17,6 +17,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.api.DisplayName;
 
 import com.tickethub.domain.Entity;
 import com.tickethub.domain.core.partner.Partner;
@@ -28,12 +29,14 @@ import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.shared.Money;
 import com.tickethub.domain.validation.Notification;
 
+@DisplayName("Show")
 class ShowTest {
     private static final Address ADDRESS = Address.create("Rua Augusta", "100", null, "Centro", "São Paulo", "SP", "Brasil", "01305-000");
     private static final OffsetDateTime DATE = OffsetDateTime.parse("2027-01-15T20:00:00-03:00");
     private static final Money PRICE = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
 
     @Test
+    @DisplayName("Given valid params, when create, then instantiate show")
     void givenValidParams_whenCreate_thenInstantiateShow() {
         final var expectedName = "O Rei Leão";
         final var expectedDescription = "Uma grande apresentação";
@@ -65,6 +68,7 @@ class ShowTest {
     }
 
     @Test
+    @DisplayName("Given valid params, when create without publish flag, then instantiate show with default publish false")
     void givenValidParams_whenCreateWithoutPublishFlag_thenInstantiateShowWithDefaultPublishFalse() {
         final var expectedName = "O Rei Leão";
         final var expectedDescription = "Uma grande apresentação";
@@ -86,6 +90,7 @@ class ShowTest {
     }
 
     @Test
+    @DisplayName("Given valid show, when publish, then change to published")
     void givenValidShow_whenPublish_thenChangeToPublished() {
         final var expectedPartnerId = PartnerID.generate();
         final var actualShow = Show.create("O Rei Leão", "Uma grande apresentação", DATE, ADDRESS, false, 50L, 0L, expectedPartnerId, new HashSet<Section>());
@@ -98,6 +103,7 @@ class ShowTest {
     }
 
     @Test
+    @DisplayName("Given valid show, when unpublish, then change to unpublished")
     void givenValidShow_whenUnpublish_thenChangeToUnpublished() {
         final var expectedPartnerId = PartnerID.generate();
         final var actualShow = Show.create("O Rei Leão", "Uma grande apresentação", DATE, ADDRESS, true, 50L, 0L, expectedPartnerId, new HashSet<Section>());
@@ -110,6 +116,7 @@ class ShowTest {
     }
 
     @Test
+    @DisplayName("Given invalid name, when create, then throw domain exception")
     void givenInvalidName_whenCreate_thenThrowDomainException() {
         final var expectedName = "A";
         final var expectedDescription = "Uma grande apresentação";
@@ -138,6 +145,7 @@ class ShowTest {
 
 
     @Test
+    @DisplayName("Given partner, when create show, then associate partner and initialize defaults")
     void givenPartner_whenCreateShow_thenAssociatePartnerAndInitializeDefaults() {
         final var partner = Partner.create("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), "cinema@domain.com", "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
         final var show = partner.createShow("Concert", "Description", DATE, ADDRESS, 10);
@@ -158,6 +166,7 @@ class ShowTest {
 
     @ParameterizedTest
     @ValueSource(longs = {0, 1, 25})
+    @DisplayName("Given capacity, when create section, then generate unique available unpublished spots")
     void givenCapacity_whenCreateSection_thenGenerateUniqueAvailableUnpublishedSpots(long capacity) {
         final var section = Section.create("VIP", "Description", capacity, PRICE);
 
@@ -176,6 +185,7 @@ class ShowTest {
     }
 
     @Test
+    @DisplayName("Given no location, when create spot, then allow validation with default flags")
     void givenNoLocation_whenCreateSpot_thenAllowValidationWithDefaultFlags() {
         final var spot = Spot.create();
         assertNotNull(spot.getId());
@@ -188,6 +198,7 @@ class ShowTest {
     }
 
     @Test
+    @DisplayName("Given show, when add sections, then accumulate capacity and generate spots")
     void givenShow_whenAddSections_thenAccumulateCapacityAndGenerateSpots() throws Exception {
         final var show = Show.create("Concert", "Description", DATE, ADDRESS, 10, PartnerID.generate());
         final var createdAt = show.getCreatedAt();
@@ -221,6 +232,7 @@ class ShowTest {
     }
 
     @Test
+    @DisplayName("Given invalid section name, when add section, then leave show unchanged")
     void givenInvalidSectionName_whenAddSection_thenLeaveShowUnchanged() {
         final var show = Show.create("Concert", "Description", DATE, ADDRESS, 10, PartnerID.generate());
         final var updatedAt = show.getUpdatedAt();
@@ -235,6 +247,7 @@ class ShowTest {
     }
 
     @Test
+    @DisplayName("Given show, when publish and unpublish, then update state and audit")
     void givenShow_whenPublishAndUnpublish_thenUpdateStateAndAudit() throws Exception {
         final var show = Show.create("Concert", "Description", DATE, ADDRESS, 0, PartnerID.generate());
         final var createdAt = show.getCreatedAt();
@@ -250,6 +263,7 @@ class ShowTest {
     }
 
     @Test
+    @DisplayName("Given section, when publish and unpublish, then update state and audit")
     void givenSection_whenPublishAndUnpublish_thenUpdateStateAndAudit() throws Exception {
         final var section = Section.create("VIP", "Description", 1, PRICE);
         final var createdAt = section.getCreatedAt();
@@ -265,6 +279,7 @@ class ShowTest {
     }
 
     @Test
+    @DisplayName("Given spot, when publish and unpublish, then update state and audit")
     void givenSpot_whenPublishAndUnpublish_thenUpdateStateAndAudit() throws Exception {
         final var spot = Spot.create();
         final var createdAt = spot.getCreatedAt();
@@ -281,6 +296,7 @@ class ShowTest {
     }
 
     @Test
+    @DisplayName("Given no address, when validate, then report required address")
     void givenNoAddress_whenValidate_thenReportRequiredAddress() {
         final var show = Show.create("Concert", "Description", DATE, null, 10, PartnerID.generate());
         final var notification = Notification.create();
@@ -292,6 +308,7 @@ class ShowTest {
     }
 
     @Test
+    @DisplayName("Given invalid show, when validate, then accumulate errors")
     void givenInvalidShow_whenValidate_thenAccumulateErrors() {
         final var show = Show.create("Concert", "Description", DATE, ADDRESS, false, -1, -1, null, null);
         final var notification = Notification.create();
@@ -302,6 +319,7 @@ class ShowTest {
     }
 
     @Test
+    @DisplayName("Given invalid section, when validate, then accumulate errors")
     void givenInvalidSection_whenValidate_thenAccumulateErrors() {
         final var section = Section.create("VIP", "Description", false, -1, -1, null, null);
         final var notification = Notification.create();
@@ -313,6 +331,7 @@ class ShowTest {
 
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 3})
+    @DisplayName("Given sections with mixed publication, when publish all, then publish entire show")
     void givenSectionsWithMixedPublication_whenPublishAll_thenPublishEntireShow(int sectionCount) throws Exception {
         final var show = Show.create("Concert", "Description", DATE, ADDRESS, 0, PartnerID.generate());
         for (int i = 0; i < sectionCount; i++) {
@@ -349,6 +368,7 @@ class ShowTest {
 
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 3})
+    @DisplayName("Given published show, when unpublish all, then unpublish entire show")
     void givenPublishedShow_whenUnpublishAll_thenUnpublishEntireShow(int sectionCount) throws Exception {
         final var show = Show.create("Concert", "Description", DATE, ADDRESS, 0, PartnerID.generate());
         for (int i = 0; i < sectionCount; i++) {

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.Document;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
@@ -18,6 +19,7 @@ import com.tickethub.infrastructure.ContainerSupport;
 import com.tickethub.infrastructure.IntegrationTest;
 
 @IntegrationTest
+@DisplayName("LiquibaseMigration")
 class LiquibaseMigrationIT extends ContainerSupport {
 
     private static final String CHANGELOG = "db/changelog/db.changelog-master.xml";
@@ -28,13 +30,16 @@ class LiquibaseMigrationIT extends ContainerSupport {
     MongoDatabaseFactory factory;
 
     @Test
+    @DisplayName("Given startup, when migrate, then applies changes once and preserves data")
     void migratesOnStartupAndDoesNotReapplyChangesOrCloseClient() throws Exception {
         final var database = factory.getMongoDatabase();
         final var collections = database.listCollectionNames().into(new ArrayList<>());
         assertTrue(collections.containsAll(
-                List.of("customers", "partners", "shows", "sections", "spots")));
+                List.of("customers", "partners", "shows", "sections", "spots")),
+                () -> "Database should contain all expected collections after migration");
         final var history = database.getCollection("DATABASECHANGELOG");
-        assertEquals(12, history.countDocuments());
+        assertEquals(12, history.countDocuments(),
+                () -> "Changelog history should contain 12 applied changesets");
         final var appliedIds = history.find()
                 .into(new ArrayList<>())
                 .stream()
@@ -48,17 +53,26 @@ class LiquibaseMigrationIT extends ContainerSupport {
                 "004-1-ownership-links-indexes",
                 "005-1-auth-credentials-indexes",
                 "006-1-create-refresh-sessions",
-                "006-2-create-refresh-sessions-indexes")));
+                "006-2-create-refresh-sessions-indexes")),
+                () -> "Changelog history should contain all expected changeset ids");
         database.getCollection("customers").insertOne(new Document("_id", "preserved"));
         LiquibaseConfiguration.migrate(client, factory, CHANGELOG);
-        assertEquals(12, history.countDocuments());
-        assertNotNull(database.getCollection("customers").find(new Document("_id", "preserved")).first());
-        assertEquals(1.0, database.runCommand(new Document("ping", 1)).getDouble("ok"));
+        assertEquals(12, history.countDocuments(),
+                () -> "Re-running migration should not reapply changesets");
+        assertNotNull(database.getCollection("customers").find(new Document("_id", "preserved")).first(),
+                () -> "Re-running migration should preserve existing customer data");
+        assertEquals(1.0, database.runCommand(new Document("ping", 1)).getDouble("ok"),
+                () -> "Mongo client should remain usable after migration");
     }
 
     @Test
+    @DisplayName("Given missing changelog, when migrate, then propagates migration failure")
     void propagatesMigrationFailures() {
-        assertThrows(Exception.class,
-                () -> LiquibaseConfiguration.migrate(client, factory, "missing-changelog.xml"));
+        final var exception = assertThrows(Exception.class,
+                () -> LiquibaseConfiguration.migrate(client, factory, "missing-changelog.xml"),
+                () -> "Migrating with a missing changelog should throw");
+
+        assertNotNull(exception,
+                () -> "Migration failure should produce an exception");
     }
 }

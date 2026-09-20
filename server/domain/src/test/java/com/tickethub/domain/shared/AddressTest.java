@@ -17,14 +17,17 @@ import org.junit.jupiter.params.provider.Arguments;
 import com.tickethub.domain.geo.CepAddress;import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.api.DisplayName;
 
 import com.tickethub.domain.exception.DomainException;
 
+@DisplayName("Address")
 class AddressTest {
     private static final List<String> FIELDS = List.of("street", "number", "complement", "neighborhood",
             "city", "state", "country", "zipCode");
 
     @Test
+    @DisplayName("Given padded fields, when create, then normalize and expose address")
     void givenPaddedFields_whenCreate_thenNormalizeAndExposeAddress() {
         final var address = Address.create("  Rua   São João  ", "  12-A ", " Sala\t 10 ", " Centro ",
                 " São\u00a0Paulo ", " SP ", " Brasil ", " 01035-000 ");
@@ -41,6 +44,7 @@ class AddressTest {
 
     @ParameterizedTest
     @MethodSource("invalidRequiredFields")
+    @DisplayName("Given missing required field, when create, then reject with field message")
     void givenMissingRequiredField_whenCreate_thenRejectWithFieldMessage(int index, String value) {
         final var fields = validFields();
         fields[index] = value;
@@ -59,6 +63,7 @@ class AddressTest {
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {" ", "\t\n", "\u00a0"})
+    @DisplayName("Given missing complement, when create, then keep it optional")
     void givenMissingComplement_whenCreate_thenKeepItOptional(String complement) {
         final var fields = validFields();
         fields[2] = complement;
@@ -67,6 +72,7 @@ class AddressTest {
     }
 
     @Test
+    @DisplayName("Given equivalent addresses, when compare, then use normalized value equality")
     void givenEquivalentAddresses_whenCompare_thenUseNormalizedValueEquality() {
         final var first = create(validFields());
         final var fields = validFields();
@@ -83,6 +89,7 @@ class AddressTest {
 
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6, 7})
+    @DisplayName("Given different field, when compare, then addresses differ")
     void givenDifferentField_whenCompare_thenAddressesDiffer(int index) {
         final var fields = validFields();
         fields[index] = "Another value";
@@ -91,6 +98,7 @@ class AddressTest {
     }
 
     @Test
+    @DisplayName("Given international address, when create, then preserve postal format")
     void givenInternationalAddress_whenCreate_thenPreservePostalFormat() {
         final var address = Address.create("Baker Street", "221B", null, "Marylebone", "London",
                 "Greater London", "United Kingdom", "NW1 6XE");
@@ -100,6 +108,7 @@ class AddressTest {
     }
 
     @Test
+    @DisplayName("Given invalid street, when call constructor, then cannot bypass validation")
     void givenInvalidStreet_whenCallConstructor_thenCannotBypassValidation() {
         final var exception = assertThrows(DomainException.class,
                 () -> new Address(null, "100", null, "Centro", "São Paulo", "SP", "Brasil", "01305-000"));
@@ -108,6 +117,7 @@ class AddressTest {
     }
 
     @Test
+    @DisplayName("Given CEP data, when enriched with, then overwrites except number and complement")
     void givenCepData_whenEnrichedWith_thenOverwritesExceptNumberAndComplement() {
         final var address = create(validFields());
         final var cep = new CepAddress("01305000", "Avenida Paulista", "Bela Vista", "São Paulo", "SP",
@@ -123,6 +133,7 @@ class AddressTest {
     }
 
     @Test
+    @DisplayName("Given blank CEP fields, when enriched with, then keeps current values")
     void givenBlankCepFields_whenEnrichedWith_thenKeepsCurrentValues() {
         final var address = create(validFields());
         final var cep = new CepAddress("01305000", "", null, "São Paulo", "", null);

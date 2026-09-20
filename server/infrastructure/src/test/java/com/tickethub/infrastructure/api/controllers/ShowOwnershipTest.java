@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -36,6 +37,7 @@ import com.tickethub.infrastructure.security.TestTokens;
 
 @ControllerTest(controllers = ShowController.class)
 @Import({SharedMapperImpl.class, ShowMapperImpl.class})
+@DisplayName("Show ownership")
 class ShowOwnershipTest {
 
     @Autowired
@@ -76,12 +78,14 @@ class ShowOwnershipTest {
     }
 
     @Test
+    @DisplayName("Given no token, when publish show, then returns401")
     void givenNoToken_whenPublishShow_thenReturns401() throws Exception {
         mvc.perform(post("/shows/show-1/publish"))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
+    @DisplayName("Given owner, when publish show, then succeeds")
     void givenOwner_whenPublishShow_thenSucceeds() throws Exception {
         when(publishShow.execute(any())).thenReturn(Either.right(PublishShowOutput.from("show-1")));
         when(showAccess.canPublish("show-1")).thenReturn(true);
@@ -93,6 +97,7 @@ class ShowOwnershipTest {
     }
 
     @Test
+    @DisplayName("Given another partner, when publish show, then returns forbidden")
     void givenAnotherPartner_whenPublishShow_thenReturnsForbidden() throws Exception {
         when(showAccess.canPublish("show-1")).thenReturn(false);
 

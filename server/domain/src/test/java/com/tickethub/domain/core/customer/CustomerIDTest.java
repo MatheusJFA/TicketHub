@@ -8,11 +8,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 
 
+@DisplayName("Customer ID")
 public class CustomerIDTest {
 
     @Test
+    @DisplayName("Given no value, when generate, then return valid uuid")
     void givenNoValue_whenGenerate_thenReturnValidUUID() {
         CustomerID id = CustomerID.generate();
 
@@ -22,6 +25,7 @@ public class CustomerIDTest {
     }
 
     @Test
+    @DisplayName("Given two generated i ds, when compare, then not be equal")
     void givenTwoGeneratedIDs_whenCompare_thenNotBeEqual() {
         CustomerID first = CustomerID.generate();
         CustomerID second = CustomerID.generate();
@@ -31,6 +35,7 @@ public class CustomerIDTest {
     }
 
     @Test
+    @DisplayName("Given a valid value, when from, then store value")
     void givenAValidValue_whenFrom_thenStoreValue() {
         String value = "cf4361d9-8e93-4c53-9ac5-629680d98469";
 
@@ -40,6 +45,7 @@ public class CustomerIDTest {
     }
 
     @Test
+    @DisplayName("Given a null value, when from, then throw null pointer exception")
     void givenANullValue_whenFrom_thenThrowNullPointerException() {
         NullPointerException exception = assertThrows(
                 NullPointerException.class,
@@ -50,6 +56,7 @@ public class CustomerIDTest {
     }
 
     @Test
+    @DisplayName("Given the same instance, when compare, then be equal")
     void givenTheSameInstance_whenCompare_thenBeEqual() {
         CustomerID id = CustomerID.from("cf4361d9-8e93-4c53-9ac5-629680d98469");
 
@@ -57,6 +64,7 @@ public class CustomerIDTest {
     }
 
     @Test
+    @DisplayName("Given i ds with same value, when compare, then be equal and have same hash code")
     void givenIDsWithSameValue_whenCompare_thenBeEqualAndHaveSameHashCode() {
         CustomerID first = CustomerID.from("cf4361d9-8e93-4c53-9ac5-629680d98469");
         CustomerID second = CustomerID.from("cf4361d9-8e93-4c53-9ac5-629680d98469");
@@ -67,6 +75,7 @@ public class CustomerIDTest {
     }
 
     @Test
+    @DisplayName("Given i ds with different values, when compare, then not be equal")
     void givenIDsWithDifferentValues_whenCompare_thenNotBeEqual() {
         CustomerID first = CustomerID.from("cf4361d9-8e93-4c53-9ac5-629680d98469");
         CustomerID second = CustomerID.from("f2f50ac2-ef1e-42a5-89c1-b0527662b458");
@@ -76,6 +85,7 @@ public class CustomerIDTest {
     }
 
     @Test
+    @DisplayName("Given a null object, when compare, then not be equal")
     void givenANullObject_whenCompare_thenNotBeEqual() {
         CustomerID id = CustomerID.from("cf4361d9-8e93-4c53-9ac5-629680d98469");
 
@@ -83,6 +93,7 @@ public class CustomerIDTest {
     }
 
     @Test
+    @DisplayName("Given a string with same value, when compare, then not be equal")
     void givenAStringWithSameValue_whenCompare_thenNotBeEqual() {
         String value = "cf4361d9-8e93-4c53-9ac5-629680d98469";
         CustomerID id = CustomerID.from(value);

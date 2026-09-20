@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.MediaType;
@@ -23,6 +24,7 @@ import com.tickethub.infrastructure.auth.persistence.RefreshSessionDocument;
 import com.tickethub.infrastructure.customer.persistence.CustomerDocument;
 
 @E2ETest
+@DisplayName("Auth E2 e")
 class AuthE2ETest extends ContainerSupport {
 
     @Autowired
@@ -76,6 +78,7 @@ class AuthE2ETest extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given registered customer, when login, then access token authorizes self service")
     void givenRegisteredCustomer_whenLogin_thenAccessTokenAuthorizesSelfService() throws Exception {
         final var customerId = registerCustomer("52998224725", "auth-login@domain.com").get("id").asText();
         final var session = login("auth-login@domain.com", "secret-123");
@@ -89,6 +92,7 @@ class AuthE2ETest extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given wrong password, when login, then returns401")
     void givenWrongPassword_whenLogin_thenReturns401() throws Exception {
         registerCustomer("12345678909", "auth-wrong@domain.com");
 
@@ -100,6 +104,7 @@ class AuthE2ETest extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given valid refresh token, when refresh, then rotates session")
     void givenValidRefreshToken_whenRefresh_thenRotatesSession() throws Exception {
         registerCustomer("11144477735", "auth-rotate@domain.com");
         final var session = login("auth-rotate@domain.com", "secret-123");
@@ -123,6 +128,7 @@ class AuthE2ETest extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given refresh token, when logout, then session is revoked")
     void givenRefreshToken_whenLogout_thenSessionIsRevoked() throws Exception {
         registerCustomer("98765432100", "auth-logout@domain.com");
         final var session = login("auth-logout@domain.com", "secret-123");
@@ -140,6 +146,7 @@ class AuthE2ETest extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given bootstrap admin, when login, then returns admin session")
     void givenBootstrapAdmin_whenLogin_thenReturnsAdminSession() throws Exception {
         final MvcResult login = mvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)

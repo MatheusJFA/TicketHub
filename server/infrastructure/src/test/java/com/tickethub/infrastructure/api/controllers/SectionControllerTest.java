@@ -16,6 +16,7 @@ import com.tickethub.application.section.update.*;
 import com.tickethub.infrastructure.ControllerTest;
 import com.tickethub.infrastructure.security.ShowAccess;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -34,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ControllerTest(controllers = SectionController.class)
 @Import({SharedMapperImpl.class, SectionMapperImpl.class})
+@DisplayName("Section controller")
 class SectionControllerTest {
     @Autowired MockMvc mvc;
     @Value("${tickethub.security.jwt.secret}")
@@ -62,6 +64,7 @@ class SectionControllerTest {
     ShowAccess showAccess;
 
     @Test
+    @DisplayName("Given a valid command, when calls create section, should return section id")
     void givenAValidCommand_whenCallsCreateSection_shouldReturnSectionId() throws Exception {
         when(createSection.execute(any())).thenReturn(Either.right(new CreateSectionOutput("section-1")));
 
@@ -73,6 +76,7 @@ class SectionControllerTest {
     }
 
     @Test
+    @DisplayName("Given non owner, when changes section name, then returns forbidden")
     void givenNonOwner_whenChangesSectionName_thenReturnsForbidden() throws Exception {
         when(showAccess.canWriteSection("section-1")).thenReturn(false);
 
@@ -84,6 +88,7 @@ class SectionControllerTest {
     }
 
     @Test
+    @DisplayName("Given owner, when changes section name, then succeeds")
     void givenOwner_whenChangesSectionName_thenSucceeds() throws Exception {
         when(showAccess.canWriteSection("section-1")).thenReturn(true);
         when(changeSectionName.execute(any()))
@@ -98,6 +103,7 @@ class SectionControllerTest {
     }
 
     @Test
+    @DisplayName("Given owner, when calls update section, then succeeds")
     void givenOwner_whenCallsUpdateSection_thenSucceeds() throws Exception {
         when(showAccess.canWriteSection("section-1")).thenReturn(true);
         when(updateSection.execute(any()))
@@ -112,6 +118,7 @@ class SectionControllerTest {
     }
 
     @Test
+    @DisplayName("Given non owner, when calls update section, then returns forbidden")
     void givenNonOwner_whenCallsUpdateSection_thenReturnsForbidden() throws Exception {
         when(showAccess.canWriteSection("section-1")).thenReturn(false);
 

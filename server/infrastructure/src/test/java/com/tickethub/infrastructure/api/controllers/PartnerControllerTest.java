@@ -13,6 +13,7 @@ import com.tickethub.infrastructure.security.OwnerAccess;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -31,6 +32,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 @ControllerTest(controllers = PartnerController.class)
 @Import({SharedMapperImpl.class, PartnerMapperImpl.class})
+@DisplayName("Partner controller")
 class PartnerControllerTest {
     @Autowired MockMvc mvc;
     @MockitoBean ChangePartnerAddressUseCase changePartnerAddress;
@@ -50,6 +52,7 @@ class PartnerControllerTest {
     }
 
     @Test
+    @DisplayName("Given a valid command, when calls create partner, should return partner id")
     void givenAValidCommand_whenCallsCreatePartner_shouldReturnPartnerId() throws Exception {
         when(createPartner.execute(any())).thenReturn(Either.right(new CreatePartnerOutput("partner-1")));
 
@@ -62,6 +65,7 @@ class PartnerControllerTest {
     }
 
     @Test
+    @DisplayName("Given owner, when calls delete own partner, then returns no content")
     void givenOwner_whenCallsDeleteOwnPartner_thenReturnsNoContent() throws Exception {
         when(deletePartner.execute("partner-1")).thenReturn(Optional.empty());
         when(ownerAccess.isSelfOrAdmin("partner-1")).thenReturn(true);
@@ -72,6 +76,7 @@ class PartnerControllerTest {
     }
 
     @Test
+    @DisplayName("Given another account, when calls delete partner, then returns forbidden")
     void givenAnotherAccount_whenCallsDeletePartner_thenReturnsForbidden() throws Exception {
         mvc.perform(delete("/partners/partner-1")
                         .header("Authorization", bearer("partner-9", "partner:delete")))
@@ -79,6 +84,7 @@ class PartnerControllerTest {
     }
 
     @Test
+    @DisplayName("Given owner, when calls update partner, then succeeds")
     void givenOwner_whenCallsUpdatePartner_thenSucceeds() throws Exception {
         when(updatePartner.execute(any())).thenReturn(Either.right(new UpdatePartnerOutput("partner-1")));
         when(ownerAccess.isSelfOrAdmin("partner-1")).thenReturn(true);
@@ -94,6 +100,7 @@ class PartnerControllerTest {
     }
 
     @Test
+    @DisplayName("Given another account, when calls update partner, then returns forbidden")
     void givenAnotherAccount_whenCallsUpdatePartner_thenReturnsForbidden() throws Exception {
         mvc.perform(put("/partners/partner-1")
                         .header("Authorization", bearer("partner-9", "partner:write"))

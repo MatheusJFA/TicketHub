@@ -7,9 +7,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.api.DisplayName;
 
 import com.tickethub.domain.exception.DomainException;
 
+@DisplayName("Partner")
 class PartnerTest {
 
     private static final String VALID_EMAIL = "cinema@domain.com";
@@ -18,6 +20,7 @@ class PartnerTest {
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {" ", "J"})
+    @DisplayName("Given invalid name, when create, then throw domain exception for null and blank")
     void givenInvalidName_whenCreate_thenThrowDomainExceptionForNullAndBlank(String name) {
         assertEquals("Invalid name " + name, assertThrows(DomainException.class,
                 () -> Partner.create(name, "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), VALID_EMAIL, VALID_HASH)).getMessage());
@@ -26,6 +29,7 @@ class PartnerTest {
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {" ", "123"})
+    @DisplayName("Given invalid CNPJ, when create, then throw domain exception for null and blank")
     void givenInvalidCnpj_whenCreate_thenThrowDomainExceptionForNullAndBlank(String cnpj) {
         assertEquals("Invalid CNPJ", assertThrows(DomainException.class,
                 () -> Partner.create("Cinema Nova", cnpj, com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), VALID_EMAIL, VALID_HASH)).getMessage());
@@ -34,12 +38,14 @@ class PartnerTest {
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {" ", "plainaddress"})
+    @DisplayName("Given invalid email, when create, then throw domain exception")
     void givenInvalidEmail_whenCreate_thenThrowDomainException(String email) {
         assertEquals("Invalid email", assertThrows(DomainException.class,
                 () -> Partner.create("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), email, VALID_HASH)).getMessage());
     }
 
     @Test
+    @DisplayName("Given valid params, when create, then instantiate partner")
     void givenValidParams_whenCreate_thenInstantiatePartner() {
         final var expectedName = "Cinema Nova";
         final var expectedCnpj = "11222333000181";
@@ -55,6 +61,7 @@ class PartnerTest {
     }
 
     @Test
+    @DisplayName("Given invalid name, when create, then throw domain exception")
     void givenInvalidName_whenCreate_thenThrowDomainException() {
         final var expectedName = "J";
         final var expectedCnpj = "11222333000181";
@@ -68,6 +75,7 @@ class PartnerTest {
     }
 
     @Test
+    @DisplayName("Given invalid CNPJ, when create, then throw domain exception")
     void givenInvalidCnpj_whenCreate_thenThrowDomainException() {
         final var expectedName = "Cinema Nova";
         final var expectedCnpj = "11222333000182";

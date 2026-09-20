@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -21,6 +22,7 @@ import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.shared.Money;
 
+@DisplayName("Unpublish all show use case")
 public class UnpublishAllShowUseCaseTest extends UseCaseTest {
     private static final OffsetDateTime DATE = OffsetDateTime.parse("2027-01-15T20:00:00-03:00");
     private static final Address ADDRESS = Address.create("Rua Augusta", "100", null, "Centro", "São Paulo", "SP", "Brasil", "01305-000");
@@ -38,6 +40,7 @@ public class UnpublishAllShowUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given valid command, when execute, should persist and return id")
     public void givenValidCommand_whenExecute_shouldPersistAndReturnId() {
         final var entity = entity();
         final var command = UnpublishAllShowCommand.with(entity.getId().getValue());
@@ -61,6 +64,7 @@ public class UnpublishAllShowUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given gateway failure, when execute, should return notification")
     public void givenGatewayFailure_whenExecute_shouldReturnNotification() {
         final var entity = entity();
         final var command = UnpublishAllShowCommand.with(entity.getId().getValue());
@@ -83,6 +87,7 @@ public class UnpublishAllShowUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given missing show, when execute, should not persist")
     public void givenMissingShow_whenExecute_shouldNotPersist() {
         final var entity = entity();
         final var command = UnpublishAllShowCommand.with(entity.getId().getValue());
@@ -97,6 +102,7 @@ public class UnpublishAllShowUseCaseTest extends UseCaseTest {
     }
 
     @Test
+    @DisplayName("Given lookup failure, when execute, should return notification")
     public void givenLookupFailure_whenExecute_shouldReturnNotification() {
         final var entity = entity();
         final var command = UnpublishAllShowCommand.with(entity.getId().getValue());

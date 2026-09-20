@@ -6,6 +6,7 @@ import java.util.Currency;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import com.tickethub.domain.shared.*;
@@ -13,6 +14,7 @@ import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.pagination.*;
 import com.tickethub.domain.core.spot.*;
 
+@DisplayName("Change spot location use case")
 class ChangeSpotLocationUseCaseTest {
     private final Spot entity = Spot.create(Location.create("A1"));
     private final SpotGateway gateway = mock(SpotGateway.class);
@@ -21,6 +23,7 @@ class ChangeSpotLocationUseCaseTest {
     private final Location value = Location.create("B2");
 
     @Test
+    @DisplayName("Changes only requested field and persists")
     void changesOnlyRequestedFieldAndPersists() {
         final var createdAt = entity.getCreatedAt();
         final var updatedAt = entity.getUpdatedAt();
@@ -40,6 +43,7 @@ class ChangeSpotLocationUseCaseTest {
     }
 
     @Test
+    @DisplayName("Rejects invalid value without mutation or persistence")
     void rejectsInvalidValueWithoutMutationOrPersistence() {
         final var original = entity.getLocation();
         final var updatedAt = entity.getUpdatedAt();
@@ -53,6 +57,7 @@ class ChangeSpotLocationUseCaseTest {
     }
 
     @Test
+    @DisplayName("Reports missing entity without persistence")
     void reportsMissingEntityWithoutPersistence() {
         when(gateway.findById(entity.getId())).thenReturn(Optional.empty());
         final var command = ChangeSpotLocationCommand.with(id, value);
@@ -62,6 +67,7 @@ class ChangeSpotLocationUseCaseTest {
     }
 
     @Test
+    @DisplayName("Reports lookup failure without persistence")
     void reportsLookupFailureWithoutPersistence() {
         when(gateway.findById(entity.getId())).thenThrow(new IllegalStateException("lookup failed"));
         final var command = ChangeSpotLocationCommand.with(id, value);
@@ -71,6 +77,7 @@ class ChangeSpotLocationUseCaseTest {
     }
 
     @Test
+    @DisplayName("Reports persistence failure")
     void reportsPersistenceFailure() {
         when(gateway.findById(entity.getId())).thenReturn(Optional.of(entity));
         when(gateway.update(entity)).thenThrow(new IllegalStateException("save failed"));

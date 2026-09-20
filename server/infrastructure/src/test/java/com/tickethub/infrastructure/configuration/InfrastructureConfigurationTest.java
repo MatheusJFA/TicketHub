@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import com.mongodb.MongoClientSettings;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.boot.kafka.autoconfigure.KafkaProperties;
 import org.springframework.boot.mongodb.autoconfigure.MongoClientSettingsBuilderCustomizer;
 import org.springframework.boot.mongodb.autoconfigure.MongoProperties;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Configuration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@DisplayName("Infrastructure configuration")
 class InfrastructureConfigurationTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
@@ -27,6 +29,7 @@ class InfrastructureConfigurationTest {
     }
 
     @Test
+    @DisplayName("Loads Mongo database and bounded timeouts")
     void loadsMongoDatabaseAndBoundedTimeouts() {
         contextRunner.withPropertyValues(
                 "spring.mongodb.database=config-test",
@@ -45,6 +48,7 @@ class InfrastructureConfigurationTest {
     }
 
     @Test
+    @DisplayName("Loads kafka producer consumer and listener settings")
     void loadsKafkaProducerConsumerAndListenerSettings() {
         contextRunner.run(context -> {
             assertThat(context).hasNotFailed();
@@ -62,6 +66,7 @@ class InfrastructureConfigurationTest {
     }
 
     @Test
+    @DisplayName("Uses same configured topic for admin and template")
     void usesSameConfiguredTopicForAdminAndTemplate() {
         contextRunner.withPropertyValues(
                 "tickethub.kafka.topic.name=custom.events",
@@ -80,12 +85,14 @@ class InfrastructureConfigurationTest {
     }
 
     @Test
+    @DisplayName("Rejects unbounded Mongo timeout")
     void rejectsUnboundedMongoTimeout() {
         contextRunner.withPropertyValues("tickethub.mongo.read-timeout=0s")
                 .run(context -> assertThat(context).hasFailed());
     }
 
     @Test
+    @DisplayName("Rejects invalid topic partition count")
     void rejectsInvalidTopicPartitionCount() {
         contextRunner.withPropertyValues("tickethub.kafka.topic.partitions=0")
                 .run(context -> assertThat(context).hasFailed());

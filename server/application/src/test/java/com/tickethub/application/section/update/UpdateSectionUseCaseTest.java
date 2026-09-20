@@ -5,11 +5,13 @@ import java.util.Optional;
 import java.util.Currency;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import com.tickethub.domain.shared.*;
 import com.tickethub.domain.core.section.*;
 
+@DisplayName("Update section use case")
 class UpdateSectionUseCaseTest {
     private static final Money PRICE = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
     private static final Money NEW_PRICE = Money.create(new BigDecimal("99.90"), Currency.getInstance("BRL"));
@@ -19,6 +21,7 @@ class UpdateSectionUseCaseTest {
     private final String id = entity.getId().getValue();
 
     @Test
+    @DisplayName("Updates all fields and persists")
     void updatesAllFieldsAndPersists() {
         when(gateway.findById(entity.getId())).thenReturn(Optional.of(entity));
         when(gateway.update(entity)).thenReturn(entity);
@@ -32,6 +35,7 @@ class UpdateSectionUseCaseTest {
     }
 
     @Test
+    @DisplayName("Rejects invalid value without persistence")
     void rejectsInvalidValueWithoutPersistence() {
         when(gateway.findById(entity.getId())).thenReturn(Optional.of(entity));
         final var command = UpdateSectionCommand.with(id, "Pista", "Geral", null);
@@ -41,6 +45,7 @@ class UpdateSectionUseCaseTest {
     }
 
     @Test
+    @DisplayName("Reports missing entity without persistence")
     void reportsMissingEntityWithoutPersistence() {
         when(gateway.findById(entity.getId())).thenReturn(Optional.empty());
         final var command = UpdateSectionCommand.with(id, "Pista", "Geral", NEW_PRICE);

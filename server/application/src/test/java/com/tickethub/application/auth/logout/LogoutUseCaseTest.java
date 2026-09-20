@@ -14,6 +14,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.DisplayName;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -22,6 +23,7 @@ import com.tickethub.domain.auth.RefreshSessionGateway;
 import com.tickethub.domain.auth.SecureTokens;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("Logout use case")
 class LogoutUseCaseTest {
 
     @Mock
@@ -35,6 +37,7 @@ class LogoutUseCaseTest {
     }
 
     @Test
+    @DisplayName("Given known token, when execute, then revokes session")
     void givenKnownToken_whenExecute_thenRevokesSession() {
         final var presented = SecureTokens.generateOpaqueToken();
         final var session = RefreshSession.issue(SecureTokens.sha256Hex(presented), "maria@domain.com",
@@ -49,6 +52,7 @@ class LogoutUseCaseTest {
     }
 
     @Test
+    @DisplayName("Given unknown token, when execute, then succeeds without persistence")
     void givenUnknownToken_whenExecute_thenSucceedsWithoutPersistence() {
         when(refreshSessions.findByTokenHash(any())).thenReturn(Optional.empty());
 

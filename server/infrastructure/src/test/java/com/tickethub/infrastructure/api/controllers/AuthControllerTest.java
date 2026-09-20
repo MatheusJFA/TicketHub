@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -26,6 +27,7 @@ import com.tickethub.infrastructure.ControllerTest;
 import java.util.Optional;
 
 @ControllerTest(controllers = AuthController.class)
+@DisplayName("Auth controller")
 class AuthControllerTest {
 
     @Autowired
@@ -41,6 +43,7 @@ class AuthControllerTest {
     LogoutUseCase logoutUseCase;
 
     @Test
+    @DisplayName("Given valid credentials, when login, then returns session")
     void givenValidCredentials_whenLogin_thenReturnsSession() throws Exception {
         when(loginUseCase.execute(any()))
                 .thenReturn(Either.right(new LoginOutput("access-token", "Bearer", 900, "refresh-token")));
@@ -55,6 +58,7 @@ class AuthControllerTest {
     }
 
     @Test
+    @DisplayName("Given invalid credentials, when login, then returns401")
     void givenInvalidCredentials_whenLogin_thenReturns401() throws Exception {
         when(loginUseCase.execute(any()))
                 .thenReturn(Either.left(Notification.create(new AuthenticationException("Invalid credentials"))));
@@ -66,6 +70,7 @@ class AuthControllerTest {
     }
 
     @Test
+    @DisplayName("Given blank identifier, when login, then returns400")
     void givenBlankIdentifier_whenLogin_thenReturns400() throws Exception {
         mvc.perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON)
                         .content("{\"identifier\":\"\",\"password\":\"secret-123\"}"))
@@ -73,6 +78,7 @@ class AuthControllerTest {
     }
 
     @Test
+    @DisplayName("Given valid refresh token, when refresh, then returns new session")
     void givenValidRefreshToken_whenRefresh_thenReturnsNewSession() throws Exception {
         when(refreshTokenUseCase.execute(any())).thenReturn(
                 Either.right(new RefreshTokenOutput("new-access", "Bearer", 900, "new-refresh")));
@@ -85,6 +91,7 @@ class AuthControllerTest {
     }
 
     @Test
+    @DisplayName("Given invalid refresh token, when refresh, then returns401")
     void givenInvalidRefreshToken_whenRefresh_thenReturns401() throws Exception {
         when(refreshTokenUseCase.execute(any())).thenReturn(
                 Either.left(Notification.create(new AuthenticationException("Invalid refresh token"))));
@@ -96,6 +103,7 @@ class AuthControllerTest {
     }
 
     @Test
+    @DisplayName("Given refresh token, when logout, then returns204")
     void givenRefreshToken_whenLogout_thenReturns204() throws Exception {
         when(logoutUseCase.execute(any())).thenReturn(Optional.empty());
 

@@ -10,12 +10,14 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 
+@DisplayName("JWT token issuer")
 class JwtTokenIssuerTest {
 
     private static final String SECRET = "test-secret-key-with-at-least-32-bytes!!";
@@ -34,6 +36,7 @@ class JwtTokenIssuerTest {
     }
 
     @Test
+    @DisplayName("Given subject with authorities, when issue access, then returns signed token")
     void givenSubjectWithAuthorities_whenIssueAccess_thenReturnsSignedToken() {
         final var issued = issuer.issueAccess("maria@domain.com",
                 List.of("ROLE_CUSTOMER", "customer:write"), "customer-1");
@@ -49,6 +52,7 @@ class JwtTokenIssuerTest {
     }
 
     @Test
+    @DisplayName("Given subject without owner, when issue access, then omits owner id claim")
     void givenSubjectWithoutOwner_whenIssueAccess_thenOmitsOwnerIdClaim() {
         final var issued = issuer.issueAccess("admin", List.of("ROLE_ADMIN"), null);
 

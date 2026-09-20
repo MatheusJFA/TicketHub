@@ -2,10 +2,12 @@ package com.tickethub.application.customer.update;
 
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import com.tickethub.domain.core.customer.*;
 
+@DisplayName("Update customer use case")
 class UpdateCustomerUseCaseTest {
     private final Customer entity = Customer.create("52998224725", "Maria Silva", "maria@domain.com",
             "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
@@ -14,6 +16,7 @@ class UpdateCustomerUseCaseTest {
     private final String id = entity.getId().getValue();
 
     @Test
+    @DisplayName("Updates name and persists")
     void updatesNameAndPersists() {
         when(gateway.findById(entity.getId())).thenReturn(Optional.of(entity));
         when(gateway.update(entity)).thenReturn(entity);
@@ -25,6 +28,7 @@ class UpdateCustomerUseCaseTest {
     }
 
     @Test
+    @DisplayName("Reports missing entity without persistence")
     void reportsMissingEntityWithoutPersistence() {
         when(gateway.findById(entity.getId())).thenReturn(Optional.empty());
         final var command = UpdateCustomerCommand.with(id, "Maria Souza");

@@ -7,9 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.Instant;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 
 import com.tickethub.domain.validation.ValidationHandler;
 
+@DisplayName("Entity actor")
 class EntityActorTest {
 
     private static final class ActorEntity extends Entity<EntityTest.DummyId> {
@@ -36,6 +38,7 @@ class EntityActorTest {
     }
 
     @Test
+    @DisplayName("Given no actor, when created, then actor fields are null")
     void givenNoActor_whenCreated_thenActorFieldsAreNull() {
         final var entity = new ActorEntity(new EntityTest.DummyId("1"));
 
@@ -44,6 +47,7 @@ class EntityActorTest {
     }
 
     @Test
+    @DisplayName("Given actors, when created, then actors are stored")
     void givenActors_whenCreated_thenActorsAreStored() {
         final var now = Instant.now();
         final var entity = new ActorEntity(new EntityTest.DummyId("1"), now, now, null, "alice", "bob");
@@ -53,6 +57,7 @@ class EntityActorTest {
     }
 
     @Test
+    @DisplayName("Given an entity, when touched by actor, then updates timestamp and actor")
     void givenAnEntity_whenTouchedByActor_thenUpdatesTimestampAndActor() throws InterruptedException {
         final var entity = new ActorEntity(new EntityTest.DummyId("1"), "alice");
         final var previousUpdate = entity.getUpdatedAt();
