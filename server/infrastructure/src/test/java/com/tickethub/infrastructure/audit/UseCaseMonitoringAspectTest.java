@@ -165,7 +165,7 @@ class UseCaseMonitoringAspectTest {
                 invocation -> Either.left(Notification.create(new IllegalStateException("db down")))));
 
         assertTrue(((Either<?, ?>) result).isLeft());
-        assertEquals(AuditOutcome.INFRA_ERROR, entries.get(0).outcome());
+        assertEquals(AuditOutcome.INFRASTRUCTURE_ERROR, entries.get(0).outcome());
     }
 
     @Test
@@ -200,12 +200,24 @@ class UseCaseMonitoringAspectTest {
         }
 
         assertThrows(IllegalStateException.class, () -> aspect.monitor(joinPoint));
-        assertEquals(AuditOutcome.INFRA_ERROR, entries.get(0).outcome());
+        assertEquals(AuditOutcome.INFRASTRUCTURE_ERROR, entries.get(0).outcome());
     }
 
     @Test
-    void givenFailingTrail_whenMonitor_thenRequestStillSucceeds() throws Throwable {
-        final ObjectProvider<AuditTrail> trails = failingTrails();
+    void givenSensitiveInput_whenMonitor_thenRecordsMaskedInput() throws Throwable {
+        final var joinPoint = mock(ProceedingJoinPoint.class);
+        when(joinPoint.getTarget()).thenReturn(useCase());
+        when(joinPoint.getArgs()).thenReturn(new Object[]{"LoginCommand[password=admin-local]"});
+        when(joinPoint.proceed()).thenReturn(Either.right("ok"));
+
+        aspect.monitor(joinPoint);
+
+        assertEquals(1, entries.size());
+        assertEquals("[LoginCommand[password=***]]", entries.get(0).input());
+    }
+
+    @Test
+    void givenFailingTrail_whenMonitor_thenRequestStillSucceeds() throws Throwable {        final ObjectProvider<AuditTrail> trails = failingTrails();
         final var silent = new UseCaseMonitoringAspect(ResiliencePolicy.disabled(), trails);
 
         final var result = silent.monitor(joinPoint(useCase(), invocation -> Either.right("ok-in")));

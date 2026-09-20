@@ -20,7 +20,7 @@ com revogação e proteção contra brute-force.
 - **Casos de uso em `application`:** `LoginUseCase`, `RefreshTokenUseCase` e
   `LogoutUseCase` retornando `Either<Notification, Output>`; 401 via
   `AuthenticationException` (mapeada em `HttpResults`/`GlobalExceptionHandler`,
-  auditada como `UNAUTHORIZED` em vez de `INFRA_ERROR`).
+  auditada como `UNAUTHORIZED` em vez de `INFRASTRUCTURE_ERROR`).
 - **Lookup unificado:** porta `AuthAccountGateway` (customers → partners →
   fallback bootstrap por username, mantendo o `ADMIN` operador até existir
   agregado próprio). `PasswordHasher`, `TokenIssuer` e `RefreshSessionGateway`

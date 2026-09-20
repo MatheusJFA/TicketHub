@@ -12,7 +12,7 @@ Operações financeiras (venda, republicação, reembolso futuro) exigem saber q
 Auditoria em três camadas, sem tocar nos casos de uso:
 
 1. **Contexto:** `CorrelationIdFilter` propaga `X-Correlation-ID` (gera UUID se ausente) e resolve o ator — principal autenticado (JWT `sub`) tem precedência sobre `X-Actor`, com fallback `system`. Tudo no MDC.
-2. **Registro:** `UseCaseMonitoringAspect` grava `AuditEntry` (action, correlationId, actor, input, outcome, error, durationMs) a cada execução de caso de uso, com `outcome` em `SUCCESS | NOT_FOUND | VALIDATION_ERROR | UNAVAILABLE | INFRA_ERROR`.
+2. **Registro:** `UseCaseMonitoringAspect` grava `AuditEntry` (action, correlationId, actor, input, outcome, error, durationMs) a cada execução de caso de uso, com `outcome` em `SUCCESS | NOT_FOUND | VALIDATION_ERROR | UNAUTHORIZED | UNAVAILABLE | INFRASTRUCTURE_ERROR`.
 3. **Persistência:** porta `AuditTrail` com implementação `MongoAuditTrail` (coleção `audit_logs`, índices em `occurredAt` e `correlationId`), desligável via `AUDIT_ENABLED=false`.
 4. **Domínio:** entidades carregam `createdBy`/`lastModifiedBy` (+ `markAsUpdatedBy`), prontos para `@CreatedBy` quando os documents chegarem.
 

@@ -6,5 +6,5 @@ public enum AuditOutcome {
     VALIDATION_ERROR,
     UNAUTHORIZED,
     UNAVAILABLE,
-    INFRA_ERROR
+    INFRASTRUCTURE_ERROR
 }
