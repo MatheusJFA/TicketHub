@@ -1,0 +1,27 @@
+# TicketHub — Modelo C4
+
+Diagramas em Mermaid (`mermaid` + `C4*`): renderizam no GitHub. Nível 1
+(contexto), 2 (containers) e 3 (componentes da API).
+
+## 1. Contexto
+
+```mermaid
+C4Context
+    title TicketHub - Contexto do sistema
+
+    Person(guest, "Convidado", "Compra o ingresso e apresenta o QR code na porta")
+    Person(partner, "Parceiro", "Cadastra shows, setores e lugares; opera a bilheteria")
+    Person(guard, "Seguranca", "Escaneia o QR code e valida o ingresso na porta")
+    Person(admin, "Admin", "Administra parceiros, audita trilhas e opera a plataforma")
+
+    System(tickethub, "TicketHub", "Venda, emissão e validação de ingressos por QR code")
+    System_Ext(viacep, "ViaCEP", "Autocompletar endereço a partir do CEP")
+    System_Ext(lgtm, "Stack LGTM", "Loki + Grafana + Tempo + Mimir: logs, traces e métricas")
+
+    Rel(guest, tickethub, "Compra e apresenta QR code")
+    Rel(partner, tickethub, "Gerencia catálogo e conta")
+    Rel(guard, tickethub, "Valida ingressos")
+    Rel(admin, tickethub, "Administra e audita")
+    Rel(tickethub, viacep, "Consulta endereço (GET /ws/{cep}/json)")
+    Rel(tickethub, lgtm, "Exporta OTLP, Prometheus e logs")
+```

@@ -1,0 +1,41 @@
+# TicketHub — Componentes da API (nível 3)
+
+Camadas: `api` (HTTP) → `application` (casos de uso) → `domain`
+(puro, portas = gateways) → `infrastructure` (adapters). Dependências
+apontam para dentro (Clean Architecture, verificado pelo `ArchitectureTest`).
+
+```mermaid
+C4Component
+    title TicketHub API - Componentes
+
+    Container_Boundary(api, "API Spring Boot") {
+        Component(controllers, "Controllers REST", "Spring MVC", "auth, customers, partners, shows, sections, spots, tickets, zipcode, audit + GlobalExceptionHandler (401/404/422/503)")
+        Component(security, "Seguranca", "Spring Security + JWT", "RBAC por autoridade, ShowAccess por dono, rate limit de login, CorrelationId")
+        Component(usecases, "Casos de uso", "Either/Notification", "create/update/delete, publish, retrieve, validate ticket (QR + baixa), lookup ZIP code, login/refresh/logout")
+        Component(domain, "Dominio", "DDD puro", "shows, sections, spots, customers, partners, sessoes, ZIP code; excecoes tipadas (DomainException)")
+        Component(mongoadapters, "Adapters Mongo", "Spring Data", "gateways de show/section/spot/customer/partner/sessao/auditoria + Liquibase")
+        Component(cep, "Adapter ViaCEP", "RestClient", "ZipCodeLookup fail-open (nunca quebra o cadastro)")
+        Component(kafkaadapters, "Adapters Kafka", "Listener + publisher", "SpotsGenerationRequested: gera lugares em lote e reprocessa")
+        Component(audit, "Auditoria", "Aspect + trail", "Entrada por caso de uso, sanitiza segredos, GET /audit-logs")
+        Component(resilience, "Resiliencia", "Resilience4j", "Retry + circuit breaker em torno dos casos de uso")
+    }
+
+    ContainerDb(mongo, "MongoDB", "MongoDB 8", "Coleções do catálogo e trilhas")
+    ContainerQueue(kafka, "Kafka", "KRaft", "tickethub.events")
+    System_Ext(viacep, "ViaCEP", "Endereco por CEP")
+    Container(alloy, "Alloy", "Coletor", "OTLP + scrape")
+
+    Rel(controllers, security, "autentica/autoriza")
+    Rel(controllers, usecases, "executa")
+    Rel(usecases, domain, "regras e portas")
+    Rel(usecases, mongoadapters, "via gateways")
+    Rel(usecases, cep, "via ZipCodeLookup (só no lookup dedicado)")
+    Rel(usecases, kafkaadapters, "publica eventos")
+    Rel(kafkaadapters, usecases, "consome e gera lugares")
+    Rel(usecases, audit, "grava trilha (aspect)")
+    Rel(usecases, resilience, "executa sob retry/CB")
+    Rel(mongoadapters, mongo, "lê/escreve")
+    Rel(kafkaadapters, kafka, "publica/consome")
+    Rel(cep, viacep, "consulta")
+    Rel(controllers, alloy, "métricas, traces e logs")
+```

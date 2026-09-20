@@ -1,0 +1,42 @@
+# TicketHub — Containers (nível 2)
+
+```mermaid
+C4Container
+    title TicketHub - Containers
+
+    Person(guest, "Convidado", "Apresenta o QR code na porta")
+    Person(partner, "Parceiro", "Gerencia catálogo e conta")
+    Person(guard, "Seguranca", "Valida ingressos na porta")
+    Person(admin, "Admin", "Administra e audita")
+
+    Container_Boundary(tickethub, "TicketHub") {
+        Container(api, "API", "Java 25, Spring Boot", "REST: clientes, parceiros, shows, setores, lugares, ingressos, CEP e auth. :8080")
+        ContainerDb(mongo, "MongoDB", "MongoDB 8", "shows, sections, spots, customers, partners, audit-logs, refresh-sessions. :27017")
+        ContainerQueue(kafka, "Kafka", "KRaft, tópico tickethub.events", "Geração assíncrona de lugares. :9092")
+    }
+
+    Container_Boundary(obs, "Observabilidade (LGTM)") {
+        Container(alloy, "Alloy", "Coletor", "OTLP :4318, scrape Prometheus, logs Docker")
+        ContainerDb(loki, "Loki", "Logs", ":3100")
+        ContainerDb(tempo, "Tempo", "Traces", ":3200")
+        ContainerDb(mimir, "Mimir", "Métricas", ":9009")
+        Container(grafana, "Grafana", "Dashboards", ":3000")
+    }
+
+    System_Ext(viacep, "ViaCEP", "Autocompletar endereço")
+
+    Rel(guest, api, "HTTPS :8080")
+    Rel(partner, api, "HTTPS :8080")
+    Rel(guard, api, "POST /shows/{id}/tickets/validate")
+    Rel(admin, grafana, "Dashboards :3000")
+    Rel(api, mongo, "Spring Data Mongo")
+    Rel(api, kafka, "Publica/consome tickethub.events")
+    Rel(api, viacep, "GET /ws/{cep}/json")
+    Rel(api, alloy, "OTLP :4318, /actuator/prometheus")
+    Rel(alloy, loki, "push :3100")
+    Rel(alloy, tempo, "OTLP :4318")
+    Rel(alloy, mimir, "remote write :9009")
+    Rel(grafana, loki, "consulta")
+    Rel(grafana, tempo, "consulta")
+    Rel(grafana, mimir, "consulta")
+```
