@@ -1,5 +1,7 @@
 package com.tickethub.domain;
 
+import static java.util.Objects.isNull;
+
 import java.util.Objects;
 
 public abstract class Identifier extends ValueObject {
@@ -12,7 +14,7 @@ public abstract class Identifier extends ValueObject {
             return true;
         }
 
-        if (other == null || getClass() != other.getClass()) {
+        if (isNull(other) || getClass() != other.getClass()) {
             return false;
         }
 

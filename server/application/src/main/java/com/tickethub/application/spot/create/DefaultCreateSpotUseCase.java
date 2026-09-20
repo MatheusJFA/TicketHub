@@ -2,6 +2,7 @@ package com.tickethub.application.spot.create;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.section.Section;
@@ -31,7 +32,8 @@ public class DefaultCreateSpotUseCase extends CreateSpotUseCase {
             }
 
             // A missing location generates a short hash-based code (see Location).
-            final Spot entity = command.location() == null ? Spot.create() : Spot.create(command.location());
+            final Spot entity = Optional.ofNullable(command.location()).map(Spot::create)
+                    .orElseGet(Spot::create);
             final Notification notification = Notification.create();
             entity.validate(notification);
 

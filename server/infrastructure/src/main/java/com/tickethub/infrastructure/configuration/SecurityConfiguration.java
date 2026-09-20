@@ -1,5 +1,7 @@
 package com.tickethub.infrastructure.configuration;
 
+import static java.util.Objects.isNull;
+
 import java.nio.charset.StandardCharsets;
 
 import javax.crypto.SecretKey;
@@ -81,7 +83,7 @@ public class SecurityConfiguration {
 
     private static SecretKey secretKey(final SecurityProperties properties) {
         final String secret = properties.getJwt().getSecret();
-        if (secret == null || secret.getBytes(StandardCharsets.UTF_8).length < 32) {
+        if (isNull(secret) || secret.getBytes(StandardCharsets.UTF_8).length < 32) {
             throw new IllegalStateException(
                     "tickethub.security.jwt.secret must be at least 32 bytes long");
         }

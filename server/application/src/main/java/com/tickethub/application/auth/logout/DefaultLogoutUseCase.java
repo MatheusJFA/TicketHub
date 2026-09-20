@@ -1,9 +1,9 @@
 package com.tickethub.application.auth.logout;
 
+import static org.apache.commons.lang3.StringUtils.defaultString;
+
 import java.util.Objects;
 import java.util.Optional;
-
-import org.apache.commons.lang3.StringUtils;
 
 import com.tickethub.domain.auth.RefreshSessionGateway;
 import com.tickethub.domain.auth.SecureTokens;
@@ -20,7 +20,7 @@ public class DefaultLogoutUseCase extends LogoutUseCase {
     @Override
     public Optional<Notification> execute(final LogoutCommand command) {
         try {
-            final var presented = StringUtils.defaultString(command.refreshToken());
+            final var presented = defaultString(command.refreshToken());
             refreshSessions.findByTokenHash(SecureTokens.sha256Hex(presented)).ifPresent(session -> {
                 session.revoke();
                 refreshSessions.save(session);

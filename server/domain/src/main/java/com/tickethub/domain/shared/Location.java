@@ -1,6 +1,7 @@
 package com.tickethub.domain.shared;
 
 import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import com.tickethub.domain.ValueObject;
 import com.tickethub.domain.exception.DomainException;
@@ -47,7 +48,7 @@ public final class Location extends ValueObject {
      * plus the one-based seat number, zero-padded to at least five digits.
      */
     public static Location generateSeat(String sectionCode, long seatNumber) {
-        if (sectionCode == null || !sectionCode.matches("[A-Z]{1,3}")) {
+        if (isNull(sectionCode) || !sectionCode.matches("[A-Z]{1,3}")) {
             throw new DomainException("Invalid section code");
         }
         if (seatNumber < 1) {
@@ -69,7 +70,7 @@ public final class Location extends ValueObject {
     }
 
     private static boolean isValid(String value) {
-        return value != null && !value.isBlank();
+        return isNotBlank(value);
     }
 
     private static String normalize(String value) {

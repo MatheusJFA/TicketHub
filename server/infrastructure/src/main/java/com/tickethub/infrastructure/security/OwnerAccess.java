@@ -1,5 +1,7 @@
 package com.tickethub.infrastructure.security;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import org.springframework.stereotype.Component;
 
 @Component("ownerAccess")
@@ -9,6 +11,6 @@ public class OwnerAccess {
         if (SecuritySupport.isAdmin()) {
             return true;
         }
-        return id != null && !id.isBlank() && SecuritySupport.ownerId().map(id::equals).orElse(false);
+        return isNotBlank(id) && SecuritySupport.ownerId().map(id::equals).orElse(false);
     }
 }

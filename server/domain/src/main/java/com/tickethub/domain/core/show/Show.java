@@ -147,7 +147,7 @@ public class Show extends AggregateRoot<ShowID> {
     }
 
     public Show reschedule(final OffsetDateTime date) {
-        if (date == null) {
+        if (isNull(date)) {
             throw new DomainException("'date' should not be null");
         }
         this.date = date;

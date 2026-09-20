@@ -1,11 +1,10 @@
 package com.tickethub.application.auth.login;
 
 import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.defaultString;
 
 import java.time.Duration;
 import java.util.Objects;
-
-import org.apache.commons.lang3.StringUtils;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.auth.AuthAccountGateway;
@@ -39,10 +38,10 @@ public class DefaultLoginUseCase extends LoginUseCase {
     @Override
     public Either<Notification, LoginOutput> execute(final LoginCommand command) {
         try {
-            final var identifier = StringUtils.defaultString(command.identifier()).trim();
+            final var identifier = defaultString(command.identifier()).trim();
             final var account = authAccounts.findByIdentifier(identifier).orElse(null);
             if (isNull(account)
-                    || !passwordHasher.matches(StringUtils.defaultString(command.password()), account.passwordHash())) {
+                    || !passwordHasher.matches(defaultString(command.password()), account.passwordHash())) {
                 return Either.left(unauthorized());
             }
             final var access = tokenIssuer.issueAccess(account.subject(), account.authorities(), account.ownerId());

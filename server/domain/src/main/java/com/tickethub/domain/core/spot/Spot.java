@@ -1,5 +1,7 @@
 package com.tickethub.domain.core.spot;
 
+import static java.util.Objects.isNull;
+
 import java.time.Instant;
 
 import com.tickethub.domain.Entity;
@@ -54,7 +56,7 @@ public class Spot extends Entity<SpotID> {
     }
 
     public Spot changeLocation(final Location location) {
-        if (location == null) {
+        if (isNull(location)) {
             throw new DomainException("'location' should not be null");
         }
         this.location = location;

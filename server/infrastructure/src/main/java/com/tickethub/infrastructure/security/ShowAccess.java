@@ -1,5 +1,10 @@
 package com.tickethub.infrastructure.security;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import java.util.Objects;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -69,27 +74,27 @@ public class ShowAccess {
             return true;
         }
         final String ownerId = SecuritySupport.ownerId().orElse(null);
-        if (ownerId == null || sectionId == null || sectionId.isBlank()) {
+        if (isBlank(ownerId) || isBlank(sectionId)) {
             return false;
         }
         try {
             final var section = mongoTemplate.findById(sectionId, SectionDocument.class,
                     SectionDocument.COLLECTION);
-            if (section == null) {
+            if (isNull(section)) {
                 return false;
             }
             // Fast path: denormalized owner, single indexed read, no join chain.
-            if (section.partnerId() != null) {
+            if (nonNull(section.partnerId())) {
                 return ownerId.equals(section.partnerId());
             }
-            if (section.showId() != null) {
+            if (nonNull(section.showId())) {
                 return ownsShow(section.showId());
             }
             // Legacy fallback: sections written before the denormalized links.
             final var show = mongoTemplate.findOne(
                     Query.query(Criteria.where("sectionIds").is(sectionId)),
                     ShowDocument.class, ShowDocument.COLLECTION);
-            return show != null && ownerId.equals(show.partnerId());
+            return nonNull(show) && ownerId.equals(show.partnerId());
         } catch (final RuntimeException e) {
             return false;
         }
@@ -100,29 +105,29 @@ public class ShowAccess {
             return true;
         }
         final String ownerId = SecuritySupport.ownerId().orElse(null);
-        if (ownerId == null || spotId == null || spotId.isBlank()) {
+        if (isBlank(ownerId) || isBlank(spotId)) {
             return false;
         }
         try {
             final var spot = mongoTemplate.findById(spotId, SpotDocument.class, SpotDocument.COLLECTION);
-            if (spot == null) {
+            if (isNull(spot)) {
                 return false;
             }
             // Fast path: denormalized owner, single indexed read, no join chain.
-            if (spot.partnerId() != null) {
+            if (nonNull(spot.partnerId())) {
                 return ownerId.equals(spot.partnerId());
             }
-            if (spot.showId() != null) {
+            if (nonNull(spot.showId())) {
                 return ownsShow(spot.showId());
             }
-            if (spot.sectionId() != null && ownsSection(spot.sectionId())) {
+            if (nonNull(spot.sectionId()) && ownsSection(spot.sectionId())) {
                 return true;
             }
             // Legacy fallback: spots written before the denormalized links.
             final var section = mongoTemplate.findOne(
                     Query.query(Criteria.where("spotIds").is(spotId)),
                     SectionDocument.class, SectionDocument.COLLECTION);
-            return section != null && ownsSection(section.id());
+            return nonNull(section) && ownsSection(section.id());
         } catch (final RuntimeException e) {
             return false;
         }
@@ -133,12 +138,12 @@ public class ShowAccess {
             return true;
         }
         final String ownerId = SecuritySupport.ownerId().orElse(null);
-        if (ownerId == null || showId == null || showId.isBlank()) {
+        if (isBlank(ownerId) || isBlank(showId)) {
             return false;
         }
         try {
             return showGateway.findById(ShowID.from(showId))
-                    .map(show -> show.getPartnerId() != null
+                    .map(show -> nonNull(show.getPartnerId())
                             && ownerId.equals(show.getPartnerId().getValue()))
                     .orElse(false);
         } catch (final RuntimeException e) {
@@ -147,7 +152,7 @@ public class ShowAccess {
     }
 
     private boolean isOwner(final String partnerId) {
-        return partnerId != null && !partnerId.isBlank()
+        return isNotBlank(partnerId)
                 && SecuritySupport.ownerId().map(partnerId::equals).orElse(false);
     }
 }

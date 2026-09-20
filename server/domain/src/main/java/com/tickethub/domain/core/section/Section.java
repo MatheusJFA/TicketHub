@@ -153,7 +153,7 @@ public class Section extends Entity<SectionID> {
     }
 
     public Section changePrice(final Money price) {
-        if (price == null) {
+        if (isNull(price)) {
             throw new DomainException("'price' should not be null");
         }
         this.price = price;

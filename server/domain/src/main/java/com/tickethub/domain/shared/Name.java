@@ -1,6 +1,7 @@
 package com.tickethub.domain.shared;
 
 import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import com.tickethub.domain.ValueObject;
 import com.tickethub.domain.exception.DomainException;
@@ -30,7 +31,7 @@ public final class Name extends ValueObject {
     }
 
     private static boolean isValid(String value) {
-        if (value == null || value.isBlank()) {
+        if (isBlank(value)) {
             return false;
         }
 

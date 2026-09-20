@@ -1,5 +1,7 @@
 package com.tickethub.domain;
 
+import static java.util.Objects.nonNull;
+
 import com.tickethub.domain.event.DomainEvent;
 import com.tickethub.domain.event.DomainEventPublisher;
 
@@ -23,7 +25,7 @@ public abstract class AggregateRoot<ID extends Identifier> extends Entity<ID> {
     }
 
     public void registerEvent(final DomainEvent event) {
-        if (event != null) {
+        if (nonNull(event)) {
             domainEvents.add(event);
         }
     }

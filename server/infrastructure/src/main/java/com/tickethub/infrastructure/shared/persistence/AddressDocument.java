@@ -1,5 +1,7 @@
 package com.tickethub.infrastructure.shared.persistence;
 
+import java.util.Optional;
+
 import com.tickethub.domain.shared.Address;
 
 public record AddressDocument(
@@ -13,12 +15,11 @@ public record AddressDocument(
         String zipCode) {
 
     public static AddressDocument from(final Address address) {
-        if (address == null) {
-            return null;
-        }
-        return new AddressDocument(address.getStreet(), address.getNumber(), address.getComplement(),
-                address.getNeighborhood(), address.getCity(), address.getState(), address.getCountry(),
-                address.getZipCode());
+        return Optional.ofNullable(address)
+                .map(current -> new AddressDocument(current.getStreet(), current.getNumber(),
+                        current.getComplement(), current.getNeighborhood(), current.getCity(),
+                        current.getState(), current.getCountry(), current.getZipCode()))
+                .orElse(null);
     }
 
     public Address toDomain() {

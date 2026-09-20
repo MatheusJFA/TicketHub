@@ -3,7 +3,7 @@ package com.tickethub.domain.shared;
 import java.util.Objects;
 import static java.util.Objects.isNull;
 
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 
 import com.tickethub.domain.ValueObject;
 import com.tickethub.domain.exception.DomainException;
@@ -45,14 +45,14 @@ public final class Address extends ValueObject {
     public Address enrichedWith(final CepAddress cep) {
         Objects.requireNonNull(cep, "'cep' should not be null");
         return new Address(
-                StringUtils.defaultIfBlank(cep.street(), street),
+                defaultIfBlank(cep.street(), street),
                 number,
                 complement,
-                StringUtils.defaultIfBlank(cep.neighborhood(), neighborhood),
-                StringUtils.defaultIfBlank(cep.city(), city),
-                StringUtils.defaultIfBlank(cep.state(), state),
-                StringUtils.defaultIfBlank(cep.country(), country),
-                StringUtils.defaultIfBlank(cep.zipCode(), zipCode));
+                defaultIfBlank(cep.neighborhood(), neighborhood),
+                defaultIfBlank(cep.city(), city),
+                defaultIfBlank(cep.state(), state),
+                defaultIfBlank(cep.country(), country),
+                defaultIfBlank(cep.zipCode(), zipCode));
     }
 
     private static String required(String value, String field) {

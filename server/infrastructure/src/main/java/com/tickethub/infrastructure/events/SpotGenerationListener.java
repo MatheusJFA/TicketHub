@@ -1,6 +1,7 @@
 package com.tickethub.infrastructure.events;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -38,9 +39,9 @@ public class SpotGenerationListener {
                 message.showId(), message.sectionId(), message.sectionCode()));
         if (result.isLeft()) {
             final var notification = result.getLeft();
-            final var first = notification.firstError();
-            throw new IllegalStateException(
-                    "Spot generation failed: " + (first == null ? "unknown" : first.message()),
+            final var detail = Optional.ofNullable(notification.firstError())
+                    .map(first -> first.message()).orElse("unknown");
+            throw new IllegalStateException("Spot generation failed: " + detail,
                     notification.getCause());
         }
     }

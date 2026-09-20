@@ -1,5 +1,7 @@
 package com.tickethub.infrastructure.api.controllers;
 
+import static java.util.Objects.nonNull;
+
 import com.tickethub.domain.auth.AuthenticationException;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.infrastructure.api.ApiValidationException;
@@ -26,7 +28,7 @@ public class GlobalExceptionHandler {
         final var errors = exception.notification().getErrors();
         // Existing use cases represent missing entities as notifications ("X not found: id").
         final boolean missing = errors.stream().anyMatch(error ->
-                error.message() != null && error.message().matches("^.+ not found: .*$"));
+                nonNull(error.message()) && error.message().matches("^.+ not found: .*$"));
         return ResponseEntity.status(missing ? 404 : 422).body(new ErrorResponse(errors));
     }
 

@@ -1,5 +1,8 @@
 package com.tickethub.domain;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+
 import java.util.Objects;
 import java.time.Instant;
 
@@ -37,7 +40,7 @@ public abstract class Entity<ID extends Identifier> {
             final String createdBy,
             final String lastModifiedBy
     ) {
-        if (id == null) {
+        if (isNull(id)) {
             throw new DomainException("'id' should not be null");
         }
         this.id = id;
@@ -95,7 +98,7 @@ public abstract class Entity<ID extends Identifier> {
     }
 
     public boolean isDeleted() {
-        return deletedAt != null;
+        return nonNull(deletedAt);
     }
 
     public void validate(final ValidationHandler handler) {

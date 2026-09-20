@@ -1,5 +1,8 @@
 package com.tickethub.infrastructure.security;
 
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.trimToEmpty;
+
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -29,7 +32,7 @@ public class MongoAuthAccountGateway implements AuthAccountGateway {
 
     @Override
     public Optional<AuthAccount> findByIdentifier(final String identifier) {
-        final String normalized = identifier == null ? "" : identifier.trim();
+        final String normalized = trimToEmpty(identifier);
         return findCustomer(normalized)
                 .or(() -> findPartner(normalized))
                 // Bootstrap users keep working for operator access (e.g. ADMIN)
@@ -40,7 +43,7 @@ public class MongoAuthAccountGateway implements AuthAccountGateway {
     private Optional<AuthAccount> findCustomer(final String identifier) {
         return toEmail(identifier)
                 .flatMap(customers::findByEmail)
-                .filter(customer -> customer.getPasswordHash() != null)
+                .filter(customer -> nonNull(customer.getPasswordHash()))
                 .map(customer -> new AuthAccount(customer.getEmail().getValue(),
                         customer.getPasswordHash().getValue(),
                         new SecurityUser(customer.getEmail().getValue(), customer.getPasswordHash().getValue(),
@@ -51,7 +54,7 @@ public class MongoAuthAccountGateway implements AuthAccountGateway {
     private Optional<AuthAccount> findPartner(final String identifier) {
         return toEmail(identifier)
                 .flatMap(partners::findByEmail)
-                .filter(partner -> partner.getPasswordHash() != null)
+                .filter(partner -> nonNull(partner.getPasswordHash()))
                 .map(partner -> new AuthAccount(partner.getEmail().getValue(),
                         partner.getPasswordHash().getValue(),
                         new SecurityUser(partner.getEmail().getValue(), partner.getPasswordHash().getValue(),

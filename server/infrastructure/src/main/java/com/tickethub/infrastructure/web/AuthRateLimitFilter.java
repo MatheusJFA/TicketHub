@@ -1,5 +1,7 @@
 package com.tickethub.infrastructure.web;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Objects;
@@ -65,7 +67,7 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
 
     private static String clientKey(final HttpServletRequest request) {
         final String forwarded = request.getHeader("X-Forwarded-For");
-        if (forwarded != null && !forwarded.isBlank()) {
+        if (isNotBlank(forwarded)) {
             return forwarded.split(",")[0].trim();
         }
         return request.getRemoteAddr();

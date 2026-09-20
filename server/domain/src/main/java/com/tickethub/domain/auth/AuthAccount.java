@@ -1,20 +1,22 @@
 package com.tickethub.domain.auth;
 
-import java.util.List;
+import static java.util.List.copyOf;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import java.util.List;
 
 public record AuthAccount(String subject, String passwordHash, List<String> authorities, String ownerId) {
 
     public AuthAccount {
-        if (StringUtils.isBlank(subject)) {
+        if (isBlank(subject)) {
             throw new IllegalArgumentException("'subject' should not be null or blank");
         }
-        if (StringUtils.isBlank(passwordHash)) {
+        if (isBlank(passwordHash)) {
             throw new IllegalArgumentException("'passwordHash' should not be null or blank");
         }
-        authorities = CollectionUtils.isEmpty(authorities) ? List.of() : List.copyOf(authorities);
-        ownerId = StringUtils.isBlank(ownerId) ? null : ownerId;
+        authorities = copyOf(emptyIfNull(authorities));
+        ownerId = defaultIfBlank(ownerId, null);
     }
 }

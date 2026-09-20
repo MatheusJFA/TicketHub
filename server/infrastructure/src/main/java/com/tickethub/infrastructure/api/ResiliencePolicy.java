@@ -1,5 +1,7 @@
 package com.tickethub.infrastructure.api;
 
+import static java.util.Objects.nonNull;
+
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -47,14 +49,15 @@ public final class ResiliencePolicy {
         if (result instanceof Either<?, ?> either && either.isLeft()) {
             return isTransientFailure(((Either<Notification, ?>) either).getLeft());
         }
-        if (result instanceof Optional<?> optional && optional.orElse(null) instanceof Notification notification) {
-            return isTransientFailure(notification);
+        if (result instanceof Optional<?> optional) {
+            return optional.filter(Notification.class::isInstance).map(Notification.class::cast)
+                    .map(ResiliencePolicy::isTransientFailure).orElse(false);
         }
         return false;
     }
 
     private static boolean isTransientFailure(final Notification notification) {
-        return notification.getCause() != null && !(notification.getCause() instanceof DomainException);
+        return nonNull(notification.getCause()) && !(notification.getCause() instanceof DomainException);
     }
 
     public <T> Supplier<T> decorate(final Supplier<T> supplier) {

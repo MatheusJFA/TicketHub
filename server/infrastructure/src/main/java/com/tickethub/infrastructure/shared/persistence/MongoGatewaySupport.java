@@ -1,5 +1,9 @@
 package com.tickethub.infrastructure.shared.persistence;
 
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import java.util.Arrays;
 import java.util.Set;
 import java.util.function.Function;
@@ -23,7 +27,7 @@ public final class MongoGatewaySupport {
 
     public static Query searchQuery(final SearchQuery query, final String... fields) {
         final Query mongoQuery = new Query();
-        if (query.searchTerm() != null && !query.searchTerm().isBlank() && fields.length > 0) {
+        if (isNotBlank(query.searchTerm()) && fields.length > 0) {
             final var pattern = Pattern.compile(Pattern.quote(query.searchTerm().trim()),
                     Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
             mongoQuery.addCriteria(new Criteria().orOperator(
@@ -35,7 +39,7 @@ public final class MongoGatewaySupport {
     }
 
     public static Sort sortOf(final SearchQuery query, final Set<String> allowedFields, final String fallback) {
-        final String sort = query.sort() != null && allowedFields.contains(query.sort())
+        final String sort = nonNull(query.sort()) && allowedFields.contains(query.sort())
                 ? query.sort()
                 : fallback;
         final Sort.Direction direction = "desc".equalsIgnoreCase(query.direction())
@@ -56,7 +60,7 @@ public final class MongoGatewaySupport {
     }
 
     public static void removeSectionsByShowId(final MongoTemplate mongoTemplate, final String showId) {
-        if (showId == null || showId.isBlank()) {
+        if (isBlank(showId)) {
             return;
         }
         mongoTemplate.remove(Query.query(Criteria.where("showId").is(showId)),
@@ -64,7 +68,7 @@ public final class MongoGatewaySupport {
     }
 
     public static void removeSpotsByShowId(final MongoTemplate mongoTemplate, final String showId) {
-        if (showId == null || showId.isBlank()) {
+        if (isBlank(showId)) {
             return;
         }
         mongoTemplate.remove(Query.query(Criteria.where("showId").is(showId)),
@@ -72,7 +76,7 @@ public final class MongoGatewaySupport {
     }
 
     public static void removeSpotsBySectionId(final MongoTemplate mongoTemplate, final String sectionId) {
-        if (sectionId == null || sectionId.isBlank()) {
+        if (isBlank(sectionId)) {
             return;
         }
         mongoTemplate.remove(Query.query(Criteria.where("sectionId").is(sectionId)),

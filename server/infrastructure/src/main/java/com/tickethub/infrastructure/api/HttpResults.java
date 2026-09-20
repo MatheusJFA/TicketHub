@@ -1,5 +1,9 @@
 package com.tickethub.infrastructure.api;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import java.util.Locale;
 import java.util.Optional;
 
@@ -45,15 +49,16 @@ public final class HttpResults {
         if (notification.getCause() instanceof AuthenticationException authentication) {
             return authentication;
         }
-        if (notification.getCause() != null && !(notification.getCause() instanceof DomainException)) {
-            return new IllegalStateException("Use case failed", notification.getCause());
+        final var cause = notification.getCause();
+        if (nonNull(cause) && !(cause instanceof DomainException)) {
+            return new IllegalStateException("Use case failed", cause);
         }
         return new ApiValidationException(notification);
     }
 
     public static SearchQuery search(String search, int page, int perPage, String sort, String direction) {
-        if (page < 0 || perPage < 1 || perPage > 100 || sort == null || sort.isBlank()
-                || direction == null
+        if (page < 0 || perPage < 1 || perPage > 100 || isBlank(sort)
+                || isNull(direction)
                 || !(direction.equalsIgnoreCase("asc") || direction.equalsIgnoreCase("desc"))) {
             throw new DomainException("Invalid pagination parameters: page >= 0, perPage between 1 and 100, sort non-blank, dir asc or desc");
         }

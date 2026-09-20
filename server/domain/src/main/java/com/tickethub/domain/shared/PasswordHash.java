@@ -3,7 +3,7 @@ package com.tickethub.domain.shared;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import com.tickethub.domain.ValueObject;
 import com.tickethub.domain.exception.DomainException;
@@ -19,7 +19,7 @@ public final class PasswordHash extends ValueObject {
     }
 
     public static PasswordHash fromHash(String value) {
-        if (StringUtils.isBlank(value) || !BCRYPT_PATTERN.matcher(value).matches()) {
+        if (isBlank(value) || !BCRYPT_PATTERN.matcher(value).matches()) {
             throw new DomainException("Invalid password hash");
         }
 

@@ -2,6 +2,8 @@ package com.tickethub.domain.auth;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -9,11 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import com.tickethub.domain.exception.DomainException;
-
 public class RefreshSession {
 
     public static final Duration DEFAULT_TTL = Duration.ofDays(7);
@@ -46,16 +44,16 @@ public class RefreshSession {
 
     public static RefreshSession issue(final String tokenHash, final String subject,
             final List<String> authorities, final String ownerId, final Duration ttl) {
-        if (StringUtils.isBlank(tokenHash)) {
+        if (isBlank(tokenHash)) {
             throw new DomainException("'tokenHash' should not be null or blank");
         }
-        if (StringUtils.isBlank(subject)) {
+        if (isBlank(subject)) {
             throw new DomainException("'subject' should not be null or blank");
         }
         final var now = Instant.now();
         final var effectiveTtl = isNull(ttl) || ttl.isNegative() || ttl.isZero() ? DEFAULT_TTL : ttl;
         return new RefreshSession(UUID.randomUUID().toString(), UUID.randomUUID().toString(), tokenHash,
-                subject, CollectionUtils.isEmpty(authorities) ? List.of() : authorities, ownerId, now,
+                subject, List.copyOf(emptyIfNull(authorities)), ownerId, now,
                 now.plus(effectiveTtl), false, null);
     }
 

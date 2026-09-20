@@ -29,14 +29,12 @@ public class ViaCepLookup implements CepLookup {
             if (!properties.isEnabled()) {
                 return Optional.empty();
             }
-            final String digits = CepAddress.normalize(zipCode);
-            if (digits == null) {
-                return Optional.empty();
-            }
-            return client.findByCep(digits)
-                    .filter(response -> !response.hasError())
-                    .map(response -> new CepAddress(digits, response.logradouro(), response.bairro(),
-                            response.localidade(), response.uf(), "Brasil"));
+            return Optional.ofNullable(CepAddress.normalize(zipCode))
+                    .flatMap(digits -> client.findByCep(digits)
+                            .filter(response -> !response.hasError())
+                            .map(response -> new CepAddress(digits, response.logradouro(),
+                                    response.bairro(), response.localidade(), response.uf(),
+                                    "Brasil")));
         } catch (final RuntimeException e) {
             // Fail-open contract: never break registration because of the provider.
             LOG.warn("CEP lookup failed zipCode={} error={}", zipCode, e.getMessage());

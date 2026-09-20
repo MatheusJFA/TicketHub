@@ -1,5 +1,7 @@
 package com.tickethub.infrastructure.configuration;
 
+import static java.util.Objects.isNull;
+
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +25,7 @@ public class EventConfiguration {
             final ObjectProvider<KafkaTemplate<String, String>> templates,
             final ObjectProvider<ObjectMapper> mappers) {
         final var template = templates.getIfAvailable();
-        if (template == null) {
+        if (isNull(template)) {
             return event -> {
             };
         }

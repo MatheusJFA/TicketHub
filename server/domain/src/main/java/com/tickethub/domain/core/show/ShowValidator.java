@@ -1,5 +1,7 @@
 package com.tickethub.domain.core.show;
 
+import static java.util.Objects.isNull;
+
 import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.ValidationHandler;
 import com.tickethub.domain.validation.Validator;
@@ -16,11 +18,11 @@ public final class ShowValidator extends Validator {
     public void validate() {
         final ValidationHandler handler = validationHandler();
 
-        if (show.getName() == null)
+        if (isNull(show.getName()))
             handler.append(new Error("'name' should not be null"));
-        if (show.getPartnerId() == null)
+        if (isNull(show.getPartnerId()))
             handler.append(new Error("'partnerId' should not be null"));
-        if (show.getAddress() == null)
+        if (isNull(show.getAddress()))
             handler.append(new Error("'address' should not be null"));
         if (show.getTotalSpots() < 0)
             handler.append(new Error("'totalSpots' should not be negative"));

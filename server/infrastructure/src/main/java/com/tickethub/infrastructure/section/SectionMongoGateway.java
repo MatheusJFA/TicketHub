@@ -1,5 +1,7 @@
 package com.tickethub.infrastructure.section;
 
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -95,9 +97,10 @@ public class SectionMongoGateway implements SectionGateway {
                 .collect(Collectors.toMap(SpotDocument::id, Function.identity(), (first, second) -> first));
         for (final Spot spot : section.getSpots()) {
             final var existing = existingSpots.get(spot.getId().getValue());
-            final var spotDocument = existing == null
-                    ? SpotDocument.from(spot)
-                    : SpotDocument.from(spot, existing.showId(), existing.sectionId(), existing.partnerId());
+            final var spotDocument = Optional.ofNullable(existing)
+                    .map(current -> SpotDocument.from(spot, current.showId(), current.sectionId(),
+                            current.partnerId()))
+                    .orElseGet(() -> SpotDocument.from(spot));
             unitOfWork.registerDirty(SpotDocument.COLLECTION, spotDocument.id(), spotDocument);
         }
         unitOfWork.commit();
@@ -113,7 +116,7 @@ public class SectionMongoGateway implements SectionGateway {
 
     @Override
     public List<SectionID> existsByIds(final List<SectionID> ids) {
-        if (ids == null || ids.isEmpty()) {
+        if (isEmpty(ids)) {
             return List.of();
         }
         return repository.findAllById(ids.stream().map(SectionID::getValue).toList()).stream()
@@ -126,7 +129,7 @@ public class SectionMongoGateway implements SectionGateway {
         // Prefer the denormalized parent field (single indexed query);
         // fall back to the legacy id array for older documents.
         List<SpotDocument> spotDocuments = spots.findBySectionId(document.id());
-        if (spotDocuments.isEmpty() && document.spotIds() != null && !document.spotIds().isEmpty()) {
+        if (spotDocuments.isEmpty() && !isEmpty(document.spotIds())) {
             final var spotsById = spots.findAllById(document.spotIds()).stream()
                     .collect(Collectors.toMap(SpotDocument::id, Function.identity(),
                             (first, second) -> first));

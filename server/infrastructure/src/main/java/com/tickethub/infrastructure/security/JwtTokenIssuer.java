@@ -1,5 +1,9 @@
 package com.tickethub.infrastructure.security;
 
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+
+import static java.util.Objects.nonNull;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -35,8 +39,8 @@ public class JwtTokenIssuer implements TokenIssuer {
                 .issuedAt(now)
                 .expiresAt(now.plus(expirationMinutes, ChronoUnit.MINUTES))
                 .subject(subject)
-                .claim("authorities", authorities == null ? List.of() : List.copyOf(authorities));
-        if (ownerId != null) {
+                .claim("authorities", List.copyOf(emptyIfNull(authorities)));
+        if (nonNull(ownerId)) {
             claims.claim("ownerId", ownerId);
         }
         final String token = jwtEncoder

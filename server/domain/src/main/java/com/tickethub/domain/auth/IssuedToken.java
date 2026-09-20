@@ -1,11 +1,11 @@
 package com.tickethub.domain.auth;
 
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public record IssuedToken(String token, long expiresInSeconds) {
 
     public IssuedToken {
-        if (StringUtils.isBlank(token)) {
+        if (isBlank(token)) {
             throw new IllegalArgumentException("'token' should not be null or blank");
         }
         if (expiresInSeconds <= 0) {

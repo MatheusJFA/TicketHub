@@ -1,11 +1,10 @@
 package com.tickethub.application.auth.refresh;
 
 import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.defaultString;
 
 import java.time.Duration;
 import java.util.Objects;
-
-import org.apache.commons.lang3.StringUtils;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.auth.AuthenticationException;
@@ -33,7 +32,7 @@ public class DefaultRefreshTokenUseCase extends RefreshTokenUseCase {
     @Override
     public Either<Notification, RefreshTokenOutput> execute(final RefreshTokenCommand command) {
         try {
-            final var presented = StringUtils.defaultString(command.refreshToken());
+            final var presented = defaultString(command.refreshToken());
             final var session = refreshSessions.findByTokenHash(SecureTokens.sha256Hex(presented)).orElse(null);
             if (isNull(session) || !session.isActive()) {
                 return Either.left(unauthorized());

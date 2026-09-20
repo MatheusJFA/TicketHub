@@ -1,5 +1,7 @@
 package com.tickethub.infrastructure.partner;
 
+import static org.apache.commons.lang3.StringUtils.contains;
+
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -73,10 +75,10 @@ public class PartnerMongoGateway implements PartnerGateway {
     }
 
     private static DomainException duplicateKey(final DuplicateKeyException e) {
-        if (e.getMessage() != null && e.getMessage().contains("uq_partners_cnpj")) {
+        if (contains(e.getMessage(), "uq_partners_cnpj")) {
             return new DomainException("'cnpj' already in use");
         }
-        if (e.getMessage() != null && e.getMessage().contains("uq_partners_email")) {
+        if (contains(e.getMessage(), "uq_partners_email")) {
             return new DomainException("'email' already in use");
         }
         throw e;

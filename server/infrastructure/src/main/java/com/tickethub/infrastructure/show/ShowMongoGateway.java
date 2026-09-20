@@ -1,5 +1,8 @@
 package com.tickethub.infrastructure.show;
 
+import static java.util.Objects.nonNull;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -14,6 +17,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
+import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.core.section.Section;
 import com.tickethub.domain.core.section.SectionID;
 import com.tickethub.domain.core.show.Show;
@@ -65,7 +69,7 @@ public class ShowMongoGateway implements ShowGateway {
                 .map(ShowDocument::sectionIds)
                 .orElseGet(List::of);
         final var spotIds = sections.findAllById(sectionIds).stream()
-                .filter(section -> section.spotIds() != null)
+                .filter(section -> nonNull(section.spotIds()))
                 .flatMap(section -> section.spotIds().stream())
                 .toList();
         unitOfWork.registerRemoved(SpotDocument.COLLECTION, spotIds);
@@ -102,7 +106,7 @@ public class ShowMongoGateway implements ShowGateway {
 
     @Override
     public List<ShowID> existsByIds(final List<ShowID> ids) {
-        if (ids == null || ids.isEmpty()) {
+        if (isEmpty(ids)) {
             return List.of();
         }
         return repository.findAllById(ids.stream().map(ShowID::getValue).toList()).stream()
@@ -113,7 +117,7 @@ public class ShowMongoGateway implements ShowGateway {
 
     @Override
     public void appendSpots(final ShowID showId, final SectionID sectionId, final Set<Spot> spots) {
-        if (spots == null || spots.isEmpty()) {
+        if (isEmpty(spots)) {
             return;
         }
         // Skip orphan writes when the parent section no longer exists.
@@ -138,7 +142,8 @@ public class ShowMongoGateway implements ShowGateway {
 
     private void registerGraph(final MongoUnitOfWork unitOfWork, final Show show, final boolean dirty) {
         final String showId = show.getId().getValue();
-        final String partnerId = show.getPartnerId() == null ? null : show.getPartnerId().getValue();
+        final String partnerId = Optional.ofNullable(show.getPartnerId())
+                .map(PartnerID::getValue).orElse(null);
         for (final Section section : show.getSections()) {
             final var sectionDocument = SectionDocument.from(section, showId, partnerId);
             if (dirty) {
@@ -161,21 +166,21 @@ public class ShowMongoGateway implements ShowGateway {
         // Prefer the denormalized parent fields (3 reads total, all indexed);
         // fall back to the legacy id arrays for documents written before them.
         List<SectionDocument> sectionDocuments = sections.findByShowId(document.id());
-        if (sectionDocuments.isEmpty() && document.sectionIds() != null && !document.sectionIds().isEmpty()) {
+        if (sectionDocuments.isEmpty() && !isEmpty(document.sectionIds())) {
             sectionDocuments = sections.findAllById(document.sectionIds());
         }
         final var spotsBySection = spots.findByShowId(document.id()).stream()
-                .filter(spot -> spot.sectionId() != null)
+                .filter(spot -> nonNull(spot.sectionId()))
                 .collect(Collectors.groupingBy(SpotDocument::sectionId));
         final var sectionsById = sectionDocuments.stream()
                 .collect(Collectors.toMap(SectionDocument::id, Function.identity(), (first, second) -> first));
         final Set<Section> sections = new HashSet<>();
-        final List<String> order = (document.sectionIds() == null || document.sectionIds().isEmpty())
+        final List<String> order = isEmpty(document.sectionIds())
                 ? sectionDocuments.stream().map(SectionDocument::id).toList()
                 : document.sectionIds();
         for (final String sectionId : order) {
             final var section = sectionsById.get(sectionId);
-            if (section != null) {
+            if (nonNull(section)) {
                 sections.add(toDomain(section, spotsBySection.getOrDefault(sectionId, List.of())));
             }
         }
@@ -186,7 +191,7 @@ public class ShowMongoGateway implements ShowGateway {
         final List<SpotDocument> spotDocuments;
         if (!candidates.isEmpty()) {
             spotDocuments = candidates;
-        } else if (document.spotIds() != null && !document.spotIds().isEmpty()) {
+        } else if (!isEmpty(document.spotIds())) {
             final var byId = spots.findAllById(document.spotIds()).stream()
                     .collect(Collectors.toMap(SpotDocument::id, Function.identity(), (first, second) -> first));
             spotDocuments = document.spotIds().stream()

@@ -1,6 +1,9 @@
 package com.tickethub.infrastructure.shared.presenters;
 
+import static java.util.Objects.isNull;
+
 import java.util.Currency;
+import java.util.Optional;
 
 import org.mapstruct.Mapper;
 
@@ -17,37 +20,37 @@ public interface SharedMapper {
     AddressModel toModel(Address address);
 
     default Address toDomain(final AddressModel model) {
-        if (model == null) {
-            return null;
-        }
-        return Address.create(model.street(), model.number(), model.complement(), model.neighborhood(),
-                model.city(), model.state(), model.country(), model.zipCode());
+        return Optional.ofNullable(model)
+                .map(current -> Address.create(current.street(), current.number(),
+                        current.complement(), current.neighborhood(), current.city(),
+                        current.state(), current.country(), current.zipCode()))
+                .orElse(null);
     }
 
     default MoneyModel toModel(final Money money) {
-        if (money == null) {
-            return null;
-        }
-        return new MoneyModel(money.getValue(), money.getCurrency().getCurrencyCode());
+        return Optional.ofNullable(money)
+                .map(current -> new MoneyModel(current.getValue(),
+                        current.getCurrency().getCurrencyCode()))
+                .orElse(null);
     }
 
     default Money toDomain(final MoneyModel model) {
-        if (model == null) {
+        if (isNull(model)) {
             return null;
         }
         try {
             return Money.create(model.value(),
-                    model.currency() == null ? null : Currency.getInstance(model.currency()));
+                    Optional.ofNullable(model.currency()).map(Currency::getInstance).orElse(null));
         } catch (final IllegalArgumentException exception) {
             throw new DomainException("Invalid currency");
         }
     }
 
     default String toValue(final Location location) {
-        return location == null ? null : location.getValue();
+        return Optional.ofNullable(location).map(Location::getValue).orElse(null);
     }
 
     default Location toLocation(final String value) {
-        return value == null ? null : Location.create(value);
+        return Optional.ofNullable(value).map(Location::create).orElse(null);
     }
 }

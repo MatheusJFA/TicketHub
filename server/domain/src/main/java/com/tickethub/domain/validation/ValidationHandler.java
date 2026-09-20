@@ -1,6 +1,9 @@
 package com.tickethub.domain.validation;
 
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+
 import java.util.List;
+import java.util.Optional;
 
 public interface ValidationHandler {
 
@@ -13,19 +16,17 @@ public interface ValidationHandler {
     List<Error> getErrors();
 
     default boolean hasError() {
-        return getErrors() != null && !getErrors().isEmpty();
+        return !isEmpty(getErrors());
     }
 
     default Error firstError() {
-        return hasError() ? getErrors().get(0) : null;
+        return Optional.ofNullable(getErrors()).filter(errors -> !errors.isEmpty())
+                .map(errors -> errors.get(0)).orElse(null);
     }
 
     default Error lastError() {
-        if (!hasError()) {
-            return null;
-        }
-        
-        return getErrors().get(getErrors().size() - 1);
+        return Optional.ofNullable(getErrors()).filter(errors -> !errors.isEmpty())
+                .map(errors -> errors.get(errors.size() - 1)).orElse(null);
     }
 
     interface Validation<T> {

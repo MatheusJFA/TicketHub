@@ -1,5 +1,7 @@
 package com.tickethub.infrastructure.spot;
 
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -40,9 +42,10 @@ public class SpotMongoGateway implements SpotGateway {
         Objects.requireNonNull(sectionId, "'sectionId' should not be null");
         // Resolve the remaining denormalized links from the parent section.
         final var parent = sections.findById(sectionId.getValue()).orElse(null);
-        final var document = parent == null
-                ? SpotDocument.from(spot, null, sectionId.getValue(), null)
-                : SpotDocument.from(spot, parent.showId(), sectionId.getValue(), parent.partnerId());
+        final var document = Optional.ofNullable(parent)
+                .map(current -> SpotDocument.from(spot, current.showId(), sectionId.getValue(),
+                        current.partnerId()))
+                .orElseGet(() -> SpotDocument.from(spot, null, sectionId.getValue(), null));
         return mongoTemplate.insert(document, SpotDocument.COLLECTION).toDomain();
     }
 
@@ -60,9 +63,10 @@ public class SpotMongoGateway implements SpotGateway {
     public Spot update(final Spot spot) {
         // Preserve the denormalized ownership links (see SectionMongoGateway.update).
         final var existing = repository.findById(spot.getId().getValue()).orElse(null);
-        final var document = existing == null
-                ? SpotDocument.from(spot)
-                : SpotDocument.from(spot, existing.showId(), existing.sectionId(), existing.partnerId());
+        final var document = Optional.ofNullable(existing)
+                .map(current -> SpotDocument.from(spot, current.showId(), current.sectionId(),
+                        current.partnerId()))
+                .orElseGet(() -> SpotDocument.from(spot));
         return mongoTemplate.save(document, SpotDocument.COLLECTION).toDomain();
     }
 
@@ -75,7 +79,7 @@ public class SpotMongoGateway implements SpotGateway {
 
     @Override
     public List<SpotID> existsByIds(final List<SpotID> ids) {
-        if (ids == null || ids.isEmpty()) {
+        if (isEmpty(ids)) {
             return List.of();
         }
         return repository.findAllById(ids.stream().map(SpotID::getValue).toList()).stream()

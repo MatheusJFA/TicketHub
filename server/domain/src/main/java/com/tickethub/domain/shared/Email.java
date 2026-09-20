@@ -5,7 +5,7 @@ import static java.util.Objects.isNull;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import com.tickethub.domain.ValueObject;
 import com.tickethub.domain.exception.DomainException;
@@ -32,7 +32,7 @@ public final class Email extends ValueObject {
     }
 
     private static boolean isValid(String email) {
-        if (StringUtils.isBlank(email) || email.length() > MAX_LENGTH) {
+        if (isBlank(email) || email.length() > MAX_LENGTH) {
             return false;
         }
 

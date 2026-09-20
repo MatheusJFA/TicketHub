@@ -1,5 +1,8 @@
 package com.tickethub.infrastructure.web;
 
+import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
@@ -45,7 +48,7 @@ public class CorrelationIdFilter extends OncePerRequestFilter {
 
     private static Optional<String> authenticatedPrincipal() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()
+        if (isNull(authentication) || !authentication.isAuthenticated()
                 || authentication instanceof AnonymousAuthenticationToken) {
             return Optional.empty();
         }
@@ -53,13 +56,13 @@ public class CorrelationIdFilter extends OncePerRequestFilter {
     }
 
     private static String headerOrGenerated(final HttpServletRequest request, final String header) {
-        final String value = request.getHeader(header);
-        return value == null || value.isBlank() ? UUID.randomUUID().toString() : value;
+        return Optional.ofNullable(request.getHeader(header)).filter(value -> !isBlank(value))
+                .orElseGet(() -> UUID.randomUUID().toString());
     }
 
     private static String headerOrDefault(final HttpServletRequest request, final String header,
             final String fallback) {
-        final String value = request.getHeader(header);
-        return value == null || value.isBlank() ? fallback : value;
+        return Optional.ofNullable(request.getHeader(header)).filter(value -> !isBlank(value))
+                .orElse(fallback);
     }
 }

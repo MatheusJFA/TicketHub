@@ -1,5 +1,7 @@
 package com.tickethub.domain.shared;
 
+import static java.util.Objects.nonNull;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Currency;
@@ -31,8 +33,8 @@ public final class Money extends ValueObject {
     }
 
     private static boolean isValid(BigDecimal value, Currency currency) {
-        return value != null
-                && currency != null
+        return nonNull(value)
+                && nonNull(currency)
                 && currency.getDefaultFractionDigits() >= 0
                 && value.signum() >= 0
                 && value.stripTrailingZeros().scale() <= currency.getDefaultFractionDigits();
