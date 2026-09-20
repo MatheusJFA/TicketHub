@@ -1,6 +1,7 @@
 package com.tickethub.domain.shared;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -56,8 +57,13 @@ class PasswordHashTest {
     }
 
     @Test
-    @DisplayName("Given password hash, when to string, then do not expose hash")
-    void givenPasswordHash_whenToString_thenDoNotExposeHash() {
-        assertEquals("***", PasswordHash.fromHash(VALID_HASH).toString());
+    @DisplayName("Given password hash, when to string, then mask without exposing hash")
+    void givenPasswordHash_whenToString_thenMaskWithoutExposingHash() {
+        final var masked = PasswordHash.fromHash(VALID_HASH).toString();
+
+        assertEquals("*".repeat(100), masked,
+                () -> "toString should mask the hash with a fixed-length asterisk mask");
+        assertFalse(masked.contains(VALID_HASH),
+                () -> "toString should not expose the hash value");
     }
 }
