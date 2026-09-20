@@ -2,12 +2,13 @@ package com.tickethub.domain;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 
-import java.util.Objects;
 import java.time.Instant;
 
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.validation.ValidationHandler;
+import java.util.Objects;
 
 public abstract class Entity<ID extends Identifier> {
 
@@ -44,8 +45,8 @@ public abstract class Entity<ID extends Identifier> {
             throw new DomainException("'id' should not be null");
         }
         this.id = id;
-        this.createdAt = Objects.requireNonNull(createdAt, "'createdAt' should not be null");
-        this.updatedAt = Objects.requireNonNull(updatedAt, "'updatedAt' should not be null");
+        this.createdAt = requireNonNull(createdAt, "'createdAt' should not be null");
+        this.updatedAt = requireNonNull(updatedAt, "'updatedAt' should not be null");
         this.deletedAt = deletedAt;
         this.createdBy = createdBy;
         this.lastModifiedBy = lastModifiedBy;

@@ -1,5 +1,6 @@
 package com.tickethub.domain.validation;
 
+import static java.util.Objects.requireNonNull;
 import com.tickethub.domain.exception.DomainException;
 
 import java.util.ArrayList;
@@ -36,14 +37,14 @@ public class Notification implements ValidationHandler {
 
     @Override
     public Notification append(final Error error) {
-        Objects.requireNonNull(error, "'error' should not be null");
+        requireNonNull(error, "'error' should not be null");
         errors.add(error);
         return this;
     }
 
     @Override
     public Notification append(final ValidationHandler handler) {
-        Objects.requireNonNull(handler, "'handler' should not be null");
+        requireNonNull(handler, "'handler' should not be null");
         errors.addAll(handler.getErrors());
         return this;
     }

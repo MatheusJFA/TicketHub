@@ -1,9 +1,9 @@
 package com.tickethub.domain.core.show;
 
 import static java.util.Objects.requireNonNull;
-import java.util.UUID;
 
 import com.tickethub.domain.Identifier;
+import java.util.UUID;
 
 public class ShowID extends Identifier {
     private final String value;

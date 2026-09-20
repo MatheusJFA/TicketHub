@@ -1,8 +1,8 @@
 package com.tickethub.infrastructure.shared.http;
 
+import static java.util.Objects.requireNonNull;
 import java.time.Duration;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -21,8 +21,8 @@ public abstract class BaseHttpClient {
     protected final String provider;
 
     protected BaseHttpClient(final RestClient restClient, final String provider) {
-        this.restClient = Objects.requireNonNull(restClient, "'restClient' should not be null");
-        this.provider = Objects.requireNonNull(provider, "'provider' should not be null");
+        this.restClient = requireNonNull(restClient, "'restClient' should not be null");
+        this.provider = requireNonNull(provider, "'provider' should not be null");
     }
 
     /**
@@ -31,8 +31,8 @@ public abstract class BaseHttpClient {
      * {@code MockRestServiceServer} before {@code build()}.
      */
     public static RestClient.Builder preparedBuilder(final RestClient.Builder builder, final String baseUrl) {
-        return Objects.requireNonNull(builder, "'builder' should not be null")
-                .baseUrl(Objects.requireNonNull(baseUrl, "'baseUrl' should not be null"))
+        return requireNonNull(builder, "'builder' should not be null")
+                .baseUrl(requireNonNull(baseUrl, "'baseUrl' should not be null"))
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.USER_AGENT, "tickethub-server");
     }

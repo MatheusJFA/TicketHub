@@ -1,7 +1,7 @@
 package com.tickethub.infrastructure.authentication;
 
+import static java.util.Objects.requireNonNull;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -20,8 +20,8 @@ public class MongoRefreshSessionGateway implements RefreshSessionGateway {
 
     public MongoRefreshSessionGateway(final MongoTemplate mongoTemplate,
             final RefreshSessionRepository repository) {
-        this.mongoTemplate = Objects.requireNonNull(mongoTemplate, "'mongoTemplate' should not be null");
-        this.repository = Objects.requireNonNull(repository, "'repository' should not be null");
+        this.mongoTemplate = requireNonNull(mongoTemplate, "'mongoTemplate' should not be null");
+        this.repository = requireNonNull(repository, "'repository' should not be null");
     }
 
     @Override

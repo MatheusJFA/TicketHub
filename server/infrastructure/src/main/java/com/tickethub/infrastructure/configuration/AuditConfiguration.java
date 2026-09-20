@@ -2,13 +2,13 @@ package com.tickethub.infrastructure.configuration;
 
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.AuditorAware;
 
 import com.tickethub.infrastructure.web.CorrelationIdFilter;
+import org.apache.commons.lang3.StringUtils;
 
 @Configuration(proxyBeanMethods = false)
 public class AuditConfiguration {

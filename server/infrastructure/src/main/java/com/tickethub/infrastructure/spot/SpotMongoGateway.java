@@ -1,9 +1,9 @@
 package com.tickethub.infrastructure.spot;
 
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static java.util.Objects.requireNonNull;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -33,14 +33,14 @@ public class SpotMongoGateway implements SpotGateway {
 
     public SpotMongoGateway(final MongoTemplate mongoTemplate, final SpotRepository repository,
             final SectionRepository sections) {
-        this.mongoTemplate = Objects.requireNonNull(mongoTemplate, "'mongoTemplate' should not be null");
-        this.repository = Objects.requireNonNull(repository, "'repository' should not be null");
-        this.sections = Objects.requireNonNull(sections, "'sections' should not be null");
+        this.mongoTemplate = requireNonNull(mongoTemplate, "'mongoTemplate' should not be null");
+        this.repository = requireNonNull(repository, "'repository' should not be null");
+        this.sections = requireNonNull(sections, "'sections' should not be null");
     }
 
     @Override
     public Spot create(final Spot spot, final SectionID sectionId) {
-        Objects.requireNonNull(sectionId, "'sectionId' should not be null");
+        requireNonNull(sectionId, "'sectionId' should not be null");
         // Resolve the remaining denormalized links from the parent section.
         final var parent = sections.findById(sectionId.getValue()).orElse(null);
         final var document = Optional.ofNullable(parent)
@@ -62,7 +62,7 @@ public class SpotMongoGateway implements SpotGateway {
 
     @Override
     public Optional<SpotPlacement> findPlacement(final SpotID id) {
-        Objects.requireNonNull(id, "'id' should not be null");
+        requireNonNull(id, "'id' should not be null");
         return repository.findById(id.getValue())
                 .map(document -> new SpotPlacement(document.toDomain(), document.showId(),
                         document.sectionId()));

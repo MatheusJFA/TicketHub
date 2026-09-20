@@ -4,6 +4,7 @@ import static java.util.Objects.isNull;
 
 import com.tickethub.domain.ValueObject;
 import com.tickethub.domain.exception.DomainException;
+import java.util.Objects;
 
 public final class CPF extends ValueObject {
     private static final int CPF_LENGTH = 11;

@@ -7,12 +7,12 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.tickethub.domain.core.customer.Customer;
-import com.tickethub.domain.core.customer.CustomerID;
 import com.tickethub.domain.shared.CPF;
-import com.tickethub.domain.shared.Email;
 import com.tickethub.domain.shared.Name;
 import com.tickethub.domain.shared.PasswordHash;
 import com.tickethub.infrastructure.audit.AuditActor;
+import com.tickethub.domain.shared.Email;
+import com.tickethub.domain.core.customer.CustomerID;
 
 @Document("customers")
 public record CustomerDocument(

@@ -1,8 +1,8 @@
 package com.tickethub.application.customer.retrieve.list;
 
+import static java.util.Objects.requireNonNull;
 import com.tickethub.domain.core.customer.Customer;
 
-import java.util.Objects;
 import java.util.Optional;
 import com.tickethub.application.Either;
 import com.tickethub.domain.validation.Notification;
@@ -16,7 +16,7 @@ public class DefaultListCustomersUseCase extends ListCustomersUseCase {
     private final CustomerGateway customerGateway;
 
     public DefaultListCustomersUseCase(final CustomerGateway customerGateway) {
-        this.customerGateway = Objects.requireNonNull(customerGateway);
+        this.customerGateway = requireNonNull(customerGateway);
     }
 
     @Override

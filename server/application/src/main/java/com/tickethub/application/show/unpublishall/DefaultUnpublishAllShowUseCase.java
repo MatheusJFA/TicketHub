@@ -1,6 +1,6 @@
 package com.tickethub.application.show.unpublishall;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 
 import com.tickethub.application.Either;
@@ -13,7 +13,7 @@ public class DefaultUnpublishAllShowUseCase extends UnpublishAllShowUseCase {
     private final ShowGateway showGateway;
 
     public DefaultUnpublishAllShowUseCase(final ShowGateway showGateway) {
-        this.showGateway = Objects.requireNonNull(showGateway);
+        this.showGateway = requireNonNull(showGateway);
     }
 
     @Override

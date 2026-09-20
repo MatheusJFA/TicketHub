@@ -1,9 +1,9 @@
 package com.tickethub.infrastructure.audit;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static java.util.Objects.requireNonNull;
 
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -27,7 +27,7 @@ public class MongoAuditLogReader implements AuditLogReader {
     private final MongoTemplate mongoTemplate;
 
     public MongoAuditLogReader(final MongoTemplate mongoTemplate) {
-        this.mongoTemplate = Objects.requireNonNull(mongoTemplate, "'mongoTemplate' should not be null");
+        this.mongoTemplate = requireNonNull(mongoTemplate, "'mongoTemplate' should not be null");
     }
 
     @Override

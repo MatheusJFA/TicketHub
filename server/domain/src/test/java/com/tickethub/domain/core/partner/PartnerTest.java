@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.jupiter.api.DisplayName;
 
 import com.tickethub.domain.exception.DomainException;
+import com.tickethub.domain.shared.Address;
 
 @DisplayName("Partner")
 class PartnerTest {
@@ -23,7 +24,7 @@ class PartnerTest {
     @DisplayName("Given invalid name, when create, then throw domain exception for null and blank")
     void givenInvalidName_whenCreate_thenThrowDomainExceptionForNullAndBlank(String name) {
         assertEquals("Invalid name " + name, assertThrows(DomainException.class,
-                () -> Partner.create(name, "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), VALID_EMAIL, VALID_HASH)).getMessage());
+                () -> Partner.create(name, "11222333000181", Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), VALID_EMAIL, VALID_HASH)).getMessage());
     }
 
     @ParameterizedTest
@@ -32,7 +33,7 @@ class PartnerTest {
     @DisplayName("Given invalid CNPJ, when create, then throw domain exception for null and blank")
     void givenInvalidCnpj_whenCreate_thenThrowDomainExceptionForNullAndBlank(String cnpj) {
         assertEquals("Invalid CNPJ", assertThrows(DomainException.class,
-                () -> Partner.create("Cinema Nova", cnpj, com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), VALID_EMAIL, VALID_HASH)).getMessage());
+                () -> Partner.create("Cinema Nova", cnpj, Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), VALID_EMAIL, VALID_HASH)).getMessage());
     }
 
     @ParameterizedTest
@@ -41,7 +42,7 @@ class PartnerTest {
     @DisplayName("Given invalid email, when create, then throw domain exception")
     void givenInvalidEmail_whenCreate_thenThrowDomainException(String email) {
         assertEquals("Invalid email", assertThrows(DomainException.class,
-                () -> Partner.create("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), email, VALID_HASH)).getMessage());
+                () -> Partner.create("Cinema Nova", "11222333000181", Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), email, VALID_HASH)).getMessage());
     }
 
     @Test
@@ -50,7 +51,7 @@ class PartnerTest {
         final var expectedName = "Cinema Nova";
         final var expectedCnpj = "11222333000181";
 
-        final var actualPartner = Partner.create(expectedName, expectedCnpj, com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), VALID_EMAIL, VALID_HASH);
+        final var actualPartner = Partner.create(expectedName, expectedCnpj, Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), VALID_EMAIL, VALID_HASH);
 
         assertNotNull(actualPartner);
         assertNotNull(actualPartner.getId());
@@ -68,7 +69,7 @@ class PartnerTest {
 
         DomainException exception = assertThrows(
                 DomainException.class,
-                () -> Partner.create(expectedName, expectedCnpj, com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), VALID_EMAIL, VALID_HASH)
+                () -> Partner.create(expectedName, expectedCnpj, Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), VALID_EMAIL, VALID_HASH)
         );
 
         assertEquals("Invalid name " + expectedName, exception.getMessage());
@@ -82,7 +83,7 @@ class PartnerTest {
 
         DomainException exception = assertThrows(
                 DomainException.class,
-                () -> Partner.create(expectedName, expectedCnpj, com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), VALID_EMAIL, VALID_HASH)
+                () -> Partner.create(expectedName, expectedCnpj, Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), VALID_EMAIL, VALID_HASH)
         );
 
         assertEquals("Invalid CNPJ", exception.getMessage());

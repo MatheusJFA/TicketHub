@@ -1,6 +1,6 @@
 package com.tickethub.application.spot.changelocation;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 
 import com.tickethub.application.Either;
@@ -13,7 +13,7 @@ public class DefaultChangeSpotLocationUseCase extends ChangeSpotLocationUseCase 
     private final SpotGateway spotGateway;
 
     public DefaultChangeSpotLocationUseCase(final SpotGateway spotGateway) {
-        this.spotGateway = Objects.requireNonNull(spotGateway);
+        this.spotGateway = requireNonNull(spotGateway);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.tickethub.application.show.create;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 
 import com.tickethub.application.Either;
@@ -16,8 +16,8 @@ public class DefaultCreateShowUseCase extends CreateShowUseCase {
     private final PartnerGateway partnerGateway;
 
     public DefaultCreateShowUseCase(final ShowGateway showGateway, final PartnerGateway partnerGateway) {
-        this.showGateway = Objects.requireNonNull(showGateway);
-        this.partnerGateway = Objects.requireNonNull(partnerGateway);
+        this.showGateway = requireNonNull(showGateway);
+        this.partnerGateway = requireNonNull(partnerGateway);
     }
 
     @Override

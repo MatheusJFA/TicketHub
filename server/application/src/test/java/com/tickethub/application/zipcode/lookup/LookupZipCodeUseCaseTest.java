@@ -2,6 +2,7 @@ package com.tickethub.application.zipcode.lookup;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,7 +20,7 @@ import com.tickethub.domain.geography.ZipCodeLookup;
 @DisplayName("Lookup ZIP code use case")
 class LookupZipCodeUseCaseTest extends UseCaseTest {
 
-    private final ZipCodeLookup zipCodeLookup = org.mockito.Mockito.mock(ZipCodeLookup.class);
+    private final ZipCodeLookup zipCodeLookup = mock(ZipCodeLookup.class);
     private final DefaultLookupZipCodeUseCase useCase = new DefaultLookupZipCodeUseCase(zipCodeLookup);
 
     @Override

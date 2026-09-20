@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 import com.tickethub.application.UseCaseTest;
 import com.tickethub.domain.authentication.PasswordHasher;
 import com.tickethub.domain.core.partner.PartnerGateway;
+import com.tickethub.domain.shared.Address;
 
 @DisplayName("Create partner use case")
 public class CreatePartnerUseCaseTest extends UseCaseTest {
@@ -44,7 +45,7 @@ public class CreatePartnerUseCaseTest extends UseCaseTest {
     @Test
     @DisplayName("Given valid command, when execute, should persist and return id")
     public void givenValidCommand_whenExecute_shouldPersistAndReturnId() {
-        final var command = CreatePartnerCommand.with("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), VALID_EMAIL, RAW_PASSWORD);
+        final var command = CreatePartnerCommand.with("Cinema Nova", "11222333000181", Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), VALID_EMAIL, RAW_PASSWORD);
         when(passwordHasher.hash(RAW_PASSWORD)).thenReturn(PASSWORD_HASH);
         when(partnerGateway.create(any())).thenAnswer(returnsFirstArg());
 
@@ -67,7 +68,7 @@ public class CreatePartnerUseCaseTest extends UseCaseTest {
     @Test
     @DisplayName("Given gateway failure, when execute, should return notification")
     public void givenGatewayFailure_whenExecute_shouldReturnNotification() {
-        final var command = CreatePartnerCommand.with("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), VALID_EMAIL, RAW_PASSWORD);
+        final var command = CreatePartnerCommand.with("Cinema Nova", "11222333000181", Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), VALID_EMAIL, RAW_PASSWORD);
         final var expectedMessage = "Gateway error";
         when(passwordHasher.hash(RAW_PASSWORD)).thenReturn(PASSWORD_HASH);
         when(partnerGateway.create(any())).thenThrow(new IllegalStateException(expectedMessage));
@@ -90,7 +91,7 @@ public class CreatePartnerUseCaseTest extends UseCaseTest {
     @Test
     @DisplayName("Given invalid command, when execute, should return validation errors without persisting")
     public void givenInvalidCommand_whenExecute_shouldReturnValidationErrorsWithoutPersisting() {
-        final var command = CreatePartnerCommand.with("Cinema Nova", "invalid", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), VALID_EMAIL, RAW_PASSWORD);
+        final var command = CreatePartnerCommand.with("Cinema Nova", "invalid", Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), VALID_EMAIL, RAW_PASSWORD);
         when(passwordHasher.hash(RAW_PASSWORD)).thenReturn(PASSWORD_HASH);
 
         final var notification = useCase.execute(command).getLeft();
@@ -104,7 +105,7 @@ public class CreatePartnerUseCaseTest extends UseCaseTest {
     @Test
     @DisplayName("Given submitted address, when execute, should persist it as is without lookup")
     public void givenSubmittedAddress_whenExecute_shouldPersistItAsIs() {
-        final var command = CreatePartnerCommand.with("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua X", "42", "Sala 9", "Bairro X", "Cidade X", "XX", "Brasil", "01305-000"), VALID_EMAIL, RAW_PASSWORD);
+        final var command = CreatePartnerCommand.with("Cinema Nova", "11222333000181", Address.create("Rua X", "42", "Sala 9", "Bairro X", "Cidade X", "XX", "Brasil", "01305-000"), VALID_EMAIL, RAW_PASSWORD);
         when(passwordHasher.hash(RAW_PASSWORD)).thenReturn(PASSWORD_HASH);
         when(partnerGateway.create(any())).thenAnswer(returnsFirstArg());
 

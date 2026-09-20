@@ -1,6 +1,6 @@
 package com.tickethub.application.partner.retrieve.get;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 
 import com.tickethub.application.Either;
@@ -13,7 +13,7 @@ public class DefaultGetPartnerUseCase extends GetPartnerUseCase {
     private final PartnerGateway partnerGateway;
 
     public DefaultGetPartnerUseCase(final PartnerGateway partnerGateway) {
-        this.partnerGateway = Objects.requireNonNull(partnerGateway);
+        this.partnerGateway = requireNonNull(partnerGateway);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.tickethub.infrastructure.zipcode;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -19,8 +19,8 @@ public class ViaCepLookup implements ZipCodeLookup {
     private final ZipCodeProperties properties;
 
     public ViaCepLookup(final ViaCepClient client, final ZipCodeProperties properties) {
-        this.client = Objects.requireNonNull(client, "'client' should not be null");
-        this.properties = Objects.requireNonNull(properties, "'properties' should not be null");
+        this.client = requireNonNull(client, "'client' should not be null");
+        this.properties = requireNonNull(properties, "'properties' should not be null");
     }
 
     @Override

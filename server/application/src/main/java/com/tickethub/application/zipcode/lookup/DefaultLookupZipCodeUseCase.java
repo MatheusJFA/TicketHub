@@ -1,6 +1,6 @@
 package com.tickethub.application.zipcode.lookup;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.geography.ZipCodeAddress;
@@ -11,7 +11,7 @@ public class DefaultLookupZipCodeUseCase extends LookupZipCodeUseCase {
     private final ZipCodeLookup zipCodeLookup;
 
     public DefaultLookupZipCodeUseCase(final ZipCodeLookup zipCodeLookup) {
-        this.zipCodeLookup = Objects.requireNonNull(zipCodeLookup, "'zipCodeLookup' should not be null");
+        this.zipCodeLookup = requireNonNull(zipCodeLookup, "'zipCodeLookup' should not be null");
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.tickethub.domain.core.section;
 
+import static java.util.Objects.requireNonNull;
 import java.time.Instant;
-import java.util.Objects;
 
 import com.tickethub.domain.event.DomainEvent;
 
@@ -13,12 +13,12 @@ public record SpotsGenerationRequested(
         Instant occurredOn) implements DomainEvent {
 
     public SpotsGenerationRequested {
-        Objects.requireNonNull(showId, "'showId' should not be null");
-        Objects.requireNonNull(sectionId, "'sectionId' should not be null");
-        Objects.requireNonNull(sectionCode, "'sectionCode' should not be null");
+        requireNonNull(showId, "'showId' should not be null");
+        requireNonNull(sectionId, "'sectionId' should not be null");
+        requireNonNull(sectionCode, "'sectionCode' should not be null");
         if (totalSpots < 1) {
             throw new IllegalArgumentException("'totalSpots' should be positive");
         }
-        Objects.requireNonNull(occurredOn, "'occurredOn' should not be null");
+        requireNonNull(occurredOn, "'occurredOn' should not be null");
     }
 }

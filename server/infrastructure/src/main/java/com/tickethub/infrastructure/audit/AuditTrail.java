@@ -1,12 +1,12 @@
 package com.tickethub.infrastructure.audit;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 public interface AuditTrail {
 
     void record(AuditEntry entry);
 
     static AuditTrail noop() {
-        return entry -> Objects.requireNonNull(entry, "'entry' should not be null");
+        return entry -> requireNonNull(entry, "'entry' should not be null");
     }
 }

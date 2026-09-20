@@ -3,10 +3,10 @@ package com.tickethub.infrastructure.security;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static java.util.Objects.requireNonNull;
 
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 public record SecurityUser(String username, String passwordHash, Set<Role> roles, String ownerId) {
@@ -15,7 +15,7 @@ public record SecurityUser(String username, String passwordHash, Set<Role> roles
         if (isBlank(username)) {
             throw new IllegalArgumentException("'username' should not be null or blank");
         }
-        Objects.requireNonNull(passwordHash, "'passwordHash' should not be null");
+        requireNonNull(passwordHash, "'passwordHash' should not be null");
         roles = isEmpty(roles) ? Set.of(Role.CUSTOMER) : Set.copyOf(roles);
         ownerId = defaultIfBlank(ownerId, null);
     }

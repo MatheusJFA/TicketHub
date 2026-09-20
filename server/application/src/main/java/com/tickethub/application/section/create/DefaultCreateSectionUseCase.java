@@ -1,7 +1,7 @@
 package com.tickethub.application.section.create;
 
+import static java.util.Objects.requireNonNull;
 import java.util.List;
-import java.util.Objects;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.section.Section;
@@ -10,8 +10,8 @@ import com.tickethub.domain.core.show.Show;
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.domain.shared.Location;
-import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.Notification;
+import com.tickethub.domain.validation.Error;
 
 public class DefaultCreateSectionUseCase extends CreateSectionUseCase {
     private final SectionGateway sectionGateway;
@@ -20,8 +20,8 @@ public class DefaultCreateSectionUseCase extends CreateSectionUseCase {
 
     public DefaultCreateSectionUseCase(final SectionGateway sectionGateway, final ShowGateway showGateway,
             final int seatNumberWidth) {
-        this.sectionGateway = Objects.requireNonNull(sectionGateway);
-        this.showGateway = Objects.requireNonNull(showGateway);
+        this.sectionGateway = requireNonNull(sectionGateway);
+        this.showGateway = requireNonNull(showGateway);
         this.seatNumberWidth = seatNumberWidth;
     }
 

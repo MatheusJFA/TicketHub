@@ -1,6 +1,6 @@
 package com.tickethub.application.show.reschedule;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 import java.time.OffsetDateTime;
 
@@ -14,7 +14,7 @@ public class DefaultRescheduleShowUseCase extends RescheduleShowUseCase {
     private final ShowGateway showGateway;
 
     public DefaultRescheduleShowUseCase(final ShowGateway showGateway) {
-        this.showGateway = Objects.requireNonNull(showGateway);
+        this.showGateway = requireNonNull(showGateway);
     }
 
     @Override

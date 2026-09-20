@@ -21,8 +21,8 @@ import org.junit.jupiter.api.DisplayName;
 import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.core.show.Show;
 import com.tickethub.domain.core.show.ShowGateway;
-import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.shared.Money;
+import com.tickethub.domain.shared.Address;
 
 @DisplayName("Generate section spots use case")
 class GenerateSectionSpotsUseCaseTest {

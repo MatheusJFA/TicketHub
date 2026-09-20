@@ -14,6 +14,7 @@ import com.tickethub.infrastructure.configuration.usecases.ShowUseCaseConfig;
 import com.tickethub.infrastructure.configuration.usecases.SectionUseCaseConfig;
 import com.tickethub.infrastructure.configuration.usecases.SpotUseCaseConfig;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import com.tickethub.application.customer.create.CreateCustomerCommand;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
@@ -48,7 +49,7 @@ class UseCaseConfigurationTest {
                 .run(context -> {
             assertThat(context).hasSingleBean(CreateCustomerUseCase.class);
             final var result = context.getBean(CreateCustomerUseCase.class).execute(
-                    new com.tickethub.application.customer.create.CreateCustomerCommand("52998224725", "Maria",
+                    new CreateCustomerCommand("52998224725", "Maria",
                             "maria@domain.com", "secret-123"));
             assertThat(result.isRight()).isTrue();
             verify(gateway).create(any());

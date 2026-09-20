@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.kafka.clients.admin.Admin;
@@ -28,6 +27,7 @@ import org.springframework.test.context.DynamicPropertySource;
 
 import com.tickethub.infrastructure.ContainerSupport;
 import com.tickethub.infrastructure.IntegrationTest;
+import java.util.UUID;
 
 @IntegrationTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

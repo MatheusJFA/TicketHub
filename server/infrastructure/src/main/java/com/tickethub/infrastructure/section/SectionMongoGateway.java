@@ -1,10 +1,10 @@
 package com.tickethub.infrastructure.section;
 
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static java.util.Objects.requireNonNull;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -28,6 +28,7 @@ import com.tickethub.infrastructure.spot.persistence.SpotDocument;
 import com.tickethub.infrastructure.spot.persistence.SpotRepository;
 import com.tickethub.infrastructure.shared.persistence.MongoGatewaySupport;
 import com.tickethub.infrastructure.shared.persistence.MongoUnitOfWork;
+import java.util.Objects;
 
 @Component
 public class SectionMongoGateway implements SectionGateway {
@@ -41,15 +42,15 @@ public class SectionMongoGateway implements SectionGateway {
 
     public SectionMongoGateway(final MongoTemplate mongoTemplate, final SectionRepository repository,
             final ShowRepository shows, final SpotRepository spots) {
-        this.mongoTemplate = Objects.requireNonNull(mongoTemplate, "'mongoTemplate' should not be null");
-        this.repository = Objects.requireNonNull(repository, "'repository' should not be null");
-        this.shows = Objects.requireNonNull(shows, "'shows' should not be null");
-        this.spots = Objects.requireNonNull(spots, "'spots' should not be null");
+        this.mongoTemplate = requireNonNull(mongoTemplate, "'mongoTemplate' should not be null");
+        this.repository = requireNonNull(repository, "'repository' should not be null");
+        this.shows = requireNonNull(shows, "'shows' should not be null");
+        this.spots = requireNonNull(spots, "'spots' should not be null");
     }
 
     @Override
     public Section create(final Section section, final ShowID showId) {
-        Objects.requireNonNull(showId, "'showId' should not be null");
+        requireNonNull(showId, "'showId' should not be null");
         // Resolve the remaining denormalized links from the parent show.
         final var partnerId = shows.findById(showId.getValue())
                 .map(ShowDocument::partnerId)

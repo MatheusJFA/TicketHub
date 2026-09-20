@@ -1,8 +1,8 @@
 package com.tickethub.infrastructure.partner;
 
 import static org.apache.commons.lang3.StringUtils.contains;
+import static java.util.Objects.requireNonNull;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -16,10 +16,10 @@ import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.domain.pagination.SearchQuery;
-import com.tickethub.domain.shared.Email;
 import com.tickethub.infrastructure.partner.persistence.PartnerDocument;
 import com.tickethub.infrastructure.partner.persistence.PartnerRepository;
 import com.tickethub.infrastructure.shared.persistence.MongoGatewaySupport;
+import com.tickethub.domain.shared.Email;
 
 @Component
 public class PartnerMongoGateway implements PartnerGateway {
@@ -30,8 +30,8 @@ public class PartnerMongoGateway implements PartnerGateway {
     private final PartnerRepository repository;
 
     public PartnerMongoGateway(final MongoTemplate mongoTemplate, final PartnerRepository repository) {
-        this.mongoTemplate = Objects.requireNonNull(mongoTemplate, "'mongoTemplate' should not be null");
-        this.repository = Objects.requireNonNull(repository, "'repository' should not be null");
+        this.mongoTemplate = requireNonNull(mongoTemplate, "'mongoTemplate' should not be null");
+        this.repository = requireNonNull(repository, "'repository' should not be null");
     }
 
     @Override

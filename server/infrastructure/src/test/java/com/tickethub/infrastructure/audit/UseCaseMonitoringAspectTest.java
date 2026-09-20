@@ -30,7 +30,6 @@ import com.tickethub.application.Either;
 import com.tickethub.application.UnitUseCase;
 import com.tickethub.application.UseCase;
 import com.tickethub.domain.authentication.AuthenticationException;
-import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.Notification;
 import com.tickethub.infrastructure.api.ResiliencePolicy;
 import com.tickethub.infrastructure.web.CorrelationIdFilter;
@@ -39,6 +38,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
+import com.tickethub.domain.validation.Error;
 
 @DisplayName("UseCaseMonitoringAspect")
 class UseCaseMonitoringAspectTest {

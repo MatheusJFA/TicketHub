@@ -13,11 +13,12 @@ import com.tickethub.application.partner.changename.DefaultChangePartnerNameUseC
 import com.tickethub.application.partner.changename.ChangePartnerNameCommand;
 import com.tickethub.domain.core.partner.*;
 import com.tickethub.domain.pagination.*;
+import com.tickethub.domain.shared.Address;
 
 @DisplayName("Partner crud use case")
 class PartnerCrudUseCaseTest {
     private final PartnerGateway gateway = mock(PartnerGateway.class);
-    private final Partner partner = Partner.create("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), "cinema@domain.com", "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
+    private final Partner partner = Partner.create("Cinema Nova", "11222333000181", Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), "cinema@domain.com", "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
     private final String id = partner.getId().getValue();
     private final SearchQuery query = new SearchQuery(2, 10, "Cinema", "name", "asc");
 

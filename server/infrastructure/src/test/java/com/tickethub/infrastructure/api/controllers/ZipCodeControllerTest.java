@@ -20,6 +20,7 @@ import com.tickethub.application.zipcode.lookup.LookupZipCodeOutput;
 import com.tickethub.application.zipcode.lookup.LookupZipCodeUseCase;
 import com.tickethub.domain.validation.Notification;
 import com.tickethub.infrastructure.ControllerTest;
+import com.tickethub.domain.validation.Error;
 
 @ControllerTest(controllers = ZipCodeController.class)
 @Import({})
@@ -47,7 +48,7 @@ class ZipCodeControllerTest {
     @DisplayName("Given unknown zip, when lookup, then returns not found")
     void givenUnknownZip_whenLookup_thenReturnsNotFound() throws Exception {
         when(lookupZipCode.execute(any())).thenReturn(Either.left(
-                Notification.create(new com.tickethub.domain.validation.Error("ZipCodeAddress not found: 99999999"))));
+                Notification.create(new Error("ZipCodeAddress not found: 99999999"))));
 
         mvc.perform(get("/zipcode/99999-999"))
                 .andExpect(status().isNotFound());

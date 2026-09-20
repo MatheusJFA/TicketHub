@@ -8,11 +8,11 @@ import java.util.Optional;
 import org.mapstruct.Mapper;
 
 import com.tickethub.domain.exception.DomainException;
-import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.shared.Location;
 import com.tickethub.domain.shared.Money;
 import com.tickethub.infrastructure.api.models.AddressModel;
 import com.tickethub.infrastructure.api.models.MoneyModel;
+import com.tickethub.domain.shared.Address;
 
 @Mapper(componentModel = "spring")
 public interface SharedMapper {

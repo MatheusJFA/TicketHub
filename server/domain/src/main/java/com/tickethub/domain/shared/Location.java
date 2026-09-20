@@ -5,6 +5,8 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import com.tickethub.domain.ValueObject;
 import com.tickethub.domain.exception.DomainException;
+import java.util.UUID;
+import java.util.Objects;
 
 public final class Location extends ValueObject {
     private static final String SPACE = " ";
@@ -69,7 +71,7 @@ public final class Location extends ValueObject {
         if (seatNumberWidth < 1) {
             throw new DomainException("'seatNumberWidth' should be positive");
         }
-        final int hash = java.util.UUID.randomUUID().hashCode();
+        final int hash = UUID.randomUUID().hashCode();
         final int positive = hash == Integer.MIN_VALUE ? 0 : Math.abs(hash);
         final char letter = (char) ('A' + positive % 26);
         final long bound = (long) Math.pow(10, seatNumberWidth);

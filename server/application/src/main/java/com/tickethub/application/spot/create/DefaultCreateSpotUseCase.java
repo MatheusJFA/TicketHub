@@ -1,7 +1,7 @@
 package com.tickethub.application.spot.create;
 
+import static java.util.Objects.requireNonNull;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import com.tickethub.application.Either;
@@ -10,8 +10,8 @@ import com.tickethub.domain.core.section.SectionGateway;
 import com.tickethub.domain.core.section.SectionID;
 import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.core.spot.SpotGateway;
-import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.Notification;
+import com.tickethub.domain.validation.Error;
 
 public class DefaultCreateSpotUseCase extends CreateSpotUseCase {
     private final SpotGateway spotGateway;
@@ -20,8 +20,8 @@ public class DefaultCreateSpotUseCase extends CreateSpotUseCase {
 
     public DefaultCreateSpotUseCase(final SpotGateway spotGateway, final SectionGateway sectionGateway,
             final int seatNumberWidth) {
-        this.spotGateway = Objects.requireNonNull(spotGateway);
-        this.sectionGateway = Objects.requireNonNull(sectionGateway);
+        this.spotGateway = requireNonNull(spotGateway);
+        this.sectionGateway = requireNonNull(sectionGateway);
         if (seatNumberWidth < 1) {
             throw new IllegalArgumentException("'seatNumberWidth' should be positive");
         }

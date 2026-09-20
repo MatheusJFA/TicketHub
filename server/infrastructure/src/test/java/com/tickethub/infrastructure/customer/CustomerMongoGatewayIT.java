@@ -20,6 +20,8 @@ import com.tickethub.infrastructure.IntegrationTest;
 import com.tickethub.infrastructure.MongoCleanUpExtension;
 import com.tickethub.infrastructure.customer.CustomerMongoGateway;
 import com.tickethub.infrastructure.customer.persistence.CustomerDocument;
+import com.tickethub.domain.shared.Email;
+import com.tickethub.domain.core.customer.CustomerID;
 
 @IntegrationTest
 @DisplayName("Customer Mongo gateway")
@@ -84,7 +86,7 @@ class CustomerMongoGatewayIT extends ContainerSupport {
         final var customer = gateway.create(
                 Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH));
 
-        final var found = gateway.findByEmail(com.tickethub.domain.shared.Email.create("MARIA@domain.com"));
+        final var found = gateway.findByEmail(Email.create("MARIA@domain.com"));
 
         assertTrue(found.isPresent());
         assertEquals(customer.getId(), found.get().getId());
@@ -140,6 +142,6 @@ class CustomerMongoGatewayIT extends ContainerSupport {
     @DisplayName("Given missing customer, when find by id, then returns empty")
     void givenMissingCustomer_whenFindById_thenReturnsEmpty() {
         assertFalse(gateway
-                .findById(com.tickethub.domain.core.customer.CustomerID.generate()).isPresent());
+                .findById(CustomerID.generate()).isPresent());
     }
 }

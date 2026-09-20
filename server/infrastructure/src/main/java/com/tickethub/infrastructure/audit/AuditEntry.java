@@ -1,7 +1,7 @@
 package com.tickethub.infrastructure.audit;
 
+import static java.util.Objects.requireNonNull;
 import java.time.Instant;
-import java.util.Objects;
 
 public record AuditEntry(
         Instant occurredAt,
@@ -14,8 +14,8 @@ public record AuditEntry(
         long durationMs) {
 
     public AuditEntry {
-        Objects.requireNonNull(occurredAt, "'occurredAt' should not be null");
-        Objects.requireNonNull(action, "'action' should not be null");
-        Objects.requireNonNull(outcome, "'outcome' should not be null");
+        requireNonNull(occurredAt, "'occurredAt' should not be null");
+        requireNonNull(action, "'action' should not be null");
+        requireNonNull(outcome, "'outcome' should not be null");
     }
 }

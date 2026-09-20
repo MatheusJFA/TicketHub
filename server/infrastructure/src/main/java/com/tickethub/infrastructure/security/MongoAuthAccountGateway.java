@@ -2,8 +2,8 @@ package com.tickethub.infrastructure.security;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
+import static java.util.Objects.requireNonNull;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -25,9 +25,9 @@ public class MongoAuthAccountGateway implements AuthAccountGateway {
 
     public MongoAuthAccountGateway(final CustomerGateway customers, final PartnerGateway partners,
             final SecurityProperties properties) {
-        this.customers = Objects.requireNonNull(customers, "'customers' should not be null");
-        this.partners = Objects.requireNonNull(partners, "'partners' should not be null");
-        this.properties = Objects.requireNonNull(properties, "'properties' should not be null");
+        this.customers = requireNonNull(customers, "'customers' should not be null");
+        this.partners = requireNonNull(partners, "'partners' should not be null");
+        this.properties = requireNonNull(properties, "'properties' should not be null");
     }
 
     @Override

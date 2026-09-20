@@ -25,6 +25,7 @@ import com.tickethub.domain.validation.Notification;
 import com.tickethub.infrastructure.ControllerTest;
 import com.tickethub.infrastructure.security.ShowAccess;
 import com.tickethub.infrastructure.security.TestTokens;
+import com.tickethub.domain.validation.Error;
 
 @ControllerTest(controllers = TicketController.class)
 @Import({})
@@ -81,7 +82,7 @@ class TicketControllerTest {
     void givenReusedTicket_whenValidates_thenReturnsUnprocessableEntity() throws Exception {
         when(showAccess.canWrite("show-1")).thenReturn(true);
         when(validateTicket.execute(any())).thenReturn(Either.left(
-                Notification.create(new com.tickethub.domain.validation.Error("Spot is already used"))));
+                Notification.create(new Error("Spot is already used"))));
 
         mvc.perform(post("/shows/show-1/tickets/validate")
                         .header("Authorization", bearerAsOwner("partner-1", "ticket:validate"))

@@ -5,7 +5,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.IOException;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.slf4j.MDC;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -18,6 +17,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.UUID;
 
 @Component
 public class CorrelationIdFilter extends OncePerRequestFilter {

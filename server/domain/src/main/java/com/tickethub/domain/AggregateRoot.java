@@ -1,6 +1,7 @@
 package com.tickethub.domain;
 
 import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 
 import com.tickethub.domain.event.DomainEvent;
 import com.tickethub.domain.event.DomainEventPublisher;
@@ -9,7 +10,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 public abstract class AggregateRoot<ID extends Identifier> extends Entity<ID> {
 
@@ -39,7 +39,7 @@ public abstract class AggregateRoot<ID extends Identifier> extends Entity<ID> {
     }
 
     public void publishDomainEvents(final DomainEventPublisher publisher) {
-        Objects.requireNonNull(publisher, "'publisher' should not be null");
+        requireNonNull(publisher, "'publisher' should not be null");
         domainEvents.forEach(publisher::publish);
         domainEvents.clear();
     }

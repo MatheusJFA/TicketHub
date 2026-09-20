@@ -2,13 +2,13 @@ package com.tickethub.domain.shared;
 
 import static java.util.Objects.isNull;
 
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import com.tickethub.domain.ValueObject;
 import com.tickethub.domain.exception.DomainException;
+import java.util.Objects;
 
 public final class Email extends ValueObject {
     private static final int MAX_LENGTH = 254;

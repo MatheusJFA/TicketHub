@@ -3,7 +3,6 @@ package com.tickethub.infrastructure.customer.presenters;
 import org.mapstruct.Mapper;
 
 import com.tickethub.application.customer.changename.ChangeCustomerNameCommand;
-import com.tickethub.application.customer.create.CreateCustomerCommand;
 import com.tickethub.application.customer.retrieve.get.GetCustomerOutput;
 import com.tickethub.application.customer.retrieve.list.ListCustomersOutput;
 import com.tickethub.application.customer.update.UpdateCustomerCommand;
@@ -12,6 +11,7 @@ import com.tickethub.infrastructure.customer.models.CreateCustomerRequest;
 import com.tickethub.infrastructure.customer.models.CustomerListResponse;
 import com.tickethub.infrastructure.customer.models.CustomerResponse;
 import com.tickethub.infrastructure.customer.models.UpdateCustomerRequest;
+import com.tickethub.application.customer.create.CreateCustomerCommand;
 
 @Mapper(componentModel = "spring")
 public interface CustomerMapper {

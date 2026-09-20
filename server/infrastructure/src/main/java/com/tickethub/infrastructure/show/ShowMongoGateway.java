@@ -2,10 +2,10 @@ package com.tickethub.infrastructure.show;
 
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static java.util.Objects.requireNonNull;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -34,6 +34,7 @@ import com.tickethub.infrastructure.spot.persistence.SpotDocument;
 import com.tickethub.infrastructure.spot.persistence.SpotRepository;
 import com.tickethub.infrastructure.shared.persistence.MongoGatewaySupport;
 import com.tickethub.infrastructure.shared.persistence.MongoUnitOfWork;
+import java.util.Objects;
 
 @Component
 public class ShowMongoGateway implements ShowGateway {
@@ -47,10 +48,10 @@ public class ShowMongoGateway implements ShowGateway {
 
     public ShowMongoGateway(final MongoTemplate mongoTemplate, final ShowRepository repository,
             final SectionRepository sections, final SpotRepository spots) {
-        this.mongoTemplate = Objects.requireNonNull(mongoTemplate, "'mongoTemplate' should not be null");
-        this.repository = Objects.requireNonNull(repository, "'repository' should not be null");
-        this.sections = Objects.requireNonNull(sections, "'sections' should not be null");
-        this.spots = Objects.requireNonNull(spots, "'spots' should not be null");
+        this.mongoTemplate = requireNonNull(mongoTemplate, "'mongoTemplate' should not be null");
+        this.repository = requireNonNull(repository, "'repository' should not be null");
+        this.sections = requireNonNull(sections, "'sections' should not be null");
+        this.spots = requireNonNull(spots, "'spots' should not be null");
     }
 
     @Override

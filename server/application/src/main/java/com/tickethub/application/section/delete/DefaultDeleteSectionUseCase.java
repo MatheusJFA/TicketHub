@@ -1,6 +1,6 @@
 package com.tickethub.application.section.delete;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 
 import com.tickethub.domain.validation.Notification;
@@ -13,7 +13,7 @@ public class DefaultDeleteSectionUseCase extends DeleteSectionUseCase {
     private final SectionGateway sectionGateway;
 
     public DefaultDeleteSectionUseCase(final SectionGateway sectionGateway) {
-        this.sectionGateway = Objects.requireNonNull(sectionGateway);
+        this.sectionGateway = requireNonNull(sectionGateway);
     }
 
     @Override

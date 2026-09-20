@@ -2,8 +2,8 @@ package com.tickethub.application;
 
 import java.util.Optional;
 
-import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.Notification;
+import com.tickethub.domain.validation.Error;
 
 public abstract class UnitUseCase<IN> {
 

@@ -1,10 +1,10 @@
 package com.tickethub.infrastructure.web;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static java.util.Objects.requireNonNull;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -33,7 +33,7 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
     private final ConcurrentMap<String, RateLimiter> limiters = new ConcurrentHashMap<>();
 
     public AuthRateLimitFilter(final AuthSessionProperties properties) {
-        Objects.requireNonNull(properties, "'properties' should not be null");
+        requireNonNull(properties, "'properties' should not be null");
         final int permits = Math.max(1, properties.getLoginRateLimitPerMinute());
         this.config = RateLimiterConfig.custom()
                 .limitForPeriod(permits)

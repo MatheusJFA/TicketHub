@@ -1,6 +1,6 @@
 package com.tickethub.application.customer.create;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.authentication.PasswordHasher;
@@ -13,8 +13,8 @@ public class DefaultCreateCustomerUseCase extends CreateCustomerUseCase {
     private final PasswordHasher passwordHasher;
 
     public DefaultCreateCustomerUseCase(final CustomerGateway customerGateway, final PasswordHasher passwordHasher) {
-        this.customerGateway = Objects.requireNonNull(customerGateway);
-        this.passwordHasher = Objects.requireNonNull(passwordHasher);
+        this.customerGateway = requireNonNull(customerGateway);
+        this.passwordHasher = requireNonNull(passwordHasher);
     }
 
     @Override

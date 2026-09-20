@@ -1,7 +1,7 @@
 package com.tickethub.domain.pagination;
 
+import static java.util.Objects.isNull;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 
 import com.tickethub.domain.exception.DomainException;
@@ -19,7 +19,7 @@ public record Pagination<T>(int currentPage, int perPage, long totalItems, List<
             throw new DomainException("'totalItems' must be >= 0");
         }
         
-        items = Objects.isNull(items) ? List.of() : List.copyOf(items);
+        items = isNull(items) ? List.of() : List.copyOf(items);
     }
 
     public <R> Pagination<R> map(Function<T, R> mapper) {

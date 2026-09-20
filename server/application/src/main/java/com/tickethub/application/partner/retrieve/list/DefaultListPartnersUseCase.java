@@ -1,5 +1,5 @@
 package com.tickethub.application.partner.retrieve.list;
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import com.tickethub.application.Either;
 import com.tickethub.domain.validation.Notification;
 import com.tickethub.domain.pagination.Pagination;
@@ -13,7 +13,7 @@ public class DefaultListPartnersUseCase extends ListPartnersUseCase {
     private final PartnerGateway partnerGateway;
 
     public DefaultListPartnersUseCase(final PartnerGateway partnerGateway) {
-        this.partnerGateway = Objects.requireNonNull(partnerGateway);
+        this.partnerGateway = requireNonNull(partnerGateway);
     }
 
     @Override

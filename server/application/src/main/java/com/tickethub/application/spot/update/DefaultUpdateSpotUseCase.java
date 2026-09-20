@@ -1,6 +1,6 @@
 package com.tickethub.application.spot.update;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 
 import com.tickethub.application.Either;
@@ -13,7 +13,7 @@ public class DefaultUpdateSpotUseCase extends UpdateSpotUseCase {
     private final SpotGateway spotGateway;
 
     public DefaultUpdateSpotUseCase(final SpotGateway spotGateway) {
-        this.spotGateway = Objects.requireNonNull(spotGateway);
+        this.spotGateway = requireNonNull(spotGateway);
     }
 
     @Override

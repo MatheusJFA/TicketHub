@@ -2,9 +2,9 @@ package com.tickethub.domain.core.customer;
 
 import static java.util.Objects.isNull;
 
+import com.tickethub.domain.validation.Validator;
 import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.ValidationHandler;
-import com.tickethub.domain.validation.Validator;
 
 public final class CustomerValidator extends Validator {
     private final Customer customer;

@@ -1,13 +1,14 @@
 package com.tickethub.domain.shared;
 
-import java.util.Objects;
 import static java.util.Objects.isNull;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
+import static java.util.Objects.requireNonNull;
 
 import com.tickethub.domain.ValueObject;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.geography.ZipCodeAddress;
+import java.util.Objects;
 
 public final class Address extends ValueObject {
     private static final String SPACE = " ";
@@ -43,7 +44,7 @@ public final class Address extends ValueObject {
      * Blank provider fields fall back to the current values.
      */
     public Address enrichedWith(final ZipCodeAddress zipCode) {
-        Objects.requireNonNull(zipCode, "'zipCode' should not be null");
+        requireNonNull(zipCode, "'zipCode' should not be null");
         return new Address(
                 defaultIfBlank(zipCode.street(), street),
                 number,

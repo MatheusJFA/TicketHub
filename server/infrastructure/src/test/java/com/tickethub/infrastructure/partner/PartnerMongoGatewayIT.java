@@ -16,12 +16,13 @@ import com.tickethub.domain.core.partner.Partner;
 import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.pagination.SearchQuery;
-import com.tickethub.domain.shared.Address;
 import com.tickethub.infrastructure.ContainerSupport;
 import com.tickethub.infrastructure.IntegrationTest;
 import com.tickethub.infrastructure.MongoCleanUpExtension;
 import com.tickethub.infrastructure.partner.PartnerMongoGateway;
 import com.tickethub.infrastructure.partner.persistence.PartnerDocument;
+import com.tickethub.domain.shared.Address;
+import com.tickethub.domain.shared.Email;
 
 @IntegrationTest
 @DisplayName("Partner Mongo gateway")
@@ -88,7 +89,7 @@ class PartnerMongoGatewayIT extends ContainerSupport {
         final var partner = gateway.create(
                 Partner.create("Cinema Nova", "11222333000181", ADDRESS, "cinema@domain.com", PASSWORD_HASH));
 
-        final var found = gateway.findByEmail(com.tickethub.domain.shared.Email.create("CINEMA@domain.com"));
+        final var found = gateway.findByEmail(Email.create("CINEMA@domain.com"));
 
         assertTrue(found.isPresent());
         assertEquals(partner.getId(), found.get().getId());

@@ -1,6 +1,6 @@
 package com.tickethub.application.partner.changeaddress;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 
 import com.tickethub.application.Either;
@@ -13,7 +13,7 @@ public class DefaultChangePartnerAddressUseCase extends ChangePartnerAddressUseC
     private final PartnerGateway partnerGateway;
 
     public DefaultChangePartnerAddressUseCase(final PartnerGateway partnerGateway) {
-        this.partnerGateway = Objects.requireNonNull(partnerGateway);
+        this.partnerGateway = requireNonNull(partnerGateway);
     }
 
     @Override

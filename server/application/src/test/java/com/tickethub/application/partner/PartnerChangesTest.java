@@ -11,8 +11,8 @@ import com.tickethub.application.partner.retrieve.get.*;
 import com.tickethub.application.partner.retrieve.list.*;
 import com.tickethub.domain.core.partner.*;
 import com.tickethub.domain.authentication.PasswordHasher;
-import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.exception.DomainException;
+import com.tickethub.domain.shared.Address;
 
 @DisplayName("Partner changes")
 class PartnerChangesTest {

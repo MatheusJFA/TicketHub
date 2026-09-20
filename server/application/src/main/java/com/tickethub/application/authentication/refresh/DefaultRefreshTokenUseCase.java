@@ -2,9 +2,9 @@ package com.tickethub.application.authentication.refresh;
 
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.defaultString;
+import static java.util.Objects.requireNonNull;
 
 import java.time.Duration;
-import java.util.Objects;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.authentication.AuthenticationException;
@@ -24,8 +24,8 @@ public class DefaultRefreshTokenUseCase extends RefreshTokenUseCase {
 
     public DefaultRefreshTokenUseCase(final TokenIssuer tokenIssuer,
             final RefreshSessionGateway refreshSessions, final Duration refreshTtl) {
-        this.tokenIssuer = Objects.requireNonNull(tokenIssuer);
-        this.refreshSessions = Objects.requireNonNull(refreshSessions);
+        this.tokenIssuer = requireNonNull(tokenIssuer);
+        this.refreshSessions = requireNonNull(refreshSessions);
         this.refreshTtl = isNull(refreshTtl) ? RefreshSession.DEFAULT_TTL : refreshTtl;
     }
 

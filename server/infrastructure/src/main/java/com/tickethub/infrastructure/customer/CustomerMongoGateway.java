@@ -1,8 +1,8 @@
 package com.tickethub.infrastructure.customer;
 
 import static org.apache.commons.lang3.StringUtils.contains;
+import static java.util.Objects.requireNonNull;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -12,14 +12,14 @@ import org.springframework.stereotype.Component;
 
 import com.tickethub.domain.core.customer.Customer;
 import com.tickethub.domain.core.customer.CustomerGateway;
-import com.tickethub.domain.core.customer.CustomerID;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.domain.pagination.SearchQuery;
-import com.tickethub.domain.shared.Email;
 import com.tickethub.infrastructure.customer.persistence.CustomerDocument;
 import com.tickethub.infrastructure.customer.persistence.CustomerRepository;
 import com.tickethub.infrastructure.shared.persistence.MongoGatewaySupport;
+import com.tickethub.domain.shared.Email;
+import com.tickethub.domain.core.customer.CustomerID;
 
 @Component
 public class CustomerMongoGateway implements CustomerGateway {
@@ -30,8 +30,8 @@ public class CustomerMongoGateway implements CustomerGateway {
     private final CustomerRepository repository;
 
     public CustomerMongoGateway(final MongoTemplate mongoTemplate, final CustomerRepository repository) {
-        this.mongoTemplate = Objects.requireNonNull(mongoTemplate, "'mongoTemplate' should not be null");
-        this.repository = Objects.requireNonNull(repository, "'repository' should not be null");
+        this.mongoTemplate = requireNonNull(mongoTemplate, "'mongoTemplate' should not be null");
+        this.repository = requireNonNull(repository, "'repository' should not be null");
     }
 
     @Override

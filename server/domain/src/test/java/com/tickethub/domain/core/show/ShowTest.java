@@ -25,9 +25,9 @@ import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.core.section.Section;
 import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.exception.DomainException;
-import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.shared.Money;
 import com.tickethub.domain.validation.Notification;
+import com.tickethub.domain.shared.Address;
 
 @DisplayName("Show")
 class ShowTest {
@@ -147,7 +147,7 @@ class ShowTest {
     @Test
     @DisplayName("Given partner, when create show, then associate partner and initialize defaults")
     void givenPartner_whenCreateShow_thenAssociatePartnerAndInitializeDefaults() {
-        final var partner = Partner.create("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), "cinema@domain.com", "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
+        final var partner = Partner.create("Cinema Nova", "11222333000181", Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), "cinema@domain.com", "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
         final var show = partner.createShow("Concert", "Description", DATE, ADDRESS, 10);
 
         assertNotNull(show.getId());

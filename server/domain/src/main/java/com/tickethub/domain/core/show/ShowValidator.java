@@ -2,9 +2,9 @@ package com.tickethub.domain.core.show;
 
 import static java.util.Objects.isNull;
 
+import com.tickethub.domain.validation.Validator;
 import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.ValidationHandler;
-import com.tickethub.domain.validation.Validator;
 
 public final class ShowValidator extends Validator {
     private final Show show;

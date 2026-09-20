@@ -19,8 +19,8 @@ import com.tickethub.application.UseCaseTest;
 import com.tickethub.domain.core.show.Show;
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.partner.PartnerID;
-import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.shared.Money;
+import com.tickethub.domain.shared.Address;
 
 @DisplayName("Unpublish all show use case")
 public class UnpublishAllShowUseCaseTest extends UseCaseTest {

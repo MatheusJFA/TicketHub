@@ -1,8 +1,8 @@
 package com.tickethub.application.show.retrieve.list;
 
+import static java.util.Objects.requireNonNull;
 import com.tickethub.domain.core.show.Show;
 
-import java.util.Objects;
 import com.tickethub.application.Either;
 import com.tickethub.domain.validation.Notification;
 import com.tickethub.domain.pagination.SearchQuery;
@@ -15,7 +15,7 @@ public class DefaultListShowsUseCase extends ListShowsUseCase {
     private final ShowGateway showGateway;
 
     public DefaultListShowsUseCase(final ShowGateway showGateway) {
-        this.showGateway = Objects.requireNonNull(showGateway);
+        this.showGateway = requireNonNull(showGateway);
     }
 
     @Override

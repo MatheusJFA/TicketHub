@@ -4,14 +4,14 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static java.util.Objects.requireNonNull;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 import com.tickethub.domain.exception.DomainException;
+import java.util.UUID;
 public class RefreshSession {
 
     public static final Duration DEFAULT_TTL = Duration.ofDays(7);
@@ -30,14 +30,14 @@ public class RefreshSession {
     private RefreshSession(String id, String familyId, String tokenHash, String subject,
             List<String> authorities, String ownerId, Instant createdAt, Instant expiresAt,
             boolean revoked, String replacedByTokenHash) {
-        this.id = Objects.requireNonNull(id, "'id' should not be null");
-        this.familyId = Objects.requireNonNull(familyId, "'familyId' should not be null");
-        this.tokenHash = Objects.requireNonNull(tokenHash, "'tokenHash' should not be null");
-        this.subject = Objects.requireNonNull(subject, "'subject' should not be null");
-        this.authorities = List.copyOf(Objects.requireNonNull(authorities, "'authorities' should not be null"));
+        this.id = requireNonNull(id, "'id' should not be null");
+        this.familyId = requireNonNull(familyId, "'familyId' should not be null");
+        this.tokenHash = requireNonNull(tokenHash, "'tokenHash' should not be null");
+        this.subject = requireNonNull(subject, "'subject' should not be null");
+        this.authorities = List.copyOf(requireNonNull(authorities, "'authorities' should not be null"));
         this.ownerId = ownerId;
-        this.createdAt = Objects.requireNonNull(createdAt, "'createdAt' should not be null");
-        this.expiresAt = Objects.requireNonNull(expiresAt, "'expiresAt' should not be null");
+        this.createdAt = requireNonNull(createdAt, "'createdAt' should not be null");
+        this.expiresAt = requireNonNull(expiresAt, "'expiresAt' should not be null");
         this.revoked = revoked;
         this.replacedByTokenHash = replacedByTokenHash;
     }

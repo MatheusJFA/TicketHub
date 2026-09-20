@@ -1,6 +1,6 @@
 package com.tickethub.application.show.delete;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 
 import com.tickethub.domain.validation.Notification;
@@ -13,7 +13,7 @@ public class DefaultDeleteShowUseCase extends DeleteShowUseCase {
     private final ShowGateway showGateway;
 
     public DefaultDeleteShowUseCase(final ShowGateway showGateway) {
-        this.showGateway = Objects.requireNonNull(showGateway);
+        this.showGateway = requireNonNull(showGateway);
     }
 
     @Override

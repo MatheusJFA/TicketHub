@@ -1,6 +1,6 @@
 package com.tickethub.application.section.generatespots;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.section.Section;
@@ -14,7 +14,7 @@ public class DefaultGenerateSectionSpotsUseCase extends GenerateSectionSpotsUseC
     private final int seatNumberWidth;
 
     public DefaultGenerateSectionSpotsUseCase(final ShowGateway showGateway, final int seatNumberWidth) {
-        this.showGateway = Objects.requireNonNull(showGateway);
+        this.showGateway = requireNonNull(showGateway);
         this.seatNumberWidth = seatNumberWidth;
     }
 

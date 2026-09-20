@@ -1,7 +1,7 @@
 package com.tickethub.application.show.addsection;
 
+import static java.util.Objects.requireNonNull;
 import java.time.Instant;
-import java.util.Objects;
 import java.util.Optional;
 
 import com.tickethub.application.Either;
@@ -24,8 +24,8 @@ public class DefaultAddSectionToShowUseCase extends AddSectionToShowUseCase {
     public DefaultAddSectionToShowUseCase(final ShowGateway showGateway,
             final DomainEventPublisher eventPublisher, final long asyncSpotThreshold,
             final int seatNumberWidth) {
-        this.showGateway = Objects.requireNonNull(showGateway);
-        this.eventPublisher = Objects.requireNonNull(eventPublisher);
+        this.showGateway = requireNonNull(showGateway);
+        this.eventPublisher = requireNonNull(eventPublisher);
         if (asyncSpotThreshold < 1) {
             throw new IllegalArgumentException("'asyncSpotThreshold' should be positive");
         }

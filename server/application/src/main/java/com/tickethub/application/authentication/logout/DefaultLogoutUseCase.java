@@ -1,8 +1,8 @@
 package com.tickethub.application.authentication.logout;
 
 import static org.apache.commons.lang3.StringUtils.defaultString;
+import static java.util.Objects.requireNonNull;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import com.tickethub.domain.authentication.RefreshSessionGateway;
@@ -14,7 +14,7 @@ public class DefaultLogoutUseCase extends LogoutUseCase {
     private final RefreshSessionGateway refreshSessions;
 
     public DefaultLogoutUseCase(final RefreshSessionGateway refreshSessions) {
-        this.refreshSessions = Objects.requireNonNull(refreshSessions);
+        this.refreshSessions = requireNonNull(refreshSessions);
     }
 
     @Override

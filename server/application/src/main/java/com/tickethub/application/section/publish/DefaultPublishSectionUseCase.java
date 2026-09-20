@@ -1,6 +1,6 @@
 package com.tickethub.application.section.publish;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 
 import com.tickethub.application.Either;
@@ -13,7 +13,7 @@ public class DefaultPublishSectionUseCase extends PublishSectionUseCase {
     private final SectionGateway sectionGateway;
 
     public DefaultPublishSectionUseCase(final SectionGateway sectionGateway) {
-        this.sectionGateway = Objects.requireNonNull(sectionGateway);
+        this.sectionGateway = requireNonNull(sectionGateway);
     }
 
     @Override

@@ -1,8 +1,8 @@
 package com.tickethub.application.spot.retrieve.list;
 
+import static java.util.Objects.requireNonNull;
 import com.tickethub.domain.core.spot.Spot;
 
-import java.util.Objects;
 import com.tickethub.application.Either;
 import com.tickethub.domain.validation.Notification;
 import com.tickethub.domain.pagination.SearchQuery;
@@ -15,7 +15,7 @@ public class DefaultListSpotsUseCase extends ListSpotsUseCase {
     private final SpotGateway spotGateway;
 
     public DefaultListSpotsUseCase(final SpotGateway spotGateway) {
-        this.spotGateway = Objects.requireNonNull(spotGateway);
+        this.spotGateway = requireNonNull(spotGateway);
     }
 
     @Override

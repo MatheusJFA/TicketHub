@@ -2,10 +2,10 @@ package com.tickethub.domain.shared;
 
 import static java.util.Objects.isNull;
 
-import java.util.Objects;
 
 import com.tickethub.domain.ValueObject;
 import com.tickethub.domain.exception.DomainException;
+import java.util.Objects;
 
 
 public final class Text extends ValueObject {

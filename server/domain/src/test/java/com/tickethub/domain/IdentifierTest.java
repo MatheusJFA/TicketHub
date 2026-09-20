@@ -15,11 +15,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.api.DisplayName;
 
 import com.tickethub.domain.Identifier;
-import com.tickethub.domain.core.customer.CustomerID;
 import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.core.section.SectionID;
 import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.domain.core.spot.SpotID;
+import com.tickethub.domain.core.customer.CustomerID;
 
 @DisplayName("Identifier")
 class IdentifierTest {

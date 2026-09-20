@@ -4,6 +4,7 @@ import static java.util.Objects.isNull;
 
 import com.tickethub.domain.ValueObject;
 import com.tickethub.domain.exception.DomainException;
+import java.util.Objects;
 
 public final class CNPJ extends ValueObject {
     private static final int CNPJ_LENGTH = 14;

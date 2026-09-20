@@ -2,10 +2,10 @@ package com.tickethub.infrastructure.audit;
 
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 
 import com.tickethub.infrastructure.web.CorrelationIdFilter;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Resolves the actor responsible for a write: the authenticated principal

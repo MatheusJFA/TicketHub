@@ -1,6 +1,6 @@
 package com.tickethub.application.section.changename;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 
 import com.tickethub.application.Either;
@@ -13,7 +13,7 @@ public class DefaultChangeSectionNameUseCase extends ChangeSectionNameUseCase {
     private final SectionGateway sectionGateway;
 
     public DefaultChangeSectionNameUseCase(final SectionGateway sectionGateway) {
-        this.sectionGateway = Objects.requireNonNull(sectionGateway);
+        this.sectionGateway = requireNonNull(sectionGateway);
     }
 
     @Override

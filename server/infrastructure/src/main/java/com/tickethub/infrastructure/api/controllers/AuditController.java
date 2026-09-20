@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.tickethub.domain.exception.DomainException;
@@ -18,6 +17,7 @@ import com.tickethub.infrastructure.audit.AuditLogReader;
 import com.tickethub.infrastructure.audit.AuditLogResponse;
 import com.tickethub.infrastructure.audit.AuditOutcome;
 import com.tickethub.infrastructure.audit.MongoAuditLogReader;
+import org.apache.commons.lang3.StringUtils;
 
 @RestController
 public class AuditController implements AuditAPI {

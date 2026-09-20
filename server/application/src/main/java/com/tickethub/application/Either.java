@@ -1,7 +1,7 @@
 package com.tickethub.application;
 
+import static java.util.Objects.requireNonNull;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.function.Function;
 
 public sealed interface Either<L, R>
@@ -9,13 +9,13 @@ public sealed interface Either<L, R>
 
     record Left<L, R>(L value) implements Either<L, R> {
         public Left {
-            Objects.requireNonNull(value, "Left value must not be null");
+            requireNonNull(value, "Left value must not be null");
         }
     }
 
     record Right<L, R>(R value) implements Either<L, R> {
         public Right {
-            Objects.requireNonNull(value, "Right value must not be null");
+            requireNonNull(value, "Right value must not be null");
         }
     }
 
@@ -62,7 +62,7 @@ public sealed interface Either<L, R>
     default <T> Either<L, T> map(
             Function<? super R, ? extends T> mapper
     ) {
-        Objects.requireNonNull(mapper, "mapper");
+        requireNonNull(mapper, "mapper");
 
         return switch (this) {
             case Left<L, R>(var value) -> Either.left(value);
@@ -73,7 +73,7 @@ public sealed interface Either<L, R>
     default <T> Either<L, T> flatMap(
             Function<? super R, ? extends Either<L, T>> mapper
     ) {
-        Objects.requireNonNull(mapper, "mapper");
+        requireNonNull(mapper, "mapper");
 
         return switch (this) {
             case Left<L, R>(var value) -> Either.left(value);
@@ -85,8 +85,8 @@ public sealed interface Either<L, R>
             Function<? super L, ? extends T> onLeft,
             Function<? super R, ? extends T> onRight
     ) {
-        Objects.requireNonNull(onLeft, "onLeft");
-        Objects.requireNonNull(onRight, "onRight");
+        requireNonNull(onLeft, "onLeft");
+        requireNonNull(onRight, "onRight");
 
         return switch (this) {
             case Left<L, R>(var value) -> onLeft.apply(value);

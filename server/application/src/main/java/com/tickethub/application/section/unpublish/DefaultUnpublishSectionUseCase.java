@@ -1,6 +1,6 @@
 package com.tickethub.application.section.unpublish;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 
 import com.tickethub.application.Either;
@@ -13,7 +13,7 @@ public class DefaultUnpublishSectionUseCase extends UnpublishSectionUseCase {
     private final SectionGateway sectionGateway;
 
     public DefaultUnpublishSectionUseCase(final SectionGateway sectionGateway) {
-        this.sectionGateway = Objects.requireNonNull(sectionGateway);
+        this.sectionGateway = requireNonNull(sectionGateway);
     }
 
     @Override

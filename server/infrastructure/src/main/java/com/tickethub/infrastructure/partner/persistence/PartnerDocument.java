@@ -9,11 +9,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.tickethub.domain.core.partner.Partner;
 import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.shared.CNPJ;
-import com.tickethub.domain.shared.Email;
 import com.tickethub.domain.shared.Name;
 import com.tickethub.domain.shared.PasswordHash;
 import com.tickethub.infrastructure.audit.AuditActor;
 import com.tickethub.infrastructure.shared.persistence.AddressDocument;
+import com.tickethub.domain.shared.Email;
 
 @Document("partners")
 public record PartnerDocument(

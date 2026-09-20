@@ -12,11 +12,11 @@ import com.tickethub.domain.AggregateRoot;
 import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.core.section.Section;
 import com.tickethub.domain.exception.DomainException;
-import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.shared.Location;
 import com.tickethub.domain.shared.Money;
 import com.tickethub.domain.shared.Name;
 import com.tickethub.domain.shared.Text;
+import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.validation.ValidationHandler;
 
 public class Show extends AggregateRoot<ShowID> {

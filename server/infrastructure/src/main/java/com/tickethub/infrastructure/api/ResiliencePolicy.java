@@ -1,8 +1,8 @@
 package com.tickethub.infrastructure.api;
 
 import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -40,8 +40,8 @@ public final class ResiliencePolicy {
 
     public static ResiliencePolicy of(final Retry retry, final CircuitBreaker circuitBreaker) {
         return new ResiliencePolicy(
-                Objects.requireNonNull(retry, "'retry' should not be null"),
-                Objects.requireNonNull(circuitBreaker, "'circuitBreaker' should not be null"),
+                requireNonNull(retry, "'retry' should not be null"),
+                requireNonNull(circuitBreaker, "'circuitBreaker' should not be null"),
                 true);
     }
 
@@ -61,10 +61,12 @@ public final class ResiliencePolicy {
     }
 
     public <T> Supplier<T> decorate(final Supplier<T> supplier) {
-        Objects.requireNonNull(supplier, "'supplier' should not be null");
+        requireNonNull(supplier, "'supplier' should not be null");
+        
         if (!enabled) {
             return supplier;
         }
+
         return CircuitBreaker.decorateSupplier(circuitBreaker, Retry.decorateSupplier(retry, supplier));
     }
 }

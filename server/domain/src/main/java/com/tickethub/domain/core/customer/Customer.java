@@ -4,9 +4,9 @@ import java.time.Instant;
 
 import com.tickethub.domain.AggregateRoot;
 import com.tickethub.domain.shared.CPF;
-import com.tickethub.domain.shared.Email;
 import com.tickethub.domain.shared.Name;
 import com.tickethub.domain.shared.PasswordHash;
+import com.tickethub.domain.shared.Email;
 import com.tickethub.domain.validation.ValidationHandler;
 
 public class Customer extends AggregateRoot<CustomerID> {

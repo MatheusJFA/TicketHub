@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import com.tickethub.domain.validation.ValidationHandler;
+import java.util.UUID;
 
 @DisplayName("Entity audit")
 class EntityAuditTest {
@@ -53,13 +55,13 @@ class EntityAuditTest {
 
     private static final class TestEntity extends Entity<TestEntityId> {
         private TestEntity(TestEntityId id) { super(id); }
-        @Override public void validate(final com.tickethub.domain.validation.ValidationHandler handler) { }
+        @Override public void validate(final ValidationHandler handler) { }
     }
 
     private static final class TestEntityId extends Identifier {
-        private final java.util.UUID value;
-        private TestEntityId(java.util.UUID value) { this.value = value; }
-        private static TestEntityId generate() { return new TestEntityId(java.util.UUID.randomUUID()); }
+        private final UUID value;
+        private TestEntityId(UUID value) { this.value = value; }
+        private static TestEntityId generate() { return new TestEntityId(UUID.randomUUID()); }
         @Override public String getValue() { return value.toString(); }
     }
 }

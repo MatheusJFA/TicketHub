@@ -1,6 +1,6 @@
 package com.tickethub.application.partner.delete;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 
 import com.tickethub.domain.validation.Notification;
@@ -13,7 +13,7 @@ public class DefaultDeletePartnerUseCase extends DeletePartnerUseCase {
     private final PartnerGateway partnerGateway;
 
     public DefaultDeletePartnerUseCase(final PartnerGateway partnerGateway) {
-        this.partnerGateway = Objects.requireNonNull(partnerGateway);
+        this.partnerGateway = requireNonNull(partnerGateway);
     }
 
     @Override

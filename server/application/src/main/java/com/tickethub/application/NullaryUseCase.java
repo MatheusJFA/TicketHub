@@ -1,7 +1,7 @@
 package com.tickethub.application;
 
-import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.Notification;
+import com.tickethub.domain.validation.Error;
 
 public abstract class NullaryUseCase<OUT> {
 

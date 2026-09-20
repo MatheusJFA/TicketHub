@@ -5,10 +5,10 @@ import static java.util.Objects.nonNull;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Currency;
-import java.util.Objects;
 
 import com.tickethub.domain.ValueObject;
 import com.tickethub.domain.exception.DomainException;
+import java.util.Objects;
 
 public final class Money extends ValueObject {
     private final BigDecimal value;

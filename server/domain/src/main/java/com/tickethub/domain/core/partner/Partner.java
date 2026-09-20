@@ -7,11 +7,11 @@ import static java.util.Objects.isNull;
 import com.tickethub.domain.AggregateRoot;
 import com.tickethub.domain.core.show.Show;
 import com.tickethub.domain.exception.DomainException;
-import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.shared.CNPJ;
-import com.tickethub.domain.shared.Email;
 import com.tickethub.domain.shared.Name;
 import com.tickethub.domain.shared.PasswordHash;
+import com.tickethub.domain.shared.Address;
+import com.tickethub.domain.shared.Email;
 import com.tickethub.domain.validation.ValidationHandler;
 
 public class Partner extends AggregateRoot<PartnerID> {

@@ -1,7 +1,7 @@
 package com.tickethub.infrastructure.audit;
 
+import static java.util.Objects.requireNonNull;
 import java.time.Instant;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -22,11 +22,11 @@ public record AuditLogQuery(
         String direction) {
 
     public AuditLogQuery {
-        Objects.requireNonNull(action, "'action' should not be null");
-        Objects.requireNonNull(actor, "'actor' should not be null");
-        Objects.requireNonNull(outcome, "'outcome' should not be null");
-        Objects.requireNonNull(correlationId, "'correlationId' should not be null");
-        Objects.requireNonNull(from, "'from' should not be null");
-        Objects.requireNonNull(to, "'to' should not be null");
+        requireNonNull(action, "'action' should not be null");
+        requireNonNull(actor, "'actor' should not be null");
+        requireNonNull(outcome, "'outcome' should not be null");
+        requireNonNull(correlationId, "'correlationId' should not be null");
+        requireNonNull(from, "'from' should not be null");
+        requireNonNull(to, "'to' should not be null");
     }
 }

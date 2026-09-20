@@ -2,9 +2,9 @@ package com.tickethub.application.authentication.login;
 
 import static java.util.Objects.isNull;
 import static org.apache.commons.lang3.StringUtils.defaultString;
+import static java.util.Objects.requireNonNull;
 
 import java.time.Duration;
-import java.util.Objects;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.authentication.AuthAccountGateway;
@@ -28,10 +28,10 @@ public class DefaultLoginUseCase extends LoginUseCase {
 
     public DefaultLoginUseCase(final AuthAccountGateway authAccounts, final PasswordHasher passwordHasher,
             final TokenIssuer tokenIssuer, final RefreshSessionGateway refreshSessions, final Duration refreshTtl) {
-        this.authAccounts = Objects.requireNonNull(authAccounts);
-        this.passwordHasher = Objects.requireNonNull(passwordHasher);
-        this.tokenIssuer = Objects.requireNonNull(tokenIssuer);
-        this.refreshSessions = Objects.requireNonNull(refreshSessions);
+        this.authAccounts = requireNonNull(authAccounts);
+        this.passwordHasher = requireNonNull(passwordHasher);
+        this.tokenIssuer = requireNonNull(tokenIssuer);
+        this.refreshSessions = requireNonNull(refreshSessions);
         this.refreshTtl = isNull(refreshTtl) ? RefreshSession.DEFAULT_TTL : refreshTtl;
     }
 

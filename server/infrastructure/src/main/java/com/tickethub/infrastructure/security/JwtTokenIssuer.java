@@ -3,11 +3,11 @@ package com.tickethub.infrastructure.security;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -26,8 +26,8 @@ public class JwtTokenIssuer implements TokenIssuer {
     private final JwtEncoder jwtEncoder;
 
     public JwtTokenIssuer(final SecurityProperties properties, final JwtEncoder jwtEncoder) {
-        this.properties = Objects.requireNonNull(properties, "'properties' should not be null");
-        this.jwtEncoder = Objects.requireNonNull(jwtEncoder, "'jwtEncoder' should not be null");
+        this.properties = requireNonNull(properties, "'properties' should not be null");
+        this.jwtEncoder = requireNonNull(jwtEncoder, "'jwtEncoder' should not be null");
     }
 
     @Override

@@ -41,7 +41,7 @@ public class CreateShowUseCaseTest extends UseCaseTest {
     @Test
     @DisplayName("Given valid command, when execute, should persist and return id")
     public void givenValidCommand_whenExecute_shouldPersistAndReturnId() {
-        final var partner = Partner.create("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), "cinema@domain.com", "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
+        final var partner = Partner.create("Cinema Nova", "11222333000181", Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), "cinema@domain.com", "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
         final var command = CreateShowCommand.with(partner.getId().getValue(), "Concert", "Description", DATE, ADDRESS, 10);
         when(partnerGateway.findById(partner.getId())).thenReturn(Optional.of(partner));
         when(showGateway.create(any())).thenAnswer(returnsFirstArg());
@@ -70,7 +70,7 @@ public class CreateShowUseCaseTest extends UseCaseTest {
     @Test
     @DisplayName("Given gateway failure, when execute, should return notification")
     public void givenGatewayFailure_whenExecute_shouldReturnNotification() {
-        final var partner = Partner.create("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), "cinema@domain.com", "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
+        final var partner = Partner.create("Cinema Nova", "11222333000181", Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), "cinema@domain.com", "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
         final var command = CreateShowCommand.with(partner.getId().getValue(), "Concert", "Description", DATE, ADDRESS, 10);
         when(partnerGateway.findById(partner.getId())).thenReturn(Optional.of(partner));
         final var expectedMessage = "Gateway error";
@@ -99,7 +99,7 @@ public class CreateShowUseCaseTest extends UseCaseTest {
     @Test
     @DisplayName("Given missing partner, when execute, should not persist")
     public void givenMissingPartner_whenExecute_shouldNotPersist() {
-        final var partner = Partner.create("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), "cinema@domain.com", "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
+        final var partner = Partner.create("Cinema Nova", "11222333000181", Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), "cinema@domain.com", "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
         final var command = CreateShowCommand.with(partner.getId().getValue(), "Concert", "Description", DATE, ADDRESS, 10);
         when(partnerGateway.findById(partner.getId())).thenReturn(Optional.empty());
 
@@ -114,7 +114,7 @@ public class CreateShowUseCaseTest extends UseCaseTest {
     @Test
     @DisplayName("Given lookup failure, when execute, should return notification")
     public void givenLookupFailure_whenExecute_shouldReturnNotification() {
-        final var partner = Partner.create("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), "cinema@domain.com", "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
+        final var partner = Partner.create("Cinema Nova", "11222333000181", Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), "cinema@domain.com", "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
         final var command = CreateShowCommand.with(partner.getId().getValue(), "Concert", "Description", DATE, ADDRESS, 10);
         when(partnerGateway.findById(partner.getId())).thenThrow(new IllegalStateException("Lookup failed"));
 
@@ -129,7 +129,7 @@ public class CreateShowUseCaseTest extends UseCaseTest {
     @Test
     @DisplayName("Given invalid command, when execute, should return validation errors without persisting")
     public void givenInvalidCommand_whenExecute_shouldReturnValidationErrorsWithoutPersisting() {
-        final var partner = Partner.create("Cinema Nova", "11222333000181", com.tickethub.domain.shared.Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), "cinema@domain.com", "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
+        final var partner = Partner.create("Cinema Nova", "11222333000181", Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), "cinema@domain.com", "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
         final var command = CreateShowCommand.with(partner.getId().getValue(), "Concert", "Description", DATE, null, -1);
         when(partnerGateway.findById(partner.getId())).thenReturn(Optional.of(partner));
 

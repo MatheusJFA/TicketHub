@@ -4,8 +4,8 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static java.util.Objects.requireNonNull;
 
-import java.util.Objects;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -25,8 +25,8 @@ public class ShowAccess {
     private final MongoTemplate mongoTemplate;
 
     public ShowAccess(final ShowGateway showGateway, final MongoTemplate mongoTemplate) {
-        this.showGateway = Objects.requireNonNull(showGateway, "'showGateway' should not be null");
-        this.mongoTemplate = Objects.requireNonNull(mongoTemplate, "'mongoTemplate' should not be null");
+        this.showGateway = requireNonNull(showGateway, "'showGateway' should not be null");
+        this.mongoTemplate = requireNonNull(mongoTemplate, "'mongoTemplate' should not be null");
     }
 
     public boolean canCreate(final String partnerId) {

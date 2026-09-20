@@ -1,6 +1,6 @@
 package com.tickethub.infrastructure.api.controllers;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,9 +26,9 @@ public class AuthController implements AuthAPI {
 
     public AuthController(final LoginUseCase loginUseCase, final RefreshTokenUseCase refreshTokenUseCase,
             final LogoutUseCase logoutUseCase) {
-        this.loginUseCase = Objects.requireNonNull(loginUseCase, "'loginUseCase' should not be null");
-        this.refreshTokenUseCase = Objects.requireNonNull(refreshTokenUseCase, "'refreshTokenUseCase' should not be null");
-        this.logoutUseCase = Objects.requireNonNull(logoutUseCase, "'logoutUseCase' should not be null");
+        this.loginUseCase = requireNonNull(loginUseCase, "'loginUseCase' should not be null");
+        this.refreshTokenUseCase = requireNonNull(refreshTokenUseCase, "'refreshTokenUseCase' should not be null");
+        this.logoutUseCase = requireNonNull(logoutUseCase, "'logoutUseCase' should not be null");
     }
 
     @Override

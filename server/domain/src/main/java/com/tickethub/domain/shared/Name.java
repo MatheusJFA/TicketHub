@@ -5,8 +5,8 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import com.tickethub.domain.ValueObject;
 import com.tickethub.domain.exception.DomainException;
-
 import java.util.Objects;
+
 
 
 public final class Name extends ValueObject {

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.time.Duration;
 import java.util.List;
@@ -19,7 +20,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.DisplayName;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.apache.commons.lang3.StringUtils;
 
 import com.tickethub.domain.authentication.AuthAccount;
 import com.tickethub.domain.authentication.AuthAccountGateway;
@@ -68,7 +68,7 @@ class LoginUseCaseTest {
         assertEquals("access-token", output.accessToken());
         assertEquals("Bearer", output.tokenType());
         assertEquals(900, output.expiresIn());
-        assertTrue(StringUtils.isNotBlank(output.refreshToken()));
+        assertTrue(isNotBlank(output.refreshToken()));
         verify(authAccounts, times(1)).findByIdentifier("maria@domain.com");
         verify(passwordHasher, times(1)).matches("secret-123", "hash");
         verify(tokenIssuer, times(1)).issueAccess("maria@domain.com", ACCOUNT.authorities(), "customer-1");

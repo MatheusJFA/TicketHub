@@ -1,6 +1,6 @@
 package com.tickethub.application.section.retrieve.list;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import com.tickethub.application.Either;
 import com.tickethub.domain.validation.Notification;
 import com.tickethub.domain.pagination.SearchQuery;
@@ -14,7 +14,7 @@ public class DefaultListSectionsUseCase extends ListSectionsUseCase {
     private final SectionGateway sectionGateway;
 
     public DefaultListSectionsUseCase(final SectionGateway sectionGateway) {
-        this.sectionGateway = Objects.requireNonNull(sectionGateway);
+        this.sectionGateway = requireNonNull(sectionGateway);
     }
 
     @Override

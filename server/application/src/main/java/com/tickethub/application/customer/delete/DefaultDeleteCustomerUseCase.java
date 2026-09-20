@@ -1,6 +1,6 @@
 package com.tickethub.application.customer.delete;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 
 import com.tickethub.domain.validation.Notification;
@@ -13,7 +13,7 @@ public class DefaultDeleteCustomerUseCase extends DeleteCustomerUseCase {
     private final CustomerGateway customerGateway;
 
     public DefaultDeleteCustomerUseCase(final CustomerGateway customerGateway) {
-        this.customerGateway = Objects.requireNonNull(customerGateway);
+        this.customerGateway = requireNonNull(customerGateway);
     }
 
     @Override

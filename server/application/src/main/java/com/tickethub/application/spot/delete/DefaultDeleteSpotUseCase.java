@@ -1,6 +1,6 @@
 package com.tickethub.application.spot.delete;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.Optional;
 
 import com.tickethub.domain.validation.Notification;
@@ -13,7 +13,7 @@ public class DefaultDeleteSpotUseCase extends DeleteSpotUseCase {
     private final SpotGateway spotGateway;
 
     public DefaultDeleteSpotUseCase(final SpotGateway spotGateway) {
-        this.spotGateway = Objects.requireNonNull(spotGateway);
+        this.spotGateway = requireNonNull(spotGateway);
     }
 
     @Override
