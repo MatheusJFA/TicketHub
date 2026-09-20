@@ -3,6 +3,7 @@ package com.tickethub.infrastructure.show.persistence;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.data.annotation.Id;
@@ -14,6 +15,7 @@ import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.shared.Name;
 import com.tickethub.domain.shared.Text;
+import com.tickethub.infrastructure.audit.AuditActor;
 import com.tickethub.infrastructure.shared.persistence.AddressDocument;
 
 @Document("shows")
@@ -36,23 +38,35 @@ public record ShowDocument(
 
     public static final String COLLECTION = "shows";
 
+    public ShowDocument withActors(final String createdBy, final String lastModifiedBy) {
+        return new ShowDocument(id, name, description, date, address, published, totalSpots,
+                totalSpotsSold, partnerId, sectionIds, createdAt, updatedAt, deletedAt, createdBy,
+                lastModifiedBy);
+    }
+
     public static ShowDocument from(final Show show) {
-        return new ShowDocument(
+        return stamped(new ShowDocument(
                 show.getId().getValue(),
                 show.getName().getValue(),
-                show.getDescription() == null ? null : show.getDescription().getValue(),
-                show.getDate() == null ? null : show.getDate().toString(),
+                Optional.ofNullable(show.getDescription()).map(Text::getValue).orElse(null),
+                Optional.ofNullable(show.getDate()).map(OffsetDateTime::toString).orElse(null),
                 AddressDocument.from(show.getAddress()),
                 show.isPublished(),
                 show.getTotalSpots(),
                 show.getTotalSpotsSold(),
-                show.getPartnerId() == null ? null : show.getPartnerId().getValue(),
+                Optional.ofNullable(show.getPartnerId()).map(PartnerID::getValue).orElse(null),
                 show.getSections().stream().map(section -> section.getId().getValue()).toList(),
                 show.getCreatedAt(),
                 show.getUpdatedAt(),
                 show.getDeletedAt(),
                 show.getCreatedBy(),
-                show.getLastModifiedBy());
+                show.getLastModifiedBy()));
+    }
+
+    private static ShowDocument stamped(final ShowDocument document) {
+        final var actor = AuditActor.currentOrAnonymous();
+        final var createdBy = Optional.ofNullable(document.createdBy()).orElse(actor);
+        return document.withActors(createdBy, actor);
     }
 
     public Show toDomain(final Set<Section> sections) {
@@ -60,12 +74,12 @@ public record ShowDocument(
                 ShowID.from(id),
                 Name.create(name),
                 Text.create(description),
-                date == null ? null : OffsetDateTime.parse(date),
-                address == null ? null : address.toDomain(),
+                Optional.ofNullable(date).map(OffsetDateTime::parse).orElse(null),
+                Optional.ofNullable(address).map(AddressDocument::toDomain).orElse(null),
                 published,
                 totalSpots,
                 totalSpotsSold,
-                partnerId == null ? null : PartnerID.from(partnerId),
+                Optional.ofNullable(partnerId).map(PartnerID::from).orElse(null),
                 sections,
                 createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
     }

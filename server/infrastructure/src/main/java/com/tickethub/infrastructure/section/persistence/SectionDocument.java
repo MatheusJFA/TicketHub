@@ -2,6 +2,7 @@ package com.tickethub.infrastructure.section.persistence;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.data.annotation.Id;
@@ -12,6 +13,7 @@ import com.tickethub.domain.core.section.SectionID;
 import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.shared.Name;
 import com.tickethub.domain.shared.Text;
+import com.tickethub.infrastructure.audit.AuditActor;
 import com.tickethub.infrastructure.shared.persistence.MoneyDocument;
 
 @Document("sections")
@@ -34,15 +36,21 @@ public record SectionDocument(
 
     public static final String COLLECTION = "sections";
 
+    public SectionDocument withActors(final String createdBy, final String lastModifiedBy) {
+        return new SectionDocument(id, name, description, published, totalSpots, totalSpotsSold,
+                price, spotIds, showId, partnerId, createdAt, updatedAt, deletedAt, createdBy,
+                lastModifiedBy);
+    }
+
     public static SectionDocument from(final Section section) {
         return from(section, null, null);
     }
 
     public static SectionDocument from(final Section section, final String showId, final String partnerId) {
-        return new SectionDocument(
+        return stamped(new SectionDocument(
                 section.getId().getValue(),
                 section.getName().getValue(),
-                section.getDescription() == null ? null : section.getDescription().getValue(),
+                Optional.ofNullable(section.getDescription()).map(Text::getValue).orElse(null),
                 section.isPublished(),
                 section.getTotalSpots(),
                 section.getTotalSpotsSold(),
@@ -54,7 +62,13 @@ public record SectionDocument(
                 section.getUpdatedAt(),
                 section.getDeletedAt(),
                 section.getCreatedBy(),
-                section.getLastModifiedBy());
+                section.getLastModifiedBy()));
+    }
+
+    private static SectionDocument stamped(final SectionDocument document) {
+        final var actor = AuditActor.currentOrAnonymous();
+        final var createdBy = Optional.ofNullable(document.createdBy()).orElse(actor);
+        return document.withActors(createdBy, actor);
     }
 
     public Section toDomain(final Set<Spot> spots) {
@@ -65,7 +79,7 @@ public record SectionDocument(
                 published,
                 totalSpots,
                 totalSpotsSold,
-                price == null ? null : price.toDomain(),
+                Optional.ofNullable(price).map(MoneyDocument::toDomain).orElse(null),
                 spots,
                 createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
     }
