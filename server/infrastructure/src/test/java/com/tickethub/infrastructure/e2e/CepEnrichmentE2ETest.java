@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.MediaType;
@@ -22,6 +23,7 @@ import com.tickethub.infrastructure.partner.persistence.PartnerDocument;
 
 @E2ETest
 @TestPropertySource(properties = "tickethub.cep.base-url=http://127.0.0.1:1")
+@DisplayName("CEP enrichment E2 e")
 class CepEnrichmentE2ETest extends ContainerSupport {
 
     @Autowired
@@ -40,6 +42,7 @@ class CepEnrichmentE2ETest extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given unreachable CEP provider, when create partner, then persists user address")
     void givenUnreachableCepProvider_whenCreatePartner_thenPersistsUserAddress() throws Exception {
         final var created = mvc.perform(post("/partners")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -64,5 +67,12 @@ class CepEnrichmentE2ETest extends ContainerSupport {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.address.street").value("Rua X"))
                 .andExpect(jsonPath("$.address.number").value("42"));
+    }
+
+    @Test
+    @DisplayName("Given unreachable CEP provider, when lookup, then returns not found")
+    void givenUnreachableCepProvider_whenLookup_thenReturnsNotFound() throws Exception {
+        mvc.perform(get("/cep/01305-000"))
+                .andExpect(status().isNotFound());
     }
 }

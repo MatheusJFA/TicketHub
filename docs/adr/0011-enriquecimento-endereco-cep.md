@@ -1,6 +1,6 @@
 # ADR-011: Enriquecimento de endereço via CEP (ViaCEP)
 
-- **Status:** Aceito
+- **Status:** Parcialmente superseded pelo ADR-013 (provider/contrato mantidos; enriquecimento removido dos creates/updates)
 - **Data:** 2026-09-19
 
 ## Contexto

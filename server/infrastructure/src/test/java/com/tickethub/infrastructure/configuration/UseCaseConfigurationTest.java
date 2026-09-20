@@ -6,8 +6,8 @@ import com.tickethub.domain.auth.PasswordHasher;
 import com.tickethub.domain.core.customer.CustomerGateway;
 import com.tickethub.domain.core.partner.PartnerGateway;
 import com.tickethub.domain.core.show.ShowGateway;
-import com.tickethub.domain.geo.CepLookup;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
 import com.tickethub.infrastructure.configuration.usecases.CustomerUseCaseConfig;
 import com.tickethub.infrastructure.configuration.usecases.PartnerUseCaseConfig;
 import com.tickethub.infrastructure.configuration.usecases.ShowUseCaseConfig;
@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 
+@DisplayName("Use case configuration")
 class UseCaseConfigurationTest {
     private final ApplicationContextRunner runner = new ApplicationContextRunner()
             .withUserConfiguration(EventConfiguration.class, CustomerUseCaseConfig.class,
@@ -25,6 +26,7 @@ class UseCaseConfigurationTest {
                     SpotUseCaseConfig.class);
 
     @Test
+    @DisplayName("Starts without persistence adapters")
     void startsWithoutPersistenceAdapters() {
         runner.run(context -> {
             assertThat(context).hasNotFailed();
@@ -34,6 +36,7 @@ class UseCaseConfigurationTest {
     }
 
     @Test
+    @DisplayName("Wires real use case when gateway exists")
     void wiresRealUseCaseWhenGatewayExists() {
         final var gateway = mock(CustomerGateway.class);
         when(gateway.create(any())).thenAnswer(returnsFirstArg());
@@ -53,13 +56,12 @@ class UseCaseConfigurationTest {
     }
 
     @Test
+    @DisplayName("Show creation requires both gateways")
     void showCreationRequiresBothGateways() {
         runner.withBean(PasswordHasher.class, () -> mock(PasswordHasher.class))
-                .withBean(CepLookup.class, () -> mock(CepLookup.class))
                 .withBean(ShowGateway.class, () -> mock(ShowGateway.class))
                 .run(context -> assertThat(context).doesNotHaveBean(CreateShowUseCase.class));
         runner.withBean(PasswordHasher.class, () -> mock(PasswordHasher.class))
-                .withBean(CepLookup.class, () -> mock(CepLookup.class))
                 .withBean(ShowGateway.class, () -> mock(ShowGateway.class))
                 .withBean(PartnerGateway.class, () -> mock(PartnerGateway.class))
                 .run(context -> assertThat(context).hasSingleBean(CreateShowUseCase.class));

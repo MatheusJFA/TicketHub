@@ -31,7 +31,6 @@ import com.tickethub.application.show.update.DefaultUpdateShowUseCase;
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.partner.PartnerGateway;
 import com.tickethub.domain.event.DomainEventPublisher;
-import com.tickethub.domain.geo.CepLookup;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.Assert;
 import org.springframework.context.annotation.Bean;
@@ -44,14 +43,12 @@ public class ShowUseCaseConfig {
     private final ShowGateway showGateway;
     private final PartnerGateway partnerGateway;
     private final DomainEventPublisher eventPublisher;
-    private final CepLookup cepLookup;
 
     public ShowUseCaseConfig(final ShowGateway showGateway, final PartnerGateway partnerGateway,
-            final DomainEventPublisher eventPublisher, final CepLookup cepLookup) {
+            final DomainEventPublisher eventPublisher) {
         this.showGateway = showGateway;
         this.partnerGateway = partnerGateway;
         this.eventPublisher = eventPublisher;
-        this.cepLookup = cepLookup;
     }
 
     @Bean
@@ -78,7 +75,7 @@ public class ShowUseCaseConfig {
 
     @Bean
     public CreateShowUseCase createShowUseCase() {
-        return new DefaultCreateShowUseCase(showGateway, partnerGateway, cepLookup);
+        return new DefaultCreateShowUseCase(showGateway, partnerGateway);
     }
 
     @Bean
