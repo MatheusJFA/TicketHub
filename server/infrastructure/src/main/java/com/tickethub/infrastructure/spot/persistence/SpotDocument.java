@@ -17,6 +17,7 @@ public record SpotDocument(
         String location,
         boolean available,
         boolean published,
+        boolean reserved,
         String showId,
         String sectionId,
         String partnerId,
@@ -29,7 +30,7 @@ public record SpotDocument(
     public static final String COLLECTION = "spots";
 
     public SpotDocument withActors(final String createdBy, final String lastModifiedBy) {
-        return new SpotDocument(id, location, available, published, showId, sectionId, partnerId,
+        return new SpotDocument(id, location, available, published, reserved, showId, sectionId, partnerId,
                 createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
     }
 
@@ -44,6 +45,7 @@ public record SpotDocument(
                 Optional.ofNullable(spot.getLocation()).map(Location::getValue).orElse(null),
                 spot.isAvailable(),
                 spot.isPublished(),
+                spot.isReserved(),
                 showId,
                 sectionId,
                 partnerId,
@@ -66,6 +68,7 @@ public record SpotDocument(
                 Optional.ofNullable(location).map(Location::create).orElse(null),
                 available,
                 published,
+                reserved,
                 createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
     }
 }

@@ -257,4 +257,28 @@ public class MoneyTest {
         assertTrue(amounts.contains(Money.create(new BigDecimal("10.0"), Currency.getInstance("USD"))),
                 () -> "Set should contain USD 10.0");
     }
+
+    @Test
+    @DisplayName("Given two amounts, when add, then return summed amount")
+    void givenTwoAmounts_whenAdd_thenReturnSummedAmount() {
+        Money first = Money.create(new BigDecimal("50.00"), BRL);
+        Money second = Money.create(new BigDecimal("25.50"), BRL);
+
+        assertEquals(Money.create(new BigDecimal("75.50"), BRL), first.add(second),
+                () -> "Adding BRL 50.00 and BRL 25.50 should return BRL 75.50");
+    }
+
+    @Test
+    @DisplayName("Given different currencies, when add, then throw DomainException")
+    void givenDifferentCurrencies_whenAdd_thenThrowDomainException() {
+        Money first = Money.create(BigDecimal.TEN, BRL);
+        Money second = Money.create(BigDecimal.TEN, Currency.getInstance("USD"));
+
+        final var exception = assertThrows(DomainException.class,
+                () -> first.add(second),
+                () -> "Adding amounts in different currencies should throw DomainException");
+
+        assertEquals("Cannot add money with different currencies", exception.getMessage(),
+                () -> "Exception message should indicate the currency mismatch");
+    }
 }

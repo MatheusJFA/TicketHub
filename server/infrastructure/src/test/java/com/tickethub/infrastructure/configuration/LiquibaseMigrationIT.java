@@ -35,11 +35,11 @@ class LiquibaseMigrationIT extends ContainerSupport {
         final var database = factory.getMongoDatabase();
         final var collections = database.listCollectionNames().into(new ArrayList<>());
         assertTrue(collections.containsAll(
-                List.of("customers", "partners", "shows", "sections", "spots")),
+                List.of("customers", "partners", "shows", "sections", "spots", "orders", "tickets")),
                 () -> "Database should contain all expected collections after migration");
         final var history = database.getCollection("DATABASECHANGELOG");
-        assertEquals(12, history.countDocuments(),
-                () -> "Changelog history should contain 12 applied changesets");
+        assertEquals(15, history.countDocuments(),
+                () -> "Changelog history should contain 15 applied changesets");
         final var appliedIds = history.find()
                 .into(new ArrayList<>())
                 .stream()
@@ -53,11 +53,14 @@ class LiquibaseMigrationIT extends ContainerSupport {
                 "004-1-ownership-links-indexes",
                 "005-1-auth-credentials-indexes",
                 "006-1-create-refresh-sessions",
-                "006-2-create-refresh-sessions-indexes")),
+                "006-2-create-refresh-sessions-indexes",
+                "007-1-create-orders",
+                "007-2-create-tickets",
+                "007-3-orders-tickets-indexes")),
                 () -> "Changelog history should contain all expected changeset ids");
         database.getCollection("customers").insertOne(new Document("_id", "preserved"));
         LiquibaseConfiguration.migrate(client, factory, CHANGELOG);
-        assertEquals(12, history.countDocuments(),
+        assertEquals(15, history.countDocuments(),
                 () -> "Re-running migration should not reapply changesets");
         assertNotNull(database.getCollection("customers").find(new Document("_id", "preserved")).first(),
                 () -> "Re-running migration should preserve existing customer data");

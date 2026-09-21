@@ -123,7 +123,7 @@ class ShowAccessTest {
     }
 
     private static SpotDocument spotOwnedBy(final String spotId, final String partnerId) {
-        return new SpotDocument(spotId, "A1", true, false, "show-1", "section-1", partnerId,
+        return new SpotDocument(spotId, "A1", true, false, false, "show-1", "section-1", partnerId,
                 Instant.now(), Instant.now(), null, null, null);
     }
 

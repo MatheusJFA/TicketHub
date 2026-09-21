@@ -23,6 +23,8 @@ public enum Permission {
 
     TICKET_VALIDATE("ticket:validate"),
 
+    ORDER_WRITE("order:write"),
+
     AUDIT_READ("audit:read");
 
     private final String authority;

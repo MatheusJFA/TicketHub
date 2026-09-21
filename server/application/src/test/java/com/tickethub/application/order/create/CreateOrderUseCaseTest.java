@@ -1,0 +1,188 @@
+package com.tickethub.application.order.create;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
+
+import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.Currency;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import com.tickethub.application.UseCaseTest;
+import com.tickethub.domain.core.customer.Customer;
+import com.tickethub.domain.core.customer.CustomerID;
+import com.tickethub.domain.core.customer.CustomerGateway;
+import com.tickethub.domain.core.order.OrderGateway;
+import com.tickethub.domain.core.order.OrderStatus;
+import com.tickethub.domain.core.section.Section;
+import com.tickethub.domain.core.section.SectionGateway;
+import com.tickethub.domain.core.spot.Spot;
+import com.tickethub.domain.core.spot.SpotID;
+import com.tickethub.domain.core.spot.SpotGateway;
+import com.tickethub.domain.core.spot.SpotPlacement;
+import com.tickethub.domain.shared.Location;
+import com.tickethub.domain.shared.Money;
+
+@DisplayName("Create order use case")
+class CreateOrderUseCaseTest extends UseCaseTest {
+
+    private static final Currency BRL = Currency.getInstance("BRL");
+    private static final Duration TTL = Duration.ofMinutes(15);
+    private static final Clock CLOCK = Clock.fixed(Instant.parse("2026-09-20T12:00:00Z"), ZoneOffset.UTC);
+
+    private final CustomerGateway customerGateway = mock(CustomerGateway.class);
+    private final SpotGateway spotGateway = mock(SpotGateway.class);
+    private final SectionGateway sectionGateway = mock(SectionGateway.class);
+    private final OrderGateway orderGateway = mock(OrderGateway.class);
+    private final DefaultCreateOrderUseCase useCase = new DefaultCreateOrderUseCase(
+            customerGateway, spotGateway, sectionGateway, orderGateway, TTL, CLOCK);
+
+    @Override
+    protected List<Object> getMocks() {
+        return List.of(customerGateway, spotGateway, sectionGateway, orderGateway);
+    }
+
+    private Customer givenCustomer() {
+        final var customer = Customer.create("52998224725", "Maria",
+                "maria@domain.com",
+                "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
+        when(customerGateway.findById(customer.getId())).thenReturn(Optional.of(customer));
+        return customer;
+    }
+
+    private Spot givenFreeSpot(final Section section, final String location) {
+        final var spot = Spot.create(Location.create(location));
+        spot.publish();
+        when(spotGateway.findPlacement(spot.getId()))
+                .thenReturn(Optional.of(new SpotPlacement(spot, "show-1", section.getId().getValue())));
+        when(spotGateway.reserveIfAvailable(spot.getId())).thenReturn(Optional.of(spot));
+        return spot;
+    }
+
+    private Section givenSection(final Money price) {
+        final var section = Section.create("VIP", "Front stage", true, 100, 0, price, Set.of());
+        when(sectionGateway.findById(section.getId())).thenReturn(Optional.of(section));
+        return section;
+    }
+
+    @Test
+    @DisplayName("Given customer and free spots, when execute, then opens pending order")
+    void givenCustomerAndFreeSpots_whenExecute_thenOpensPendingOrder() {
+        final var customer = givenCustomer();
+        final var price = Money.create(new BigDecimal("50.00"), BRL);
+        final var section = givenSection(price);
+        final var first = givenFreeSpot(section, "A1");
+        final var second = givenFreeSpot(section, "A2");
+        when(orderGateway.create(any())).thenAnswer(returnsFirstArg());
+
+        final var output = useCase.execute(CreateOrderCommand.with(customer.getId().getValue(),
+                List.of(first.getId().getValue(), second.getId().getValue()))).getRight();
+
+        assertNotNull(output.orderId());
+        assertEquals(customer.getId().getValue(), output.customerId());
+        assertEquals(OrderStatus.PENDING.name(), output.status());
+        assertEquals(new BigDecimal("100.00"), output.totalValue());
+        assertEquals("BRL", output.currency());
+        assertEquals(CLOCK.instant().plus(TTL), output.expiresAt());
+        assertEquals(2, output.spotIds().size());
+        verify(customerGateway, times(1)).findById(customer.getId());
+        verify(spotGateway, times(2)).findPlacement(any());
+        verify(spotGateway, times(2)).reserveIfAvailable(any());
+        verify(sectionGateway, times(2)).findById(any());
+        verify(orderGateway, times(1)).create(any());
+    }
+
+    @Test
+    @DisplayName("Given unknown customer, when execute, then returns not found")
+    void givenUnknownCustomer_whenExecute_thenReturnsNotFound() {
+        final var customerId = CustomerID.generate();
+        when(customerGateway.findById(customerId)).thenReturn(Optional.empty());
+
+        final var notification = useCase.execute(
+                CreateOrderCommand.with(customerId.getValue(), List.of("spot-1"))).getLeft();
+
+        assertEquals("Customer not found: " + customerId.getValue(),
+                notification.firstError().message());
+        verify(customerGateway, times(1)).findById(customerId);
+        verify(spotGateway, times(0)).reserveIfAvailable(any());
+        verify(orderGateway, times(0)).create(any());
+    }
+
+    @Test
+    @DisplayName("Given unknown spot, when execute, then returns not found")
+    void givenUnknownSpot_whenExecute_thenReturnsNotFound() {
+        final var customer = givenCustomer();
+        final var spotId = SpotID.generate();
+        when(spotGateway.findPlacement(spotId)).thenReturn(Optional.empty());
+
+        final var notification = useCase.execute(
+                CreateOrderCommand.with(customer.getId().getValue(), List.of(spotId.getValue())))
+                .getLeft();
+
+        assertEquals("Spot not found: " + spotId.getValue(), notification.firstError().message());
+        verify(customerGateway, times(1)).findById(customer.getId());
+        verify(spotGateway, times(1)).findPlacement(spotId);
+        verify(orderGateway, times(0)).create(any());
+    }
+
+    @Test
+    @DisplayName("Given taken spot, when execute, then returns unavailable without order")
+    void givenTakenSpot_whenExecute_thenReturnsUnavailable() {
+        final var customer = givenCustomer();
+        final var section = givenSection(Money.create(new BigDecimal("50.00"), BRL));
+        final var spot = Spot.create(Location.create("A1"));
+        spot.publish();
+        when(spotGateway.findPlacement(spot.getId()))
+                .thenReturn(Optional.of(new SpotPlacement(spot, "show-1", section.getId().getValue())));
+        when(spotGateway.reserveIfAvailable(spot.getId())).thenReturn(Optional.empty());
+
+        final var notification = useCase.execute(CreateOrderCommand.with(
+                customer.getId().getValue(), List.of(spot.getId().getValue()))).getLeft();
+
+        assertEquals("Spot is unavailable", notification.firstError().message());
+        verify(customerGateway, times(1)).findById(customer.getId());
+        verify(spotGateway, times(1)).findPlacement(spot.getId());
+        verify(spotGateway, times(1)).reserveIfAvailable(spot.getId());
+        verify(orderGateway, times(0)).create(any());
+    }
+
+    @Test
+    @DisplayName("Given failure on second spot, when execute, then releases first reservation")
+    void givenFailureOnSecondSpot_whenExecute_thenReleasesFirst() {
+        final var customer = givenCustomer();
+        final var section = givenSection(Money.create(new BigDecimal("50.00"), BRL));
+        final var first = givenFreeSpot(section, "A1");
+        final var missing = SpotID.generate();
+        when(spotGateway.findPlacement(missing)).thenReturn(Optional.empty());
+        when(spotGateway.update(any())).thenAnswer(returnsFirstArg());
+
+        final var notification = useCase.execute(CreateOrderCommand.with(
+                customer.getId().getValue(),
+                List.of(first.getId().getValue(), missing.getValue()))).getLeft();
+
+        assertEquals("Spot not found: " + missing.getValue(), notification.firstError().message());
+        verify(orderGateway, times(0)).create(any());
+        verify(customerGateway, times(1)).findById(customer.getId());
+        verify(spotGateway, times(2)).findPlacement(any());
+        verify(spotGateway, times(1)).reserveIfAvailable(any());
+        verify(sectionGateway, times(1)).findById(any());
+        verify(spotGateway, times(1)).update(any());
+        assertFalse(first.isReserved());
+    }
+}

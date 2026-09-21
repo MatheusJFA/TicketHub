@@ -8,7 +8,8 @@ public enum Role {
 
     CUSTOMER(EnumSet.of(
             Permission.CUSTOMER_WRITE,
-            Permission.CUSTOMER_DELETE)),
+            Permission.CUSTOMER_DELETE,
+            Permission.ORDER_WRITE)),
 
     PARTNER(EnumSet.of(
             Permission.PARTNER_WRITE,

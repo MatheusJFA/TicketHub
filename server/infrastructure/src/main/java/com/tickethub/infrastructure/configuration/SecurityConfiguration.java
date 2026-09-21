@@ -44,7 +44,7 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login", "/auth/refresh", "/auth/logout", "/actuator/health",
-                                "/actuator/prometheus", "/swagger-ui/**", "/v3/api-docs/**")
+                                "/actuator/prometheus", "/payments/webhook", "/swagger-ui/**", "/v3/api-docs/**")
                         .permitAll()
                         .requestMatchers(HttpMethod.GET, "/shows/**", "/sections/**", "/spots/**", "/zipcode/**")
                         .permitAll()

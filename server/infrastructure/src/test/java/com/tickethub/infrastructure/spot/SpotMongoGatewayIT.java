@@ -142,4 +142,40 @@ class SpotMongoGatewayIT extends ContainerSupport {
         assertTrue(existing.contains(second.getId()));
         assertEquals(List.of(), gateway.existsByIds(List.of()));
     }
+
+    @Test
+    @DisplayName("Given a free spot, when reserve if available, then flips to reserved atomically")
+    void givenFreeSpot_whenReserveIfAvailable_thenFlipsToReserved() {
+        final var spot = gateway.create(Spot.create(Location.create("A1")), givenSection());
+
+        final var reserved = gateway.reserveIfAvailable(spot.getId()).orElseThrow();
+
+        assertTrue(reserved.isReserved());
+        assertTrue(gateway.findById(spot.getId()).orElseThrow().isReserved());
+    }
+
+    @Test
+    @DisplayName("Given a reserved spot, when reserve if available, then returns empty")
+    void givenReservedSpot_whenReserveIfAvailable_thenReturnsEmpty() {
+        final var spot = gateway.create(Spot.create(Location.create("A1")), givenSection());
+        gateway.reserveIfAvailable(spot.getId()).orElseThrow();
+
+        assertTrue(gateway.reserveIfAvailable(spot.getId()).isEmpty());
+    }
+
+    @Test
+    @DisplayName("Given a used spot, when reserve if available, then returns empty")
+    void givenUsedSpot_whenReserveIfAvailable_thenReturnsEmpty() {
+        final var spot = gateway.create(Spot.create(Location.create("A1")), givenSection());
+        spot.checkIn();
+        gateway.update(spot);
+
+        assertTrue(gateway.reserveIfAvailable(spot.getId()).isEmpty());
+    }
+
+    @Test
+    @DisplayName("Given a missing spot, when reserve if available, then returns empty")
+    void givenMissingSpot_whenReserveIfAvailable_thenReturnsEmpty() {
+        assertTrue(gateway.reserveIfAvailable(SpotID.generate()).isEmpty());
+    }
 }

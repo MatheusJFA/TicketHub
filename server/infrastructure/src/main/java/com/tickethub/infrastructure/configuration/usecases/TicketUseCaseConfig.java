@@ -8,20 +8,27 @@ import com.tickethub.application.ticket.validate.DefaultValidateTicketUseCase;
 import com.tickethub.application.ticket.validate.ValidateTicketUseCase;
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.spot.SpotGateway;
+import com.tickethub.domain.core.ticket.TicketGateway;
+import com.tickethub.domain.core.ticket.TicketSigner;
 
 @Configuration(proxyBeanMethods = false)
-@ConditionalOnBean({SpotGateway.class, ShowGateway.class})
+@ConditionalOnBean({TicketGateway.class, TicketSigner.class, SpotGateway.class, ShowGateway.class})
 public class TicketUseCaseConfig {
+    private final TicketGateway ticketGateway;
+    private final TicketSigner ticketSigner;
     private final SpotGateway spotGateway;
     private final ShowGateway showGateway;
 
-    public TicketUseCaseConfig(final SpotGateway spotGateway, final ShowGateway showGateway) {
+    public TicketUseCaseConfig(final TicketGateway ticketGateway, final TicketSigner ticketSigner,
+            final SpotGateway spotGateway, final ShowGateway showGateway) {
+        this.ticketGateway = ticketGateway;
+        this.ticketSigner = ticketSigner;
         this.spotGateway = spotGateway;
         this.showGateway = showGateway;
     }
 
     @Bean
     public ValidateTicketUseCase validateTicketUseCase() {
-        return new DefaultValidateTicketUseCase(spotGateway, showGateway);
+        return new DefaultValidateTicketUseCase(ticketGateway, ticketSigner, spotGateway, showGateway);
     }
 }

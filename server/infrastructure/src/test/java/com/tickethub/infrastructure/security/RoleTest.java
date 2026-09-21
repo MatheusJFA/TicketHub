@@ -34,9 +34,10 @@ class RoleTest {
     }
 
     @Test
-    @DisplayName("Given customer, when permissions, then manages own account")
+    @DisplayName("Given customer, when permissions, then manages own account and buys tickets")
     void givenCustomer_whenPermissions_thenManagesOwnAccount() {
-        assertEquals(Set.of(Permission.CUSTOMER_WRITE, Permission.CUSTOMER_DELETE), Role.CUSTOMER.permissions());
+        assertEquals(Set.of(Permission.CUSTOMER_WRITE, Permission.CUSTOMER_DELETE,
+                Permission.ORDER_WRITE), Role.CUSTOMER.permissions());
     }
 
     @Test

@@ -50,19 +50,20 @@ class TicketControllerTest {
     @Test
     @DisplayName("Given valid QR data, when validates ticket, then returns checked-in ticket")
     void givenValidQrData_whenValidatesTicket_thenReturnsCheckedInTicket() throws Exception {
-        final var output = new ValidateTicketOutput("show-1", "section-1", "spot-1", "A00001",
-                OffsetDateTime.parse("2027-01-15T20:00:00-03:00"), Instant.parse("2027-01-15T22:00:00Z"));
+        final var output = new ValidateTicketOutput("show-1", "ticket-1", "ABCDEFGH", "order-1",
+                "spot-1", "A00001", OffsetDateTime.parse("2027-01-15T20:00:00-03:00"),
+                Instant.parse("2027-01-15T22:00:00Z"));
         when(showAccess.canWrite("show-1")).thenReturn(true);
         when(validateTicket.execute(any())).thenReturn(Either.right(output));
 
         mvc.perform(post("/shows/show-1/tickets/validate")
                         .header("Authorization", bearerAsOwner("partner-1", "ticket:validate"))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"sectionId\":\"section-1\",\"spotId\":\"spot-1\"}"))
+                        .content("{\"ticketId\":\"ticket-1\",\"code\":\"ABCDEFGH\",\"signature\":\"sig\"}"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.spotId").value("spot-1"))
+                .andExpect(jsonPath("$.ticketId").value("ticket-1"))
                 .andExpect(jsonPath("$.showId").value("show-1"))
-                .andExpect(jsonPath("$.sectionId").value("section-1"));
+                .andExpect(jsonPath("$.spotId").value("spot-1"));
     }
 
     @Test
@@ -73,21 +74,56 @@ class TicketControllerTest {
         mvc.perform(post("/shows/show-1/tickets/validate")
                         .header("Authorization", bearerAsOwner("partner-9", "ticket:validate"))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"sectionId\":\"section-1\",\"spotId\":\"spot-1\"}"))
+                        .content("{\"ticketId\":\"ticket-1\",\"code\":\"ABCDEFGH\",\"signature\":\"sig\"}"))
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    @DisplayName("Given reused ticket, when validates, then returns unprocessable entity")
-    void givenReusedTicket_whenValidates_thenReturnsUnprocessableEntity() throws Exception {
+    @DisplayName("Given missing code, when validates ticket, then returns bad request")
+    void givenMissingCode_whenValidatesTicket_thenReturnsBadRequest() throws Exception {
         when(showAccess.canWrite("show-1")).thenReturn(true);
-        when(validateTicket.execute(any())).thenReturn(Either.left(
-                Notification.create(new Error("Spot is already used"))));
 
         mvc.perform(post("/shows/show-1/tickets/validate")
                         .header("Authorization", bearerAsOwner("partner-1", "ticket:validate"))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"sectionId\":\"section-1\",\"spotId\":\"spot-1\"}"))
+                        .content("{\"ticketId\":\"ticket-1\",\"signature\":\"sig\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Given unknown ticket, when validates ticket, then returns not found")
+    void givenUnknownTicket_whenValidatesTicket_thenReturnsNotFound() throws Exception {
+        when(showAccess.canWrite("show-1")).thenReturn(true);
+        when(validateTicket.execute(any())).thenReturn(Either.left(
+                Notification.create(new Error("Ticket not found: ticket-1"))));
+
+        mvc.perform(post("/shows/show-1/tickets/validate")
+                        .header("Authorization", bearerAsOwner("partner-1", "ticket:validate"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"ticketId\":\"ticket-1\",\"code\":\"ABCDEFGH\",\"signature\":\"sig\"}"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Given used ticket, when validates ticket, then returns unprocessable")
+    void givenUsedTicket_whenValidatesTicket_thenReturnsUnprocessable() throws Exception {
+        when(showAccess.canWrite("show-1")).thenReturn(true);
+        when(validateTicket.execute(any())).thenReturn(Either.left(
+                Notification.create(new Error("Ticket is already used"))));
+
+        mvc.perform(post("/shows/show-1/tickets/validate")
+                        .header("Authorization", bearerAsOwner("partner-1", "ticket:validate"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"ticketId\":\"ticket-1\",\"code\":\"ABCDEFGH\",\"signature\":\"sig\"}"))
                 .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    @DisplayName("Given no token, when validates ticket, then returns unauthorized")
+    void givenNoToken_whenValidatesTicket_thenReturnsUnauthorized() throws Exception {
+        mvc.perform(post("/shows/show-1/tickets/validate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"ticketId\":\"ticket-1\",\"code\":\"ABCDEFGH\",\"signature\":\"sig\"}"))
+                .andExpect(status().isUnauthorized());
     }
 }

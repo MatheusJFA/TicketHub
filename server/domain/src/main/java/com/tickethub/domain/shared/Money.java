@@ -1,5 +1,6 @@
 package com.tickethub.domain.shared;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 import java.math.BigDecimal;
@@ -38,6 +39,20 @@ public final class Money extends ValueObject {
                 && currency.getDefaultFractionDigits() >= 0
                 && value.signum() >= 0
                 && value.stripTrailingZeros().scale() <= currency.getDefaultFractionDigits();
+    }
+
+    /**
+     * Sums two amounts in the same currency, used to total order items whose
+     * prices were snapshotted at purchase time.
+     */
+    public Money add(final Money other) {
+        if (isNull(other)) {
+            throw new DomainException("'other' should not be null");
+        }
+        if (!currency.equals(other.currency)) {
+            throw new DomainException("Cannot add money with different currencies");
+        }
+        return Money.create(value.add(other.value), currency);
     }
 
     public BigDecimal getValue() {

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd
+                   http://www.liquibase.org/xml/ns/dbchangelog-ext https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <changeSet id="007-1-create-orders" author="tickethub">
+        <ext:createCollection collectionName="orders"/>
+    </changeSet>
+    <changeSet id="007-2-create-tickets" author="tickethub">
+        <ext:createCollection collectionName="tickets"/>
+    </changeSet>
+    <changeSet id="007-3-orders-tickets-indexes" author="tickethub">
+        <ext:createIndex collectionName="orders">
+            <ext:keys>{ "customerId": 1 }</ext:keys>
+            <ext:options>{ "name": "idx_orders_customerId" }</ext:options>
+        </ext:createIndex>
+        <ext:createIndex collectionName="orders">
+            <ext:keys>{ "status": 1, "expiresAt": 1 }</ext:keys>
+            <ext:options>{ "name": "idx_orders_status_expiresAt" }</ext:options>
+        </ext:createIndex>
+        <ext:createIndex collectionName="orders">
+            <ext:keys>{ "chargeId": 1 }</ext:keys>
+            <ext:options>{ "unique": true, "sparse": true, "name": "uq_orders_chargeId" }</ext:options>
+        </ext:createIndex>
+        <ext:createIndex collectionName="tickets">
+            <ext:keys>{ "orderId": 1 }</ext:keys>
+            <ext:options>{ "name": "idx_tickets_orderId" }</ext:options>
+        </ext:createIndex>
+        <ext:createIndex collectionName="tickets">
+            <ext:keys>{ "spotId": 1 }</ext:keys>
+            <ext:options>{ "name": "idx_tickets_spotId" }</ext:options>
+        </ext:createIndex>
+    </changeSet>
+</databaseChangeLog>

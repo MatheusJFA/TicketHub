@@ -43,6 +43,10 @@ tickethub:
   spots:
     async-threshold: ${SPOTS_ASYNC_THRESHOLD:1000}
     seat-number-width: ${SPOTS_SEAT_NUMBER_WIDTH:5}
+  orders:
+    reservation-ttl: ${TICKETHUB_ORDERS_RESERVATION_TTL:15m}
+  tickets:
+    signature-secret: ${TICKETHUB_TICKETS_SIGNATURE_SECRET:dev-only-change-me-ticket-signing-secret-0123456789}
   audit:
     enabled: ${AUDIT_ENABLED:true}
   auth:

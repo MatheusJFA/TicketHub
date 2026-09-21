@@ -3,11 +3,16 @@ package com.tickethub.infrastructure.spot;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static java.util.Objects.requireNonNull;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import com.tickethub.domain.core.spot.Spot;
@@ -17,6 +22,7 @@ import com.tickethub.domain.core.spot.SpotPlacement;
 import com.tickethub.domain.core.section.SectionID;
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.domain.pagination.SearchQuery;
+import com.tickethub.infrastructure.audit.AuditActor;
 import com.tickethub.infrastructure.spot.persistence.SpotDocument;
 import com.tickethub.infrastructure.spot.persistence.SpotRepository;
 import com.tickethub.infrastructure.section.persistence.SectionRepository;
@@ -58,6 +64,28 @@ public class SpotMongoGateway implements SpotGateway {
     @Override
     public Optional<Spot> findById(final SpotID id) {
         return repository.findById(id.getValue()).map(SpotDocument::toDomain);
+    }
+
+    @Override
+    public Optional<Spot> reserveIfAvailable(final SpotID id) {
+        requireNonNull(id, "'id' should not be null");
+        // Single atomic findAndModify: only a free spot flips to reserved, so
+        // concurrent buyers cannot hold the same seat. Documents written
+        // before the `reserved` field existed are treated as unreserved.
+        final var query = new Query(Criteria.where("_id").is(id.getValue())
+                .and("available").is(true)
+                .andOperator(new Criteria().orOperator(
+                        Criteria.where("reserved").is(false),
+                        Criteria.where("reserved").exists(false))));
+        final var update = new Update()
+                .set("reserved", true)
+                .set("updatedAt", Instant.now())
+                .set("lastModifiedBy", AuditActor.currentOrAnonymous());
+        final var options = FindAndModifyOptions.options().returnNew(true);
+        return Optional
+                .ofNullable(mongoTemplate.findAndModify(query, update, options,
+                        SpotDocument.class, SpotDocument.COLLECTION))
+                .map(SpotDocument::toDomain);
     }
 
     @Override

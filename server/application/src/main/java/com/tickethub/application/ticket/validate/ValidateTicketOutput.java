@@ -4,19 +4,24 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 
 import com.tickethub.domain.core.spot.Spot;
+import com.tickethub.domain.core.ticket.Ticket;
 
 public record ValidateTicketOutput(
         String showId,
-        String sectionId,
+        String ticketId,
+        String code,
+        String orderId,
         String spotId,
         String location,
         OffsetDateTime showDate,
         Instant checkedInAt) {
-    public static ValidateTicketOutput from(final String showId, final String sectionId,
+    public static ValidateTicketOutput from(final String showId, final Ticket ticket,
             final Spot spot, final OffsetDateTime showDate) {
         return new ValidateTicketOutput(
                 showId,
-                sectionId,
+                ticket.getId().getValue(),
+                ticket.getCode(),
+                ticket.getOrderId().getValue(),
                 spot.getId().getValue(),
                 spot.getLocation().getValue(),
                 showDate,

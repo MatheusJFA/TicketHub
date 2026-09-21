@@ -7,7 +7,9 @@ import com.tickethub.application.ticket.validate.ValidateTicketOutput;
 
 public record ValidateTicketResponse(
         String showId,
-        String sectionId,
+        String ticketId,
+        String code,
+        String orderId,
         String spotId,
         String location,
         OffsetDateTime showDate,
@@ -15,7 +17,9 @@ public record ValidateTicketResponse(
     public static ValidateTicketResponse from(final ValidateTicketOutput output) {
         return new ValidateTicketResponse(
                 output.showId(),
-                output.sectionId(),
+                output.ticketId(),
+                output.code(),
+                output.orderId(),
                 output.spotId(),
                 output.location(),
                 output.showDate(),

@@ -7,31 +7,34 @@ import java.time.Instant;
 import com.tickethub.domain.Entity;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.exception.SpotAlreadyUsedException;
+import com.tickethub.domain.exception.SpotUnavailableException;
 import com.tickethub.domain.shared.Location;
 
 public class Spot extends Entity<SpotID> {
     private Location location;
     private boolean isAvailable;
     private boolean isPublished;
+    private boolean isReserved;
 
-    private Spot(SpotID id, Location location, boolean isAvailable, boolean isPublished,
+    private Spot(SpotID id, Location location, boolean isAvailable, boolean isPublished, boolean isReserved,
             Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
         super(id, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
         this.location = location;
         this.isAvailable = isAvailable;
         this.isPublished = isPublished;
+        this.isReserved = isReserved;
     }
 
     public static Spot create(Location location, boolean isAvailable, boolean isPublished) {
         final SpotID id = SpotID.generate();
         final var now = Instant.now();
-        return new Spot(id, location, isAvailable, isPublished, now, now, null, null, null);
+        return new Spot(id, location, isAvailable, isPublished, false, now, now, null, null, null);
     }
 
     public static Spot create(Location location) {
         final SpotID id = SpotID.generate();
         final var now = Instant.now();
-        return new Spot(id, location, true, false, now, now, null, null, null);
+        return new Spot(id, location, true, false, false, now, now, null, null, null);
     }
 
     /**
@@ -42,12 +45,13 @@ public class Spot extends Entity<SpotID> {
     public static Spot create(int seatNumberWidth) {
         final SpotID id = SpotID.generate();
         final var now = Instant.now();
-        return new Spot(id, Location.generateRandom(seatNumberWidth), true, false, now, now, null, null, null);
+        return new Spot(id, Location.generateRandom(seatNumberWidth), true, false, false, now, now, null, null, null);
     }
 
     public static Spot reconstitute(SpotID id, Location location, boolean isAvailable, boolean isPublished,
+            boolean isReserved,
             Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
-        return new Spot(id, location, isAvailable, isPublished,
+        return new Spot(id, location, isAvailable, isPublished, isReserved,
                 createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
     }
 
@@ -58,6 +62,31 @@ public class Spot extends Entity<SpotID> {
 
     public void unpublish() {
         this.isPublished = false;
+        this.markAsUpdated();
+    }
+
+    /**
+     * Reserves the spot for an open order. Only free (available, unused)
+     * spots can be reserved; a used or already reserved spot fails so two
+     * buyers cannot hold the same seat.
+     */
+    public void reserve() {
+        if (!isAvailable || isReserved) {
+            throw new SpotUnavailableException();
+        }
+        this.isReserved = true;
+        this.markAsUpdated();
+    }
+
+    /**
+     * Releases a reservation (order expired or cancelled) and puts the spot
+     * back on sale. Releasing a non-reserved spot is a no-op.
+     */
+    public void release() {
+        if (!isReserved) {
+            return;
+        }
+        this.isReserved = false;
         this.markAsUpdated();
     }
 
@@ -94,4 +123,7 @@ public class Spot extends Entity<SpotID> {
         return isPublished;
     }
 
+    public boolean isReserved() {
+        return isReserved;
+    }
 }

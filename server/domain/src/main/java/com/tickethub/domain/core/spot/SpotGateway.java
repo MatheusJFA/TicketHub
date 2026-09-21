@@ -12,6 +12,12 @@ public interface SpotGateway {
     void deleteById(SpotID id);
     Optional<Spot> findById(SpotID id);
     /**
+     * Atomically reserves a free spot for an open order. Returns the reserved
+     * spot, or empty when it is already reserved, used or missing, so
+     * concurrent buyers cannot hold the same seat.
+     */
+    Optional<Spot> reserveIfAvailable(SpotID id);
+    /**
      * Loads the spot together with the show/section it belongs to, for
      * ticket (QR code) validation at the door.
      */

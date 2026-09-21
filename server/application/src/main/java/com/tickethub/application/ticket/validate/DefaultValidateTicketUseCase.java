@@ -4,7 +4,7 @@ import static java.util.Objects.requireNonNull;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
-import java.util.Optional;
+import java.util.Objects;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.show.Show;
@@ -14,29 +14,41 @@ import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.core.spot.SpotGateway;
 import com.tickethub.domain.core.spot.SpotID;
 import com.tickethub.domain.core.spot.SpotPlacement;
+import com.tickethub.domain.core.ticket.Ticket;
+import com.tickethub.domain.core.ticket.TicketGateway;
+import com.tickethub.domain.core.ticket.TicketID;
+import com.tickethub.domain.core.ticket.TicketSigner;
+import com.tickethub.domain.core.ticket.TicketStatus;
+import com.tickethub.domain.exception.InvalidTicketSignatureException;
 import com.tickethub.domain.exception.ResourceNotFoundException;
 import com.tickethub.domain.exception.ShowOutsideCheckInDateException;
 import com.tickethub.domain.exception.SpotOwnershipException;
+import com.tickethub.domain.exception.TicketAlreadyUsedException;
 import com.tickethub.domain.validation.Notification;
-import java.util.Objects;
 
 /**
- * Door validation for guest QR codes. Confirms the ticket really exists for
- * the presented show and section, that the show is happening today, and then
- * checks the spot in (marks it used) so the same QR code cannot be reused.
+ * Door validation for ticket QR codes. Proves the QR was issued by this
+ * system (signature), that the ticket is still unused, that its spot really
+ * belongs to the show being controlled, and that the show is happening
+ * today. Then checks both ticket and spot in so the QR cannot be reused.
  */
 public class DefaultValidateTicketUseCase extends ValidateTicketUseCase {
+    private final TicketGateway ticketGateway;
+    private final TicketSigner ticketSigner;
     private final SpotGateway spotGateway;
     private final ShowGateway showGateway;
     private final Clock clock;
 
-    public DefaultValidateTicketUseCase(final SpotGateway spotGateway, final ShowGateway showGateway) {
-        this(spotGateway, showGateway, Clock.systemUTC());
+    public DefaultValidateTicketUseCase(final TicketGateway ticketGateway, final TicketSigner ticketSigner,
+            final SpotGateway spotGateway, final ShowGateway showGateway) {
+        this(ticketGateway, ticketSigner, spotGateway, showGateway, Clock.systemUTC());
     }
 
-    public DefaultValidateTicketUseCase(final SpotGateway spotGateway, final ShowGateway showGateway,
-            final Clock clock) {
-        this.spotGateway = requireNonNull(spotGateway);
+    public DefaultValidateTicketUseCase(final TicketGateway ticketGateway, final TicketSigner ticketSigner,
+            final SpotGateway spotGateway, final ShowGateway showGateway, final Clock clock) {
+        this.ticketGateway = requireNonNull(ticketGateway, "'ticketGateway' should not be null");
+        this.ticketSigner = requireNonNull(ticketSigner, "'ticketSigner' should not be null");
+        this.spotGateway = requireNonNull(spotGateway, "'spotGateway' should not be null");
         this.showGateway = requireNonNull(showGateway, "'showGateway' should not be null");
         this.clock = requireNonNull(clock, "'clock' should not be null");
     }
@@ -44,27 +56,32 @@ public class DefaultValidateTicketUseCase extends ValidateTicketUseCase {
     @Override
     public Either<Notification, ValidateTicketOutput> execute(final ValidateTicketCommand command) {
         try {
-            final SpotID spotId = SpotID.from(command.spotId());
-            final Optional<SpotPlacement> placement = spotGateway.findPlacement(spotId);
-
-            if (placement.isEmpty()) {
-                throw new ResourceNotFoundException(Spot.class.getSimpleName(), spotId.getValue());
+            final TicketID ticketId = TicketID.from(command.ticketId());
+            final var stored = ticketGateway.findById(ticketId);
+            if (stored.isEmpty()) {
+                throw new ResourceNotFoundException(Ticket.class.getSimpleName(), ticketId.getValue());
+            }
+            final Ticket ticket = stored.get();
+            if (!Objects.equals(command.code(), ticket.getCode())) {
+                throw new InvalidTicketSignatureException();
+            }
+            ticket.verifySignature(ticketSigner);
+            if (ticket.getStatus() == TicketStatus.USED) {
+                throw new TicketAlreadyUsedException();
             }
 
-            final SpotPlacement found = placement.get();
-            if (!Objects.equals(command.showId(), found.showId())
-                    || !Objects.equals(command.sectionId(), found.sectionId())) {
+            final SpotPlacement placement = spotGateway.findPlacement(ticket.getSpotId())
+                    .orElseThrow(() -> new ResourceNotFoundException(Spot.class.getSimpleName(),
+                            ticket.getSpotId().getValue()));
+            if (!Objects.equals(command.showId(), placement.showId())) {
                 throw new SpotOwnershipException();
             }
 
             final ShowID showId = ShowID.from(command.showId());
-            final Optional<Show> show = showGateway.findById(showId);
+            final Show entity = showGateway.findById(showId)
+                    .orElseThrow(() -> new ResourceNotFoundException(Show.class.getSimpleName(),
+                            showId.getValue()));
 
-            if (show.isEmpty()) {
-                throw new ResourceNotFoundException(Show.class.getSimpleName(), showId.getValue());
-            }
-
-            final Show entity = show.get();
             final var showDate = entity.getDate();
             final var todayAtVenue = LocalDate.ofInstant(clock.instant(),
                     showDate != null ? showDate.getOffset() : ZoneOffset.UTC);
@@ -72,12 +89,14 @@ public class DefaultValidateTicketUseCase extends ValidateTicketUseCase {
                 throw new ShowOutsideCheckInDateException(showDate);
             }
 
-            final Spot spot = found.spot();
-            spot.checkIn();
+            ticket.checkIn();
+            ticketGateway.update(ticket);
 
+            final Spot spot = placement.spot();
+            spot.checkIn();
             final Spot updated = spotGateway.update(spot);
-            return Either.right(ValidateTicketOutput.from(command.showId(), command.sectionId(),
-                    updated, entity.getDate()));
+            return Either.right(ValidateTicketOutput.from(command.showId(), ticket, updated,
+                    entity.getDate()));
         } catch (final RuntimeException exception) {
             return Either.left(Notification.create(exception));
         }

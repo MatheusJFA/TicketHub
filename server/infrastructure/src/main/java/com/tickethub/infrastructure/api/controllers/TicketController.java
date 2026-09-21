@@ -21,7 +21,7 @@ public class TicketController implements TicketAPI {
     public ValidateTicketResponse validateTicket(final String showId,
             final ValidateTicketRequest input) {
         final var output = HttpResults.require(validateTicket.execute(
-                ValidateTicketCommand.with(showId, input.sectionId(), input.spotId())));
+                ValidateTicketCommand.with(showId, input.ticketId(), input.code(), input.signature())));
         return ValidateTicketResponse.from(output);
     }
 }
