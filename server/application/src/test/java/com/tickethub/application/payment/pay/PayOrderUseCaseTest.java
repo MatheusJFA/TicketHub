@@ -1,4 +1,4 @@
-package com.tickethub.application.order.pay;
+package com.tickethub.application.payment.pay;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

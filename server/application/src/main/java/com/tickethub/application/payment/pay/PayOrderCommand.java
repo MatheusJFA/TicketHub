@@ -1,4 +1,4 @@
-package com.tickethub.application.order.pay;
+package com.tickethub.application.payment.pay;
 
 public record PayOrderCommand(String orderId) {
     public static PayOrderCommand with(final String orderId) {

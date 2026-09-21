@@ -1,4 +1,4 @@
-package com.tickethub.application.order.pay;
+package com.tickethub.application.payment.pay;
 
 import com.tickethub.domain.core.order.Order;
 import com.tickethub.domain.core.payment.Charge;

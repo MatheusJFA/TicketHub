@@ -1,6 +1,6 @@
 package com.tickethub.infrastructure.order.models;
 
-import com.tickethub.application.order.pay.PayOrderOutput;
+import com.tickethub.application.payment.pay.PayOrderOutput;
 
 public record PayOrderResponse(
         String orderId,

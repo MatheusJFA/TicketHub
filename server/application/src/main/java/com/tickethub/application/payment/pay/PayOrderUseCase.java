@@ -1,4 +1,4 @@
-package com.tickethub.application.order.pay;
+package com.tickethub.application.payment.pay;
 
 import com.tickethub.application.Either;
 import com.tickethub.application.UseCase;

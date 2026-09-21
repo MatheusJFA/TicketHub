@@ -1,4 +1,4 @@
-package com.tickethub.application.order.pay;
+package com.tickethub.application.payment.pay;
 
 import static java.util.Objects.requireNonNull;
 
