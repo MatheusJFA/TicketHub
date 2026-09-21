@@ -18,6 +18,7 @@ import java.util.Currency;
 import java.util.List;
 
 import com.tickethub.domain.core.customer.CustomerID;
+import com.tickethub.domain.core.payment.ChargeID;
 import com.tickethub.domain.core.spot.SpotID;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.exception.IllegalOrderTransitionException;
@@ -83,9 +84,9 @@ class OrderTest {
     void givenPendingOrder_whenAttachCharge_thenLinkChargeId() {
         final var order = Order.create(CustomerID.generate(), items(), TTL, CLOCK);
 
-        order.attachCharge("ch_123");
+        order.attachCharge(ChargeID.from("ch_123"));
 
-        assertEquals("ch_123", order.getChargeId());
+        assertEquals("ch_123", order.getChargeId().getValue());
         assertTrue(order.hasCharge());
     }
 
@@ -96,7 +97,7 @@ class OrderTest {
         order.markAsPaid(CLOCK);
 
         final var exception = assertThrows(IllegalOrderTransitionException.class,
-                () -> order.attachCharge("ch_123"));
+                () -> order.attachCharge(ChargeID.from("ch_123")));
 
         assertEquals("Illegal order transition from PAID to PENDING", exception.getMessage());
     }

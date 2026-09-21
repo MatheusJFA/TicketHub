@@ -12,6 +12,7 @@ import com.tickethub.domain.core.order.Order;
 import com.tickethub.domain.core.order.OrderID;
 import com.tickethub.domain.core.order.OrderItem;
 import com.tickethub.domain.core.order.OrderStatus;
+import com.tickethub.domain.core.payment.ChargeID;
 import com.tickethub.domain.core.spot.SpotID;
 import com.tickethub.infrastructure.audit.AuditActor;
 import com.tickethub.infrastructure.shared.persistence.MoneyDocument;
@@ -61,7 +62,7 @@ public record OrderDocument(
                 MoneyDocument.from(order.getTotal()),
                 order.getStatus().name(),
                 order.getExpiresAt(),
-                order.getChargeId(),
+                Optional.ofNullable(order.getChargeId()).map(ChargeID::getValue).orElse(null),
                 order.getCreatedAt(),
                 order.getUpdatedAt(),
                 order.getDeletedAt(),
@@ -83,7 +84,7 @@ public record OrderDocument(
                 Optional.ofNullable(total).map(MoneyDocument::toDomain).orElse(null),
                 OrderStatus.valueOf(status),
                 expiresAt,
-                chargeId,
+                chargeId == null ? null : ChargeID.from(chargeId),
                 createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
     }
 }

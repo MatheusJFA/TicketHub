@@ -22,6 +22,7 @@ import com.tickethub.domain.core.customer.CustomerID;
 import com.tickethub.domain.core.order.Order;
 import com.tickethub.domain.core.order.OrderID;
 import com.tickethub.domain.core.order.OrderItem;
+import com.tickethub.domain.core.payment.ChargeID;
 import com.tickethub.domain.core.spot.SpotID;
 import com.tickethub.domain.shared.Money;
 import com.tickethub.infrastructure.ContainerSupport;
@@ -76,15 +77,15 @@ class OrderMongoGatewayIT extends ContainerSupport {
     @DisplayName("Given a paid order with charge, when find by charge id, then returns order")
     void givenPaidOrder_whenFindByChargeId_thenReturnsOrder() {
         final var order = givenOrder();
-        order.attachCharge("ch_123");
+        order.attachCharge(ChargeID.from("ch_123"));
         order.markAsPaid();
         gateway.create(order);
 
-        final var found = gateway.findByChargeId("ch_123").orElseThrow();
+        final var found = gateway.findByChargeId(ChargeID.from("ch_123")).orElseThrow();
 
         assertEquals(order.getId(), found.getId());
-        assertEquals("ch_123", found.getChargeId());
-        assertFalse(gateway.findByChargeId("ch_missing").isPresent());
+        assertEquals(ChargeID.from("ch_123"), found.getChargeId());
+        assertFalse(gateway.findByChargeId(ChargeID.from("ch_missing")).isPresent());
         assertFalse(gateway.findById(OrderID.generate()).isPresent());
     }
 
@@ -93,12 +94,12 @@ class OrderMongoGatewayIT extends ContainerSupport {
     void givenAnOrder_whenUpdate_thenPersistsChanges() {
         final var order = gateway.create(givenOrder());
 
-        order.attachCharge("ch_123");
+        order.attachCharge(ChargeID.from("ch_123"));
         order.markAsPaid();
         gateway.update(order);
 
         final var found = gateway.findById(order.getId()).orElseThrow();
-        assertEquals("ch_123", found.getChargeId());
+        assertEquals(ChargeID.from("ch_123"), found.getChargeId());
         assertEquals(com.tickethub.domain.core.order.OrderStatus.PAID, found.getStatus());
     }
 

@@ -13,6 +13,7 @@ import java.util.List;
 
 import com.tickethub.domain.AggregateRoot;
 import com.tickethub.domain.core.customer.CustomerID;
+import com.tickethub.domain.core.payment.ChargeID;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.exception.IllegalOrderTransitionException;
 import com.tickethub.domain.exception.OrderExpiredException;
@@ -25,10 +26,10 @@ public class Order extends AggregateRoot<OrderID> {
     private final Money total;
     private OrderStatus status;
     private final Instant expiresAt;
-    private String chargeId;
+    private ChargeID chargeId;
 
     private Order(OrderID id, CustomerID customerId, List<OrderItem> items, Money total,
-            OrderStatus status, Instant expiresAt, String chargeId,
+            OrderStatus status, Instant expiresAt, ChargeID chargeId,
             Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
         super(id, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
         this.customerId = customerId;
@@ -70,7 +71,7 @@ public class Order extends AggregateRoot<OrderID> {
     }
 
     public static Order reconstitute(OrderID id, CustomerID customerId, List<OrderItem> items, Money total,
-            OrderStatus status, Instant expiresAt, String chargeId,
+            OrderStatus status, Instant expiresAt, ChargeID chargeId,
             Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
         return new Order(id, customerId, items, total, status, expiresAt, chargeId,
                 createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
@@ -90,7 +91,7 @@ public class Order extends AggregateRoot<OrderID> {
      * (PENDING) orders can be charged; the actual payment confirmation
      * arrives later through {@link #markAsPaid()}.
      */
-    public void attachCharge(final String chargeId) {
+    public void attachCharge(final ChargeID chargeId) {
         requireNonNull(chargeId, "'chargeId' should not be null");
         requirePendingFor(OrderStatus.PENDING);
         this.chargeId = chargeId;
@@ -199,7 +200,7 @@ public class Order extends AggregateRoot<OrderID> {
         return expiresAt;
     }
 
-    public String getChargeId() {
+    public ChargeID getChargeId() {
         return chargeId;
     }
 

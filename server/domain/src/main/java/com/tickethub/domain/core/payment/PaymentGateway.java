@@ -9,5 +9,5 @@ import com.tickethub.domain.shared.Money;
  */
 public interface PaymentGateway {
     Charge createCharge(OrderID orderId, Money total);
-    Charge findStatus(String chargeId);
+    Charge findStatus(ChargeID chargeId);
 }

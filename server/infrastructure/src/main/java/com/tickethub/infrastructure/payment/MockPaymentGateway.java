@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.tickethub.domain.core.order.OrderID;
 import com.tickethub.domain.core.payment.Charge;
+import com.tickethub.domain.core.payment.ChargeID;
 import com.tickethub.domain.core.payment.ChargeStatus;
 import com.tickethub.domain.core.payment.PaymentGateway;
 import com.tickethub.domain.exception.ResourceNotFoundException;
@@ -30,19 +31,19 @@ public class MockPaymentGateway implements PaymentGateway {
     public Charge createCharge(final OrderID orderId, final Money total) {
         requireNonNull(orderId, "'orderId' should not be null");
         requireNonNull(total, "'total' should not be null");
-        final var chargeId = "ch_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12);
-        final var charge = new Charge(chargeId, orderId, total, ChargeStatus.PENDING,
-                "PIX-MOCK-" + chargeId);
-        charges.put(chargeId, charge);
+        final var chargeId = ChargeID.from("ch_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12));
+        final var charge = Charge.create(chargeId, orderId, total, ChargeStatus.PENDING,
+                "PIX-MOCK-" + chargeId.getValue());
+        charges.put(chargeId.getValue(), charge);
         return charge;
     }
 
     @Override
-    public Charge findStatus(final String chargeId) {
+    public Charge findStatus(final ChargeID chargeId) {
         requireNonNull(chargeId, "'chargeId' should not be null");
-        final var charge = charges.get(chargeId);
+        final var charge = charges.get(chargeId.getValue());
         if (charge == null) {
-            throw new ResourceNotFoundException("Charge", chargeId);
+            throw new ResourceNotFoundException("Charge", chargeId.getValue());
         }
         return charge;
     }

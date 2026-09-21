@@ -52,7 +52,7 @@ public class DefaultPayOrderUseCase extends PayOrderUseCase {
                 return Either.left(Notification.create(new OrderExpiredException()));
             }
             final var charge = paymentGateway.createCharge(order.getId(), order.getTotal());
-            order.attachCharge(charge.chargeId());
+            order.attachCharge(charge.getChargeId());
             return Either.right(PayOrderOutput.from(orderGateway.update(order), charge));
         } catch (final RuntimeException exception) {
             return Either.left(Notification.create(exception));

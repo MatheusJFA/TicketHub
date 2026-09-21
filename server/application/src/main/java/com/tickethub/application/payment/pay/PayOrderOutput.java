@@ -11,8 +11,8 @@ public record PayOrderOutput(
     public static PayOrderOutput from(final Order order, final Charge charge) {
         return new PayOrderOutput(
                 order.getId().getValue(),
-                charge.chargeId(),
-                charge.paymentCode(),
-                charge.status().name());
+                charge.getChargeId().getValue(),
+                charge.getPaymentCode(),
+                charge.getStatus().name());
     }
 }

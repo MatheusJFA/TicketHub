@@ -27,6 +27,10 @@ import com.tickethub.domain.core.order.Order;
 import com.tickethub.domain.core.order.OrderGateway;
 import com.tickethub.domain.core.order.OrderItem;
 import com.tickethub.domain.core.order.OrderStatus;
+import com.tickethub.domain.core.payment.Charge;
+import com.tickethub.domain.core.payment.ChargeID;
+import com.tickethub.domain.core.payment.ChargeStatus;
+import com.tickethub.domain.core.payment.PaymentGateway;
 import com.tickethub.domain.core.spot.SpotID;
 import com.tickethub.domain.core.ticket.TicketGateway;
 import com.tickethub.domain.core.ticket.TicketSigner;
@@ -42,12 +46,13 @@ class ConfirmPaymentUseCaseTest extends UseCaseTest {
 
     private final OrderGateway orderGateway = mock(OrderGateway.class);
     private final TicketGateway ticketGateway = mock(TicketGateway.class);
+    private final PaymentGateway paymentGateway = mock(PaymentGateway.class);
     private final DefaultConfirmPaymentUseCase useCase =
-            new DefaultConfirmPaymentUseCase(orderGateway, ticketGateway, SIGNER, CLOCK);
+            new DefaultConfirmPaymentUseCase(orderGateway, ticketGateway, SIGNER, paymentGateway, CLOCK);
 
     @Override
     protected List<Object> getMocks() {
-        return List.of(orderGateway, ticketGateway);
+        return List.of(orderGateway, ticketGateway, paymentGateway);
     }
 
     private Order givenChargedOrder() {
@@ -56,8 +61,8 @@ class ConfirmPaymentUseCaseTest extends UseCaseTest {
                         OrderItem.of(SpotID.generate(), Money.create(new BigDecimal("50.00"), BRL)),
                         OrderItem.of(SpotID.generate(), Money.create(new BigDecimal("25.00"), BRL))),
                 TTL, CLOCK);
-        order.attachCharge("ch_123");
-        when(orderGateway.findByChargeId("ch_123")).thenReturn(Optional.of(order));
+        order.attachCharge(ChargeID.from("ch_123"));
+        when(orderGateway.findByChargeId(ChargeID.from("ch_123"))).thenReturn(Optional.of(order));
         when(ticketGateway.create(any())).thenAnswer(returnsFirstArg());
         when(orderGateway.update(any())).thenAnswer(returnsFirstArg());
         return order;
@@ -67,13 +72,17 @@ class ConfirmPaymentUseCaseTest extends UseCaseTest {
     @DisplayName("Given paid charge, when execute, then settles order and issues tickets")
     void givenPaidCharge_whenExecute_thenSettlesAndIssuesTickets() {
         final var order = givenChargedOrder();
+        when(paymentGateway.findStatus(ChargeID.from("ch_123"))).thenReturn(Charge.create(
+                ChargeID.from("ch_123"), order.getId(), order.getTotal(), ChargeStatus.PENDING,
+                "PIX-MOCK-ch_123"));
 
         final var output = useCase.execute(ConfirmPaymentCommand.with("ch_123", "PAID")).getRight();
 
         assertNotNull(output);
         assertEquals(order.getId().getValue(), output.orderId());
         assertEquals(OrderStatus.PAID.name(), output.orderStatus());
-        verify(orderGateway, times(1)).findByChargeId("ch_123");
+        verify(orderGateway, times(1)).findByChargeId(ChargeID.from("ch_123"));
+        verify(paymentGateway, times(1)).findStatus(ChargeID.from("ch_123"));
         verify(ticketGateway, times(2)).create(any());
         verify(orderGateway, times(1)).update(any());
     }
@@ -86,7 +95,7 @@ class ConfirmPaymentUseCaseTest extends UseCaseTest {
         final var output = useCase.execute(ConfirmPaymentCommand.with("ch_123", "FAILED")).getRight();
 
         assertEquals(OrderStatus.PENDING.name(), output.orderStatus());
-        verify(orderGateway, times(1)).findByChargeId("ch_123");
+        verify(orderGateway, times(1)).findByChargeId(ChargeID.from("ch_123"));
         verify(ticketGateway, times(0)).create(any());
         verify(orderGateway, times(0)).update(any());
     }
@@ -94,13 +103,13 @@ class ConfirmPaymentUseCaseTest extends UseCaseTest {
     @Test
     @DisplayName("Given unknown charge, when execute, then returns not found")
     void givenUnknownCharge_whenExecute_thenReturnsNotFound() {
-        when(orderGateway.findByChargeId("ch_missing")).thenReturn(Optional.empty());
+        when(orderGateway.findByChargeId(ChargeID.from("ch_missing"))).thenReturn(Optional.empty());
 
         final var notification =
                 useCase.execute(ConfirmPaymentCommand.with("ch_missing", "PAID")).getLeft();
 
         assertEquals("Charge not found: ch_missing", notification.firstError().message());
-        verify(orderGateway, times(1)).findByChargeId("ch_missing");
+        verify(orderGateway, times(1)).findByChargeId(ChargeID.from("ch_missing"));
     }
 
     @Test
@@ -121,7 +130,7 @@ class ConfirmPaymentUseCaseTest extends UseCaseTest {
         final var output = useCase.execute(ConfirmPaymentCommand.with("ch_123", "PAID")).getRight();
 
         assertEquals(OrderStatus.PAID.name(), output.orderStatus());
-        verify(orderGateway, times(1)).findByChargeId("ch_123");
+        verify(orderGateway, times(1)).findByChargeId(ChargeID.from("ch_123"));
         verify(ticketGateway, times(0)).create(any());
     }
 }

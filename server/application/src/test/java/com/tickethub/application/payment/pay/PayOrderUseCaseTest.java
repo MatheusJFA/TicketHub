@@ -28,6 +28,7 @@ import com.tickethub.domain.core.order.OrderGateway;
 import com.tickethub.domain.core.order.OrderID;
 import com.tickethub.domain.core.order.OrderItem;
 import com.tickethub.domain.core.payment.Charge;
+import com.tickethub.domain.core.payment.ChargeID;
 import com.tickethub.domain.core.payment.ChargeStatus;
 import com.tickethub.domain.core.payment.PaymentGateway;
 import com.tickethub.domain.core.spot.SpotID;
@@ -57,7 +58,7 @@ class PayOrderUseCaseTest extends UseCaseTest {
     }
 
     private Charge givenCharge(final Order order) {
-        return new Charge("ch_123", order.getId(), order.getTotal(), ChargeStatus.PENDING,
+        return Charge.create(ChargeID.from("ch_123"), order.getId(), order.getTotal(), ChargeStatus.PENDING,
                 "PIX-MOCK-ch_123");
     }
 
@@ -87,16 +88,16 @@ class PayOrderUseCaseTest extends UseCaseTest {
     void givenChargedOrder_whenExecute_thenReturnsCurrentCharge() {
         final var order = givenOrder();
         final var charge = givenCharge(order);
-        order.attachCharge(charge.chargeId());
+        order.attachCharge(charge.getChargeId());
         when(orderGateway.findById(order.getId())).thenReturn(Optional.of(order));
-        when(paymentGateway.findStatus("ch_123")).thenReturn(charge);
+        when(paymentGateway.findStatus(ChargeID.from("ch_123"))).thenReturn(charge);
 
         final var output = useCase.execute(PayOrderCommand.with(order.getId().getValue())).getRight();
 
         assertEquals("ch_123", output.chargeId());
         verify(orderGateway, times(1)).findById(order.getId());
         verify(paymentGateway, times(0)).createCharge(any(), any());
-        verify(paymentGateway, times(1)).findStatus("ch_123");
+        verify(paymentGateway, times(1)).findStatus(ChargeID.from("ch_123"));
     }
 
     @Test

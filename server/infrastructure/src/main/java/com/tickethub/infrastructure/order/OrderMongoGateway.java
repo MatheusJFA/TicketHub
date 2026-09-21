@@ -13,6 +13,7 @@ import com.tickethub.domain.core.order.Order;
 import com.tickethub.domain.core.order.OrderGateway;
 import com.tickethub.domain.core.order.OrderID;
 import com.tickethub.domain.core.order.OrderStatus;
+import com.tickethub.domain.core.payment.ChargeID;
 import com.tickethub.infrastructure.order.persistence.OrderDocument;
 import com.tickethub.infrastructure.order.persistence.OrderRepository;
 
@@ -39,9 +40,9 @@ public class OrderMongoGateway implements OrderGateway {
     }
 
     @Override
-    public Optional<Order> findByChargeId(final String chargeId) {
+    public Optional<Order> findByChargeId(final ChargeID chargeId) {
         requireNonNull(chargeId, "'chargeId' should not be null");
-        return repository.findByChargeId(chargeId).map(OrderDocument::toDomain);
+        return repository.findByChargeId(chargeId.getValue()).map(OrderDocument::toDomain);
     }
 
     @Override

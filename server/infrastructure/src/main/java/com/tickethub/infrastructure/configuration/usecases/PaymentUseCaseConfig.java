@@ -36,6 +36,6 @@ public class PaymentUseCaseConfig {
 
     @Bean
     public ConfirmPaymentUseCase confirmPaymentUseCase() {
-        return new DefaultConfirmPaymentUseCase(orderGateway, ticketGateway, ticketSigner);
+        return new DefaultConfirmPaymentUseCase(orderGateway, ticketGateway, ticketSigner, paymentGateway);
     }
 }
