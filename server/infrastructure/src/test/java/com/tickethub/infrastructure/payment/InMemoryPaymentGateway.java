@@ -42,4 +42,13 @@ public class InMemoryPaymentGateway implements PaymentGateway {
         return Optional.ofNullable(charges.get(chargeId.getValue()))
                 .orElseThrow(() -> new ResourceNotFoundException("Charge", chargeId.getValue()));
     }
+
+    @Override
+    public void refund(final ChargeID chargeId) {
+        requireNonNull(chargeId, "'chargeId' should not be null");
+        final var charge = findStatus(chargeId);
+        if (charge.getStatus() == ChargeStatus.PENDING) {
+            charge.markAsFailed();
+        }
+    }
 }
