@@ -30,6 +30,14 @@ leitura deve dar baixa no ingresso para impedir reuso do mesmo QR.
 - **Respostas:** 200 válido (detalhes + `checkedInAt`), 404 spot/show
   inexistente, 422 vínculo/data/reuso.
 
+## Alternativas consideradas
+
+- **JWT assinado como ingresso (offline):** descartado — permitiria validar sem leitura ao banco, mas revogação (reembolso, cancelamento) exigiria denylist; a leitura indexada ao `SpotDocument` já é rápida e dá baixa atômica.
+- **Código aleatório/opaco por ingresso (tabela `tickets`):** descartado — novo agregado + índice + ciclo de vida para o que `showId:sectionId:spotId` + `available` já expressam sem estado novo.
+- **Código de barras unidimensional:** descartado — menor densidade que QR para o triplo `showId:sectionId:spotId` e leitura mais lenta no app do segurança.
+- **NFC/pulseira:** descartado — exige hardware na porta e logística de mídia física; QR no celular zera o custo.
+- **Check-in sem baixa (só consulta):** descartado — permitiria reuso do mesmo QR; `Spot.checkIn()` com `available=false` torna a segunda leitura 422.
+
 ## Consequências
 
 - **Pró:** validação e baixa atômicas no caso de uso; sem estado novo no

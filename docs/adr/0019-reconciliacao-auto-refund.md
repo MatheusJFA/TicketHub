@@ -28,6 +28,14 @@ com callback atrasado era rejeitada pelo relógio de processamento
   persistidas); ausente = trata como agora (conservador: reembolsa).
 - Scheduler limpa o cache `spots` só quando a rodada mudou disponibilidade.
 
+## Alternativas consideradas
+
+- **Só webhook, sem reconciliação:** descartado — era o estado anterior; PIX aprovado com callback perdido deixava dinheiro capturado e pedido `PENDING` expirado sem ingresso nem devolução.
+- **Expirar sem reembolsar (suporte manual):** descartado — empurra o prejuízo ao cliente e gera ticket de suporte por venda; auto-refund via `POST /v1/payments/{id}/refunds` fecha o loop sem intervenção.
+- **SAGA orquestrada (coordenador dedicado):** descartada — motor de saga/eventos para dois estados (`PENDING`→`PAID`/`REFUNDED`) é excesso; scheduler a cada 2min sobre pedidos expirados com cobrança basta.
+- **DLQ do webhook como reconciliação:** descartada — sem DLT no Kafka hoje (ADR-003) e DLQ só cobre falha de consumo, não callback nunca entregue pelo provedor.
+- **Estorno sem releitura (confiar no 2xx):** descartado — 2xx do `refunds` sem `findStatus` de confirmação marcaria `REFUNDED` sem garantia; a releitura confirma o estado real.
+
 ## Consequências
 
 - **Pró:** dinheiro nunca estranda (liquida ou devolve); webhook perdido vira

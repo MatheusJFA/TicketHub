@@ -16,6 +16,14 @@ Resilience4j aplicado pelo `UseCaseMonitoringAspect` (`@Around` em `*UseCase.exe
 - Circuito aberto vira **503** (`ResponseStatusException`), reaproveitando o contrato OpenAPI. Sem persistência configurada a aplicação falha rápido no boot (sem stubs de fallback).
 - Tudo configurável por env (`RESILIENCE_*`); sem política carregada, pass-through.
 
+## Alternativas consideradas
+
+- **Spring Retry (`@Retryable` por adapter):** descartado — exigiria anotar cada adapter individualmente e não oferece circuit breaker nativo; a cobertura transversal via aspecto cobre ~40 casos de uso num ponto só.
+- **Netflix Hystrix:** descartado — em modo de manutenção/descontinuado; Resilience4j é o sucessor leve e suportado.
+- **Retry manual com `try/catch` nos casos de uso:** descartado — poluiria `application` com política de infra, violando o ADR-001 (aplicação framework-free).
+- **Service mesh (Istio/Linkerd) para retry/CB:** descartado — desloca resiliência para a malha, mas exige Kubernetes + sidecars fora do escopo do Compose atual; retry de camada 7 não distingue 404/422 de falha transitória sem inspeção de corpo.
+- **Fail-fast sem retry nem breaker:** descartado — qualquer soluço de MongoDB/Kafka viraria 500 imediato e picos de venda esgotariam threads.
+
 ## Consequências
 
 - **Pró:** um ponto único de resiliência para ~40 casos de uso, sem try/catch por endpoint; controllers chamam casos de uso diretamente.

@@ -26,6 +26,13 @@ persistir.
   como porta + adapter do lookup dedicado (contrato fail-open continua
   valendo).
 
+## Alternativas consideradas
+
+- **Manter enriquecimento automático no create/update:** descartado — cada cadastro pagava latência do ViaCEP e herdava o ponto de falha; o endereço do cliente já basta para persistir.
+- **Remover CEP por completo (sem endpoint):** descartado — perderia o autofill do formulário, UX que o ADR-011 já havia entregue; `GET /zipcode/{zipCode}` preserva o valor sem o acoplamento.
+- **Frontend chamando ViaCEP direto:** descartado — cada cliente reimplementaria timeout, normalização (`ZipCodeAddress`) e tratamento de `erro:true`; o backend centraliza o contrato fail-open.
+- **Enriquecimento assíncrono pós-cadastro (job/evento):** descartado — complexidade de worker + estado "endereço pendente" para ganho nulo: o dado cru já é suficiente e o autofill pré-cadastro resolve a UX.
+
 ## Consequências
 
 - **Pró:** cadastro sem dependência de rede do provedor; UX de autofill

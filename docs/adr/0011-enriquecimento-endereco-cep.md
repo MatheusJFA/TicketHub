@@ -29,6 +29,14 @@ adapters.
   parceiro enriquecem antes de persistir. Falha do provedor não quebra o
   cadastro (fail-open, exigido para não travar vendas/cadastros).
 
+## Alternativas consideradas
+
+- **BrasilAPI como provedor principal:** descartada — API agregadora com rate-limit mais agressivo e contrato menos estável que o ViaCEP para o caso simples de CEP→endereço.
+- **API dos Correios (oficial):** descartada — exige contrato/chave e tem disponibilidade irregular; ViaCEP gratuito sem chave zera o atrito.
+- **OpenCEP/BuscaCEP agregadores pagos:** descartados — custo sem necessidade; o fail-open já tolera a gratuidade do ViaCEP.
+- **Enriquecimento no frontend (browser chama ViaCEP direto):** descartado na época — duplicaria a integração em cada cliente e impediria normalização central (`ZipCodeAddress`, `Address.enrichedWith`); a decisão foi revista no ADR-013 com o endpoint dedicado `GET /zipcode`.
+- **Fail-closed (rejeitar cadastro se o provedor falhar):** descartado — indisponibilidade do ViaCEP não pode travar vendas/cadastros; contrato fail-open foi exigido.
+
 ## Consequências
 
 - **Pró:** um lugar só para evoluir HTTP de saída (retry/CB podem entrar na

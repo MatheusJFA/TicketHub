@@ -18,6 +18,14 @@ Auditoria em três camadas, sem tocar nos casos de uso:
 
 A escrita na trilha é **best-effort**: falha de auditoria loga `warn` e nunca quebra a requisição.
 
+## Alternativas consideradas
+
+- **Event sourcing completo:** descartado — reescrever agregados como sequência de eventos é migração profunda; `audit_logs` entrega "quem fez o quê" sem trocar o modelo de persistência.
+- **Triggers/change streams do MongoDB:** descartados — capturam mudança de dado, mas não ator, correlationId nem outcome do caso de uso (404/422/503).
+- **Apenas logs de aplicação (sem coleção dedicada):** descartado — grep em log não permite consulta por `correlationId`/ator nem retenção consultável para conciliação.
+- **Serviço externo de auditoria (SaaS dedicado):** descartado — dependência de rede + custo + dados sensíveis fora da base; a porta `AuditTrail` permite plugar um sink externo depois sem tocar casos de uso.
+- **Auditoria síncrona fail-closed (quebra o request se falhar):** descartada — indisponibilidade da trilha não pode derrubar venda de ingresso; best-effort com `warn` foi a escolha.
+
 ## Consequências
 
 - **Pró:** auditoria transversal sem poluir domínio/aplicação; quando o login chegar, a trilha vira por-usuário sem mudança (o ator passa a ser o `sub` do token).

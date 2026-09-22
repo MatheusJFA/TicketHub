@@ -15,6 +15,13 @@ MongoDB 8.0 como banco principal, via Spring Data MongoDB (`MongoTemplate`), com
 - Migrações com Liquibase + extensão MongoDB (coleções e índices versionados em `db/changelog`).
 - Índices únicos em `customers.cpf` e `partners.cnpj`; índices de consulta em `shows.partnerId`, `sections.showId`, `spots.sectionId`.
 
+## Alternativas consideradas
+
+- **PostgreSQL/MySQL (relacional):** descartado — o catálogo (show + sections + spots) exigiria joins em toda leitura quente e migrações de schema mais rígidas; o modelo é lido como documento agregado.
+- **DynamoDB:** descartado — single-table design imporia remodelagem completa e custo/lock-in de nuvem sem ganho para o volume atual; índices locais/secundários complicariam ownership.
+- **Cassandra/ScyllaDB:** descartado — otimizado para escrita massiva distribuída, exagero para catálogo com leitura dominante e consultas ad-hoc por `partnerId`/`showId`.
+- **SQLite/H2 embarcado:** descartado — serve para protótipo local, mas sem replicação, índices parciais avançados nem paridade com produção.
+
 ## Consequências
 
 - **Pró:** modelo de leitura simples, sem joins para o catálogo; evolução de schema sem migrações pesadas.

@@ -25,6 +25,14 @@ assentos duas vezes (até duas cobranças PIX). O `pay` já era idempotente
 - **Reserva nunca passa pelo replay:** a releitura só devolve pedido já
   persistido; a decisão de reserva continua atômica no Mongo.
 
+## Alternativas consideradas
+
+- **Tabela separada `idempotency_keys`:** descartada — nova coleção + ciclo de vida (TTL, limpeza) para o que um campo nullable + índice esparso em `orders` já resolve, seguindo o padrão `uq_orders_chargeId`.
+- **Chave de idempotência no Redis:** descartada — introduziria dependência de escrita no caminho do checkout (e janelas de divergência Redis↔Mongo); o índice único do Mongo é a própria trava atômica.
+- **Token de idempotência no body:** descartado — exige mudar contrato de criação e cada cliente gerar UUID; header `Idempotency-Key` é a convenção (Stripe/MP) e mantém o body intacto.
+- **Dedup por (customerId + showId + spots):** descartado — recompra legítima dos mesmos assentos em sessões diferentes seria falsamente deduplicada; chave explícita define a intenção.
+- **Sem idempotência (culpar o cliente):** descartado — era o estado anterior; duplo clique/retry abria dois pedidos, travava assentos duas vezes e gerava duas cobranças PIX.
+
 ## Consequências
 
 - **Pró:** retry seguro no checkout; corrida resolve para um único pedido;

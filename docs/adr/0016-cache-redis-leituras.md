@@ -35,6 +35,14 @@ de reserva nunca pode sair do cache.
   os DTOs são records com `Instant`, que o serializer padrão do Spring Data
   Redis não suporta — sem isso, a primeira escrita no cache quebra.
 
+## Alternativas consideradas
+
+- **Caffeine local (in-process):** descartado — cada réplica teria visão própria; invalidação (`@CacheEvict`) não atravessa instâncias e o stale divergiria entre pods.
+- **Memcached:** descartado — sem integração nativa com Spring Cache; exigiria adapter manual para o que `spring-boot-starter-data-redis` entrega pronto.
+- **Hazelcast/Infinispan (grid embarcado):** descartados — protocolo de cluster próprio e operação mais pesada; Redis no Compose + Testcontainers já cobre compartilhamento com TTL.
+- **Read replicas do MongoDB:** descartadas — aliviam primário, mas sem TTL/invalidação por agregado; spots continuariam batendo no banco a cada request.
+- **Sem cache (só índices Mongo):** descartado — era o estado anterior; todo `GET` de catálogo pagava round-trip ao Mongo no caminho quente.
+
 ## Consequências
 
 - **Pró:** leitura de catálogo sai do Mongo no caminho quente; invalidação

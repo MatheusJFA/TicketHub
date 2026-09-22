@@ -42,6 +42,15 @@ provedor, a aplicação faz fail-fast na subida.
   com o provedor via `findStatus`, então nenhum formato específico do MP vaza
   para os casos de uso.
 
+## Alternativas consideradas
+
+- **Stripe:** descartado — PIX via Stripe tem disponibilidade/cobertura menor no Brasil frente ao Mercado Pago; `qr_code` do MP casa direto com `Charge.paymentCode`.
+- **PagSeguro/PagBank:** descartado — SDK e webhooks com documentação instável; API PIX do MP (`POST /v1/payments`) é direta via `RestClient` sem dependência nova.
+- **Adyen/Ebanx:** descartados — enterprise/global com onboarding pesado (contrato, KYB) para o estágio atual.
+- **Checkout Pro (redirect `init_point`):** descartado — retorna URL de redirect, não código de pagamento; quebraria o modelo `Charge.paymentCode` (copia-e-cola).
+- **SDK oficial `mercadopago-sdk-java`:** descartado — dependência pesada para dois calls (criar + consultar); `BaseHttpClient` + `MockRestServiceServer` já seguem o padrão ViaCEP (ADR-011) sem rede nos testes.
+- **Boleto/cartão como primeiro método:** descartados — boleto tem compensação lenta (incompatível com reserva de assento com TTL) e cartão exige PCI/tokenização; PIX liquida em segundos.
+
 ## Consequências
 
 - **Pró:** domínio e aplicação intactos; falha de configuração aparece no boot

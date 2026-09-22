@@ -35,6 +35,14 @@ aplica o status **do comando**, não o do provedor.
   pública configurada (`MERCADOPAGO_NOTIFICATION_URL`, omitida se vazia), com
   `X-Idempotency-Key` = orderId.
 
+## Alternativas consideradas
+
+- **Polling de status (sem webhook):** descartado — latência de liquidação viraria intervalo de poll e carga contínua na API do MP; push com verify-then-fetch liquida em segundos.
+- **mTLS no callback:** descartado — o MP não oferece client-certificate nesse webhook; HMAC com `webhook-secret` é o mecanismo da spec oficial.
+- **Allowlist de IPs do MP:** descartada — faixas mudam sem aviso e IP spoofável não prova autenticidade do corpo; HMAC sobre o manifest prova posse do secret.
+- **JWT/bearer no callback:** descartado — o MP não autentica com token nosso; a verificação HMAC-SHA256 em tempo constante cumpre o papel sem cooperação extra.
+- **Confiar no status do body (genérico puro):** descartado — era a vulnerabilidade que motivou o ADR (forjar `PAID` emitia ingressos); o body nunca fornece status, só `data.id` para `findStatus`.
+
 ## Consequências
 
 - **Pró:** callback forjado não liquida mais nada; redelivery do MP é

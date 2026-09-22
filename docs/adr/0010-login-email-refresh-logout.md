@@ -35,6 +35,14 @@ com revogação e proteção contra brute-force.
   (puros, sem framework) para guards de null/string/coleção; `ArchitectureTest`
   atualizado.
 
+## Alternativas consideradas
+
+- **JWT longo sem refresh (ex.: 24h):** descartado — janela de abuso grande após vazamento, sem revogação; access curto + refresh rotativo limita o dano.
+- **Sessão opaca só no servidor (sem JWT):** descartada — cada request exigiria lookup em `refresh_sessions`; JWT stateless mantém leitura sem I/O, com refresh opaco só na renovação.
+- **Refresh JWT (stateless) em vez de opaco:** descartado — token stateless não é revogável; logout real exige identificador persistido (hash SHA-256 + `familyId`) para revogar a família.
+- **Keycloak/OIDC como IdP:** descartado por enquanto — segue como evolução; IdP externo adiciona operação (realm, clientes) antes de existir sequer cadastro local com `ownerId`.
+- **Rate-limit distribuído (Redis) já de início:** descartado — filtro por IP em memória basta para o volume atual; estado distribuído entra quando houver múltiplas réplicas.
+
 ## Consequências
 
 - **Pró:** cadastro vira conta de verdade (`ownerId` = ID do agregado, sem

@@ -17,6 +17,14 @@ A API nasceu aberta. Era preciso autenticar atores (cliente, parceiro, admin) e 
 - Ownership fino de `Section`/`Spot`: `@showAccess.canWriteSection/canWriteSpot` (e variantes publish/delete) resolvem o dono via campos denormalizados (`partnerId`, fallback `showId`) — 1 leitura indexada no fast path. Updates avulsos preservam os vínculos; documentos órfãos/legados sem vínculo negam escrita para não-admin (fail-closed).
 - `@EnableMethodSecurity(proxyTargetClass = true)`: sem CGLIB, os proxies JDK escondem os controllers e zeram os mappings no Spring Boot 4.
 
+## Alternativas consideradas
+
+- **Keycloak/OIDC externo:** descartado por enquanto — registrado como evolução (ADR-010); excesso operacional (realm, clientes, rotação) para três papéis e ownership por `partnerId`.
+- **Sessão server-side (cookie + store):** descartada — exigiria store compartilhado (Redis/DB) e CSRF; JWT stateless escala sem estado de sessão.
+- **RBAC só com roles (`hasRole`), sem permissões:** descartado — granularidade como `section:publish` vs. `spot:write` exigiria explosão de roles; permissões como authorities evitam isso.
+- **ACL por objeto (Spring ACL):** descartada — tabela de ACEs por show/section/spot é pesada para regra simples ("dono do `partnerId`"); ownership via claim `ownerId` + leitura indexada resolve em 1 query.
+- **ABAC genérico (políticas OPA/Cedar):** descartado — poder expressivo desnecessário agora; custo de policy engine externa sem casos de atributo além de dono/papel.
+
 ## Consequências
 
 - **Pró:** granularidade sem explosão administrativa; testes com JWT real cobrem 401/403/200 e a matriz (`ApiAuthorizationTest` trava drift via reflection).

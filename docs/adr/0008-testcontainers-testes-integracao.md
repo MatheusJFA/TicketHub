@@ -19,6 +19,13 @@ Seguir o padrão FC3 adaptado para MongoDB/Kafka:
 
 Notas de versão: BOM Testcontainers **2.0.5** com artefatos `testcontainers-*` (na 1.21 os nomes são curtos — `mongodb`, `kafka`); docker-java precisa falar API ≥ 1.40 com o daemon atual.
 
+## Alternativas consideradas
+
+- **H2/Fongo/Mongo embarcado em memória:** descartado — sem paridade com MongoDB 8.0/Kafka 3.9.1 reais (índices, replica set, protocolo Kafka); teste passaria no falso e quebraria em produção.
+- **Compose manual antes da suíte (`docker-compose up`):** descartado — era o estado anterior; quebra CI, exige passo manual e vaza estado entre execuções.
+- **Mocks dos gateways em todos os ITs:** descartado — testa o mock, não o adapter (`MongoTemplate`, `KafkaAdmin`, Liquibase); migrações e serialização ficariam sem cobertura.
+- **Embedded Kafka (spring-kafka-test):** descartado — versão do broker embarcado diverge do Compose; Testcontainers usa as mesmas imagens da produção.
+
 ## Consequências
 
 - **Pró:** `mise run integration` funciona só com Docker, sem Compose; paridade de versões com produção.

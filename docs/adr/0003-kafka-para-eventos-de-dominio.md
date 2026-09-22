@@ -22,6 +22,14 @@ Apache Kafka 3.9.1 em modo KRaft (broker único, sem ZooKeeper), tópico `ticket
   grafo. O consumidor é idempotente (pula sections completas); falha de publicação
   degrada para geração síncrona no próprio request.
 
+## Alternativas consideradas
+
+- **RabbitMQ:** descartado — roteamento por exchange/fila é ótimo para tasks, mas replay de eventos e particionamento por `showId` (ordenação por show) são naturais no log particionado do Kafka.
+- **SQS/SNS gerenciado:** descartado — lock-in de nuvem e custo operacional externo; FIFO com ordenação estrita teria throughput menor para geração de spots em lote.
+- **Redis Pub/Sub:** descartado — sem persistência/replay; queda do consumidor perderia `SpotsGenerationRequested` sem redelivery confiável.
+- **Spring ApplicationEvents (in-process):** descartado — não atravessa instâncias e acopla geração de spots ao request; sem backpressure nem retry fora do processo.
+- **Outbox transacional + polling:** avaliado como evolução futura, não para agora — adiciona tabela de outbox e relay; o produtor idempotente + consumidor idempotente cobre o estágio atual.
+
 ## Consequências
 
 - **Pró:** desacoplamento entre escrita e reações; replay de eventos.
