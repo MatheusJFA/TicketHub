@@ -26,21 +26,25 @@ public class MercadoPagoClient extends BaseHttpClient {
     }
 
     public PaymentResponse createPixPayment(final BigDecimal amount, final String description,
-            final String externalReference, final String payerEmail) {
+            final String externalReference, final String payerEmail, final String notificationUrl) {
         requireNonNull(amount, "'amount' should not be null");
         requireNonNull(externalReference, "'externalReference' should not be null");
         requireNonNull(payerEmail, "'payerEmail' should not be null");
         try {
+            final var body = new java.util.HashMap<String, Object>(Map.of(
+                    "transaction_amount", amount,
+                    "description", description,
+                    "payment_method_id", "pix",
+                    "payer", Map.of("email", payerEmail),
+                    "external_reference", externalReference));
+            if (notificationUrl != null && !notificationUrl.isBlank()) {
+                body.put("notification_url", notificationUrl);
+            }
             final var response = restClient.post()
                     .uri("/v1/payments")
                     .header("X-Idempotency-Key", externalReference)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(Map.of(
-                            "transaction_amount", amount,
-                            "description", description,
-                            "payment_method_id", "pix",
-                            "payer", Map.of("email", payerEmail),
-                            "external_reference", externalReference))
+                    .body(body)
                     .retrieve()
                     .toEntity(PaymentResponse.class);
             return requireNonNull(response.getBody(),
