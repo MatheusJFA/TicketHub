@@ -197,4 +197,56 @@ class OrderTest {
 
         assertTrue(notification.getErrors().isEmpty());
     }
+
+    @Test
+    @DisplayName("Given in-time approval, when mark as paid at, then settles after expiry")
+    void givenInTimeApproval_whenMarkAsPaidAt_thenSettles() {
+        final var order = Order.create(CustomerID.generate(), items(), TTL, CLOCK);
+
+        order.markAsPaidAt(CLOCK.instant().plus(Duration.ofMinutes(5)), CLOCK);
+
+        assertEquals(OrderStatus.PAID, order.getStatus());
+    }
+
+    @Test
+    @DisplayName("Given late approval, when mark as paid at, then expires")
+    void givenLateApproval_whenMarkAsPaidAt_thenExpires() {
+        final var order = Order.create(CustomerID.generate(), items(), TTL, CLOCK);
+
+        assertThrows(OrderExpiredException.class,
+                () -> order.markAsPaidAt(CLOCK.instant().plus(TTL).plusSeconds(1), CLOCK));
+        assertEquals(OrderStatus.EXPIRED, order.getStatus());
+    }
+
+    @Test
+    @DisplayName("Given paid order, when refund, then moves to refunded")
+    void givenPaidOrder_whenRefund_thenMovesToRefunded() {
+        final var order = Order.create(CustomerID.generate(), items(), TTL, CLOCK);
+        order.markAsPaid(CLOCK);
+
+        order.refund();
+
+        assertEquals(OrderStatus.REFUNDED, order.getStatus());
+        assertTrue(order.domainEvents().get(2) instanceof OrderRefunded);
+    }
+
+    @Test
+    @DisplayName("Given expired order, when refund, then moves to refunded")
+    void givenExpiredOrder_whenRefund_thenMovesToRefunded() {
+        final var order = Order.create(CustomerID.generate(), items(), TTL, CLOCK);
+        order.expireIfElapsed(CLOCK.instant().plus(TTL));
+
+        order.refund();
+
+        assertEquals(OrderStatus.REFUNDED, order.getStatus());
+    }
+
+    @Test
+    @DisplayName("Given pending order, when refund, then rejects transition")
+    void givenPendingOrder_whenRefund_thenRejects() {
+        final var order = Order.create(CustomerID.generate(), items(), TTL, CLOCK);
+
+        assertThrows(IllegalOrderTransitionException.class, order::refund);
+        assertEquals(OrderStatus.PENDING, order.getStatus());
+    }
 }

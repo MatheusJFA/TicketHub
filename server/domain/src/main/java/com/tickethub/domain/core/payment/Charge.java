@@ -2,6 +2,8 @@ package com.tickethub.domain.core.payment;
 
 import static java.util.Objects.requireNonNull;
 
+import java.time.Instant;
+
 import com.tickethub.domain.Entity;
 import com.tickethub.domain.core.order.OrderID;
 import com.tickethub.domain.exception.IllegalChargeTransitionException;
@@ -18,19 +20,26 @@ public class Charge extends Entity<ChargeID> {
     private final Money total;
     private ChargeStatus status;
     private final String paymentCode;
+    private final Instant approvedAt;
 
     private Charge(final ChargeID chargeId, final OrderID orderId, final Money total,
-            final ChargeStatus status, final String paymentCode) {
+            final ChargeStatus status, final String paymentCode, final Instant approvedAt) {
         super(chargeId);
         this.orderId = requireNonNull(orderId, "'orderId' should not be null");
         this.total = requireNonNull(total, "'total' should not be null");
         this.status = requireNonNull(status, "'status' should not be null");
         this.paymentCode = paymentCode;
+        this.approvedAt = approvedAt;
     }
 
     public static Charge create(final ChargeID chargeId, final OrderID orderId, final Money total,
             final ChargeStatus status, final String paymentCode) {
-        return new Charge(chargeId, orderId, total, status, paymentCode);
+        return new Charge(chargeId, orderId, total, status, paymentCode, null);
+    }
+
+    public static Charge create(final ChargeID chargeId, final OrderID orderId, final Money total,
+            final ChargeStatus status, final String paymentCode, final Instant approvedAt) {
+        return new Charge(chargeId, orderId, total, status, paymentCode, approvedAt);
     }
 
     public ChargeID getChargeId() {
@@ -51,6 +60,14 @@ public class Charge extends Entity<ChargeID> {
 
     public String getPaymentCode() {
         return paymentCode;
+    }
+
+    /**
+     * When the provider captured the money, if known. Reconciliation settles
+     * approvals inside the reservation TTL and refunds late ones.
+     */
+    public Instant getApprovedAt() {
+        return approvedAt;
     }
 
     /**

@@ -133,6 +133,41 @@ public class Order extends AggregateRoot<OrderID> {
     }
 
     /**
+     * Settles an order approved at {@code approvedAt}, even if the callback
+     * arrives late: the TTL applies to when the money was captured, not to
+     * when we processed it. Approvals past the expiry refund instead.
+     */
+    public void markAsPaidAt(final Instant approvedAt, final Clock clock) {
+        requireNonNull(approvedAt, "'approvedAt' should not be null");
+        requireNonNull(clock, "'clock' should not be null");
+        requirePendingFor(OrderStatus.PAID);
+        if (approvedAt.isAfter(expiresAt)) {
+            expire();
+            throw new OrderExpiredException();
+        }
+        this.status = OrderStatus.PAID;
+        markAsUpdated();
+        registerEvent(new OrderPaid(getId().getValue(), clock.instant()));
+    }
+
+    /**
+     * Returns captured money for a dead order (PAID refunded on request, or
+     * EXPIRED with a captured charge found by reconciliation). Terminal and
+     * idempotent like {@link #expire()}.
+     */
+    public void refund() {
+        if (status != OrderStatus.PAID && status != OrderStatus.EXPIRED) {
+            if (status == OrderStatus.REFUNDED) {
+                return;
+            }
+            throw new IllegalOrderTransitionException(status, OrderStatus.REFUNDED);
+        }
+        this.status = OrderStatus.REFUNDED;
+        markAsUpdated();
+        registerEvent(new OrderRefunded(getId().getValue(), Instant.now()));
+    }
+
+    /**
      * Expires an open order and releases its spots. Terminal orders are left
      * untouched (idempotent, like {@link #delete()}), except PAID which can
      * never expire.

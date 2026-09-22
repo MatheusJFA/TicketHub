@@ -22,3 +22,4 @@ Decisões arquiteturais do TicketHub, em ordem cronológica. Convenção: `NNNN-
 | [016](./0016-cache-redis-leituras.md) | Cache compartilhado de leitura em Redis | Aceito |
 | [017](./0017-webhook-mercado-pago-assinado.md) | Webhook do Mercado Pago com assinatura verificada | Aceito |
 | [018](./0018-idempotencia-criacao-pedidos.md) | Idempotency-Key na criação de pedidos | Aceito |
+| [019](./0019-reconciliacao-auto-refund.md) | Reconciliação de pagamentos e auto-refund | Aceito |

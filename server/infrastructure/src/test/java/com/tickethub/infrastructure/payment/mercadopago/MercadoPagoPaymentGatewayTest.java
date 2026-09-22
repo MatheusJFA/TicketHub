@@ -118,13 +118,15 @@ class MercadoPagoPaymentGatewayTest {
         fixture.server().expect(requestTo(BASE_URL + "/v1/payments/123"))
                 .andRespond(withSuccess("""
                         {"id":123,"status":"approved","transaction_amount":50.00,\
-                        "currency_id":"BRL","external_reference":"order-1"}\
+                        "currency_id":"BRL","external_reference":"order-1",\
+                        "date_approved":"2026-09-22T10:05:00.000-03:00"}\
                         """, MediaType.APPLICATION_JSON));
 
         final var charge = fixture.gateway().findStatus(ChargeID.from("123"));
 
         assertEquals(ChargeStatus.PAID, charge.getStatus());
         assertEquals("order-1", charge.getOrderId().getValue());
+        assertEquals(java.time.Instant.parse("2026-09-22T13:05:00Z"), charge.getApprovedAt());
         fixture.server().verify();
     }
 
@@ -156,6 +158,18 @@ class MercadoPagoPaymentGatewayTest {
 
         assertThrows(HttpUpstreamException.class,
                 () -> fixture.gateway().findStatus(ChargeID.from("123")));
+        fixture.server().verify();
+    }
+
+    @Test
+    @DisplayName("Given captured payment, when refund, then posts refund without error")
+    void givenCapturedPayment_whenRefund_thenPostsRefund() {
+        final var fixture = fixture();
+        fixture.server().expect(requestTo(BASE_URL + "/v1/payments/123/refunds"))
+                .andRespond(withSuccess("{}", MediaType.APPLICATION_JSON));
+
+        org.junit.jupiter.api.Assertions.assertDoesNotThrow(
+                () -> fixture.gateway().refund(ChargeID.from("123")));
         fixture.server().verify();
     }
 }
