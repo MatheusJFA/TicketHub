@@ -15,3 +15,7 @@ Decisões arquiteturais do TicketHub, em ordem cronológica. Convenção: `NNNN-
 | [009](./0009-cucumber-testes-aceitacao.md) | Testes de aceitação com Cucumber | Aceito |
 | [010](./0010-login-email-refresh-logout.md) | Login por email + refresh rotativo com revogação | Aceito |
 | [011](./0011-enriquecimento-endereco-cep.md) | Enriquecimento de endereço via CEP (ViaCEP) | Aceito |
+| [012](./0012-validacao-ingresso-qrcode.md) | Validação de ingresso via QR code | Aceito |
+| [013](./0013-cep-lookup-dedicado.md) | CEP lookup dedicado | Aceito |
+| [014](./0014-observabilidade-lgtm.md) | Observabilidade LGTM | Aceito |
+| [015](./0015-pagamento-pix-mercado-pago.md) | Pagamento PIX via Mercado Pago | Aceito |
