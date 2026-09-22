@@ -10,10 +10,12 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.tickethub.infrastructure.payment.PaymentGatewayTestConfiguration;
+
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-@SpringBootTest(classes = Main.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@SpringBootTest(classes = {Main.class, PaymentGatewayTestConfiguration.class}, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @ExtendWith(MongoCleanUpExtension.class)
 @Tag("integrationTest")
 public @interface IntegrationTest {

@@ -26,4 +26,10 @@
             <ext:options>{ "name": "idx_spots_sectionId" }</ext:options>
         </ext:createIndex>
     </changeSet>
+    <changeSet id="002-2-orders-idempotency-index" author="tickethub">
+        <ext:createIndex collectionName="orders">
+            <ext:keys>{ "idempotencyKey": 1 }</ext:keys>
+            <ext:options>{ "unique": true, "sparse": true, "name": "uq_orders_idempotencyKey" }</ext:options>
+        </ext:createIndex>
+    </changeSet>
 </databaseChangeLog>

@@ -104,6 +104,21 @@ class OrderMongoGatewayIT extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given an order with key, when find by idempotency key, then returns order")
+    void givenOrderWithKey_whenFindByIdempotencyKey_thenReturnsOrder() {
+        final var order = Order.create(CustomerID.generate(),
+                List.of(OrderItem.of(SpotID.generate(), Money.create(new BigDecimal("50.00"), BRL))),
+                TTL, Clock.systemUTC(), "key-1");
+        gateway.create(order);
+
+        final var found = gateway.findByIdempotencyKey("key-1").orElseThrow();
+
+        assertEquals(order.getId(), found.getId());
+        assertEquals("key-1", found.getIdempotencyKey());
+        assertTrue(gateway.findByIdempotencyKey("missing").isEmpty());
+    }
+
+    @Test
     @DisplayName("Given expired and open orders, when find pending expired, then returns only expired")
     void givenOrders_whenFindPendingExpired_thenReturnsOnlyExpired() {
         final var past = Clock.fixed(Instant.now().minus(TTL).minusSeconds(60), ZoneOffset.UTC);

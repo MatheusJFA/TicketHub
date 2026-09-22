@@ -29,5 +29,6 @@ public abstract class ContainerSupport {
         registry.add("spring.kafka.bootstrap-servers", KAFKA::getBootstrapServers);
         registry.add("spring.data.redis.host", REDIS::getHost);
         registry.add("spring.data.redis.port", () -> String.valueOf(REDIS.getMappedPort(6379)));
+        registry.add("tickethub.payment.mercadopago.access-token", () -> "test-access-token");
     }
 }

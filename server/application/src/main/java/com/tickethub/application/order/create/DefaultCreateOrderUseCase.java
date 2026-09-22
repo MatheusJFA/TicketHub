@@ -6,6 +6,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.customer.CustomerGateway;
@@ -57,6 +58,10 @@ public class DefaultCreateOrderUseCase extends CreateOrderUseCase {
     @Override
     public Either<Notification, CreateOrderOutput> execute(final CreateOrderCommand command) {
         try {
+            final var replayed = findReplay(command.idempotencyKey());
+            if (replayed.isPresent()) {
+                return Either.right(CreateOrderOutput.from(replayed.get()));
+            }
             final var customerId = CustomerID.from(command.customerId());
             if (customerGateway.findById(customerId).isEmpty()) {
                 return Either.left(notFound("Customer", customerId.getValue()));
@@ -95,16 +100,43 @@ public class DefaultCreateOrderUseCase extends CreateOrderUseCase {
                 items.add(OrderItem.of(spotId, price));
             }
 
-            final var order = Order.create(customerId, items, reservationTtl, clock);
+            final var order = Order.create(customerId, items, reservationTtl, clock,
+                    command.idempotencyKey());
             final Notification notification = Notification.create();
             order.validate(notification);
             if (notification.hasError()) {
                 releaseAll(reserved);
                 return Either.left(notification);
             }
-            return Either.right(CreateOrderOutput.from(orderGateway.create(order)));
+            return Either.right(CreateOrderOutput.from(persist(order)));
         } catch (final RuntimeException exception) {
             return Either.left(Notification.create(exception));
+        }
+    }
+
+    private Optional<Order> findReplay(final String idempotencyKey) {
+        if (idempotencyKey == null || idempotencyKey.isBlank()) {
+            return Optional.empty();
+        }
+        return orderGateway.findByIdempotencyKey(idempotencyKey);
+    }
+
+    /**
+     * Persists the reserved order. On concurrent retries with the same key the
+     * unique index rejects the second insert: re-read the winner and return it
+     * instead of failing. Framework-free on purpose (no Spring imports in the
+     * application layer): any persistence failure with a key falls back to a
+     * lookup, and only surfaces the error when nothing was stored.
+     */
+    private Order persist(final Order order) {
+        if (order.getIdempotencyKey() == null || order.getIdempotencyKey().isBlank()) {
+            return orderGateway.create(order);
+        }
+        try {
+            return orderGateway.create(order);
+        } catch (final RuntimeException conflict) {
+            return findReplay(order.getIdempotencyKey())
+                    .orElseThrow(() -> conflict);
         }
     }
 

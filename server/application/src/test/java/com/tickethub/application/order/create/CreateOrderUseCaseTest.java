@@ -28,7 +28,9 @@ import com.tickethub.application.UseCaseTest;
 import com.tickethub.domain.core.customer.Customer;
 import com.tickethub.domain.core.customer.CustomerID;
 import com.tickethub.domain.core.customer.CustomerGateway;
+import com.tickethub.domain.core.order.Order;
 import com.tickethub.domain.core.order.OrderGateway;
+import com.tickethub.domain.core.order.OrderItem;
 import com.tickethub.domain.core.order.OrderStatus;
 import com.tickethub.domain.core.section.Section;
 import com.tickethub.domain.core.section.SectionGateway;
@@ -184,5 +186,50 @@ class CreateOrderUseCaseTest extends UseCaseTest {
         verify(sectionGateway, times(1)).findById(any());
         verify(spotGateway, times(1)).update(any());
         assertFalse(first.isReserved());
+    }
+
+    @Test
+    @DisplayName("Given known idempotency key, when execute, then replays original order")
+    void givenKnownKey_whenExecute_thenReplaysOriginalOrder() {
+        final var customer = givenCustomer();
+        final var price = Money.create(new BigDecimal("50.00"), BRL);
+        final var original = Order.create(customer.getId(),
+                List.of(OrderItem.of(SpotID.generate(), price)), TTL, CLOCK, "key-1");
+        when(orderGateway.findByIdempotencyKey("key-1")).thenReturn(Optional.of(original));
+
+        final var output = useCase.execute(CreateOrderCommand.with(customer.getId().getValue(),
+                List.of("spot-9"), "key-1")).getRight();
+
+        assertEquals(original.getId().getValue(), output.orderId());
+        verify(orderGateway, times(1)).findByIdempotencyKey("key-1");
+        verify(customerGateway, times(0)).findById(any());
+        verify(spotGateway, times(0)).reserveIfAvailable(any());
+        verify(orderGateway, times(0)).create(any());
+    }
+
+    @Test
+    @DisplayName("Given concurrent retry, when insert conflicts, then replays winner")
+    void givenConcurrentRetry_whenInsertConflicts_thenReplaysWinner() {
+        final var customer = givenCustomer();
+        final var price = Money.create(new BigDecimal("50.00"), BRL);
+        final var section = givenSection(price);
+        final var spot = givenFreeSpot(section, "A1");
+        final var winner = Order.create(customer.getId(),
+                List.of(OrderItem.of(spot.getId(), price)), TTL, CLOCK, "key-1");
+        when(orderGateway.findByIdempotencyKey("key-1"))
+                .thenReturn(Optional.empty())
+                .thenReturn(Optional.of(winner));
+        when(orderGateway.create(any())).thenThrow(new RuntimeException("duplicate key"));
+
+        final var output = useCase.execute(CreateOrderCommand.with(customer.getId().getValue(),
+                List.of(spot.getId().getValue()), "key-1")).getRight();
+
+        assertEquals(winner.getId().getValue(), output.orderId());
+        verify(orderGateway, times(2)).findByIdempotencyKey("key-1");
+        verify(orderGateway, times(1)).create(any());
+        verify(customerGateway, times(1)).findById(customer.getId());
+        verify(spotGateway, times(1)).findPlacement(spot.getId());
+        verify(spotGateway, times(1)).reserveIfAvailable(spot.getId());
+        verify(sectionGateway, times(1)).findById(section.getId());
     }
 }

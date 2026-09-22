@@ -74,6 +74,25 @@ class OrderControllerTest {
     }
 
     @Test
+    @DisplayName("Given idempotency key, when creates order, then forwards key to use case")
+    void givenIdempotencyKey_whenCreatesOrder_thenForwardsKey() throws Exception {
+        when(createOrder.execute(any())).thenReturn(Either.right(created()));
+        final var captor = org.mockito.ArgumentCaptor.forClass(
+                com.tickethub.application.order.create.CreateOrderCommand.class);
+
+        mvc.perform(post("/orders")
+                        .header("Authorization", bearer("order:write"))
+                        .header("Idempotency-Key", "key-1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"customerId\":\"customer-1\",\"spotIds\":[\"spot-1\",\"spot-2\"]}"))
+                .andExpect(status().isCreated());
+
+        org.mockito.Mockito.verify(createOrder).execute(captor.capture());
+        org.assertj.core.api.Assertions.assertThat(captor.getValue().idempotencyKey())
+                .isEqualTo("key-1");
+    }
+
+    @Test
     @DisplayName("Given unavailable spot, when creates order, then returns unprocessable")
     void givenUnavailableSpot_whenCreatesOrder_thenReturnsUnprocessable() throws Exception {
         when(createOrder.execute(any())).thenReturn(Either.left(

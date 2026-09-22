@@ -21,3 +21,4 @@ Decisões arquiteturais do TicketHub, em ordem cronológica. Convenção: `NNNN-
 | [015](./0015-pagamento-pix-mercado-pago.md) | Pagamento PIX via Mercado Pago | Aceito |
 | [016](./0016-cache-redis-leituras.md) | Cache compartilhado de leitura em Redis | Aceito |
 | [017](./0017-webhook-mercado-pago-assinado.md) | Webhook do Mercado Pago com assinatura verificada | Aceito |
+| [018](./0018-idempotencia-criacao-pedidos.md) | Idempotency-Key na criação de pedidos | Aceito |

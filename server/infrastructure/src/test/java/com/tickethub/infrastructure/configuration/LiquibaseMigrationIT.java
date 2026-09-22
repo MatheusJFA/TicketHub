@@ -38,8 +38,8 @@ class LiquibaseMigrationIT extends ContainerSupport {
                 List.of("customers", "partners", "shows", "sections", "spots", "orders", "tickets")),
                 () -> "Database should contain all expected collections after migration");
         final var history = database.getCollection("DATABASECHANGELOG");
-        assertEquals(15, history.countDocuments(),
-                () -> "Changelog history should contain 15 applied changesets");
+        assertEquals(16, history.countDocuments(),
+                () -> "Changelog history should contain 16 applied changesets");
         final var appliedIds = history.find()
                 .into(new ArrayList<>())
                 .stream()
@@ -56,11 +56,12 @@ class LiquibaseMigrationIT extends ContainerSupport {
                 "006-2-create-refresh-sessions-indexes",
                 "007-1-create-orders",
                 "007-2-create-tickets",
-                "007-3-orders-tickets-indexes")),
+                "007-3-orders-tickets-indexes",
+                "002-2-orders-idempotency-index")),
                 () -> "Changelog history should contain all expected changeset ids");
         database.getCollection("customers").insertOne(new Document("_id", "preserved"));
         LiquibaseConfiguration.migrate(client, factory, CHANGELOG);
-        assertEquals(15, history.countDocuments(),
+        assertEquals(16, history.countDocuments(),
                 () -> "Re-running migration should not reapply changesets");
         assertNotNull(database.getCollection("customers").find(new Document("_id", "preserved")).first(),
                 () -> "Re-running migration should preserve existing customer data");

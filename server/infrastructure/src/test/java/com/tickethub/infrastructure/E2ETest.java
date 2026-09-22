@@ -13,10 +13,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.TestPropertySource;
 
+import com.tickethub.infrastructure.payment.PaymentGatewayTestConfiguration;
+
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-@SpringBootTest(classes = Main.class)
+@SpringBootTest(classes = {Main.class, PaymentGatewayTestConfiguration.class})
 @AutoConfigureMockMvc
 @ExtendWith(MongoCleanUpExtension.class)
 // E2E suites share the cached application context (and its per-IP rate
