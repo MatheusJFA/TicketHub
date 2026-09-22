@@ -74,6 +74,7 @@ tickethub:
     read-timeout: ${TICKETHUB_ZIPCODE_READ_TIMEOUT:5s}
   payment:
     generic-webhook-enabled: ${GENERIC_WEBHOOK_ENABLED:true}
+    reconcile-interval: ${PAYMENT_RECONCILE_INTERVAL:2m}
     mercadopago:
       enabled: ${MERCADOPAGO_ENABLED:true}
       base-url: ${MERCADOPAGO_BASE_URL:https://api.mercadopago.com}

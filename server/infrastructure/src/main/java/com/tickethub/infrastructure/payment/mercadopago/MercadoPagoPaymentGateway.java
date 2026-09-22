@@ -71,7 +71,15 @@ public class MercadoPagoPaymentGateway implements PaymentGateway {
                 response.currencyId() != null ? response.currencyId() : "BRL");
         final var total = Money.create(response.transactionAmount(), currency);
         return Charge.create(chargeId, OrderID.from(response.externalReference()), total,
-                mapStatus(response.status()), response.qrCode());
+                mapStatus(response.status()), response.qrCode(),
+                response.dateApproved() != null ? response.dateApproved().toInstant() : null);
+    }
+
+    @Override
+    public void refund(final ChargeID chargeId) {
+        requireNonNull(chargeId, "'chargeId' should not be null");
+        ensureEnabled();
+        client.refundPayment(chargeId.getValue());
     }
 
     private void ensureEnabled() {

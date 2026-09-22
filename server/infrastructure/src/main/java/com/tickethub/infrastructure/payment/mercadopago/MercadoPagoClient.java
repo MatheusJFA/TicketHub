@@ -3,6 +3,7 @@ package com.tickethub.infrastructure.payment.mercadopago;
 import static java.util.Objects.requireNonNull;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.Map;
 
 import org.springframework.http.MediaType;
@@ -59,6 +60,19 @@ public class MercadoPagoClient extends BaseHttpClient {
         return getRequired("/v1/payments/{id}", Map.of("id", paymentId), PaymentResponse.class);
     }
 
+    public void refundPayment(final String paymentId) {
+        requireNonNull(paymentId, "'paymentId' should not be null");
+        try {
+            restClient.post()
+                    .uri("/v1/payments/{id}/refunds", Map.of("id", paymentId))
+                    .header("X-Idempotency-Key", paymentId)
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (final RestClientException e) {
+            throw new HttpUpstreamException(provider, e);
+        }
+    }
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record PaymentResponse(
             Long id,
@@ -66,6 +80,7 @@ public class MercadoPagoClient extends BaseHttpClient {
             @JsonProperty("transaction_amount") BigDecimal transactionAmount,
             @JsonProperty("currency_id") String currencyId,
             @JsonProperty("external_reference") String externalReference,
+            @JsonProperty("date_approved") OffsetDateTime dateApproved,
             @JsonProperty("point_of_interaction") PointOfInteraction pointOfInteraction) {
 
         public String qrCode() {
