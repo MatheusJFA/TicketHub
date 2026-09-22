@@ -57,6 +57,14 @@ tickethub:
     base-url: ${TICKETHUB_ZIPCODE_BASE_URL:https://viacep.com.br}
     connect-timeout: ${TICKETHUB_ZIPCODE_CONNECT_TIMEOUT:5s}
     read-timeout: ${TICKETHUB_ZIPCODE_READ_TIMEOUT:5s}
+  payment:
+    mercadopago:
+      enabled: ${MERCADOPAGO_ENABLED:true}
+      base-url: ${MERCADOPAGO_BASE_URL:https://api.mercadopago.com}
+      access-token: ${MERCADOPAGO_ACCESS_TOKEN:}
+      payer-email: ${MERCADOPAGO_PAYER_EMAIL:buyer@tickethub.local}
+      connect-timeout: ${MERCADOPAGO_CONNECT_TIMEOUT:5s}
+      read-timeout: ${MERCADOPAGO_READ_TIMEOUT:5s}
   security:
     jwt:
       secret: ${TICKETHUB_JWT_SECRET:dev-only-change-me-in-production-0123456789abcdef}
