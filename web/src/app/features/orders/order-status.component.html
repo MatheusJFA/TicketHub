@@ -1,0 +1,29 @@
+<section>
+  <h1>Meu pedido</h1>
+  <form class="search" (ngSubmit)="lookup()">
+    <input name="orderId" [(ngModel)]="orderId" placeholder="ID do pedido" />
+    <button type="submit">Consultar</button>
+  </form>
+  @if (loading()) {
+    <p>Carregando…</p>
+  } @else if (error()) {
+    <p class="error">{{ error() }}</p>
+  } @else if (order()) {
+    <dl class="detail">
+      <dt>Pedido</dt>
+      <dd>{{ order()!.orderId }}</dd>
+      <dt>Status</dt>
+      <dd><strong>{{ order()!.status }}</strong></dd>
+      <dt>Total</dt>
+      <dd>{{ order()!.currency }} {{ order()!.totalValue }}</dd>
+      <dt>Expira em</dt>
+      <dd>{{ order()!.expiresAt }}</dd>
+      <dt>Assentos</dt>
+      <dd>{{ order()!.spotIds.join(', ') }}</dd>
+      @if (order()!.chargeId) {
+        <dt>Cobrança</dt>
+        <dd>{{ order()!.chargeId }}</dd>
+      }
+    </dl>
+  }
+</section>

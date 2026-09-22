@@ -1,0 +1,42 @@
+<section>
+  <h1>Checkout</h1>
+
+  @if (phase() === 'review') {
+    <ul class="cart">
+      @for (spot of cart.spots(); track spot.id) {
+        <li>{{ spot.location }}</li>
+      }
+    </ul>
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+    <button type="button" (click)="confirm()" [disabled]="cart.spots().length === 0">
+      Confirmar e gerar PIX
+    </button>
+    <p class="hint"><a routerLink="/seats">Voltar aos assentos</a></p>
+  }
+
+  @if (phase() === 'paying') {
+    <p>Reservando assentos e gerando cobrança…</p>
+  }
+
+  @if ((phase() === 'waiting' || phase() === 'done') && payment()) {
+    <p>Status do pedido: <strong>{{ order()?.status }}</strong></p>
+    <p>Pague com o código PIX copia e cola:</p>
+    <pre class="pix">{{ payment()!.paymentCode }}</pre>
+    <button type="button" (click)="copyCode()">Copiar código</button>
+    @if (phase() === 'waiting') {
+      <p class="hint">Aguardando confirmação do pagamento…</p>
+    } @else if (order()?.status === 'PAID') {
+      <p class="success">Pagamento confirmado! Seus ingressos foram emitidos.</p>
+      <p class="hint">Pedido {{ order()?.orderId }} · assentos: {{ order()?.spotIds?.join(', ') }}</p>
+    } @else {
+      <p class="error">Pedido {{ order()?.status }}. Fale com o suporte se você pagou.</p>
+    }
+  }
+
+  @if (phase() === 'error') {
+    <p class="error">{{ error() }}</p>
+    <button type="button" (click)="confirm()">Tentar novamente</button>
+  }
+</section>

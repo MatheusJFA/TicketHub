@@ -1,0 +1,22 @@
+<section>
+  <h1>Shows</h1>
+  @if (loading()) {
+    <p>Carregando…</p>
+  } @else if (error()) {
+    <p class="error">{{ error() }}</p>
+  } @else if (shows().length === 0) {
+    <p>Nenhum show publicado no momento.</p>
+  } @else {
+    <div class="cards">
+      @for (show of shows(); track show.id) {
+        <article class="card">
+          <h2>{{ show.name }}</h2>
+          <p class="muted">{{ show.date | date: 'dd/MM/yyyy HH:mm' }}</p>
+          <p>{{ show.description }}</p>
+          <p class="muted">{{ show.totalSpotsSold }} / {{ show.totalSpots }} vendidos</p>
+          <a [routerLink]="['/shows', show.id]">Ver detalhes</a>
+        </article>
+      }
+    </div>
+  }
+</section>

@@ -1,0 +1,33 @@
+<section>
+  <h1>Assentos</h1>
+  <form class="search" (ngSubmit)="load()">
+    <input name="search" [(ngModel)]="search" placeholder="Buscar por localização (ex.: A1)" />
+    <button type="submit">Buscar</button>
+  </form>
+  @if (loading()) {
+    <p>Carregando…</p>
+  } @else if (error()) {
+    <p class="error">{{ error() }}</p>
+  } @else {
+    <div class="seats">
+      @for (spot of spots(); track spot.id) {
+        <button
+          type="button"
+          class="seat"
+          [class.selected]="cart.contains(spot.id)"
+          [disabled]="!spot.available"
+          (click)="toggle(spot)"
+          [title]="spot.location">
+          {{ spot.location }}
+        </button>
+      }
+    </div>
+    <div class="cart-bar">
+      <span>{{ cart.spots().length }} selecionado(s)</span>
+      <button type="button" (click)="checkout()" [disabled]="cart.spots().length === 0">
+        Ir para o checkout
+      </button>
+    </div>
+    <p class="hint"><a routerLink="/">Voltar aos shows</a></p>
+  }
+</section>

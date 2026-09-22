@@ -5,3 +5,7 @@ server/target/
 server/.settings/
 server/.classpath
 server/.project
+
+# frontend
+web/node_modules/
+web/dist/
