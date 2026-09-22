@@ -1,0 +1,16 @@
+<header class="topbar">
+  <a routerLink="/" class="brand">TicketHub</a>
+  <nav>
+    <a routerLink="/">Shows</a>
+    <a routerLink="/seats">Assentos @if (cart.spots().length > 0) { ({{ cart.spots().length }}) }</a>
+    <a routerLink="/orders">Meu pedido</a>
+    @if (auth.isLoggedIn()) {
+      <button type="button" (click)="logout()">Sair</button>
+    } @else {
+      <a routerLink="/login">Entrar</a>
+    }
+  </nav>
+</header>
+<main>
+  <router-outlet />
+</main>

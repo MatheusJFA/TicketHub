@@ -1,0 +1,19 @@
+<section class="auth">
+  <h1>Entrar</h1>
+  <p class="hint">Use seu e-mail de cliente. Contas de demonstração estão no README do servidor.</p>
+  <form (ngSubmit)="submit()">
+    <label>
+      E-mail ou usuário
+      <input name="identifier" [(ngModel)]="identifier" required autocomplete="username" />
+    </label>
+    <label>
+      Senha
+      <input name="password" [(ngModel)]="password" type="password" required autocomplete="current-password" />
+    </label>
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+    <button type="submit" [disabled]="loading()">{{ loading() ? 'Entrando…' : 'Entrar' }}</button>
+  </form>
+  <p class="hint">Sem conta? <a routerLink="/signup">Cadastre-se</a></p>
+</section>

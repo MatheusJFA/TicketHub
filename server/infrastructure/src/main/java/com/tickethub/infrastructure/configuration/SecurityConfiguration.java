@@ -26,21 +26,28 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.tickethub.infrastructure.authentication.AuthSessionProperties;
 import com.tickethub.infrastructure.security.SecurityProperties;
+import com.tickethub.infrastructure.web.CorsProperties;
 
 @Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
 @EnableMethodSecurity(proxyTargetClass = true)
-@EnableConfigurationProperties({ SecurityProperties.class, AuthSessionProperties.class })
+@EnableConfigurationProperties({ SecurityProperties.class, AuthSessionProperties.class,
+        CorsProperties.class })
 public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(final HttpSecurity http, final JwtDecoder jwtDecoder,
-            final JwtAuthenticationConverter jwtAuthenticationConverter) throws Exception {
+            final JwtAuthenticationConverter jwtAuthenticationConverter,
+            final CorsConfigurationSource corsConfigurationSource) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login", "/auth/refresh", "/auth/logout", "/actuator/health",
@@ -79,6 +86,19 @@ public class SecurityConfiguration {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource(final CorsProperties properties) {
+        final var source = new UrlBasedCorsConfigurationSource();
+        final var config = new CorsConfiguration();
+        config.setAllowedOrigins(properties.getAllowedOrigins());
+        config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(java.util.List.of("Authorization", "Content-Type", "Idempotency-Key"));
+        config.setExposedHeaders(java.util.List.of("Location"));
+        config.setMaxAge(3600L);
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
     private static SecretKey secretKey(final SecurityProperties properties) {

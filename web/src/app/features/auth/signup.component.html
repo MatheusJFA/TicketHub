@@ -1,0 +1,26 @@
+<section class="auth">
+  <h1>Criar conta</h1>
+  <form (ngSubmit)="submit()">
+    <label>
+      CPF
+      <input name="cpf" [(ngModel)]="cpf" required inputmode="numeric" />
+    </label>
+    <label>
+      Nome
+      <input name="name" [(ngModel)]="name" required autocomplete="name" />
+    </label>
+    <label>
+      E-mail
+      <input name="email" [(ngModel)]="email" type="email" required autocomplete="email" />
+    </label>
+    <label>
+      Senha
+      <input name="password" [(ngModel)]="password" type="password" required autocomplete="new-password" />
+    </label>
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+    <button type="submit" [disabled]="loading()">{{ loading() ? 'Cadastrando…' : 'Cadastrar' }}</button>
+  </form>
+  <p class="hint">Já tem conta? <a routerLink="/login">Entrar</a></p>
+</section>

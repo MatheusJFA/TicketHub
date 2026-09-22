@@ -1,0 +1,17 @@
+@if (loading()) {
+  <p>Carregando…</p>
+} @else if (error() || !show()) {
+  <p class="error">{{ error() }}</p>
+} @else {
+  <section>
+    <h1>{{ show()!.name }}</h1>
+    <p class="muted">{{ show()!.date | date: 'dd/MM/yyyy HH:mm' }}</p>
+    <p>{{ show()!.description }}</p>
+    <p class="muted">
+      {{ show()!.address.street }}, {{ show()!.address.number }} —
+      {{ show()!.address.city }}/{{ show()!.address.state }}
+    </p>
+    <p class="muted">{{ show()!.totalSpotsSold }} / {{ show()!.totalSpots }} vendidos</p>
+    <a class="button" routerLink="/seats">Escolher assentos</a>
+  </section>
+}
