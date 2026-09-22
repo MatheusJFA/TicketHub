@@ -21,6 +21,9 @@ import org.springframework.http.ResponseEntity;
 import com.tickethub.infrastructure.api.ShowAPI;
 import com.tickethub.infrastructure.api.HttpResults;
 import com.tickethub.infrastructure.show.presenters.ShowMapper;
+import com.tickethub.infrastructure.cache.TickethubCacheProperties;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -71,76 +74,89 @@ public class ShowController implements ShowAPI {
     }
 
     @Override
+    @CacheEvict(value = TickethubCacheProperties.SHOWS, allEntries = true)
     public ResponseEntity<IdResponse> addSectionToShow(String id, AddSectionToShowRequest input) {
         final var output = HttpResults.require(addSectionToShow.execute(mapper.toCommand(id, input)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
+    @CacheEvict(value = TickethubCacheProperties.SHOWS, allEntries = true)
     public ResponseEntity<IdResponse> changeShowDescription(String id, ChangeShowDescriptionRequest input) {
         final var output = HttpResults.require(changeShowDescription.execute(mapper.toCommand(id, input)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
+    @CacheEvict(value = TickethubCacheProperties.SHOWS, allEntries = true)
     public ResponseEntity<IdResponse> changeShowName(String id, ChangeShowNameRequest input) {
         final var output = HttpResults.require(changeShowName.execute(mapper.toCommand(id, input)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
+    @CacheEvict(value = TickethubCacheProperties.SHOWS, allEntries = true)
     public ResponseEntity<IdResponse> createShow(CreateShowRequest input) {
         final var output = HttpResults.require(createShow.execute(mapper.toCommand(input)));
         return ResponseEntity.created(URI.create("/shows/" + output.id())).body(new IdResponse(output.id()));
     }
 
     @Override
+    @CacheEvict(value = TickethubCacheProperties.SHOWS, allEntries = true)
     public ResponseEntity<Void> deleteById(String id) {
         HttpResults.requireEmpty(deleteShow.execute(id));
         return ResponseEntity.noContent().build();
     }
 
     @Override
+    @CacheEvict(value = TickethubCacheProperties.SHOWS, allEntries = true)
     public ResponseEntity<IdResponse> publishShow(String id) {
         final var output = HttpResults.require(publishShow.execute(new PublishShowCommand(id)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
+    @CacheEvict(value = TickethubCacheProperties.SHOWS, allEntries = true)
     public ResponseEntity<IdResponse> publishAllShow(String id) {
         final var output = HttpResults.require(publishAllShow.execute(new PublishAllShowCommand(id)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
+    @CacheEvict(value = TickethubCacheProperties.SHOWS, allEntries = true)
     public ResponseEntity<IdResponse> rescheduleShow(String id, RescheduleShowRequest input) {
         final var output = HttpResults.require(rescheduleShow.execute(mapper.toCommand(id, input)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
+    @Cacheable(TickethubCacheProperties.SHOWS)
     public ShowResponse getById(String id) {
         return mapper.toResponse(HttpResults.require(getShow.execute(id)));
     }
 
     @Override
+    @Cacheable(TickethubCacheProperties.SHOWS)
     public Pagination<ShowListResponse> list(String search, int page, int perPage, String sort, String direction) {
         return HttpResults.require(listShows.execute(HttpResults.search(search, page, perPage, sort, direction))).map(mapper::toListResponse);
     }
 
     @Override
+    @CacheEvict(value = TickethubCacheProperties.SHOWS, allEntries = true)
     public ResponseEntity<IdResponse> unpublishShow(String id) {
         final var output = HttpResults.require(unpublishShow.execute(new UnpublishShowCommand(id)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
+    @CacheEvict(value = TickethubCacheProperties.SHOWS, allEntries = true)
     public ResponseEntity<IdResponse> unpublishAllShow(String id) {
         final var output = HttpResults.require(unpublishAllShow.execute(new UnpublishAllShowCommand(id)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
+    @CacheEvict(value = TickethubCacheProperties.SHOWS, allEntries = true)
     public ResponseEntity<IdResponse> updateShow(String id, UpdateShowRequest input) {
         final var output = HttpResults.require(updateShow.execute(mapper.toCommand(id, input)));
         return ResponseEntity.ok(new IdResponse(output.id()));

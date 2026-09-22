@@ -35,8 +35,17 @@ spring:
     username: ${MONGO_USERNAME:tickethub}
     password: ${MONGO_PASSWORD:tickethub-local}
     authentication-database: ${MONGO_AUTH_DATABASE:admin}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
 tickethub:
+  cache:
+    enabled: ${CACHE_ENABLED:true}
+    shows-ttl: ${CACHE_SHOWS_TTL:5m}
+    sections-ttl: ${CACHE_SECTIONS_TTL:5m}
+    spots-ttl: ${CACHE_SPOTS_TTL:15s}
   liquibase:
     enabled: ${LIQUIBASE_ENABLED:true}
     change-log: db/changelog/db.changelog-master.xml
