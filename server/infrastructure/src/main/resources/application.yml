@@ -72,6 +72,8 @@ tickethub:
     base-url: ${TICKETHUB_ZIPCODE_BASE_URL:https://viacep.com.br}
     connect-timeout: ${TICKETHUB_ZIPCODE_CONNECT_TIMEOUT:5s}
     read-timeout: ${TICKETHUB_ZIPCODE_READ_TIMEOUT:5s}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}
   payment:
     generic-webhook-enabled: ${GENERIC_WEBHOOK_ENABLED:true}
     reconcile-interval: ${PAYMENT_RECONCILE_INTERVAL:2m}
