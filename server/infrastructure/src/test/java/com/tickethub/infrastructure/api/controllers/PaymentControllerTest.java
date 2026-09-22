@@ -20,14 +20,20 @@ import com.tickethub.application.payment.confirm.ConfirmPaymentUseCase;
 import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.Notification;
 import com.tickethub.infrastructure.ControllerTest;
+import com.tickethub.infrastructure.payment.mercadopago.InvalidWebhookSignatureException;
+import com.tickethub.infrastructure.payment.mercadopago.MercadoPagoWebhookHandler;
 
-@ControllerTest(controllers = PaymentController.class)
+import java.util.Optional;
+
+@ControllerTest(controllers = {PaymentController.class, MercadoPagoWebhookController.class})
 @Import({})
 @DisplayName("Payment controller")
 class PaymentControllerTest {
     @Autowired MockMvc mvc;
 
     @MockitoBean ConfirmPaymentUseCase confirmPayment;
+
+    @MockitoBean MercadoPagoWebhookHandler mercadoPagoWebhook;
 
     @Test
     @DisplayName("Given paid charge, when webhook arrives without token, then settles order")
@@ -62,5 +68,50 @@ class PaymentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"chargeId\":\"ch_123\"}"))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Given verified MP notification, when webhook arrives, then settles order")
+    void givenVerifiedMpNotification_whenWebhookArrives_thenSettlesOrder() throws Exception {
+        when(mercadoPagoWebhook.handle(any(), any(), any(), any())).thenReturn(Optional.of(Either.right(
+                new ConfirmPaymentOutput("order-1", "PAID"))));
+
+        mvc.perform(post("/payments/mercadopago")
+                        .queryParam("data.id", "123")
+                        .queryParam("type", "payment")
+                        .header("x-signature", "ts=1,v1=abc")
+                        .header("x-request-id", "req-1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"type\":\"payment\",\"data\":{\"id\":\"123\"}}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.orderId").value("order-1"))
+                .andExpect(jsonPath("$.orderStatus").value("PAID"));
+    }
+
+    @Test
+    @DisplayName("Given forged MP notification, when webhook arrives, then returns unauthorized")
+    void givenForgedMpNotification_whenWebhookArrives_thenReturnsUnauthorized() throws Exception {
+        when(mercadoPagoWebhook.handle(any(), any(), any(), any()))
+                .thenThrow(new InvalidWebhookSignatureException("Invalid webhook signature"));
+
+        mvc.perform(post("/payments/mercadopago")
+                        .queryParam("data.id", "123")
+                        .header("x-signature", "ts=1,v1=forged")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"type\":\"payment\",\"data\":{\"id\":\"123\"}}"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("Given non-payment MP topic, when webhook arrives, then acknowledges without effect")
+    void givenNonPaymentTopic_whenWebhookArrives_thenAcknowledges() throws Exception {
+        when(mercadoPagoWebhook.handle(any(), any(), any(), any())).thenReturn(Optional.empty());
+
+        mvc.perform(post("/payments/mercadopago")
+                        .queryParam("data.id", "123")
+                        .queryParam("type", "merchant_order")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"type\":\"merchant_order\",\"data\":{\"id\":\"123\"}}"))
+                .andExpect(status().isOk());
     }
 }

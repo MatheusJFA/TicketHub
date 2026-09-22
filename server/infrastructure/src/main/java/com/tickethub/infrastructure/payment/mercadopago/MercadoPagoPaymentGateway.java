@@ -49,7 +49,8 @@ public class MercadoPagoPaymentGateway implements PaymentGateway {
         requireNonNull(total, "'total' should not be null");
         ensureEnabled();
         final var response = client.createPixPayment(total.getValue(),
-                "TicketHub order " + orderId.getValue(), orderId.getValue(), resolvePayerEmail(orderId));
+                "TicketHub order " + orderId.getValue(), orderId.getValue(), resolvePayerEmail(orderId),
+                properties.getNotificationUrl());
         if (response.id() == null) {
             throw new HttpUpstreamException("mercadopago", 200, "Missing payment id");
         }

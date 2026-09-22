@@ -1,5 +1,6 @@
 package com.tickethub.infrastructure.api.controllers;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -10,9 +11,18 @@ import com.tickethub.infrastructure.api.PaymentAPI;
 import com.tickethub.infrastructure.cache.TickethubCacheProperties;
 import com.tickethub.infrastructure.payment.models.ConfirmPaymentResponse;
 import com.tickethub.infrastructure.payment.models.WebhookRequest;
+
 import org.springframework.cache.annotation.CacheEvict;
 
+/**
+ * Legacy generic webhook (chargeId + status trusted from the body), kept for
+ * local development without a real provider. Disable in production with
+ * {@code GENERIC_WEBHOOK_ENABLED=false}: with a real {@code PaymentGateway}
+ * a forged body would settle orders without provider approval.
+ */
 @RestController
+@ConditionalOnProperty(prefix = "tickethub.payment", name = "generic-webhook-enabled",
+        havingValue = "true", matchIfMissing = true)
 public class PaymentController implements PaymentAPI {
     private final ConfirmPaymentUseCase confirmPayment;
 

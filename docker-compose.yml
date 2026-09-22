@@ -32,9 +32,12 @@ services:
       REDIS_PORT: ${REDIS_PORT:-6379}
       MERCADOPAGO_ACCESS_TOKEN: ${MERCADOPAGO_ACCESS_TOKEN:-}
       MERCADOPAGO_PAYER_EMAIL: ${MERCADOPAGO_PAYER_EMAIL:-buyer@tickethub.local}
+      MERCADOPAGO_WEBHOOK_SECRET: ${MERCADOPAGO_WEBHOOK_SECRET:-}
+      MERCADOPAGO_NOTIFICATION_URL: ${MERCADOPAGO_NOTIFICATION_URL:-}
     ports:
       - "127.0.0.1:${SERVER_PORT:-8080}:8080"
     restart: unless-stopped
+    stop_grace_period: 40s
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:8080/actuator/health"]
       interval: 15s

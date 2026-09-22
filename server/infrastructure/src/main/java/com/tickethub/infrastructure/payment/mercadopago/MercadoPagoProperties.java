@@ -11,6 +11,9 @@ public class MercadoPagoProperties {
     private String baseUrl = "https://api.mercadopago.com";
     private String accessToken = "";
     private String payerEmail = "buyer@tickethub.local";
+    private String webhookSecret = "";
+    private Duration webhookTolerance = Duration.ofMinutes(5);
+    private String notificationUrl = "";
     private Duration connectTimeout = Duration.ofSeconds(5);
     private Duration readTimeout = Duration.ofSeconds(5);
 
@@ -44,6 +47,30 @@ public class MercadoPagoProperties {
 
     public void setPayerEmail(final String payerEmail) {
         this.payerEmail = payerEmail;
+    }
+
+    public String getWebhookSecret() {
+        return webhookSecret;
+    }
+
+    public void setWebhookSecret(final String webhookSecret) {
+        this.webhookSecret = webhookSecret;
+    }
+
+    public Duration getWebhookTolerance() {
+        return webhookTolerance;
+    }
+
+    public void setWebhookTolerance(final Duration webhookTolerance) {
+        this.webhookTolerance = webhookTolerance;
+    }
+
+    public String getNotificationUrl() {
+        return notificationUrl;
+    }
+
+    public void setNotificationUrl(final String notificationUrl) {
+        this.notificationUrl = notificationUrl;
     }
 
     public Duration getConnectTimeout() {

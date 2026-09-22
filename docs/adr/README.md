@@ -20,3 +20,4 @@ Decisões arquiteturais do TicketHub, em ordem cronológica. Convenção: `NNNN-
 | [014](./0014-observabilidade-lgtm.md) | Observabilidade LGTM | Aceito |
 | [015](./0015-pagamento-pix-mercado-pago.md) | Pagamento PIX via Mercado Pago | Aceito |
 | [016](./0016-cache-redis-leituras.md) | Cache compartilhado de leitura em Redis | Aceito |
+| [017](./0017-webhook-mercado-pago-assinado.md) | Webhook do Mercado Pago com assinatura verificada | Aceito |
