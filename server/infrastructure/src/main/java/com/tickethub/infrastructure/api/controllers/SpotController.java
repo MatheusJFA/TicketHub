@@ -16,6 +16,9 @@ import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import com.tickethub.infrastructure.api.SpotAPI;
 import com.tickethub.infrastructure.api.HttpResults;
+import com.tickethub.infrastructure.cache.TickethubCacheProperties;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -51,46 +54,54 @@ public class SpotController implements SpotAPI {
     }
 
     @Override
+    @CacheEvict(value = TickethubCacheProperties.SPOTS, allEntries = true)
     public ResponseEntity<IdResponse> changeSpotLocation(String id, ChangeSpotLocationRequest input) {
         final var output = HttpResults.require(changeSpotLocation.execute(mapper.toCommand(id, input)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
+    @CacheEvict(value = TickethubCacheProperties.SPOTS, allEntries = true)
     public ResponseEntity<IdResponse> createSpot(CreateSpotRequest input) {
         final var output = HttpResults.require(createSpot.execute(mapper.toCommand(input)));
         return ResponseEntity.created(URI.create("/spots/" + output.id())).body(new IdResponse(output.id()));
     }
 
     @Override
+    @CacheEvict(value = TickethubCacheProperties.SPOTS, allEntries = true)
     public ResponseEntity<Void> deleteById(String id) {
         HttpResults.requireEmpty(deleteSpot.execute(id));
         return ResponseEntity.noContent().build();
     }
 
     @Override
+    @CacheEvict(value = TickethubCacheProperties.SPOTS, allEntries = true)
     public ResponseEntity<IdResponse> publishSpot(String id) {
         final var output = HttpResults.require(publishSpot.execute(new PublishSpotCommand(id)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
+    @Cacheable(TickethubCacheProperties.SPOTS)
     public SpotResponse getById(String id) {
         return mapper.toResponse(HttpResults.require(getSpot.execute(id)));
     }
 
     @Override
+    @Cacheable(TickethubCacheProperties.SPOTS)
     public Pagination<SpotListResponse> list(String search, int page, int perPage, String sort, String direction) {
         return HttpResults.require(listSpots.execute(HttpResults.search(search, page, perPage, sort, direction))).map(mapper::toListResponse);
     }
 
     @Override
+    @CacheEvict(value = TickethubCacheProperties.SPOTS, allEntries = true)
     public ResponseEntity<IdResponse> unpublishSpot(String id) {
         final var output = HttpResults.require(unpublishSpot.execute(new UnpublishSpotCommand(id)));
         return ResponseEntity.ok(new IdResponse(output.id()));
     }
 
     @Override
+    @CacheEvict(value = TickethubCacheProperties.SPOTS, allEntries = true)
     public ResponseEntity<IdResponse> updateSpot(String id, UpdateSpotRequest input) {
         final var output = HttpResults.require(updateSpot.execute(mapper.toCommand(id, input)));
         return ResponseEntity.ok(new IdResponse(output.id()));

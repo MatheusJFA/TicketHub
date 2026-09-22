@@ -9,8 +9,11 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       MONGO_HOST: mongo
+      REDIS_HOST: redis
       LIQUIBASE_ENABLED: ${LIQUIBASE_ENABLED:-true}
       OTEL_EXPORTER_OTLP_TRACING_ENDPOINT: ${OTEL_EXPORTER_OTLP_TRACING_ENDPOINT:-http://alloy:4318/v1/traces}
       TRACING_SAMPLING_PROBABILITY: ${TRACING_SAMPLING_PROBABILITY:-1.0}
@@ -26,6 +29,7 @@ services:
       MONGO_SERVER_SELECTION_TIMEOUT: ${MONGO_SERVER_SELECTION_TIMEOUT:-5s}
       MONGO_USERNAME: ${MONGO_USERNAME:-tickethub}
       MONGO_PASSWORD: ${MONGO_PASSWORD:-tickethub-local}
+      REDIS_PORT: ${REDIS_PORT:-6379}
       MERCADOPAGO_ACCESS_TOKEN: ${MERCADOPAGO_ACCESS_TOKEN:-}
       MERCADOPAGO_PAYER_EMAIL: ${MERCADOPAGO_PAYER_EMAIL:-buyer@tickethub.local}
     ports:
@@ -61,6 +65,20 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+
+  redis:
+    image: redis:8-alpine
+    ports:
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   kafka:
     image: apache/kafka:3.9.1
@@ -159,6 +177,7 @@ services:
 volumes:
   mongo_data:
   kafka_data:
+  redis_data:
   loki_data:
   tempo_data:
   mimir_data:
