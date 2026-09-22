@@ -26,6 +26,7 @@ public record OrderDocument(
         String status,
         Instant expiresAt,
         String chargeId,
+        String idempotencyKey,
         Instant createdAt,
         Instant updatedAt,
         Instant deletedAt,
@@ -51,7 +52,7 @@ public record OrderDocument(
 
     public OrderDocument withActors(final String createdBy, final String lastModifiedBy) {
         return new OrderDocument(id, customerId, items, total, status, expiresAt, chargeId,
-                createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
+                idempotencyKey, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
     }
 
     public static OrderDocument from(final Order order) {
@@ -63,6 +64,7 @@ public record OrderDocument(
                 order.getStatus().name(),
                 order.getExpiresAt(),
                 Optional.ofNullable(order.getChargeId()).map(ChargeID::getValue).orElse(null),
+                order.getIdempotencyKey(),
                 order.getCreatedAt(),
                 order.getUpdatedAt(),
                 order.getDeletedAt(),
@@ -85,6 +87,7 @@ public record OrderDocument(
                 OrderStatus.valueOf(status),
                 expiresAt,
                 chargeId == null ? null : ChargeID.from(chargeId),
+                idempotencyKey,
                 createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
     }
 }

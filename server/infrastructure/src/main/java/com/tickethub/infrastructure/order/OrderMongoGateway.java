@@ -46,6 +46,12 @@ public class OrderMongoGateway implements OrderGateway {
     }
 
     @Override
+    public Optional<Order> findByIdempotencyKey(final String idempotencyKey) {
+        requireNonNull(idempotencyKey, "'idempotencyKey' should not be null");
+        return repository.findByIdempotencyKey(idempotencyKey).map(OrderDocument::toDomain);
+    }
+
+    @Override
     public List<Order> findPendingExpired(final Instant now) {
         requireNonNull(now, "'now' should not be null");
         return repository.findByStatusAndExpiresAtBefore(OrderStatus.PENDING.name(), now).stream()

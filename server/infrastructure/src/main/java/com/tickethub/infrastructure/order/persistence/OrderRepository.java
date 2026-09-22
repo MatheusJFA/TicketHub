@@ -10,5 +10,7 @@ public interface OrderRepository extends MongoRepository<OrderDocument, String> 
 
     Optional<OrderDocument> findByChargeId(String chargeId);
 
+    Optional<OrderDocument> findByIdempotencyKey(String idempotencyKey);
+
     List<OrderDocument> findByStatusAndExpiresAtBefore(String status, Instant now);
 }

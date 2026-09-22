@@ -10,6 +10,7 @@ public interface OrderGateway {
     Order create(Order order);
     Optional<Order> findById(OrderID id);
     Optional<Order> findByChargeId(ChargeID chargeId);
+    Optional<Order> findByIdempotencyKey(String idempotencyKey);
     List<Order> findPendingExpired(Instant now);
     Order update(Order order);
 }
