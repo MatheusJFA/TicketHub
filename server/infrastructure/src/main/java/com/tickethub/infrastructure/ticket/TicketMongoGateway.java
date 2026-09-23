@@ -2,11 +2,15 @@ package com.tickethub.infrastructure.ticket;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
+import com.tickethub.domain.core.order.OrderID;
 import com.tickethub.domain.core.ticket.Ticket;
 import com.tickethub.domain.core.ticket.TicketGateway;
 import com.tickethub.domain.core.ticket.TicketID;
@@ -33,6 +37,15 @@ public class TicketMongoGateway implements TicketGateway {
     public Optional<Ticket> findById(final TicketID id) {
         requireNonNull(id, "'id' should not be null");
         return repository.findById(id.getValue()).map(TicketDocument::toDomain);
+    }
+
+    @Override
+    public List<Ticket> findByOrderId(final OrderID orderId) {
+        requireNonNull(orderId, "'orderId' should not be null");
+        return mongoTemplate.find(Query.query(Criteria.where("orderId").is(orderId.getValue())),
+                TicketDocument.class, TicketDocument.COLLECTION).stream()
+                .map(TicketDocument::toDomain)
+                .toList();
     }
 
     @Override

@@ -39,11 +39,13 @@ public class UseCaseMonitoringAspect {
 
     private final ResiliencePolicy resilience;
     private final ObjectProvider<AuditTrail> trails;
+    private final UseCaseMetrics metrics;
 
     public UseCaseMonitoringAspect(final ResiliencePolicy resilience,
-            final ObjectProvider<AuditTrail> trails) {
+            final ObjectProvider<AuditTrail> trails, final UseCaseMetrics metrics) {
         this.resilience = resilience;
         this.trails = trails;
+        this.metrics = metrics;
     }
 
     @Around("execution(* com.tickethub.application..*UseCase.execute(..))")
@@ -84,6 +86,7 @@ public class UseCaseMonitoringAspect {
     private void audit(final String action, final Optional<String> input, final long startedAt,
             final AuditOutcome outcome, final Optional<String> error) {
         final long durationMs = (System.nanoTime() - startedAt) / 1_000_000;
+        metrics.record(action, outcome, System.nanoTime() - startedAt);
         final var entry = new AuditEntry(Instant.now(),
                 MDC.get(CorrelationIdFilter.CORRELATION_ID_KEY),
                 MDC.get(CorrelationIdFilter.ACTOR_KEY),

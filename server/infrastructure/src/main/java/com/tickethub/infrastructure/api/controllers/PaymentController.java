@@ -9,6 +9,7 @@ import com.tickethub.application.payment.confirm.ConfirmPaymentUseCase;
 import com.tickethub.infrastructure.api.HttpResults;
 import com.tickethub.infrastructure.api.PaymentAPI;
 import com.tickethub.infrastructure.cache.TickethubCacheProperties;
+import com.tickethub.infrastructure.notification.OrderConfirmationMailer;
 import com.tickethub.infrastructure.payment.models.ConfirmPaymentResponse;
 import com.tickethub.infrastructure.payment.models.WebhookRequest;
 
@@ -25,9 +26,12 @@ import org.springframework.cache.annotation.CacheEvict;
         havingValue = "true", matchIfMissing = true)
 public class PaymentController implements PaymentAPI {
     private final ConfirmPaymentUseCase confirmPayment;
+    private final OrderConfirmationMailer confirmationMailer;
 
-    public PaymentController(final ConfirmPaymentUseCase confirmPayment) {
+    public PaymentController(final ConfirmPaymentUseCase confirmPayment,
+            final OrderConfirmationMailer confirmationMailer) {
         this.confirmPayment = confirmPayment;
+        this.confirmationMailer = confirmationMailer;
     }
 
     @Override
@@ -35,6 +39,9 @@ public class PaymentController implements PaymentAPI {
     public ResponseEntity<ConfirmPaymentResponse> paymentWebhook(final WebhookRequest input) {
         final var output = HttpResults.require(confirmPayment.execute(
                 ConfirmPaymentCommand.with(input.chargeId(), input.status())));
+        if ("PAID".equals(output.orderStatus())) {
+            confirmationMailer.sendFor(output.orderId());
+        }
         return ResponseEntity.ok(ConfirmPaymentResponse.from(output));
     }
 }

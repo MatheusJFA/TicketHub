@@ -47,3 +47,20 @@ Datasources Loki, Tempo e Mimir já vêm provisionados
   `EventPublishException`, `SpotGenerationException`) → **503**, com log de
   erro no servidor. Falha de dependência (Mongo, Kafka, ViaCEP) aparece como
   503, nunca como erro de validação.
+
+## Métricas de negócio
+
+Todo caso de uso emite `tickethub_usecase_executions_total{action,outcome}` e
+`tickethub_usecase_duration_*` via `UseCaseMonitoringAspect` (Mimir):
+
+```promql
+# conversão de checkout (pedidos pagos / pedidos criados, 1h)
+sum(rate(tickethub_usecase_executions_total{action="DefaultConfirmPaymentUseCase",outcome="SUCCESS"}[1h]))
+/ sum(rate(tickethub_usecase_executions_total{action="DefaultCreateOrderUseCase",outcome="SUCCESS"}[1h]))
+
+# p95 de criação de pedido
+histogram_quantile(0.95, sum(rate(tickethub_usecase_duration_bucket{action="DefaultCreateOrderUseCase"}[5m])) by (le))
+
+# erros de pagamento por motivo
+sum by (outcome) (rate(tickethub_usecase_executions_total{action=~"Default(PayOrder|ConfirmPayment|ReconcileOrders)UseCase"}[5m]))
+```

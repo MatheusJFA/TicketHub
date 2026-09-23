@@ -40,6 +40,8 @@ import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
 import com.tickethub.domain.validation.Error;
 
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+
 @DisplayName("UseCaseMonitoringAspect")
 class UseCaseMonitoringAspectTest {
 
@@ -56,7 +58,7 @@ class UseCaseMonitoringAspectTest {
         MDC.put(CorrelationIdFilter.CORRELATION_ID_KEY, "corr-1");
         MDC.put(CorrelationIdFilter.ACTOR_KEY, "alice");
         final ObjectProvider<AuditTrail> trails = trails();
-        aspect = new UseCaseMonitoringAspect(ResiliencePolicy.disabled(), trails);
+        aspect = new UseCaseMonitoringAspect(ResiliencePolicy.disabled(), trails, new UseCaseMetrics(new SimpleMeterRegistry()));
     }
 
     @AfterEach
@@ -258,7 +260,7 @@ class UseCaseMonitoringAspectTest {
     @Test
     @DisplayName("Given failing trail, when monitor, then request still succeeds")
     void givenFailingTrail_whenMonitor_thenRequestStillSucceeds() throws Throwable {        final ObjectProvider<AuditTrail> trails = failingTrails();
-        final var silent = new UseCaseMonitoringAspect(ResiliencePolicy.disabled(), trails);
+        final var silent = new UseCaseMonitoringAspect(ResiliencePolicy.disabled(), trails, new UseCaseMetrics(new SimpleMeterRegistry()));
 
         final var result = silent.monitor(joinPoint(useCase(), invocation -> Either.right("ok-in")));
 
@@ -291,7 +293,7 @@ class UseCaseMonitoringAspectTest {
     @DisplayName("Given transient failures, when monitor, then retries and returns success")
     void givenTransientFailures_whenMonitor_thenRetriesAndReturnsSuccess() throws Throwable {
         final ObjectProvider<AuditTrail> trails = trails();
-        final var resilient = new UseCaseMonitoringAspect(policy(3, closedBreaker()), trails);
+        final var resilient = new UseCaseMonitoringAspect(policy(3, closedBreaker()), trails, new UseCaseMetrics(new SimpleMeterRegistry()));
 
         final var result = resilient.monitor(joinPoint(useCase(), invocation -> {
             final int call = calls.getAndIncrement();
@@ -308,7 +310,7 @@ class UseCaseMonitoringAspectTest {
     @DisplayName("Given validation failure, when monitor, then does not retry")
     void givenValidationFailure_whenMonitor_thenDoesNotRetry() throws Throwable {
         final ObjectProvider<AuditTrail> trails = trails();
-        final var resilient = new UseCaseMonitoringAspect(policy(3, closedBreaker()), trails);
+        final var resilient = new UseCaseMonitoringAspect(policy(3, closedBreaker()), trails, new UseCaseMetrics(new SimpleMeterRegistry()));
 
         resilient.monitor(joinPoint(useCase(),
                 invocation -> {
@@ -326,7 +328,7 @@ class UseCaseMonitoringAspectTest {
         final ObjectProvider<AuditTrail> trails = trails();
         final var circuitBreaker = closedBreaker();
         circuitBreaker.transitionToOpenState();
-        final var resilient = new UseCaseMonitoringAspect(policy(3, circuitBreaker), trails);
+        final var resilient = new UseCaseMonitoringAspect(policy(3, circuitBreaker), trails, new UseCaseMetrics(new SimpleMeterRegistry()));
         final var joinPoint = unchecked(useCase(), invocation -> {
             calls.getAndIncrement();
             return Either.right("ok");
@@ -346,7 +348,7 @@ class UseCaseMonitoringAspectTest {
     @DisplayName("Given exhausted retries, when monitor, then returns last failure")
     void givenExhaustedRetries_whenMonitor_thenReturnsLastFailure() throws Throwable {
         final ObjectProvider<AuditTrail> trails = trails();
-        final var resilient = new UseCaseMonitoringAspect(policy(3, closedBreaker()), trails);
+        final var resilient = new UseCaseMonitoringAspect(policy(3, closedBreaker()), trails, new UseCaseMetrics(new SimpleMeterRegistry()));
 
         final var result = resilient.monitor(joinPoint(useCase(), invocation -> {
             calls.getAndIncrement();

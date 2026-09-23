@@ -20,6 +20,7 @@ import com.tickethub.application.payment.confirm.ConfirmPaymentUseCase;
 import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.Notification;
 import com.tickethub.infrastructure.ControllerTest;
+import com.tickethub.infrastructure.notification.OrderConfirmationMailer;
 import com.tickethub.infrastructure.payment.mercadopago.InvalidWebhookSignatureException;
 import com.tickethub.infrastructure.payment.mercadopago.MercadoPagoWebhookHandler;
 
@@ -35,6 +36,8 @@ class PaymentControllerTest {
 
     @MockitoBean MercadoPagoWebhookHandler mercadoPagoWebhook;
 
+    @MockitoBean OrderConfirmationMailer confirmationMailer;
+
     @Test
     @DisplayName("Given paid charge, when webhook arrives without token, then settles order")
     void givenPaidCharge_whenWebhookArrives_thenSettlesOrder() throws Exception {
@@ -47,6 +50,8 @@ class PaymentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.orderId").value("order-1"))
                 .andExpect(jsonPath("$.orderStatus").value("PAID"));
+
+        org.mockito.Mockito.verify(confirmationMailer).sendFor("order-1");
     }
 
     @Test
