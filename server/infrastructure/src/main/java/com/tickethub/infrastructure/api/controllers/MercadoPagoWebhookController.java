@@ -9,6 +9,7 @@ import com.tickethub.infrastructure.api.HttpResults;
 import com.tickethub.infrastructure.api.MercadoPagoWebhookAPI;
 import com.tickethub.infrastructure.cache.TickethubCacheProperties;
 import com.tickethub.infrastructure.exception.InfrastructureException;
+import com.tickethub.infrastructure.notification.OrderConfirmationMailer;
 import com.tickethub.infrastructure.payment.models.ConfirmPaymentResponse;
 import com.tickethub.infrastructure.payment.models.MercadoPagoNotification;
 import com.tickethub.infrastructure.payment.mercadopago.MercadoPagoWebhookHandler;
@@ -18,9 +19,12 @@ import org.springframework.cache.annotation.CacheEvict;
 @RestController
 public class MercadoPagoWebhookController implements MercadoPagoWebhookAPI {
     private final ObjectProvider<MercadoPagoWebhookHandler> webhook;
+    private final OrderConfirmationMailer confirmationMailer;
 
-    public MercadoPagoWebhookController(final ObjectProvider<MercadoPagoWebhookHandler> webhook) {
+    public MercadoPagoWebhookController(final ObjectProvider<MercadoPagoWebhookHandler> webhook,
+            final OrderConfirmationMailer confirmationMailer) {
         this.webhook = webhook;
+        this.confirmationMailer = confirmationMailer;
     }
 
     @Override
@@ -41,6 +45,10 @@ public class MercadoPagoWebhookController implements MercadoPagoWebhookAPI {
         if (result.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.OK);
         }
-        return ResponseEntity.ok(ConfirmPaymentResponse.from(HttpResults.require(result.get())));
+        final var output = HttpResults.require(result.get());
+        if ("PAID".equals(output.orderStatus())) {
+            confirmationMailer.sendFor(output.orderId());
+        }
+        return ResponseEntity.ok(ConfirmPaymentResponse.from(output));
     }
 }
