@@ -2,6 +2,10 @@ package com.tickethub.infrastructure.order;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Optional;
+
+import org.springframework.cache.Cache;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -44,10 +48,8 @@ public class OrderExpirationScheduler {
             return;
         }
         LOG.info("Order expiration sweep expired={} orderIds={}", output.expired(), output.orderIds());
-        final var manager = cacheManager.getIfAvailable();
-        final var spots = manager != null ? manager.getCache(TickethubCacheProperties.SPOTS) : null;
-        if (spots != null) {
-            spots.clear();
-        }
+        Optional.ofNullable(cacheManager.getIfAvailable())
+                .map(manager -> manager.getCache(TickethubCacheProperties.SPOTS))
+                .ifPresent(Cache::clear);
     }
 }

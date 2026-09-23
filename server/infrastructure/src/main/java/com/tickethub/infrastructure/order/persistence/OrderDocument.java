@@ -86,7 +86,7 @@ public record OrderDocument(
                 Optional.ofNullable(total).map(MoneyDocument::toDomain).orElse(null),
                 OrderStatus.valueOf(status),
                 expiresAt,
-                chargeId == null ? null : ChargeID.from(chargeId),
+                Optional.ofNullable(chargeId).map(ChargeID::from).orElse(null),
                 idempotencyKey,
                 createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
     }

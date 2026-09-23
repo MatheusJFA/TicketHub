@@ -2,6 +2,8 @@ package com.tickethub.infrastructure.payment.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.Optional;
+
 /**
  * Mercado Pago notification envelope. The payment id preferably arrives as
  * the {@code data.id} query param; the body is a fallback. The status is
@@ -11,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public record MercadoPagoNotification(String type, NotificationData data) {
 
     public String dataId() {
-        return data != null ? data.id() : null;
+        return Optional.ofNullable(data).map(NotificationData::id).orElse(null);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

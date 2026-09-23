@@ -20,11 +20,13 @@ public interface SharedMapper {
     AddressModel toModel(Address address);
 
     default Address toDomain(final AddressModel model) {
-        return Optional.ofNullable(model)
-                .map(current -> Address.create(current.street(), current.number(),
-                        current.complement(), current.neighborhood(), current.city(),
-                        current.state(), current.country(), current.zipCode()))
-                .orElse(null);
+        return Optional.ofNullable(model).map(SharedMapper::with).orElse(null);
+    }
+
+    private static Address with(final AddressModel current) {
+        return Address.create(current.street(), current.number(),
+                current.complement(), current.neighborhood(), current.city(),
+                current.state(), current.country(), current.zipCode());
     }
 
     default MoneyModel toModel(final Money money) {

@@ -1,6 +1,8 @@
 package com.tickethub.infrastructure.ticket;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -28,7 +30,7 @@ public class HmacTicketSigner implements TicketSigner {
     private final String secret;
 
     public HmacTicketSigner(@Value("${tickethub.tickets.signature-secret}") final String secret) {
-        if (secret == null || secret.isBlank()) {
+        if (isBlank(secret)) {
             throw new IllegalStateException("tickethub.tickets.signature-secret must not be blank");
         }
         this.secret = secret;

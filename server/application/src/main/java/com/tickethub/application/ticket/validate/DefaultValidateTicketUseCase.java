@@ -1,10 +1,13 @@
 package com.tickethub.application.ticket.validate;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Objects.isNull;
 import java.time.Clock;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Objects;
+import java.util.Optional;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.show.Show;
@@ -83,9 +86,11 @@ public class DefaultValidateTicketUseCase extends ValidateTicketUseCase {
                             showId.getValue()));
 
             final var showDate = entity.getDate();
-            final var todayAtVenue = LocalDate.ofInstant(clock.instant(),
-                    showDate != null ? showDate.getOffset() : ZoneOffset.UTC);
-            if (showDate == null || !showDate.toLocalDate().isEqual(todayAtVenue)) {
+            final var venueZone = Optional.ofNullable(showDate)
+                    .map(OffsetDateTime::getOffset)
+                    .orElse(ZoneOffset.UTC);
+            final var todayAtVenue = LocalDate.ofInstant(clock.instant(), venueZone);
+            if (isNull(showDate) || !showDate.toLocalDate().isEqual(todayAtVenue)) {
                 throw new ShowOutsideCheckInDateException(showDate);
             }
 

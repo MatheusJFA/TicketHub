@@ -15,11 +15,13 @@ public record AddressDocument(
         String zipCode) {
 
     public static AddressDocument from(final Address address) {
-        return Optional.ofNullable(address)
-                .map(current -> new AddressDocument(current.getStreet(), current.getNumber(),
-                        current.getComplement(), current.getNeighborhood(), current.getCity(),
-                        current.getState(), current.getCountry(), current.getZipCode()))
-                .orElse(null);
+        return Optional.ofNullable(address).map(AddressDocument::with).orElse(null);
+    }
+
+    static AddressDocument with(final Address current) {
+        return new AddressDocument(current.getStreet(), current.getNumber(),
+                current.getComplement(), current.getNeighborhood(), current.getCity(),
+                current.getState(), current.getCountry(), current.getZipCode());
     }
 
     public Address toDomain() {

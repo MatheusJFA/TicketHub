@@ -1,5 +1,10 @@
 package com.tickethub.infrastructure.api.controllers;
 
+import static java.util.Objects.isNull;
+
+import java.util.Objects;
+import java.util.stream.Stream;
+
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,14 +42,12 @@ public class MercadoPagoWebhookController implements MercadoPagoWebhookAPI {
             final String xRequestId, final String dataId, final String type,
             final MercadoPagoNotification body) {
         final var handler = webhook.getIfAvailable();
-        if (handler == null) {
+        if (isNull(handler)) {
             throw new InfrastructureException(
                     "Mercado Pago webhook is not configured: set MERCADOPAGO_ACCESS_TOKEN");
         }
-        final var paymentId = dataId != null ? dataId
-                : body != null ? body.dataId() : null;
-        final var topic = type != null ? type
-                : body != null ? body.type() : null;
+        final var paymentId = firstPresent(dataId, isNull(body) ? null : body.dataId());
+        final var topic = firstPresent(type, isNull(body) ? null : body.type());
         final var result = handler.handle(xSignature, xRequestId, paymentId, topic);
         if (result.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.OK);
@@ -54,5 +57,9 @@ public class MercadoPagoWebhookController implements MercadoPagoWebhookAPI {
             confirmationMailer.sendFor(output.orderId());
         }
         return ResponseEntity.ok(ConfirmPaymentResponse.from(output));
+    }
+
+    private static String firstPresent(final String... values) {
+        return Stream.of(values).filter(Objects::nonNull).findFirst().orElse(null);
     }
 }

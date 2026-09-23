@@ -1,6 +1,9 @@
 package com.tickethub.infrastructure.payment.mercadopago;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -47,7 +50,7 @@ public class MercadoPagoWebhookVerifier {
         if (secret.isBlank()) {
             throw new InvalidWebhookSignatureException("Mercado Pago webhook secret is not configured");
         }
-        if (xSignature == null || dataId == null || dataId.isBlank()) {
+        if (isNull(xSignature) || isBlank(dataId)) {
             throw new InvalidWebhookSignatureException("Missing webhook signature or payment id");
         }
         String ts = null;
@@ -65,13 +68,13 @@ public class MercadoPagoWebhookVerifier {
                 hash = value;
             }
         }
-        if (ts == null || hash == null) {
+        if (isNull(ts) || isNull(hash)) {
             throw new InvalidWebhookSignatureException("Malformed webhook signature");
         }
         checkFreshness(ts);
         final var manifest = new StringBuilder();
         manifest.append("id:").append(normalize(dataId)).append(';');
-        if (xRequestId != null && !xRequestId.isBlank()) {
+        if (isNotBlank(xRequestId)) {
             manifest.append("request-id:").append(xRequestId).append(';');
         }
         manifest.append("ts:").append(ts).append(';');

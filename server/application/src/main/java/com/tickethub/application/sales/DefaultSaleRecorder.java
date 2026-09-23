@@ -32,17 +32,15 @@ public class DefaultSaleRecorder implements SaleRecorder {
     public void recordSale(final Order order) {
         requireNonNull(order, "'order' should not be null");
         for (final var item : order.getItems()) {
-            final var placement = spotGateway.findPlacement(item.getSpotId()).orElse(null);
-            if (placement == null) {
-                continue;
-            }
-            sectionGateway.findById(SectionID.from(placement.sectionId())).ifPresent(section -> {
-                section.registerSale();
-                sectionGateway.update(section);
-            });
-            showGateway.findById(ShowID.from(placement.showId())).ifPresent(show -> {
-                show.registerSale();
-                showGateway.update(show);
+            spotGateway.findPlacement(item.getSpotId()).ifPresent(placement -> {
+                sectionGateway.findById(SectionID.from(placement.sectionId())).ifPresent(section -> {
+                    section.registerSale();
+                    sectionGateway.update(section);
+                });
+                showGateway.findById(ShowID.from(placement.showId())).ifPresent(show -> {
+                    show.registerSale();
+                    showGateway.update(show);
+                });
             });
         }
     }
@@ -51,17 +49,15 @@ public class DefaultSaleRecorder implements SaleRecorder {
     public void recordRefund(final Order order) {
         requireNonNull(order, "'order' should not be null");
         for (final var item : order.getItems()) {
-            final var placement = spotGateway.findPlacement(item.getSpotId()).orElse(null);
-            if (placement == null) {
-                continue;
-            }
-            sectionGateway.findById(SectionID.from(placement.sectionId())).ifPresent(section -> {
-                section.registerRefund();
-                sectionGateway.update(section);
-            });
-            showGateway.findById(ShowID.from(placement.showId())).ifPresent(show -> {
-                show.registerRefund();
-                showGateway.update(show);
+            spotGateway.findPlacement(item.getSpotId()).ifPresent(placement -> {
+                sectionGateway.findById(SectionID.from(placement.sectionId())).ifPresent(section -> {
+                    section.registerRefund();
+                    sectionGateway.update(section);
+                });
+                showGateway.findById(ShowID.from(placement.showId())).ifPresent(show -> {
+                    show.registerRefund();
+                    showGateway.update(show);
+                });
             });
         }
     }

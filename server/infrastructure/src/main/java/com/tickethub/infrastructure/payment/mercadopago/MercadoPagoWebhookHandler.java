@@ -1,6 +1,7 @@
 package com.tickethub.infrastructure.payment.mercadopago;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Objects.nonNull;
 
 import java.util.Optional;
 
@@ -36,7 +37,7 @@ public class MercadoPagoWebhookHandler {
 
     public Optional<Either<Notification, ConfirmPaymentOutput>> handle(final String xSignature,
             final String xRequestId, final String dataId, final String type) {
-        if (type != null && !"payment".equalsIgnoreCase(type)) {
+        if (nonNull(type) && !"payment".equalsIgnoreCase(type)) {
             return Optional.empty();
         }
         verifier.verify(xSignature, xRequestId, dataId);

@@ -1,6 +1,7 @@
 package com.tickethub.infrastructure.notification;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Objects.isNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,13 +44,13 @@ public class OrderConfirmationMailer {
     public void sendFor(final String orderId) {
         try {
             final var order = orders.findById(OrderID.from(orderId)).orElse(null);
-            if (order == null) {
+            if (isNull(order)) {
                 return;
             }
             final var email = customers.findById(order.getCustomerId())
                     .map(customer -> customer.getEmail().getValue())
                     .orElse(null);
-            if (email == null) {
+            if (isNull(email)) {
                 LOG.warn("Confirmation email skipped, customer has no email orderId={}", orderId);
                 return;
             }

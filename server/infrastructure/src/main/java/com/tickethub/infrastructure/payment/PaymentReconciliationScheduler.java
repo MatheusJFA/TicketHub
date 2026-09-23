@@ -2,6 +2,10 @@ package com.tickethub.infrastructure.payment;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Optional;
+
+import org.springframework.cache.Cache;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -45,15 +49,11 @@ public class PaymentReconciliationScheduler {
         }
         LOG.info("Payment reconciliation settled={} refunded={} expired={}",
                 output.settled().size(), output.refunded().size(), output.expired().size());
-        final var manager = cacheManager.getIfAvailable();
-        if (manager != null) {
+        Optional.ofNullable(cacheManager.getIfAvailable()).ifPresent(manager -> {
             for (final var name : new String[] { TickethubCacheProperties.SHOWS,
                     TickethubCacheProperties.SECTIONS, TickethubCacheProperties.SPOTS }) {
-                final var cache = manager.getCache(name);
-                if (cache != null) {
-                    cache.clear();
-                }
+                Optional.ofNullable(manager.getCache(name)).ifPresent(Cache::clear);
             }
-        }
+        });
     }
 }

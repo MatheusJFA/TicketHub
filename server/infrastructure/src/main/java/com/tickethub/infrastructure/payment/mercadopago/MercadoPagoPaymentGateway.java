@@ -1,8 +1,14 @@
 package com.tickethub.infrastructure.payment.mercadopago;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Objects.isNull;
 
+import java.util.Optional;
+
+import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Currency;
+import com.tickethub.domain.shared.Email;
 import java.util.Locale;
 
 import org.slf4j.Logger;
@@ -51,7 +57,7 @@ public class MercadoPagoPaymentGateway implements PaymentGateway {
         final var response = client.createPixPayment(total.getValue(),
                 "TicketHub order " + orderId.getValue(), orderId.getValue(), resolvePayerEmail(orderId),
                 properties.getNotificationUrl());
-        if (response.id() == null) {
+        if (isNull(response.id())) {
             throw new HttpUpstreamException("mercadopago", 200, "Missing payment id");
         }
         return Charge.create(ChargeID.from(String.valueOf(response.id())), orderId, total,
@@ -63,16 +69,15 @@ public class MercadoPagoPaymentGateway implements PaymentGateway {
         requireNonNull(chargeId, "'chargeId' should not be null");
         ensureEnabled();
         final var response = client.getPayment(chargeId.getValue());
-        if (response.externalReference() == null) {
+        if (isNull(response.externalReference())) {
             throw new HttpUpstreamException("mercadopago", 200,
                     "Missing external_reference for payment " + chargeId.getValue());
         }
-        final var currency = Currency.getInstance(
-                response.currencyId() != null ? response.currencyId() : "BRL");
+        final var currency =
+                Currency.getInstance(Optional.ofNullable(response.currencyId()).orElse("BRL"));
         final var total = Money.create(response.transactionAmount(), currency);
         return Charge.create(chargeId, OrderID.from(response.externalReference()), total,
-                mapStatus(response.status()), response.qrCode(),
-                response.dateApproved() != null ? response.dateApproved().toInstant() : null);
+                mapStatus(response.status()), response.qrCode(), approvedAt(response));
     }
 
     @Override
@@ -82,8 +87,11 @@ public class MercadoPagoPaymentGateway implements PaymentGateway {
         client.refundPayment(chargeId.getValue());
     }
 
-    private void ensureEnabled() {
-        if (!properties.isEnabled()) {
+    private static Instant approvedAt(final MercadoPagoClient.PaymentResponse response) {
+        return Optional.ofNullable(response.dateApproved()).map(OffsetDateTime::toInstant).orElse(null);
+    }
+
+    private void ensureEnabled() {        if (!properties.isEnabled()) {
             throw new InfrastructureException("Mercado Pago provider is disabled");
         }
     }
@@ -97,16 +105,19 @@ public class MercadoPagoPaymentGateway implements PaymentGateway {
     String resolvePayerEmail(final OrderID orderId) {
         try {
             final var order = orderGateway.findById(orderId).orElse(null);
-            if (order == null) {
+            if (isNull(order)) {
                 LOG.warn("Order not found for payer email orderId={}, using fallback", orderId.getValue());
                 return properties.getPayerEmail();
             }
-            final var customer = customerGateway.findById(order.getCustomerId()).orElse(null);
-            if (customer == null || customer.getEmail() == null) {
+            final var email = customerGateway.findById(order.getCustomerId())
+                    .map(customer -> customer.getEmail())
+                    .map(Email::getValue)
+                    .orElse(null);
+            if (isNull(email)) {
                 LOG.warn("Customer not found for payer email orderId={}, using fallback", orderId.getValue());
                 return properties.getPayerEmail();
             }
-            return customer.getEmail().getValue();
+            return email;
         } catch (final RuntimeException e) {
             LOG.warn("Payer email lookup failed orderId={} error={}, using fallback",
                     orderId.getValue(), e.getMessage());
@@ -114,8 +125,7 @@ public class MercadoPagoPaymentGateway implements PaymentGateway {
         }
     }
 
-    static ChargeStatus mapStatus(final String mpStatus) {
-        if (mpStatus == null) {
+    static ChargeStatus mapStatus(final String mpStatus) {        if (isNull(mpStatus)) {
             throw new HttpUpstreamException("mercadopago", 200, "Missing payment status");
         }
         return switch (mpStatus.toLowerCase(Locale.ROOT)) {

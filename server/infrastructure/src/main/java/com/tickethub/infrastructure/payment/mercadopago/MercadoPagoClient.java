@@ -1,6 +1,8 @@
 package com.tickethub.infrastructure.payment.mercadopago;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -39,7 +41,7 @@ public class MercadoPagoClient extends BaseHttpClient {
                     "payment_method_id", "pix",
                     "payer", Map.of("email", payerEmail),
                     "external_reference", externalReference));
-            if (notificationUrl != null && !notificationUrl.isBlank()) {
+            if (isNotBlank(notificationUrl)) {
                 body.put("notification_url", notificationUrl);
             }
             final var response = restClient.post()
@@ -85,7 +87,7 @@ public class MercadoPagoClient extends BaseHttpClient {
             @JsonProperty("point_of_interaction") PointOfInteraction pointOfInteraction) {
 
         public String qrCode() {
-            if (pointOfInteraction == null || pointOfInteraction.transactionData() == null) {
+            if (isNull(pointOfInteraction) || isNull(pointOfInteraction.transactionData())) {
                 return null;
             }
             return pointOfInteraction.transactionData().qrCode();

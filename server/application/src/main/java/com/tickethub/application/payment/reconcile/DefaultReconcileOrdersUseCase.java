@@ -6,6 +6,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.tickethub.application.Either;
 import com.tickethub.application.sales.SaleRecorder;
@@ -87,7 +88,7 @@ public class DefaultReconcileOrdersUseCase extends ReconcileOrdersUseCase {
             }
             return;
         }
-        final var approvedAt = charge.getApprovedAt() != null ? charge.getApprovedAt() : now;
+        final var approvedAt = Optional.ofNullable(charge.getApprovedAt()).orElse(now);
         if (!approvedAt.isAfter(order.getExpiresAt())) {
             order.markAsPaidAt(approvedAt, clock);
             for (final var item : order.getItems()) {

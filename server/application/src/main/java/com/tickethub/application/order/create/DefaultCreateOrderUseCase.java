@@ -1,6 +1,8 @@
 package com.tickethub.application.order.create;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -14,6 +16,7 @@ import com.tickethub.domain.core.customer.CustomerID;
 import com.tickethub.domain.core.order.Order;
 import com.tickethub.domain.core.order.OrderGateway;
 import com.tickethub.domain.core.order.OrderItem;
+import com.tickethub.domain.core.section.Section;
 import com.tickethub.domain.core.section.SectionGateway;
 import com.tickethub.domain.core.section.SectionID;
 import com.tickethub.domain.core.spot.Spot;
@@ -66,7 +69,7 @@ public class DefaultCreateOrderUseCase extends CreateOrderUseCase {
             if (customerGateway.findById(customerId).isEmpty()) {
                 return Either.left(notFound("Customer", customerId.getValue()));
             }
-            if (command.spotIds() == null || command.spotIds().isEmpty()) {
+            if (isNull(command.spotIds()) || command.spotIds().isEmpty()) {
                 return Either.left(
                         Notification.create(new DomainException("'spotIds' should not be empty")));
             }
@@ -92,12 +95,12 @@ public class DefaultCreateOrderUseCase extends CreateOrderUseCase {
                 }
                 reserved.add(taken.get());
                 final var price = sectionPrice(found.sectionId());
-                if (price == null) {
+                if (price.isEmpty()) {
                     releaseAll(reserved);
                     return Either.left(Notification.create(
                             new DomainException("Spot is not on sale: " + spotId.getValue())));
                 }
-                items.add(OrderItem.of(spotId, price));
+                items.add(OrderItem.of(spotId, price.get()));
             }
 
             final var order = Order.create(customerId, items, reservationTtl, clock,
@@ -115,7 +118,7 @@ public class DefaultCreateOrderUseCase extends CreateOrderUseCase {
     }
 
     private Optional<Order> findReplay(final String idempotencyKey) {
-        if (idempotencyKey == null || idempotencyKey.isBlank()) {
+        if (isBlank(idempotencyKey)) {
             return Optional.empty();
         }
         return orderGateway.findByIdempotencyKey(idempotencyKey);
@@ -129,7 +132,7 @@ public class DefaultCreateOrderUseCase extends CreateOrderUseCase {
      * lookup, and only surfaces the error when nothing was stored.
      */
     private Order persist(final Order order) {
-        if (order.getIdempotencyKey() == null || order.getIdempotencyKey().isBlank()) {
+        if (isBlank(order.getIdempotencyKey())) {
             return orderGateway.create(order);
         }
         try {
@@ -140,17 +143,14 @@ public class DefaultCreateOrderUseCase extends CreateOrderUseCase {
         }
     }
 
-    private Money sectionPrice(final String sectionId) {
-        if (sectionId == null) {
-            return null;
-        }
-        return sectionGateway.findById(SectionID.from(sectionId))
-                .map(section -> section.getPrice())
-                .orElse(null);
+    private Optional<Money> sectionPrice(final String sectionId) {
+        return Optional.ofNullable(sectionId)
+                .flatMap(id -> sectionGateway.findById(SectionID.from(id)))
+                .map(Section::getPrice);
     }
 
     private void releaseAll(final List<Spot> reserved) {
-        for (final Spot spot : reserved) {
+        reserved.forEach(spot -> {
             try {
                 spot.release();
                 spotGateway.update(spot);
@@ -158,6 +158,6 @@ public class DefaultCreateOrderUseCase extends CreateOrderUseCase {
                 // Best effort: the sweeper frees spots of expired orders, and a
                 // failed release here must not mask the original failure.
             }
-        }
+        });
     }
 }

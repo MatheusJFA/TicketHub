@@ -1,6 +1,7 @@
 package com.tickethub.application.zipcode.lookup;
 
 import static java.util.Objects.requireNonNull;
+import static java.util.Objects.isNull;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.geography.ZipCodeAddress;
@@ -18,7 +19,7 @@ public class DefaultLookupZipCodeUseCase extends LookupZipCodeUseCase {
     public Either<Notification, LookupZipCodeOutput> execute(final String zipCode) {
         try {
             final var normalized = ZipCodeAddress.normalize(zipCode);
-            if (normalized == null) {
+            if (isNull(normalized)) {
                 return Either.left(notFound(ZipCodeAddress.class.getSimpleName(), String.valueOf(zipCode)));
             }
             return findOrNotFound(
