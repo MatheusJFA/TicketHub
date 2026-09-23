@@ -33,13 +33,14 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.tickethub.infrastructure.authentication.AuthSessionProperties;
 import com.tickethub.infrastructure.security.SecurityProperties;
+import com.tickethub.infrastructure.web.CheckoutProperties;
 import com.tickethub.infrastructure.web.CorsProperties;
 
 @Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
 @EnableMethodSecurity(proxyTargetClass = true)
 @EnableConfigurationProperties({ SecurityProperties.class, AuthSessionProperties.class,
-        CorsProperties.class })
+        CorsProperties.class, CheckoutProperties.class })
 public class SecurityConfiguration {
 
     @Bean
