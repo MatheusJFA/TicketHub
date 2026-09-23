@@ -1,13 +1,13 @@
 package com.tickethub.application.spot.update;
 
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.core.spot.SpotGateway;
 import com.tickethub.domain.core.spot.SpotID;
 import com.tickethub.domain.validation.Notification;
+import java.util.Optional;
 
 public class DefaultUpdateSpotUseCase extends UpdateSpotUseCase {
     private final SpotGateway spotGateway;
@@ -44,5 +44,4 @@ public class DefaultUpdateSpotUseCase extends UpdateSpotUseCase {
             return Either.left(notification);
         }
     }
-
 }

@@ -7,20 +7,18 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.time.Duration;
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.DisplayName;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import com.tickethub.domain.authentication.RefreshSession;
 import com.tickethub.domain.authentication.RefreshSessionGateway;
 import com.tickethub.domain.authentication.SecureTokens;
+import java.time.Duration;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Logout use case")
@@ -40,8 +38,8 @@ class LogoutUseCaseTest {
     @DisplayName("Given known token, when execute, then revokes session")
     void givenKnownToken_whenExecute_thenRevokesSession() {
         final var presented = SecureTokens.generateOpaqueToken();
-        final var session = RefreshSession.issue(SecureTokens.sha256Hex(presented), "maria@domain.com",
-                List.of(), null, Duration.ofDays(7));
+        final var session = RefreshSession.issue(
+                SecureTokens.sha256Hex(presented), "maria@domain.com", List.of(), null, Duration.ofDays(7));
         when(refreshSessions.findByTokenHash(session.getTokenHash())).thenReturn(Optional.of(session));
 
         final var result = useCase.execute(LogoutCommand.with(presented));

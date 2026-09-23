@@ -4,18 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.Currency;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
-
 import com.tickethub.domain.core.section.Section;
 import com.tickethub.domain.core.section.SectionID;
 import com.tickethub.domain.core.show.ShowID;
@@ -24,10 +12,19 @@ import com.tickethub.domain.shared.Money;
 import com.tickethub.infrastructure.ContainerSupport;
 import com.tickethub.infrastructure.IntegrationTest;
 import com.tickethub.infrastructure.MongoCleanUpExtension;
-import com.tickethub.infrastructure.section.SectionMongoGateway;
 import com.tickethub.infrastructure.section.persistence.SectionDocument;
 import com.tickethub.infrastructure.show.persistence.ShowDocument;
 import com.tickethub.infrastructure.spot.persistence.SpotDocument;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.Currency;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 
 @IntegrationTest
 @DisplayName("Section Mongo gateway")
@@ -43,8 +40,8 @@ class SectionMongoGatewayIT extends ContainerSupport {
 
     @BeforeEach
     void cleanUp() {
-        MongoCleanUpExtension.cleanCollections(mongoTemplate,
-                ShowDocument.COLLECTION, SectionDocument.COLLECTION, SpotDocument.COLLECTION);
+        MongoCleanUpExtension.cleanCollections(
+                mongoTemplate, ShowDocument.COLLECTION, SectionDocument.COLLECTION, SpotDocument.COLLECTION);
     }
 
     private long count(final String collection) {
@@ -54,8 +51,23 @@ class SectionMongoGatewayIT extends ContainerSupport {
     private ShowID givenShow() {
         final var showId = ShowID.generate();
         final var now = Instant.now();
-        mongoTemplate.insert(new ShowDocument(showId.getValue(), "Show", "Description", null, null,
-                false, 0, 0, "partner-1", List.of(), now, now, null, null, null),
+        mongoTemplate.insert(
+                new ShowDocument(
+                        showId.getValue(),
+                        "Show",
+                        "Description",
+                        null,
+                        null,
+                        false,
+                        0,
+                        0,
+                        "partner-1",
+                        List.of(),
+                        now,
+                        now,
+                        null,
+                        null,
+                        null),
                 ShowDocument.COLLECTION);
         return showId;
     }
@@ -71,15 +83,14 @@ class SectionMongoGatewayIT extends ContainerSupport {
         assertEquals(1, count(SectionDocument.COLLECTION));
         assertEquals(3, count(SpotDocument.COLLECTION));
 
-        final var storedSection = mongoTemplate.findById(section.getId().getValue(),
-                SectionDocument.class, SectionDocument.COLLECTION);
+        final var storedSection =
+                mongoTemplate.findById(section.getId().getValue(), SectionDocument.class, SectionDocument.COLLECTION);
         assertEquals(showId.getValue(), storedSection.showId());
         assertEquals("partner-1", storedSection.partnerId());
 
-        final var storedSpots = mongoTemplate.find(new Query(), SpotDocument.class,
-                SpotDocument.COLLECTION);
-        assertTrue(storedSpots.stream().allMatch(spot ->
-                showId.getValue().equals(spot.showId())
+        final var storedSpots = mongoTemplate.find(new Query(), SpotDocument.class, SpotDocument.COLLECTION);
+        assertTrue(storedSpots.stream()
+                .allMatch(spot -> showId.getValue().equals(spot.showId())
                         && section.getId().getValue().equals(spot.sectionId())
                         && "partner-1".equals(spot.partnerId())));
 
@@ -129,7 +140,9 @@ class SectionMongoGatewayIT extends ContainerSupport {
         assertEquals(2, page.totalItems());
         assertEquals(2, page.items().size());
         assertTrue(page.items().stream().allMatch(section -> !section.getSpots().isEmpty()));
-        assertEquals(1, gateway.findAll(new SearchQuery(0, 10, "pista", "name", "asc")).totalItems());
+        assertEquals(
+                1,
+                gateway.findAll(new SearchQuery(0, 10, "pista", "name", "asc")).totalItems());
     }
 
     @Test
@@ -156,8 +169,7 @@ class SectionMongoGatewayIT extends ContainerSupport {
         final var vip = gateway.create(Section.create("VIP", "Front stage", 1, PRICE, "A", 5), first);
         gateway.create(Section.create("Pista", "Geral", 1, PRICE, "A", 5), second);
 
-        final var found =
-                gateway.findByShowId(first, new SearchQuery(0, 10, "", "name", "asc"));
+        final var found = gateway.findByShowId(first, new SearchQuery(0, 10, "", "name", "asc"));
 
         assertEquals(1, found.totalItems());
         assertEquals(vip.getId(), found.items().get(0).getId());

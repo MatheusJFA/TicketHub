@@ -2,8 +2,6 @@ package com.tickethub.application.payment.pay;
 
 import static java.util.Objects.requireNonNull;
 
-import java.time.Clock;
-
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.order.Order;
 import com.tickethub.domain.core.order.OrderGateway;
@@ -11,6 +9,7 @@ import com.tickethub.domain.core.order.OrderID;
 import com.tickethub.domain.core.payment.PaymentGateway;
 import com.tickethub.domain.exception.OrderExpiredException;
 import com.tickethub.domain.validation.Notification;
+import java.time.Clock;
 
 /**
  * Starts payment for a PENDING order by creating a provider charge. Retrying
@@ -27,8 +26,8 @@ public class DefaultPayOrderUseCase extends PayOrderUseCase {
         this(orderGateway, paymentGateway, Clock.systemUTC());
     }
 
-    public DefaultPayOrderUseCase(final OrderGateway orderGateway, final PaymentGateway paymentGateway,
-            final Clock clock) {
+    public DefaultPayOrderUseCase(
+            final OrderGateway orderGateway, final PaymentGateway paymentGateway, final Clock clock) {
         this.orderGateway = requireNonNull(orderGateway, "'orderGateway' should not be null");
         this.paymentGateway = requireNonNull(paymentGateway, "'paymentGateway' should not be null");
         this.clock = requireNonNull(clock, "'clock' should not be null");

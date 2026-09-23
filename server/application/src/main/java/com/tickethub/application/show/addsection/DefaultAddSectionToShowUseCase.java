@@ -1,8 +1,6 @@
 package com.tickethub.application.show.addsection;
 
 import static java.util.Objects.requireNonNull;
-import java.time.Instant;
-import java.util.Optional;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.section.Section;
@@ -13,6 +11,8 @@ import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.domain.event.DomainEventPublisher;
 import com.tickethub.domain.shared.Location;
 import com.tickethub.domain.validation.Notification;
+import java.time.Instant;
+import java.util.Optional;
 
 public class DefaultAddSectionToShowUseCase extends AddSectionToShowUseCase {
 
@@ -21,8 +21,10 @@ public class DefaultAddSectionToShowUseCase extends AddSectionToShowUseCase {
     private final long asyncSpotThreshold;
     private final int seatNumberWidth;
 
-    public DefaultAddSectionToShowUseCase(final ShowGateway showGateway,
-            final DomainEventPublisher eventPublisher, final long asyncSpotThreshold,
+    public DefaultAddSectionToShowUseCase(
+            final ShowGateway showGateway,
+            final DomainEventPublisher eventPublisher,
+            final long asyncSpotThreshold,
             final int seatNumberWidth) {
         this.showGateway = requireNonNull(showGateway);
         this.eventPublisher = requireNonNull(eventPublisher);
@@ -58,8 +60,12 @@ public class DefaultAddSectionToShowUseCase extends AddSectionToShowUseCase {
                 return addSectionAsync(entity, command);
             }
 
-            final Section candidate = Section.create(command.name(), command.description(),
-                    command.totalSpots(), command.price(), Location.sectionCode(0),
+            final Section candidate = Section.create(
+                    command.name(),
+                    command.description(),
+                    command.totalSpots(),
+                    command.price(),
+                    Location.sectionCode(0),
                     seatNumberWidth);
             candidate.validate(notification);
             if (notification.hasError()) {
@@ -67,11 +73,7 @@ public class DefaultAddSectionToShowUseCase extends AddSectionToShowUseCase {
             }
 
             entity.addSection(
-                    command.name(),
-                    command.description(),
-                    command.totalSpots(),
-                    command.price(),
-                    seatNumberWidth);
+                    command.name(), command.description(), command.totalSpots(), command.price(), seatNumberWidth);
 
             final Notification afterMutation = Notification.create();
             entity.validate(afterMutation);
@@ -88,21 +90,18 @@ public class DefaultAddSectionToShowUseCase extends AddSectionToShowUseCase {
         }
     }
 
-    private Either<Notification, AddSectionToShowOutput> addSectionAsync(final Show entity,
-            final AddSectionToShowCommand command) {
-        final Section candidate = Section.createShell(command.name(), command.description(),
-                command.totalSpots(), command.price());
+    private Either<Notification, AddSectionToShowOutput> addSectionAsync(
+            final Show entity, final AddSectionToShowCommand command) {
+        final Section candidate =
+                Section.createShell(command.name(), command.description(), command.totalSpots(), command.price());
         final Notification validation = Notification.create();
         candidate.validate(validation);
         if (validation.hasError()) {
             return Either.left(validation);
         }
         final String sectionCode = Location.sectionCode(entity.getSections().size());
-        final Section shell = entity.addSectionShell(
-                command.name(),
-                command.description(),
-                command.totalSpots(),
-                command.price());
+        final Section shell =
+                entity.addSectionShell(command.name(), command.description(), command.totalSpots(), command.price());
 
         final Notification afterMutation = Notification.create();
         entity.validate(afterMutation);
@@ -124,5 +123,4 @@ public class DefaultAddSectionToShowUseCase extends AddSectionToShowUseCase {
         }
         return Either.right(AddSectionToShowOutput.from(updatedShow));
     }
-
 }

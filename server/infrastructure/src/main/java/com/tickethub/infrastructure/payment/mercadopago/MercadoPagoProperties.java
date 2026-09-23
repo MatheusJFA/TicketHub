@@ -1,7 +1,6 @@
 package com.tickethub.infrastructure.payment.mercadopago;
 
 import java.time.Duration;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "tickethub.payment.mercadopago")

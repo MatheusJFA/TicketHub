@@ -1,15 +1,15 @@
 package com.tickethub.application.section.update;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Currency;
-import java.math.BigDecimal;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import com.tickethub.domain.shared.*;
+
 import com.tickethub.domain.core.section.*;
+import com.tickethub.domain.shared.*;
+import java.math.BigDecimal;
+import java.util.Currency;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Update section use case")
 class UpdateSectionUseCaseTest {

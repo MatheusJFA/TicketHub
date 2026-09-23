@@ -2,13 +2,12 @@ package com.tickethub.infrastructure.api.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
-
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.infrastructure.exception.EventPublishException;
 import com.tickethub.infrastructure.exception.InfrastructureException;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 
 @DisplayName("Global exception handler")
 class GlobalExceptionHandlerTest {
@@ -18,12 +17,12 @@ class GlobalExceptionHandlerTest {
     @Test
     @DisplayName("Given infrastructure failure, when handle, then returns service unavailable")
     void givenInfrastructureFailure_whenHandle_thenReturnsServiceUnavailable() {
-        final var response = handler.infrastructure(
-                new EventPublishException("Failed to publish spot generation event",
-                        new IllegalStateException("mapper down")));
+        final var response = handler.infrastructure(new EventPublishException(
+                "Failed to publish spot generation event", new IllegalStateException("mapper down")));
 
         assertEquals(HttpStatus.SERVICE_UNAVAILABLE, response.getStatusCode());
-        assertEquals("Failed to publish spot generation event",
+        assertEquals(
+                "Failed to publish spot generation event",
                 response.getBody().errors().get(0).message());
     }
 

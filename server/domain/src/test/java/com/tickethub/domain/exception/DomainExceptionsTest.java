@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 import java.time.OffsetDateTime;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +45,6 @@ class DomainExceptionsTest {
         final var exception = new ShowOutsideCheckInDateException(showDate);
 
         assertInstanceOf(DomainException.class, exception);
-        assertEquals("Show is outside the check-in date (showDate=2027-01-14T20:00-03:00)",
-                exception.getMessage());
+        assertEquals("Show is outside the check-in date (showDate=2027-01-14T20:00-03:00)", exception.getMessage());
     }
 }

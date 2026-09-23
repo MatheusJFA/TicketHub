@@ -1,19 +1,17 @@
 package com.tickethub.infrastructure.partner.persistence;
 
-import java.time.Instant;
-import java.util.Optional;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import com.tickethub.domain.core.partner.Partner;
 import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.shared.CNPJ;
+import com.tickethub.domain.shared.Email;
 import com.tickethub.domain.shared.Name;
 import com.tickethub.domain.shared.PasswordHash;
 import com.tickethub.infrastructure.audit.AuditActor;
 import com.tickethub.infrastructure.shared.persistence.AddressDocument;
-import com.tickethub.domain.shared.Email;
+import java.time.Instant;
+import java.util.Optional;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document("partners")
 public record PartnerDocument(
@@ -32,8 +30,18 @@ public record PartnerDocument(
     public static final String COLLECTION = "partners";
 
     public PartnerDocument withActors(final String createdBy, final String lastModifiedBy) {
-        return new PartnerDocument(id, name, cnpj, address, email, passwordHash, createdAt,
-                updatedAt, deletedAt, createdBy, lastModifiedBy);
+        return new PartnerDocument(
+                id,
+                name,
+                cnpj,
+                address,
+                email,
+                passwordHash,
+                createdAt,
+                updatedAt,
+                deletedAt,
+                createdBy,
+                lastModifiedBy);
     }
 
     public static PartnerDocument from(final Partner partner) {
@@ -43,7 +51,9 @@ public record PartnerDocument(
                 partner.getCnpj().getValue(),
                 AddressDocument.from(partner.getAddress()),
                 Optional.ofNullable(partner.getEmail()).map(Email::getValue).orElse(null),
-                Optional.ofNullable(partner.getPasswordHash()).map(PasswordHash::getValue).orElse(null),
+                Optional.ofNullable(partner.getPasswordHash())
+                        .map(PasswordHash::getValue)
+                        .orElse(null),
                 partner.getCreatedAt(),
                 partner.getUpdatedAt(),
                 partner.getDeletedAt(),
@@ -62,7 +72,8 @@ public record PartnerDocument(
         // validation/login instead of breaking reads.
         final Email email = Optional.ofNullable(this.email).map(Email::create).orElse(null);
         final PasswordHash passwordHash = Optional.ofNullable(this.passwordHash)
-                .map(PasswordHash::fromHash).orElse(null);
+                .map(PasswordHash::fromHash)
+                .orElse(null);
         return Partner.reconstitute(
                 PartnerID.from(id),
                 Name.create(name),
@@ -70,6 +81,10 @@ public record PartnerDocument(
                 address.toDomain(),
                 email,
                 passwordHash,
-                createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
+                createdAt,
+                updatedAt,
+                deletedAt,
+                createdBy,
+                lastModifiedBy);
     }
 }

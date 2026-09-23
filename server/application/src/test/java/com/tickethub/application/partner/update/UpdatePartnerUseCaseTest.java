@@ -1,20 +1,25 @@
 package com.tickethub.application.partner.update;
 
-import java.util.Optional;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import com.tickethub.domain.shared.*;
+
 import com.tickethub.domain.core.partner.*;
+import com.tickethub.domain.shared.*;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Update partner use case")
 class UpdatePartnerUseCaseTest {
-    private final Address address = Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil",
-            "01001000");
-    private final Address newAddress = Address.create("Rua B", "20", "Sala 1", "Centro", "Sao Paulo", "SP", "Brasil",
-            "01001001");
-    private final Partner entity = Partner.create("Cinema", "11222333000181", address, "cinema@domain.com",
+    private final Address address =
+            Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000");
+    private final Address newAddress =
+            Address.create("Rua B", "20", "Sala 1", "Centro", "Sao Paulo", "SP", "Brasil", "01001001");
+    private final Partner entity = Partner.create(
+            "Cinema",
+            "11222333000181",
+            address,
+            "cinema@domain.com",
             "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
     private final PartnerGateway gateway = mock(PartnerGateway.class);
     private final DefaultUpdatePartnerUseCase useCase = new DefaultUpdatePartnerUseCase(gateway);

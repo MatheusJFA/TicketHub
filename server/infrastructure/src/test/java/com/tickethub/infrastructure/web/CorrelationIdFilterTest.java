@@ -4,11 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import java.util.List;
-
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -16,9 +17,6 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 
 @DisplayName("Correlation id filter")
 class CorrelationIdFilterTest {
@@ -70,8 +68,9 @@ class CorrelationIdFilterTest {
     @Test
     @DisplayName("Given authenticated principal, when filter, then principal wins over actor header")
     void givenAuthenticatedPrincipal_whenFilter_thenPrincipalWinsOverActorHeader() throws Exception {
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
-                "jwt-user", null, List.of(new SimpleGrantedAuthority("show:create"))));
+        SecurityContextHolder.getContext()
+                .setAuthentication(new UsernamePasswordAuthenticationToken(
+                        "jwt-user", null, List.of(new SimpleGrantedAuthority("show:create"))));
         final var request = new MockHttpServletRequest();
         request.addHeader(CorrelationIdFilter.ACTOR_HEADER, "spoofed");
         final var response = new MockHttpServletResponse();

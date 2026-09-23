@@ -1,7 +1,7 @@
 package com.tickethub.infrastructure.api.controllers;
 
-import com.tickethub.infrastructure.api.models.IdResponse;
-import com.tickethub.domain.pagination.Pagination;
+import com.tickethub.application.section.retrieve.byshow.ListShowSectionsCommand;
+import com.tickethub.application.section.retrieve.byshow.ListShowSectionsUseCase;
 import com.tickethub.application.show.addsection.AddSectionToShowUseCase;
 import com.tickethub.application.show.changedescription.ChangeShowDescriptionUseCase;
 import com.tickethub.application.show.changename.ChangeShowNameUseCase;
@@ -14,13 +14,18 @@ import com.tickethub.application.show.publishall.PublishAllShowUseCase;
 import com.tickethub.application.show.reschedule.RescheduleShowUseCase;
 import com.tickethub.application.show.retrieve.get.GetShowUseCase;
 import com.tickethub.application.show.retrieve.list.ListShowsUseCase;
-import com.tickethub.application.section.retrieve.byshow.ListShowSectionsCommand;
-import com.tickethub.application.section.retrieve.byshow.ListShowSectionsUseCase;
 import com.tickethub.application.show.unpublish.UnpublishShowCommand;
 import com.tickethub.application.show.unpublish.UnpublishShowUseCase;
 import com.tickethub.application.show.unpublishall.UnpublishAllShowCommand;
 import com.tickethub.application.show.unpublishall.UnpublishAllShowUseCase;
 import com.tickethub.application.show.update.UpdateShowUseCase;
+import com.tickethub.domain.pagination.Pagination;
+import com.tickethub.infrastructure.api.HttpResults;
+import com.tickethub.infrastructure.api.ShowAPI;
+import com.tickethub.infrastructure.api.models.IdResponse;
+import com.tickethub.infrastructure.cache.TickethubCacheProperties;
+import com.tickethub.infrastructure.section.models.SectionListResponse;
+import com.tickethub.infrastructure.section.presenters.SectionMapper;
 import com.tickethub.infrastructure.show.models.AddSectionToShowRequest;
 import com.tickethub.infrastructure.show.models.ChangeShowDescriptionRequest;
 import com.tickethub.infrastructure.show.models.ChangeShowNameRequest;
@@ -29,16 +34,11 @@ import com.tickethub.infrastructure.show.models.RescheduleShowRequest;
 import com.tickethub.infrastructure.show.models.ShowListResponse;
 import com.tickethub.infrastructure.show.models.ShowResponse;
 import com.tickethub.infrastructure.show.models.UpdateShowRequest;
-import com.tickethub.infrastructure.section.models.SectionListResponse;
-import java.net.URI;
-import org.springframework.http.ResponseEntity;
-import com.tickethub.infrastructure.api.ShowAPI;
-import com.tickethub.infrastructure.api.HttpResults;
 import com.tickethub.infrastructure.show.presenters.ShowMapper;
-import com.tickethub.infrastructure.section.presenters.SectionMapper;
-import com.tickethub.infrastructure.cache.TickethubCacheProperties;
+import java.net.URI;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -60,7 +60,8 @@ public class ShowController implements ShowAPI {
     private final ShowMapper mapper;
     private final SectionMapper sectionMapper;
 
-    public ShowController(AddSectionToShowUseCase addSectionToShow,
+    public ShowController(
+            AddSectionToShowUseCase addSectionToShow,
             ChangeShowDescriptionUseCase changeShowDescription,
             ChangeShowNameUseCase changeShowName,
             CreateShowUseCase createShow,
@@ -159,15 +160,16 @@ public class ShowController implements ShowAPI {
     @Override
     @Cacheable(TickethubCacheProperties.SHOWS)
     public Pagination<ShowListResponse> list(String search, int page, int perPage, String sort, String direction) {
-        return HttpResults.require(listShows.execute(HttpResults.search(search, page, perPage, sort, direction))).map(mapper::toListResponse);
+        return HttpResults.require(listShows.execute(HttpResults.search(search, page, perPage, sort, direction)))
+                .map(mapper::toListResponse);
     }
 
     @Override
     @Cacheable(TickethubCacheProperties.SECTIONS)
-    public Pagination<SectionListResponse> listSections(String id, String search, int page, int perPage,
-            String sort, String direction) {
-        return HttpResults.require(listShowSections.execute(ListShowSectionsCommand.with(id,
-                HttpResults.search(search, page, perPage, sort, direction))))
+    public Pagination<SectionListResponse> listSections(
+            String id, String search, int page, int perPage, String sort, String direction) {
+        return HttpResults.require(listShowSections.execute(
+                        ListShowSectionsCommand.with(id, HttpResults.search(search, page, perPage, sort, direction))))
                 .map(sectionMapper::toListResponse);
     }
 

@@ -1,9 +1,9 @@
 package com.tickethub.infrastructure.security;
 
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static java.util.Objects.requireNonNull;
 
 import java.util.LinkedHashSet;
 import java.util.List;

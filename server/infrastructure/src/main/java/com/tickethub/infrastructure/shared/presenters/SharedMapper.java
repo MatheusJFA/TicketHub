@@ -2,17 +2,15 @@ package com.tickethub.infrastructure.shared.presenters;
 
 import static java.util.Objects.isNull;
 
-import java.util.Currency;
-import java.util.Optional;
-
-import org.mapstruct.Mapper;
-
 import com.tickethub.domain.exception.DomainException;
+import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.shared.Location;
 import com.tickethub.domain.shared.Money;
 import com.tickethub.infrastructure.api.models.AddressModel;
 import com.tickethub.infrastructure.api.models.MoneyModel;
-import com.tickethub.domain.shared.Address;
+import java.util.Currency;
+import java.util.Optional;
+import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface SharedMapper {
@@ -24,15 +22,21 @@ public interface SharedMapper {
     }
 
     private static Address with(final AddressModel current) {
-        return Address.create(current.street(), current.number(),
-                current.complement(), current.neighborhood(), current.city(),
-                current.state(), current.country(), current.zipCode());
+        return Address.create(
+                current.street(),
+                current.number(),
+                current.complement(),
+                current.neighborhood(),
+                current.city(),
+                current.state(),
+                current.country(),
+                current.zipCode());
     }
 
     default MoneyModel toModel(final Money money) {
         return Optional.ofNullable(money)
-                .map(current -> new MoneyModel(current.getValue(),
-                        current.getCurrency().getCurrencyCode()))
+                .map(current ->
+                        new MoneyModel(current.getValue(), current.getCurrency().getCurrencyCode()))
                 .orElse(null);
     }
 
@@ -41,8 +45,11 @@ public interface SharedMapper {
             return null;
         }
         try {
-            return Money.create(model.value(),
-                    Optional.ofNullable(model.currency()).map(Currency::getInstance).orElse(null));
+            return Money.create(
+                    model.value(),
+                    Optional.ofNullable(model.currency())
+                            .map(Currency::getInstance)
+                            .orElse(null));
         } catch (final IllegalArgumentException exception) {
             throw new DomainException("Invalid currency");
         }

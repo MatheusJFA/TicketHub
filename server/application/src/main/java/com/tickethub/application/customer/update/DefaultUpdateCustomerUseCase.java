@@ -1,13 +1,13 @@
 package com.tickethub.application.customer.update;
 
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.customer.Customer;
 import com.tickethub.domain.core.customer.CustomerGateway;
-import com.tickethub.domain.validation.Notification;
 import com.tickethub.domain.core.customer.CustomerID;
+import com.tickethub.domain.validation.Notification;
+import java.util.Optional;
 
 public class DefaultUpdateCustomerUseCase extends UpdateCustomerUseCase {
     private final CustomerGateway customerGateway;
@@ -44,5 +44,4 @@ public class DefaultUpdateCustomerUseCase extends UpdateCustomerUseCase {
             return Either.left(notification);
         }
     }
-
 }

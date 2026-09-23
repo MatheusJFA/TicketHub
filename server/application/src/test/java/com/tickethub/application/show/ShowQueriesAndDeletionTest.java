@@ -1,25 +1,30 @@
 package com.tickethub.application.show;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Currency;
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import com.tickethub.domain.shared.*;
-import com.tickethub.domain.core.partner.PartnerID;
-import com.tickethub.domain.pagination.*;
-import com.tickethub.domain.core.show.*;
+
+import com.tickethub.application.show.delete.*;
 import com.tickethub.application.show.retrieve.get.*;
 import com.tickethub.application.show.retrieve.list.*;
-import com.tickethub.application.show.delete.*;
+import com.tickethub.domain.core.partner.PartnerID;
+import com.tickethub.domain.core.show.*;
+import com.tickethub.domain.pagination.*;
+import com.tickethub.domain.shared.*;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Show queries and deletion")
 class ShowQueriesAndDeletionTest {
-    private final Show entity = Show.create("Show original", "Descricao original", OffsetDateTime.parse("2030-01-01T20:00:00Z"), Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), 10, PartnerID.generate());
+    private final Show entity = Show.create(
+            "Show original",
+            "Descricao original",
+            OffsetDateTime.parse("2030-01-01T20:00:00Z"),
+            Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"),
+            10,
+            PartnerID.generate());
     private final ShowGateway gateway = mock(ShowGateway.class);
     private final String id = entity.getId().getValue();
     private final SearchQuery query = new SearchQuery(2, 10, "search", "id", "asc");

@@ -8,6 +8,4 @@ import jakarta.validation.constraints.NotBlank;
  * PSP callback; provider signature verification is future work.
  */
 public record WebhookRequest(
-        @NotBlank String chargeId,
-        @NotBlank String status) {
-}
+        @NotBlank String chargeId, @NotBlank String status) {}

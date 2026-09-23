@@ -1,13 +1,12 @@
 package com.tickethub.application.authentication.logout;
 
-import static org.apache.commons.lang3.StringUtils.defaultString;
 import static java.util.Objects.requireNonNull;
-
-import java.util.Optional;
+import static org.apache.commons.lang3.StringUtils.defaultString;
 
 import com.tickethub.domain.authentication.RefreshSessionGateway;
 import com.tickethub.domain.authentication.SecureTokens;
 import com.tickethub.domain.validation.Notification;
+import java.util.Optional;
 
 public class DefaultLogoutUseCase extends LogoutUseCase {
 

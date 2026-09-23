@@ -1,20 +1,18 @@
 package com.tickethub.infrastructure.notification;
 
-import static java.util.Objects.requireNonNull;
 import static java.util.Objects.isNull;
+import static java.util.Objects.requireNonNull;
 
+import com.tickethub.domain.core.customer.CustomerGateway;
+import com.tickethub.domain.core.order.OrderGateway;
+import com.tickethub.domain.core.order.OrderID;
+import com.tickethub.domain.core.ticket.TicketGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
-
-import com.tickethub.domain.core.customer.CustomerGateway;
-import com.tickethub.domain.core.customer.CustomerID;
-import com.tickethub.domain.core.order.OrderGateway;
-import com.tickethub.domain.core.order.OrderID;
-import com.tickethub.domain.core.ticket.TicketGateway;
 
 /**
  * Sends the buyer their tickets after a confirmed payment. Best effort by
@@ -31,8 +29,11 @@ public class OrderConfirmationMailer {
     private final JavaMailSender mailSender;
     private final String from;
 
-    public OrderConfirmationMailer(final OrderGateway orders, final CustomerGateway customers,
-            final TicketGateway tickets, final JavaMailSender mailSender,
+    public OrderConfirmationMailer(
+            final OrderGateway orders,
+            final CustomerGateway customers,
+            final TicketGateway tickets,
+            final JavaMailSender mailSender,
             @Value("${tickethub.mail.from:noreply@tickethub.local}") final String from) {
         this.orders = requireNonNull(orders, "'orders' should not be null");
         this.customers = requireNonNull(customers, "'customers' should not be null");
@@ -47,7 +48,8 @@ public class OrderConfirmationMailer {
             if (isNull(order)) {
                 return;
             }
-            final var email = customers.findById(order.getCustomerId())
+            final var email = customers
+                    .findById(order.getCustomerId())
                     .map(customer -> customer.getEmail().getValue())
                     .orElse(null);
             if (isNull(email)) {
@@ -67,11 +69,11 @@ public class OrderConfirmationMailer {
     }
 
     private String body(final String orderId) {
-        final var lines = new StringBuilder("Pedido ").append(orderId)
+        final var lines = new StringBuilder("Pedido ")
+                .append(orderId)
                 .append(" confirmado! Apresente um código por ingresso na portaria:\n");
         for (final var ticket : tickets.findByOrderId(OrderID.from(orderId))) {
-            lines.append("\n- ").append(ticket.getId().getValue())
-                    .append(" · ").append(ticket.getCode());
+            lines.append("\n- ").append(ticket.getId().getValue()).append(" · ").append(ticket.getCode());
         }
         return lines.toString();
     }

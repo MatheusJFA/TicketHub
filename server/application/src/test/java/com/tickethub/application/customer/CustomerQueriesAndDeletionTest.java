@@ -1,25 +1,25 @@
 package com.tickethub.application.customer;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Currency;
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import com.tickethub.domain.shared.*;
-import com.tickethub.domain.core.partner.PartnerID;
-import com.tickethub.domain.pagination.*;
-import com.tickethub.domain.core.customer.*;
+
+import com.tickethub.application.customer.delete.*;
 import com.tickethub.application.customer.retrieve.get.*;
 import com.tickethub.application.customer.retrieve.list.*;
-import com.tickethub.application.customer.delete.*;
+import com.tickethub.domain.core.customer.*;
+import com.tickethub.domain.pagination.*;
+import com.tickethub.domain.shared.*;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Customer queries and deletion")
 class CustomerQueriesAndDeletionTest {
-    private final Customer entity = Customer.create("52998224725", "Maria Silva", "maria@domain.com",
+    private final Customer entity = Customer.create(
+            "52998224725",
+            "Maria Silva",
+            "maria@domain.com",
             "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
     private final CustomerGateway gateway = mock(CustomerGateway.class);
     private final String id = entity.getId().getValue();

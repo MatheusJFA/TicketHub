@@ -18,8 +18,7 @@ public class DefaultGetOrderUseCase extends GetOrderUseCase {
     public Either<Notification, GetOrderOutput> execute(final String orderId) {
         try {
             final var id = OrderID.from(orderId);
-            return findOrNotFound(orderGateway.findById(id).map(GetOrderOutput::from),
-                    "Order", id.getValue());
+            return findOrNotFound(orderGateway.findById(id).map(GetOrderOutput::from), "Order", id.getValue());
         } catch (final RuntimeException exception) {
             return Either.left(Notification.create(exception));
         }

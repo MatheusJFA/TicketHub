@@ -1,7 +1,5 @@
 package com.tickethub.infrastructure.api.controllers;
 
-import com.tickethub.infrastructure.api.models.*;
-import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.application.section.changedescription.*;
 import com.tickethub.application.section.changename.*;
 import com.tickethub.application.section.changeprice.*;
@@ -11,21 +9,23 @@ import com.tickethub.application.section.publish.*;
 import com.tickethub.application.section.publishall.*;
 import com.tickethub.application.section.retrieve.get.*;
 import com.tickethub.application.section.retrieve.list.*;
-import com.tickethub.application.spot.retrieve.bysection.*;
 import com.tickethub.application.section.unpublish.*;
 import com.tickethub.application.section.unpublishall.*;
 import com.tickethub.application.section.update.*;
-import com.tickethub.infrastructure.section.models.*;
-import com.tickethub.infrastructure.spot.models.SpotListResponse;
-import java.net.URI;
-import org.springframework.http.ResponseEntity;
-import com.tickethub.infrastructure.api.SectionAPI;
+import com.tickethub.application.spot.retrieve.bysection.*;
+import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.infrastructure.api.HttpResults;
-import com.tickethub.infrastructure.section.presenters.SectionMapper;
-import com.tickethub.infrastructure.spot.presenters.SpotMapper;
+import com.tickethub.infrastructure.api.SectionAPI;
+import com.tickethub.infrastructure.api.models.*;
 import com.tickethub.infrastructure.cache.TickethubCacheProperties;
+import com.tickethub.infrastructure.section.models.*;
+import com.tickethub.infrastructure.section.presenters.SectionMapper;
+import com.tickethub.infrastructure.spot.models.SpotListResponse;
+import com.tickethub.infrastructure.spot.presenters.SpotMapper;
+import java.net.URI;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -46,7 +46,8 @@ public class SectionController implements SectionAPI {
     private final SectionMapper mapper;
     private final SpotMapper spotMapper;
 
-    public SectionController(ChangeSectionDescriptionUseCase changeSectionDescription,
+    public SectionController(
+            ChangeSectionDescriptionUseCase changeSectionDescription,
             ChangeSectionNameUseCase changeSectionName,
             ChangeSectionPriceUseCase changeSectionPrice,
             CreateSectionUseCase createSection,
@@ -136,15 +137,16 @@ public class SectionController implements SectionAPI {
     @Override
     @Cacheable(TickethubCacheProperties.SECTIONS)
     public Pagination<SectionListResponse> list(String search, int page, int perPage, String sort, String direction) {
-        return HttpResults.require(listSections.execute(HttpResults.search(search, page, perPage, sort, direction))).map(mapper::toListResponse);
+        return HttpResults.require(listSections.execute(HttpResults.search(search, page, perPage, sort, direction)))
+                .map(mapper::toListResponse);
     }
 
     @Override
     @Cacheable(TickethubCacheProperties.SPOTS)
-    public Pagination<SpotListResponse> listSpots(String id, String search, int page, int perPage,
-            String sort, String direction) {
-        return HttpResults.require(listSectionSpots.execute(ListSectionSpotsCommand.with(id,
-                HttpResults.search(search, page, perPage, sort, direction))))
+    public Pagination<SpotListResponse> listSpots(
+            String id, String search, int page, int perPage, String sort, String direction) {
+        return HttpResults.require(listSectionSpots.execute(
+                        ListSectionSpotsCommand.with(id, HttpResults.search(search, page, perPage, sort, direction))))
                 .map(spotMapper::toListResponse);
     }
 

@@ -2,24 +2,12 @@ package com.tickethub.application.payment.reconcile;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.AdditionalAnswers.returnsFirstArg;
-
-import java.math.BigDecimal;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.util.Currency;
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
 import com.tickethub.application.UseCaseTest;
 import com.tickethub.application.sales.SaleRecorder;
@@ -39,6 +27,16 @@ import com.tickethub.domain.core.ticket.TicketGateway;
 import com.tickethub.domain.core.ticket.TicketSigner;
 import com.tickethub.domain.shared.Location;
 import com.tickethub.domain.shared.Money;
+import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.Currency;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Reconcile orders use case")
 class ReconcileOrdersUseCaseTest extends UseCaseTest {
@@ -64,9 +62,11 @@ class ReconcileOrdersUseCaseTest extends UseCaseTest {
 
     private Order givenChargedOrder(final String charge) {
         final var spot = Spot.create(Location.create("A1"));
-        final var order = Order.create(CustomerID.generate(),
+        final var order = Order.create(
+                CustomerID.generate(),
                 List.of(OrderItem.of(spot.getId(), Money.create(new BigDecimal("50.00"), BRL))),
-                TTL, PAST);
+                TTL,
+                PAST);
         order.attachCharge(ChargeID.from(charge));
         when(spotGateway.findById(spot.getId())).thenReturn(Optional.of(spot));
         when(spotGateway.update(any())).thenAnswer(returnsFirstArg());
@@ -76,8 +76,7 @@ class ReconcileOrdersUseCaseTest extends UseCaseTest {
     }
 
     private Charge providerCharge(final Order order, final ChargeStatus status, final Instant approvedAt) {
-        return Charge.create(order.getChargeId(), order.getId(), order.getTotal(), status,
-                "PIX", approvedAt);
+        return Charge.create(order.getChargeId(), order.getId(), order.getTotal(), status, "PIX", approvedAt);
     }
 
     @Test
@@ -86,7 +85,8 @@ class ReconcileOrdersUseCaseTest extends UseCaseTest {
         final var order = givenChargedOrder("ch_1");
         when(orderGateway.findPendingExpired(any())).thenReturn(List.of(order));
         when(paymentGateway.findStatus(order.getChargeId()))
-                .thenReturn(providerCharge(order, ChargeStatus.PAID, PAST.instant().plus(Duration.ofMinutes(5))));
+                .thenReturn(
+                        providerCharge(order, ChargeStatus.PAID, PAST.instant().plus(Duration.ofMinutes(5))));
 
         final var output = useCase.execute().getRight();
 
@@ -108,8 +108,8 @@ class ReconcileOrdersUseCaseTest extends UseCaseTest {
         final var order = givenChargedOrder("ch_2");
         when(orderGateway.findPendingExpired(any())).thenReturn(List.of(order));
         when(paymentGateway.findStatus(order.getChargeId()))
-                .thenReturn(providerCharge(order, ChargeStatus.PAID,
-                        PAST.instant().plus(TTL).plusSeconds(1)));
+                .thenReturn(providerCharge(
+                        order, ChargeStatus.PAID, PAST.instant().plus(TTL).plusSeconds(1)));
 
         final var output = useCase.execute().getRight();
 
@@ -153,9 +153,11 @@ class ReconcileOrdersUseCaseTest extends UseCaseTest {
     @Test
     @DisplayName("Given order without charge, when execute, then skips for sweeper")
     void givenOrderWithoutCharge_whenExecute_thenSkips() {
-        final var plain = Order.create(CustomerID.generate(),
+        final var plain = Order.create(
+                CustomerID.generate(),
                 List.of(OrderItem.of(SpotID.generate(), Money.create(new BigDecimal("50.00"), BRL))),
-                TTL, CLOCK);
+                TTL,
+                CLOCK);
         when(orderGateway.findPendingExpired(any())).thenReturn(List.of(plain));
 
         final var output = useCase.execute().getRight();

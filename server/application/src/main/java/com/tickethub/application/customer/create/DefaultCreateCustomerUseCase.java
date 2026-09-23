@@ -20,8 +20,8 @@ public class DefaultCreateCustomerUseCase extends CreateCustomerUseCase {
     @Override
     public Either<Notification, CreateCustomerOutput> execute(final CreateCustomerCommand command) {
         try {
-            final Customer entity = Customer.create(command.cpf(), command.name(), command.email(),
-                    passwordHasher.hash(command.password()));
+            final Customer entity = Customer.create(
+                    command.cpf(), command.name(), command.email(), passwordHasher.hash(command.password()));
             final Notification notification = Notification.create();
 
             entity.validate(notification);

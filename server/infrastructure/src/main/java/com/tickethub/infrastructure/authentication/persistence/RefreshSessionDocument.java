@@ -1,12 +1,10 @@
 package com.tickethub.infrastructure.authentication.persistence;
 
+import com.tickethub.domain.authentication.RefreshSession;
 import java.time.Instant;
 import java.util.List;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import com.tickethub.domain.authentication.RefreshSession;
 
 @Document("refresh_sessions")
 public record RefreshSessionDocument(
@@ -38,7 +36,16 @@ public record RefreshSessionDocument(
     }
 
     public RefreshSession toDomain() {
-        return RefreshSession.reconstitute(id, familyId, tokenHash, subject, authorities, ownerId,
-                createdAt, expiresAt, revoked, replacedByTokenHash);
+        return RefreshSession.reconstitute(
+                id,
+                familyId,
+                tokenHash,
+                subject,
+                authorities,
+                ownerId,
+                createdAt,
+                expiresAt,
+                revoked,
+                replacedByTokenHash);
     }
 }

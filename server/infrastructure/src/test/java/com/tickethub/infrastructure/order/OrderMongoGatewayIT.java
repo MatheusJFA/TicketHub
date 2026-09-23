@@ -4,20 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.math.BigDecimal;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.util.Currency;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-
 import com.tickethub.domain.core.customer.CustomerID;
 import com.tickethub.domain.core.order.Order;
 import com.tickethub.domain.core.order.OrderID;
@@ -29,6 +15,18 @@ import com.tickethub.infrastructure.ContainerSupport;
 import com.tickethub.infrastructure.IntegrationTest;
 import com.tickethub.infrastructure.MongoCleanUpExtension;
 import com.tickethub.infrastructure.order.persistence.OrderDocument;
+import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.Currency;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
 @IntegrationTest
 @DisplayName("Order Mongo gateway")
@@ -66,10 +64,10 @@ class OrderMongoGatewayIT extends ContainerSupport {
         assertEquals(order.getCustomerId(), found.getCustomerId());
         assertEquals(order.getTotal(), found.getTotal());
         assertEquals(order.getStatus(), found.getStatus());
-        assertEquals(order.getExpiresAt().truncatedTo(java.time.temporal.ChronoUnit.MILLIS),
-                found.getExpiresAt());
+        assertEquals(order.getExpiresAt().truncatedTo(java.time.temporal.ChronoUnit.MILLIS), found.getExpiresAt());
         assertEquals(1, found.getItems().size());
-        assertEquals(order.getItems().get(0).getSpotId(), found.getItems().get(0).getSpotId());
+        assertEquals(
+                order.getItems().get(0).getSpotId(), found.getItems().get(0).getSpotId());
         assertEquals(order.getItems().get(0).getPrice(), found.getItems().get(0).getPrice());
     }
 
@@ -106,9 +104,12 @@ class OrderMongoGatewayIT extends ContainerSupport {
     @Test
     @DisplayName("Given an order with key, when find by idempotency key, then returns order")
     void givenOrderWithKey_whenFindByIdempotencyKey_thenReturnsOrder() {
-        final var order = Order.create(CustomerID.generate(),
+        final var order = Order.create(
+                CustomerID.generate(),
                 List.of(OrderItem.of(SpotID.generate(), Money.create(new BigDecimal("50.00"), BRL))),
-                TTL, Clock.systemUTC(), "key-1");
+                TTL,
+                Clock.systemUTC(),
+                "key-1");
         gateway.create(order);
 
         final var found = gateway.findByIdempotencyKey("key-1").orElseThrow();
@@ -122,9 +123,11 @@ class OrderMongoGatewayIT extends ContainerSupport {
     @DisplayName("Given expired and open orders, when find pending expired, then returns only expired")
     void givenOrders_whenFindPendingExpired_thenReturnsOnlyExpired() {
         final var past = Clock.fixed(Instant.now().minus(TTL).minusSeconds(60), ZoneOffset.UTC);
-        final var expired = Order.create(CustomerID.generate(),
+        final var expired = Order.create(
+                CustomerID.generate(),
                 List.of(OrderItem.of(SpotID.generate(), Money.create(BigDecimal.TEN, BRL))),
-                TTL, past);
+                TTL,
+                past);
         final var open = givenOrder();
         gateway.create(expired);
         gateway.create(open);

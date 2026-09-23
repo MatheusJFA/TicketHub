@@ -2,12 +2,6 @@ package com.tickethub.application.payment.reconcile;
 
 import static java.util.Objects.requireNonNull;
 
-import java.time.Clock;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import com.tickethub.application.Either;
 import com.tickethub.application.sales.SaleRecorder;
 import com.tickethub.domain.core.order.Order;
@@ -19,6 +13,11 @@ import com.tickethub.domain.core.ticket.Ticket;
 import com.tickethub.domain.core.ticket.TicketGateway;
 import com.tickethub.domain.core.ticket.TicketSigner;
 import com.tickethub.domain.validation.Notification;
+import java.time.Clock;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Reconciles PENDING orders past their TTL that already have a charge —
@@ -36,15 +35,24 @@ public class DefaultReconcileOrdersUseCase extends ReconcileOrdersUseCase {
     private final SaleRecorder sales;
     private final Clock clock;
 
-    public DefaultReconcileOrdersUseCase(final OrderGateway orderGateway, final TicketGateway ticketGateway,
-            final TicketSigner ticketSigner, final PaymentGateway paymentGateway,
-            final SpotGateway spotGateway, final SaleRecorder sales) {
+    public DefaultReconcileOrdersUseCase(
+            final OrderGateway orderGateway,
+            final TicketGateway ticketGateway,
+            final TicketSigner ticketSigner,
+            final PaymentGateway paymentGateway,
+            final SpotGateway spotGateway,
+            final SaleRecorder sales) {
         this(orderGateway, ticketGateway, ticketSigner, paymentGateway, spotGateway, sales, Clock.systemUTC());
     }
 
-    public DefaultReconcileOrdersUseCase(final OrderGateway orderGateway, final TicketGateway ticketGateway,
-            final TicketSigner ticketSigner, final PaymentGateway paymentGateway,
-            final SpotGateway spotGateway, final SaleRecorder sales, final Clock clock) {
+    public DefaultReconcileOrdersUseCase(
+            final OrderGateway orderGateway,
+            final TicketGateway ticketGateway,
+            final TicketSigner ticketSigner,
+            final PaymentGateway paymentGateway,
+            final SpotGateway spotGateway,
+            final SaleRecorder sales,
+            final Clock clock) {
         this.orderGateway = requireNonNull(orderGateway, "'orderGateway' should not be null");
         this.ticketGateway = requireNonNull(ticketGateway, "'ticketGateway' should not be null");
         this.ticketSigner = requireNonNull(ticketSigner, "'ticketSigner' should not be null");
@@ -77,8 +85,12 @@ public class DefaultReconcileOrdersUseCase extends ReconcileOrdersUseCase {
         }
     }
 
-    private void reconcile(final Order order, final Instant now, final List<String> settled,
-            final List<String> refunded, final List<String> expired) {
+    private void reconcile(
+            final Order order,
+            final Instant now,
+            final List<String> settled,
+            final List<String> refunded,
+            final List<String> expired) {
         final var charge = paymentGateway.findStatus(order.getChargeId());
         if (charge.getStatus() != ChargeStatus.PAID) {
             if (order.expireIfElapsed(now)) {
@@ -92,8 +104,8 @@ public class DefaultReconcileOrdersUseCase extends ReconcileOrdersUseCase {
         if (!approvedAt.isAfter(order.getExpiresAt())) {
             order.markAsPaidAt(approvedAt, clock);
             for (final var item : order.getItems()) {
-                ticketGateway.create(Ticket.issue(order.getId(), item.getSpotId(),
-                        order.getCustomerId(), ticketSigner));
+                ticketGateway.create(
+                        Ticket.issue(order.getId(), item.getSpotId(), order.getCustomerId(), ticketSigner));
             }
             sales.recordSale(order);
             orderGateway.update(order);

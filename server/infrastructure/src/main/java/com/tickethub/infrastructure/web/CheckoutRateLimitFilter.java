@@ -2,12 +2,11 @@ package com.tickethub.infrastructure.web;
 
 import static java.util.Objects.requireNonNull;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Flood protection for the money paths: order creation and payment. Reads
@@ -19,8 +18,9 @@ import jakarta.servlet.http.HttpServletRequest;
 public class CheckoutRateLimitFilter extends AbstractRateLimitFilter {
 
     public CheckoutRateLimitFilter(final CheckoutProperties properties) {
-        super("checkout", requireNonNull(properties, "'properties' should not be null")
-                .getOrderRateLimitPerMinute());
+        super(
+                "checkout",
+                requireNonNull(properties, "'properties' should not be null").getOrderRateLimitPerMinute());
     }
 
     @Override

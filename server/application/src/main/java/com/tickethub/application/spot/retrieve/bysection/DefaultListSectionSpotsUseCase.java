@@ -20,8 +20,7 @@ public class DefaultListSectionSpotsUseCase extends ListSectionSpotsUseCase {
     @Override
     public Either<Notification, Pagination<ListSpotsOutput>> execute(final ListSectionSpotsCommand input) {
         try {
-            final Pagination<Spot> page =
-                    spotGateway.findBySection(SectionID.from(input.sectionId()), input.query());
+            final Pagination<Spot> page = spotGateway.findBySection(SectionID.from(input.sectionId()), input.query());
             return Either.right(page.map(ListSpotsOutput::from));
         } catch (final RuntimeException exception) {
             return Either.left(Notification.create(exception));

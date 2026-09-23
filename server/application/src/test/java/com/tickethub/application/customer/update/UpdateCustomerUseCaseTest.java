@@ -1,15 +1,19 @@
 package com.tickethub.application.customer.update;
 
-import java.util.Optional;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
 import com.tickethub.domain.core.customer.*;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Update customer use case")
 class UpdateCustomerUseCaseTest {
-    private final Customer entity = Customer.create("52998224725", "Maria Silva", "maria@domain.com",
+    private final Customer entity = Customer.create(
+            "52998224725",
+            "Maria Silva",
+            "maria@domain.com",
             "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
     private final CustomerGateway gateway = mock(CustomerGateway.class);
     private final DefaultUpdateCustomerUseCase useCase = new DefaultUpdateCustomerUseCase(gateway);

@@ -1,10 +1,8 @@
 package com.tickethub.application.authentication.refresh;
 
 import static java.util.Objects.isNull;
-import static org.apache.commons.lang3.StringUtils.defaultString;
 import static java.util.Objects.requireNonNull;
-
-import java.time.Duration;
+import static org.apache.commons.lang3.StringUtils.defaultString;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.authentication.AuthenticationException;
@@ -13,6 +11,7 @@ import com.tickethub.domain.authentication.RefreshSessionGateway;
 import com.tickethub.domain.authentication.SecureTokens;
 import com.tickethub.domain.authentication.TokenIssuer;
 import com.tickethub.domain.validation.Notification;
+import java.time.Duration;
 
 public class DefaultRefreshTokenUseCase extends RefreshTokenUseCase {
 
@@ -22,8 +21,8 @@ public class DefaultRefreshTokenUseCase extends RefreshTokenUseCase {
     private final RefreshSessionGateway refreshSessions;
     private final Duration refreshTtl;
 
-    public DefaultRefreshTokenUseCase(final TokenIssuer tokenIssuer,
-            final RefreshSessionGateway refreshSessions, final Duration refreshTtl) {
+    public DefaultRefreshTokenUseCase(
+            final TokenIssuer tokenIssuer, final RefreshSessionGateway refreshSessions, final Duration refreshTtl) {
         this.tokenIssuer = requireNonNull(tokenIssuer);
         this.refreshSessions = requireNonNull(refreshSessions);
         this.refreshTtl = isNull(refreshTtl) ? RefreshSession.DEFAULT_TTL : refreshTtl;
@@ -33,7 +32,9 @@ public class DefaultRefreshTokenUseCase extends RefreshTokenUseCase {
     public Either<Notification, RefreshTokenOutput> execute(final RefreshTokenCommand command) {
         try {
             final var presented = defaultString(command.refreshToken());
-            final var session = refreshSessions.findByTokenHash(SecureTokens.sha256Hex(presented)).orElse(null);
+            final var session = refreshSessions
+                    .findByTokenHash(SecureTokens.sha256Hex(presented))
+                    .orElse(null);
             if (isNull(session) || !session.isActive()) {
                 return Either.left(unauthorized());
             }
@@ -49,8 +50,8 @@ public class DefaultRefreshTokenUseCase extends RefreshTokenUseCase {
             final var next = session.rotate(SecureTokens.sha256Hex(nextToken), refreshTtl);
             refreshSessions.save(session);
             refreshSessions.save(next);
-            final var access = tokenIssuer.issueAccess(session.getSubject(), session.getAuthorities(),
-                    session.getOwnerId());
+            final var access =
+                    tokenIssuer.issueAccess(session.getSubject(), session.getAuthorities(), session.getOwnerId());
             return Either.right(new RefreshTokenOutput(access.token(), "Bearer", access.expiresInSeconds(), nextToken));
         } catch (final RuntimeException exception) {
             return Either.left(Notification.create(exception));

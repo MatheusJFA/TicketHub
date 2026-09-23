@@ -1,15 +1,13 @@
 package com.tickethub.infrastructure.spot.persistence;
 
-import java.time.Instant;
-import java.util.Optional;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.core.spot.SpotID;
 import com.tickethub.domain.shared.Location;
 import com.tickethub.infrastructure.audit.AuditActor;
+import java.time.Instant;
+import java.util.Optional;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document("spots")
 public record SpotDocument(
@@ -30,16 +28,28 @@ public record SpotDocument(
     public static final String COLLECTION = "spots";
 
     public SpotDocument withActors(final String createdBy, final String lastModifiedBy) {
-        return new SpotDocument(id, location, available, published, reserved, showId, sectionId, partnerId,
-                createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
+        return new SpotDocument(
+                id,
+                location,
+                available,
+                published,
+                reserved,
+                showId,
+                sectionId,
+                partnerId,
+                createdAt,
+                updatedAt,
+                deletedAt,
+                createdBy,
+                lastModifiedBy);
     }
 
     public static SpotDocument from(final Spot spot) {
         return from(spot, null, null, null);
     }
 
-    public static SpotDocument from(final Spot spot, final String showId, final String sectionId,
-            final String partnerId) {
+    public static SpotDocument from(
+            final Spot spot, final String showId, final String sectionId, final String partnerId) {
         return stamped(new SpotDocument(
                 spot.getId().getValue(),
                 Optional.ofNullable(spot.getLocation()).map(Location::getValue).orElse(null),
@@ -69,6 +79,10 @@ public record SpotDocument(
                 available,
                 published,
                 reserved,
-                createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
+                createdAt,
+                updatedAt,
+                deletedAt,
+                createdBy,
+                lastModifiedBy);
     }
 }

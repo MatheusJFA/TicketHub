@@ -1,6 +1,5 @@
 package com.tickethub.infrastructure.api.controllers;
 
-import com.tickethub.infrastructure.api.models.*;
 import com.tickethub.application.partner.changeaddress.*;
 import com.tickethub.application.partner.changename.*;
 import com.tickethub.application.partner.create.*;
@@ -8,15 +7,15 @@ import com.tickethub.application.partner.delete.*;
 import com.tickethub.application.partner.retrieve.get.*;
 import com.tickethub.application.partner.retrieve.list.*;
 import com.tickethub.application.partner.update.*;
-import com.tickethub.infrastructure.partner.models.*;
 import com.tickethub.domain.pagination.Pagination;
-import org.springframework.http.ResponseEntity;
 import com.tickethub.infrastructure.api.HttpResults;
-import com.tickethub.infrastructure.partner.presenters.PartnerMapper;
 import com.tickethub.infrastructure.api.PartnerAPI;
-import org.springframework.web.bind.annotation.RestController;
-
+import com.tickethub.infrastructure.api.models.*;
+import com.tickethub.infrastructure.partner.models.*;
+import com.tickethub.infrastructure.partner.presenters.PartnerMapper;
 import java.net.URI;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class PartnerController implements PartnerAPI {
@@ -29,7 +28,8 @@ public class PartnerController implements PartnerAPI {
     private final UpdatePartnerUseCase updatePartner;
     private final PartnerMapper mapper;
 
-    public PartnerController(ChangePartnerAddressUseCase changePartnerAddress,
+    public PartnerController(
+            ChangePartnerAddressUseCase changePartnerAddress,
             ChangePartnerNameUseCase changePartnerName,
             CreatePartnerUseCase createPartner,
             DeletePartnerUseCase deletePartner,
@@ -77,8 +77,10 @@ public class PartnerController implements PartnerAPI {
     }
 
     @Override
-    public ResponseEntity<Pagination<PartnerListResponse>> list(String search, int page, int perPage, String sort, String direction) {
-        final var result = HttpResults.require(listPartners.execute(HttpResults.search(search, page, perPage, sort, direction)))
+    public ResponseEntity<Pagination<PartnerListResponse>> list(
+            String search, int page, int perPage, String sort, String direction) {
+        final var result = HttpResults.require(
+                        listPartners.execute(HttpResults.search(search, page, perPage, sort, direction)))
                 .map(mapper::toListResponse);
         return ResponseEntity.ok(result);
     }

@@ -1,7 +1,6 @@
 package com.tickethub.infrastructure.cache;
 
 import java.time.Duration;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**

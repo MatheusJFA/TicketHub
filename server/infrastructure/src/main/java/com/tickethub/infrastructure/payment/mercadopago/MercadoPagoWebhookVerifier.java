@@ -1,7 +1,7 @@
 package com.tickethub.infrastructure.payment.mercadopago;
 
-import static java.util.Objects.requireNonNull;
 import static java.util.Objects.isNull;
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -13,10 +13,8 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Locale;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +53,7 @@ public class MercadoPagoWebhookVerifier {
         }
         String ts = null;
         String hash = null;
+        // Filtra: segmentos "chave=valor" do header x-signature separados por virgula (ts, v1).
         for (final String part : xSignature.split(",")) {
             final int separator = part.indexOf('=');
             if (separator < 0) {
@@ -79,8 +78,7 @@ public class MercadoPagoWebhookVerifier {
         }
         manifest.append("ts:").append(ts).append(';');
         final var expected = hmacHex(manifest.toString());
-        if (!MessageDigest.isEqual(expected.getBytes(StandardCharsets.UTF_8),
-                hash.getBytes(StandardCharsets.UTF_8))) {
+        if (!MessageDigest.isEqual(expected.getBytes(StandardCharsets.UTF_8), hash.getBytes(StandardCharsets.UTF_8))) {
             LOG.warn("Mercado Pago signature mismatch dataId={}", dataId);
             throw new InvalidWebhookSignatureException("Invalid webhook signature");
         }
@@ -101,9 +99,7 @@ public class MercadoPagoWebhookVerifier {
 
     private static String normalize(final String dataId) {
         final var trimmed = dataId.trim();
-        return trimmed.chars().allMatch(Character::isLetterOrDigit)
-                ? trimmed.toLowerCase(Locale.ROOT)
-                : trimmed;
+        return trimmed.chars().allMatch(Character::isLetterOrDigit) ? trimmed.toLowerCase(Locale.ROOT) : trimmed;
     }
 
     private String hmacHex(final String message) {

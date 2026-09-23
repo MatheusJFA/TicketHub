@@ -1,5 +1,13 @@
 package com.tickethub.infrastructure.api.controllers;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import com.tickethub.application.Either;
 import com.tickethub.application.section.changedescription.*;
 import com.tickethub.application.section.changename.*;
@@ -10,38 +18,33 @@ import com.tickethub.application.section.publish.*;
 import com.tickethub.application.section.publishall.*;
 import com.tickethub.application.section.retrieve.get.*;
 import com.tickethub.application.section.retrieve.list.*;
-import com.tickethub.application.spot.retrieve.bysection.*;
-import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.application.section.unpublish.*;
 import com.tickethub.application.section.unpublishall.*;
 import com.tickethub.application.section.update.*;
+import com.tickethub.application.spot.retrieve.bysection.*;
+import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.infrastructure.ControllerTest;
+import com.tickethub.infrastructure.section.presenters.SectionMapperImpl;
 import com.tickethub.infrastructure.security.ShowAccess;
-import org.junit.jupiter.api.Test;
+import com.tickethub.infrastructure.security.TestTokens;
+import com.tickethub.infrastructure.shared.presenters.SharedMapperImpl;
+import com.tickethub.infrastructure.spot.presenters.SpotMapperImpl;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import com.tickethub.infrastructure.shared.presenters.SharedMapperImpl;
-import com.tickethub.infrastructure.section.presenters.SectionMapperImpl;
-import com.tickethub.infrastructure.spot.presenters.SpotMapperImpl;
-import com.tickethub.infrastructure.security.TestTokens;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ControllerTest(controllers = SectionController.class)
 @Import({SharedMapperImpl.class, SectionMapperImpl.class, SpotMapperImpl.class})
 @DisplayName("Section controller")
 class SectionControllerTest {
-    @Autowired MockMvc mvc;
+    @Autowired
+    MockMvc mvc;
+
     @Value("${tickethub.security.jwt.secret}")
     String jwtSecret;
 
@@ -52,19 +55,46 @@ class SectionControllerTest {
     private String bearerAsOwner(final String ownerId, final String... authorities) {
         return "Bearer " + TestTokens.bearer(jwtSecret, ownerId, authorities);
     }
-    @MockitoBean ChangeSectionDescriptionUseCase changeSectionDescription;
-    @MockitoBean ChangeSectionNameUseCase changeSectionName;
-    @MockitoBean ChangeSectionPriceUseCase changeSectionPrice;
-    @MockitoBean CreateSectionUseCase createSection;
-    @MockitoBean DeleteSectionUseCase deleteSection;
-    @MockitoBean PublishSectionUseCase publishSection;
-    @MockitoBean PublishAllSectionUseCase publishAllSection;
-    @MockitoBean GetSectionUseCase getSection;
-    @MockitoBean ListSectionsUseCase listSections;
-    @MockitoBean ListSectionSpotsUseCase listSectionSpots;
-    @MockitoBean UnpublishSectionUseCase unpublishSection;
-    @MockitoBean UnpublishAllSectionUseCase unpublishAllSection;
-    @MockitoBean UpdateSectionUseCase updateSection;
+
+    @MockitoBean
+    ChangeSectionDescriptionUseCase changeSectionDescription;
+
+    @MockitoBean
+    ChangeSectionNameUseCase changeSectionName;
+
+    @MockitoBean
+    ChangeSectionPriceUseCase changeSectionPrice;
+
+    @MockitoBean
+    CreateSectionUseCase createSection;
+
+    @MockitoBean
+    DeleteSectionUseCase deleteSection;
+
+    @MockitoBean
+    PublishSectionUseCase publishSection;
+
+    @MockitoBean
+    PublishAllSectionUseCase publishAllSection;
+
+    @MockitoBean
+    GetSectionUseCase getSection;
+
+    @MockitoBean
+    ListSectionsUseCase listSections;
+
+    @MockitoBean
+    ListSectionSpotsUseCase listSectionSpots;
+
+    @MockitoBean
+    UnpublishSectionUseCase unpublishSection;
+
+    @MockitoBean
+    UnpublishAllSectionUseCase unpublishAllSection;
+
+    @MockitoBean
+    UpdateSectionUseCase updateSection;
+
     @MockitoBean(name = "showAccess")
     ShowAccess showAccess;
 
@@ -73,8 +103,12 @@ class SectionControllerTest {
     void givenAValidCommand_whenCallsCreateSection_shouldReturnSectionId() throws Exception {
         when(createSection.execute(any())).thenReturn(Either.right(new CreateSectionOutput("section-1")));
 
-        mvc.perform(post("/sections").header("Authorization", bearer("section:write")).contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"showId\":\"show-1\",\"name\":\"VIP\",\"description\":\"VIP\",\"totalSpots\":10,\"price\":{\"value\":50.00,\"currency\":\"BRL\"}}"))
+        mvc.perform(
+                        post("/sections")
+                                .header("Authorization", bearer("section:write"))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"showId\":\"show-1\",\"name\":\"VIP\",\"description\":\"VIP\",\"totalSpots\":10,\"price\":{\"value\":50.00,\"currency\":\"BRL\"}}"))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/sections/section-1"))
                 .andExpect(jsonPath("$.id").value("section-1"));
@@ -96,8 +130,7 @@ class SectionControllerTest {
     @DisplayName("Given owner, when changes section name, then succeeds")
     void givenOwner_whenChangesSectionName_thenSucceeds() throws Exception {
         when(showAccess.canWriteSection("section-1")).thenReturn(true);
-        when(changeSectionName.execute(any()))
-                .thenReturn(Either.right(new ChangeSectionNameOutput("section-1")));
+        when(changeSectionName.execute(any())).thenReturn(Either.right(new ChangeSectionNameOutput("section-1")));
 
         mvc.perform(patch("/sections/section-1/name")
                         .header("Authorization", bearerAsOwner("partner-1", "section:write"))
@@ -111,13 +144,14 @@ class SectionControllerTest {
     @DisplayName("Given owner, when calls update section, then succeeds")
     void givenOwner_whenCallsUpdateSection_thenSucceeds() throws Exception {
         when(showAccess.canWriteSection("section-1")).thenReturn(true);
-        when(updateSection.execute(any()))
-                .thenReturn(Either.right(new UpdateSectionOutput("section-1")));
+        when(updateSection.execute(any())).thenReturn(Either.right(new UpdateSectionOutput("section-1")));
 
-        mvc.perform(put("/sections/section-1")
-                        .header("Authorization", bearerAsOwner("partner-1", "section:write"))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"Pista\",\"description\":\"Geral\",\"price\":{\"value\":60.00,\"currency\":\"BRL\"}}"))
+        mvc.perform(
+                        put("/sections/section-1")
+                                .header("Authorization", bearerAsOwner("partner-1", "section:write"))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"name\":\"Pista\",\"description\":\"Geral\",\"price\":{\"value\":60.00,\"currency\":\"BRL\"}}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("section-1"));
     }
@@ -127,18 +161,19 @@ class SectionControllerTest {
     void givenNonOwner_whenCallsUpdateSection_thenReturnsForbidden() throws Exception {
         when(showAccess.canWriteSection("section-1")).thenReturn(false);
 
-        mvc.perform(put("/sections/section-1")
-                        .header("Authorization", bearerAsOwner("partner-9", "section:write"))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"Pista\",\"description\":\"Geral\",\"price\":{\"value\":60.00,\"currency\":\"BRL\"}}"))
+        mvc.perform(
+                        put("/sections/section-1")
+                                .header("Authorization", bearerAsOwner("partner-9", "section:write"))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        "{\"name\":\"Pista\",\"description\":\"Geral\",\"price\":{\"value\":60.00,\"currency\":\"BRL\"}}"))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     @DisplayName("Given spots, when lists section spots, then returns page without auth")
     void givenSpots_whenListsSectionSpots_thenReturnsPage() throws Exception {
-        when(listSectionSpots.execute(any()))
-                .thenReturn(Either.right(new Pagination<>(0, 10, 0, java.util.List.of())));
+        when(listSectionSpots.execute(any())).thenReturn(Either.right(new Pagination<>(0, 10, 0, java.util.List.of())));
 
         mvc.perform(get("/sections/section-1/spots"))
                 .andExpect(status().isOk())

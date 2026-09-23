@@ -1,23 +1,21 @@
 package com.tickethub.application.section.publishall;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
-
-import java.math.BigDecimal;
-import java.util.Currency;
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import static org.mockito.Mockito.*;
 
 import com.tickethub.application.UseCaseTest;
 import com.tickethub.domain.core.section.Section;
 import com.tickethub.domain.core.section.SectionGateway;
 import com.tickethub.domain.shared.Money;
+import java.math.BigDecimal;
+import java.util.Currency;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
 @DisplayName("Publish all section use case")
 public class PublishAllSectionUseCaseTest extends UseCaseTest {
@@ -47,8 +45,8 @@ public class PublishAllSectionUseCaseTest extends UseCaseTest {
         assertNotNull(output.id());
         assertEquals(entity.getId().getValue(), output.id());
         verify(sectionGateway, times(1)).findById(entity.getId());
-        verify(sectionGateway, times(1)).update(argThat(saved ->
-                saved.getId() != null
+        verify(sectionGateway, times(1))
+                .update(argThat(saved -> saved.getId() != null
                         && saved.getId().getValue().equals(output.id())
                         && saved.getCreatedAt() != null
                         && saved.getUpdatedAt() != null
@@ -71,7 +69,8 @@ public class PublishAllSectionUseCaseTest extends UseCaseTest {
         assertEquals(1, notification.getErrors().size());
         assertEquals(expectedMessage, notification.firstError().message());
         verify(sectionGateway, times(1)).findById(entity.getId());
-        verify(sectionGateway, times(1)).update(argThat(saved -> saved.getId() != null
+        verify(sectionGateway, times(1))
+                .update(argThat(saved -> saved.getId() != null
                         && saved.getCreatedAt() != null
                         && saved.getUpdatedAt() != null
                         && saved.getDeletedAt() == null
@@ -89,7 +88,9 @@ public class PublishAllSectionUseCaseTest extends UseCaseTest {
         final var notification = useCase.execute(command).getLeft();
 
         assertEquals(1, notification.getErrors().size());
-        assertEquals("Section not found: " + entity.getId().getValue(), notification.firstError().message());
+        assertEquals(
+                "Section not found: " + entity.getId().getValue(),
+                notification.firstError().message());
         verify(sectionGateway, times(1)).findById(entity.getId());
         verify(sectionGateway, never()).update(any());
     }

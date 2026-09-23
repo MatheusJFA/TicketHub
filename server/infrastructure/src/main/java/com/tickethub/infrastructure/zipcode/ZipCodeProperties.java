@@ -1,7 +1,6 @@
 package com.tickethub.infrastructure.zipcode;
 
 import java.time.Duration;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "tickethub.zipcode")

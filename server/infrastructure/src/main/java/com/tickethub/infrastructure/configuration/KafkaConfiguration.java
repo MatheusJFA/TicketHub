@@ -17,10 +17,9 @@ public class KafkaConfiguration {
             @Value("${tickethub.kafka.topic.replicas}") final int replicas) {
         Assert.hasText(name, "Kafka topic name must not be blank");
         Assert.isTrue(partitions > 0, "Kafka topic partitions must be positive");
-        Assert.isTrue(replicas > 0 && replicas <= Short.MAX_VALUE, "Kafka topic replicas must be positive and within short range");
-        return TopicBuilder.name(name)
-                .partitions(partitions)
-                .replicas(replicas)
-                .build();
+        Assert.isTrue(
+                replicas > 0 && replicas <= Short.MAX_VALUE,
+                "Kafka topic replicas must be positive and within short range");
+        return TopicBuilder.name(name).partitions(partitions).replicas(replicas).build();
     }
 }

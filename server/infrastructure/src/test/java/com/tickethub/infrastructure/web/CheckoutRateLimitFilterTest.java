@@ -2,14 +2,12 @@ package com.tickethub.infrastructure.web;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import jakarta.servlet.FilterChain;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-
-import jakarta.servlet.FilterChain;
 
 @DisplayName("Checkout rate limit filter")
 class CheckoutRateLimitFilterTest {
@@ -42,8 +40,7 @@ class CheckoutRateLimitFilterTest {
     @DisplayName("Given order creation beyond limit, when filter, then returns 429")
     void givenOrdersBeyondLimit_whenFilter_thenReturns429() throws Exception {
         final var filter = filter(1);
-        final FilterChain chain = (req, res) -> {
-        };
+        final FilterChain chain = (req, res) -> {};
 
         filter.doFilter(request("POST", "/orders"), new MockHttpServletResponse(), chain);
         final var response = new MockHttpServletResponse();

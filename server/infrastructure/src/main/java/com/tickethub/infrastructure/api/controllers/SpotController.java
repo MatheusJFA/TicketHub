@@ -1,7 +1,5 @@
 package com.tickethub.infrastructure.api.controllers;
 
-import com.tickethub.infrastructure.api.models.*;
-import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.application.spot.changelocation.*;
 import com.tickethub.application.spot.create.*;
 import com.tickethub.application.spot.delete.*;
@@ -10,15 +8,17 @@ import com.tickethub.application.spot.retrieve.get.*;
 import com.tickethub.application.spot.retrieve.list.*;
 import com.tickethub.application.spot.unpublish.*;
 import com.tickethub.application.spot.update.*;
+import com.tickethub.domain.pagination.Pagination;
+import com.tickethub.infrastructure.api.HttpResults;
+import com.tickethub.infrastructure.api.SpotAPI;
+import com.tickethub.infrastructure.api.models.*;
+import com.tickethub.infrastructure.cache.TickethubCacheProperties;
 import com.tickethub.infrastructure.spot.models.*;
 import com.tickethub.infrastructure.spot.presenters.SpotMapper;
 import java.net.URI;
-import org.springframework.http.ResponseEntity;
-import com.tickethub.infrastructure.api.SpotAPI;
-import com.tickethub.infrastructure.api.HttpResults;
-import com.tickethub.infrastructure.cache.TickethubCacheProperties;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -33,7 +33,8 @@ public class SpotController implements SpotAPI {
     private final UpdateSpotUseCase updateSpot;
     private final SpotMapper mapper;
 
-    public SpotController(ChangeSpotLocationUseCase changeSpotLocation,
+    public SpotController(
+            ChangeSpotLocationUseCase changeSpotLocation,
             CreateSpotUseCase createSpot,
             DeleteSpotUseCase deleteSpot,
             PublishSpotUseCase publishSpot,
@@ -90,7 +91,8 @@ public class SpotController implements SpotAPI {
     @Override
     @Cacheable(TickethubCacheProperties.SPOTS)
     public Pagination<SpotListResponse> list(String search, int page, int perPage, String sort, String direction) {
-        return HttpResults.require(listSpots.execute(HttpResults.search(search, page, perPage, sort, direction))).map(mapper::toListResponse);
+        return HttpResults.require(listSpots.execute(HttpResults.search(search, page, perPage, sort, direction)))
+                .map(mapper::toListResponse);
     }
 
     @Override

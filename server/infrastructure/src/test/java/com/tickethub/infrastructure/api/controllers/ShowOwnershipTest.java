@@ -6,18 +6,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.web.servlet.MockMvc;
-import com.tickethub.infrastructure.shared.presenters.SharedMapperImpl;
-import com.tickethub.infrastructure.show.presenters.ShowMapperImpl;
-import com.tickethub.infrastructure.section.presenters.SectionMapperImpl;
-
 import com.tickethub.application.Either;
+import com.tickethub.application.section.retrieve.byshow.*;
 import com.tickethub.application.show.addsection.AddSectionToShowUseCase;
 import com.tickethub.application.show.changedescription.ChangeShowDescriptionUseCase;
 import com.tickethub.application.show.changename.ChangeShowNameUseCase;
@@ -32,10 +22,19 @@ import com.tickethub.application.show.retrieve.list.ListShowsUseCase;
 import com.tickethub.application.show.unpublish.UnpublishShowUseCase;
 import com.tickethub.application.show.unpublishall.UnpublishAllShowUseCase;
 import com.tickethub.application.show.update.*;
-import com.tickethub.application.section.retrieve.byshow.*;
 import com.tickethub.infrastructure.ControllerTest;
+import com.tickethub.infrastructure.section.presenters.SectionMapperImpl;
 import com.tickethub.infrastructure.security.ShowAccess;
 import com.tickethub.infrastructure.security.TestTokens;
+import com.tickethub.infrastructure.shared.presenters.SharedMapperImpl;
+import com.tickethub.infrastructure.show.presenters.ShowMapperImpl;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
 
 @ControllerTest(controllers = ShowController.class)
 @Import({SharedMapperImpl.class, ShowMapperImpl.class, SectionMapperImpl.class})
@@ -44,32 +43,49 @@ class ShowOwnershipTest {
 
     @Autowired
     MockMvc mvc;
+
     @MockitoBean
     AddSectionToShowUseCase addSectionToShow;
+
     @MockitoBean
     ChangeShowDescriptionUseCase changeShowDescription;
+
     @MockitoBean
     ChangeShowNameUseCase changeShowName;
+
     @MockitoBean
     CreateShowUseCase createShow;
+
     @MockitoBean
     DeleteShowUseCase deleteShow;
+
     @MockitoBean
     PublishShowUseCase publishShow;
+
     @MockitoBean
     PublishAllShowUseCase publishAllShow;
+
     @MockitoBean
     RescheduleShowUseCase rescheduleShow;
+
     @MockitoBean
     GetShowUseCase getShow;
+
     @MockitoBean
     ListShowsUseCase listShows;
+
     @MockitoBean
     UnpublishShowUseCase unpublishShow;
+
     @MockitoBean
     UnpublishAllShowUseCase unpublishAllShow;
-    @MockitoBean UpdateShowUseCase updateShow;
-    @MockitoBean ListShowSectionsUseCase listShowSections;
+
+    @MockitoBean
+    UpdateShowUseCase updateShow;
+
+    @MockitoBean
+    ListShowSectionsUseCase listShowSections;
+
     @MockitoBean(name = "showAccess")
     ShowAccess showAccess;
 
@@ -83,8 +99,7 @@ class ShowOwnershipTest {
     @Test
     @DisplayName("Given no token, when publish show, then returns401")
     void givenNoToken_whenPublishShow_thenReturns401() throws Exception {
-        mvc.perform(post("/shows/show-1/publish"))
-                .andExpect(status().isUnauthorized());
+        mvc.perform(post("/shows/show-1/publish")).andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -93,8 +108,7 @@ class ShowOwnershipTest {
         when(publishShow.execute(any())).thenReturn(Either.right(PublishShowOutput.from("show-1")));
         when(showAccess.canPublish("show-1")).thenReturn(true);
 
-        mvc.perform(post("/shows/show-1/publish")
-                        .header("Authorization", bearer("partner-1", "show:publish")))
+        mvc.perform(post("/shows/show-1/publish").header("Authorization", bearer("partner-1", "show:publish")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("show-1"));
     }
@@ -104,8 +118,7 @@ class ShowOwnershipTest {
     void givenAnotherPartner_whenPublishShow_thenReturnsForbidden() throws Exception {
         when(showAccess.canPublish("show-1")).thenReturn(false);
 
-        mvc.perform(post("/shows/show-1/publish")
-                        .header("Authorization", bearer("partner-9", "show:publish")))
+        mvc.perform(post("/shows/show-1/publish").header("Authorization", bearer("partner-9", "show:publish")))
                 .andExpect(status().isForbidden());
     }
 }

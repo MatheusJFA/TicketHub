@@ -6,16 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-
-import java.math.BigDecimal;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.util.Currency;
-import java.util.List;
 
 import com.tickethub.domain.core.customer.CustomerID;
 import com.tickethub.domain.core.payment.ChargeID;
@@ -25,6 +15,15 @@ import com.tickethub.domain.exception.IllegalOrderTransitionException;
 import com.tickethub.domain.exception.OrderExpiredException;
 import com.tickethub.domain.shared.Money;
 import com.tickethub.domain.validation.Notification;
+import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.Currency;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Order")
 class OrderTest {
@@ -61,8 +60,8 @@ class OrderTest {
     @Test
     @DisplayName("Given no items, when create, then throw domain exception")
     void givenNoItems_whenCreate_thenThrowDomainException() {
-        final var exception = assertThrows(DomainException.class,
-                () -> Order.create(CustomerID.generate(), List.of(), TTL, CLOCK));
+        final var exception =
+                assertThrows(DomainException.class, () -> Order.create(CustomerID.generate(), List.of(), TTL, CLOCK));
 
         assertEquals("'items' should not be empty", exception.getMessage());
     }
@@ -72,11 +71,9 @@ class OrderTest {
     void givenMixedCurrencies_whenCreate_thenThrowDomainException() {
         final var mixed = List.of(
                 OrderItem.of(SpotID.generate(), Money.create(BigDecimal.TEN, BRL)),
-                OrderItem.of(SpotID.generate(),
-                        Money.create(BigDecimal.TEN, Currency.getInstance("USD"))));
+                OrderItem.of(SpotID.generate(), Money.create(BigDecimal.TEN, Currency.getInstance("USD"))));
 
-        assertThrows(DomainException.class,
-                () -> Order.create(CustomerID.generate(), mixed, TTL, CLOCK));
+        assertThrows(DomainException.class, () -> Order.create(CustomerID.generate(), mixed, TTL, CLOCK));
     }
 
     @Test
@@ -96,8 +93,8 @@ class OrderTest {
         final var order = Order.create(CustomerID.generate(), items(), TTL, CLOCK);
         order.markAsPaid(CLOCK);
 
-        final var exception = assertThrows(IllegalOrderTransitionException.class,
-                () -> order.attachCharge(ChargeID.from("ch_123")));
+        final var exception =
+                assertThrows(IllegalOrderTransitionException.class, () -> order.attachCharge(ChargeID.from("ch_123")));
 
         assertEquals("Illegal order transition from PAID to PENDING", exception.getMessage());
     }
@@ -120,8 +117,7 @@ class OrderTest {
         final var order = Order.create(CustomerID.generate(), items(), TTL, CLOCK);
         order.markAsPaid(CLOCK);
 
-        final var exception = assertThrows(IllegalOrderTransitionException.class,
-                () -> order.markAsPaid(CLOCK));
+        final var exception = assertThrows(IllegalOrderTransitionException.class, () -> order.markAsPaid(CLOCK));
 
         assertEquals("Illegal order transition from PAID to PAID", exception.getMessage());
     }
@@ -132,8 +128,7 @@ class OrderTest {
         final var order = Order.create(CustomerID.generate(), items(), TTL, CLOCK);
         final var late = Clock.fixed(CLOCK.instant().plus(TTL).plusSeconds(1), ZoneOffset.UTC);
 
-        final var exception = assertThrows(OrderExpiredException.class,
-                () -> order.markAsPaid(late));
+        final var exception = assertThrows(OrderExpiredException.class, () -> order.markAsPaid(late));
 
         assertEquals("Order is expired", exception.getMessage());
         assertEquals(OrderStatus.EXPIRED, order.getStatus());
@@ -213,7 +208,8 @@ class OrderTest {
     void givenLateApproval_whenMarkAsPaidAt_thenExpires() {
         final var order = Order.create(CustomerID.generate(), items(), TTL, CLOCK);
 
-        assertThrows(OrderExpiredException.class,
+        assertThrows(
+                OrderExpiredException.class,
                 () -> order.markAsPaidAt(CLOCK.instant().plus(TTL).plusSeconds(1), CLOCK));
         assertEquals(OrderStatus.EXPIRED, order.getStatus());
     }

@@ -1,18 +1,14 @@
 package com.tickethub.application.spot.changelocation;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Currency;
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import com.tickethub.domain.shared.*;
-import com.tickethub.domain.core.partner.PartnerID;
-import com.tickethub.domain.pagination.*;
+
 import com.tickethub.domain.core.spot.*;
+import com.tickethub.domain.pagination.*;
+import com.tickethub.domain.shared.*;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Change spot location use case")
 class ChangeSpotLocationUseCaseTest {

@@ -1,13 +1,11 @@
 package com.tickethub.application.show.delete;
 
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
-
-import com.tickethub.domain.validation.Notification;
 
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.show.ShowID;
-
+import com.tickethub.domain.validation.Notification;
+import java.util.Optional;
 
 public class DefaultDeleteShowUseCase extends DeleteShowUseCase {
     private final ShowGateway showGateway;

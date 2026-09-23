@@ -4,32 +4,33 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-
-import java.math.BigDecimal;
-import java.util.Currency;
 
 import com.tickethub.domain.core.order.OrderID;
 import com.tickethub.domain.exception.IllegalChargeTransitionException;
 import com.tickethub.domain.shared.Money;
+import java.math.BigDecimal;
+import java.util.Currency;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 @DisplayName("Charge")
 class ChargeTest {
 
     private static Charge pending() {
-        return Charge.create(ChargeID.from("ch_123"), OrderID.generate(),
+        return Charge.create(
+                ChargeID.from("ch_123"),
+                OrderID.generate(),
                 Money.create(BigDecimal.TEN, Currency.getInstance("BRL")),
-                ChargeStatus.PENDING, "PIX-MOCK-ch_123");
+                ChargeStatus.PENDING,
+                "PIX-MOCK-ch_123");
     }
 
     @ParameterizedTest(name = "Given pending charge, when change status to {0}, then allowed={1}")
     @CsvSource({"PAID, true", "FAILED, true", "PENDING, false"})
     @DisplayName("Given pending charge, when change status, then follow state machine")
-    void givenPendingCharge_whenChangeStatus_thenFollowStateMachine(
-            final ChargeStatus target, final boolean allowed) {
+    void givenPendingCharge_whenChangeStatus_thenFollowStateMachine(final ChargeStatus target, final boolean allowed) {
         final var charge = pending();
 
         if (allowed) {
@@ -37,29 +38,24 @@ class ChargeTest {
 
             assertEquals(target, charge.getStatus());
         } else {
-            final var exception = assertThrows(IllegalChargeTransitionException.class,
-                    () -> charge.changeStatus(target));
+            final var exception =
+                    assertThrows(IllegalChargeTransitionException.class, () -> charge.changeStatus(target));
 
-            assertEquals("Illegal charge transition from PENDING to " + target,
-                    exception.getMessage());
+            assertEquals("Illegal charge transition from PENDING to " + target, exception.getMessage());
             assertEquals(ChargeStatus.PENDING, charge.getStatus());
         }
     }
 
     @ParameterizedTest(name = "Given terminal charge {0}, when change status to {1}, then rejected")
-    @CsvSource({"PAID, PAID", "PAID, FAILED", "PAID, PENDING", "FAILED, PAID", "FAILED, FAILED",
-            "FAILED, PENDING"})
+    @CsvSource({"PAID, PAID", "PAID, FAILED", "PAID, PENDING", "FAILED, PAID", "FAILED, FAILED", "FAILED, PENDING"})
     @DisplayName("Given terminal charge, when change status, then reject every transition")
-    void givenTerminalCharge_whenChangeStatus_thenReject(
-            final ChargeStatus from, final ChargeStatus target) {
+    void givenTerminalCharge_whenChangeStatus_thenReject(final ChargeStatus from, final ChargeStatus target) {
         final var charge = pending();
         charge.changeStatus(from);
 
-        final var exception = assertThrows(IllegalChargeTransitionException.class,
-                () -> charge.changeStatus(target));
+        final var exception = assertThrows(IllegalChargeTransitionException.class, () -> charge.changeStatus(target));
 
-        assertEquals("Illegal charge transition from " + from + " to " + target,
-                exception.getMessage());
+        assertEquals("Illegal charge transition from " + from + " to " + target, exception.getMessage());
         assertEquals(from, charge.getStatus());
     }
 

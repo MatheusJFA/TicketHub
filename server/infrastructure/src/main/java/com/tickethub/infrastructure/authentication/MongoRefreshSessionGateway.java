@@ -1,16 +1,15 @@
 package com.tickethub.infrastructure.authentication;
 
 import static java.util.Objects.requireNonNull;
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.stereotype.Component;
 
 import com.tickethub.domain.authentication.RefreshSession;
 import com.tickethub.domain.authentication.RefreshSessionGateway;
 import com.tickethub.infrastructure.authentication.persistence.RefreshSessionDocument;
 import com.tickethub.infrastructure.authentication.persistence.RefreshSessionRepository;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.stereotype.Component;
 
 @Component
 public class MongoRefreshSessionGateway implements RefreshSessionGateway {
@@ -18,15 +17,15 @@ public class MongoRefreshSessionGateway implements RefreshSessionGateway {
     private final MongoTemplate mongoTemplate;
     private final RefreshSessionRepository repository;
 
-    public MongoRefreshSessionGateway(final MongoTemplate mongoTemplate,
-            final RefreshSessionRepository repository) {
+    public MongoRefreshSessionGateway(final MongoTemplate mongoTemplate, final RefreshSessionRepository repository) {
         this.mongoTemplate = requireNonNull(mongoTemplate, "'mongoTemplate' should not be null");
         this.repository = requireNonNull(repository, "'repository' should not be null");
     }
 
     @Override
     public RefreshSession save(final RefreshSession session) {
-        return mongoTemplate.save(RefreshSessionDocument.from(session), RefreshSessionDocument.COLLECTION)
+        return mongoTemplate
+                .save(RefreshSessionDocument.from(session), RefreshSessionDocument.COLLECTION)
                 .toDomain();
     }
 
@@ -37,6 +36,8 @@ public class MongoRefreshSessionGateway implements RefreshSessionGateway {
 
     @Override
     public List<RefreshSession> findByFamilyId(final String familyId) {
-        return repository.findByFamilyId(familyId).stream().map(RefreshSessionDocument::toDomain).toList();
+        return repository.findByFamilyId(familyId).stream()
+                .map(RefreshSessionDocument::toDomain)
+                .toList();
     }
 }

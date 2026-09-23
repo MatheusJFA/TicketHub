@@ -1,14 +1,14 @@
 package com.tickethub.application.show.reschedule;
 
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
-import java.time.OffsetDateTime;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.show.Show;
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.domain.validation.Notification;
+import java.time.OffsetDateTime;
+import java.util.Optional;
 
 public class DefaultRescheduleShowUseCase extends RescheduleShowUseCase {
     private final ShowGateway showGateway;
@@ -40,7 +40,8 @@ public class DefaultRescheduleShowUseCase extends RescheduleShowUseCase {
             }
 
             final Show saved = showGateway.update(entity);
-            final RescheduleShowOutput output = new RescheduleShowOutput(saved.getId().getValue());
+            final RescheduleShowOutput output =
+                    new RescheduleShowOutput(saved.getId().getValue());
             return Either.right(output);
         } catch (final RuntimeException exception) {
             final Notification notification = Notification.create(exception);

@@ -1,25 +1,21 @@
 package com.tickethub.infrastructure.security;
 
+import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
-import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
-
-import com.nimbusds.jose.jwk.source.ImmutableSecret;
 
 public final class TestTokens {
 
-    private TestTokens() {
-    }
+    private TestTokens() {}
 
     public static String bearer(final String secret, final String... authorities) {
         return bearer(secret, null, authorities);
@@ -38,8 +34,8 @@ public final class TestTokens {
         if (ownerId != null) {
             claims.claim("ownerId", ownerId);
         }
-        return encoder
-                .encode(JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(), claims.build()))
+        return encoder.encode(JwtEncoderParameters.from(
+                        JwsHeader.with(MacAlgorithm.HS256).build(), claims.build()))
                 .getTokenValue();
     }
 }

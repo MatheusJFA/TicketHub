@@ -4,12 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-
 import com.tickethub.domain.core.customer.CustomerID;
 import com.tickethub.domain.core.order.OrderID;
 import com.tickethub.domain.core.spot.SpotID;
@@ -20,6 +14,11 @@ import com.tickethub.infrastructure.ContainerSupport;
 import com.tickethub.infrastructure.IntegrationTest;
 import com.tickethub.infrastructure.MongoCleanUpExtension;
 import com.tickethub.infrastructure.ticket.persistence.TicketDocument;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
 @IntegrationTest
 @DisplayName("Ticket Mongo gateway")
@@ -37,8 +36,8 @@ class TicketMongoGatewayIT extends ContainerSupport {
     }
 
     private Ticket givenTicket() {
-        return Ticket.issue(OrderID.generate(), SpotID.generate(), CustomerID.generate(),
-                payload -> "signed:" + payload);
+        return Ticket.issue(
+                OrderID.generate(), SpotID.generate(), CustomerID.generate(), payload -> "signed:" + payload);
     }
 
     @Test

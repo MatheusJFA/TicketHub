@@ -1,23 +1,20 @@
 package com.tickethub.infrastructure.security;
 
-import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
-
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
-import org.springframework.security.oauth2.jwt.JwsHeader;
-import org.springframework.stereotype.Component;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 import com.tickethub.domain.authentication.IssuedToken;
 import com.tickethub.domain.authentication.TokenIssuer;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwsHeader;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.stereotype.Component;
 
 @Component
 public class JwtTokenIssuer implements TokenIssuer {
@@ -44,7 +41,8 @@ public class JwtTokenIssuer implements TokenIssuer {
             claims.claim("ownerId", ownerId);
         }
         final String token = jwtEncoder
-                .encode(JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(), claims.build()))
+                .encode(JwtEncoderParameters.from(
+                        JwsHeader.with(MacAlgorithm.HS256).build(), claims.build()))
                 .getTokenValue();
         return new IssuedToken(token, expirationMinutes * 60);
     }

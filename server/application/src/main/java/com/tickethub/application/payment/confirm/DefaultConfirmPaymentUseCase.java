@@ -2,8 +2,6 @@ package com.tickethub.application.payment.confirm;
 
 import static java.util.Objects.requireNonNull;
 
-import java.time.Clock;
-
 import com.tickethub.application.Either;
 import com.tickethub.application.sales.SaleRecorder;
 import com.tickethub.domain.core.order.Order;
@@ -18,6 +16,7 @@ import com.tickethub.domain.core.ticket.TicketSigner;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.exception.OrderExpiredException;
 import com.tickethub.domain.validation.Notification;
+import java.time.Clock;
 
 /**
  * Handles the provider webhook: links the charge to its order and, on PAID,
@@ -33,14 +32,21 @@ public class DefaultConfirmPaymentUseCase extends ConfirmPaymentUseCase {
     private final SaleRecorder sales;
     private final Clock clock;
 
-    public DefaultConfirmPaymentUseCase(final OrderGateway orderGateway, final TicketGateway ticketGateway,
-            final TicketSigner ticketSigner, final PaymentGateway paymentGateway,
+    public DefaultConfirmPaymentUseCase(
+            final OrderGateway orderGateway,
+            final TicketGateway ticketGateway,
+            final TicketSigner ticketSigner,
+            final PaymentGateway paymentGateway,
             final SaleRecorder sales) {
         this(orderGateway, ticketGateway, ticketSigner, paymentGateway, sales, Clock.systemUTC());
     }
 
-    public DefaultConfirmPaymentUseCase(final OrderGateway orderGateway, final TicketGateway ticketGateway,
-            final TicketSigner ticketSigner, final PaymentGateway paymentGateway, final SaleRecorder sales,
+    public DefaultConfirmPaymentUseCase(
+            final OrderGateway orderGateway,
+            final TicketGateway ticketGateway,
+            final TicketSigner ticketSigner,
+            final PaymentGateway paymentGateway,
+            final SaleRecorder sales,
             final Clock clock) {
         this.orderGateway = requireNonNull(orderGateway, "'orderGateway' should not be null");
         this.ticketGateway = requireNonNull(ticketGateway, "'ticketGateway' should not be null");
@@ -57,8 +63,8 @@ public class DefaultConfirmPaymentUseCase extends ConfirmPaymentUseCase {
             try {
                 status = ChargeStatus.valueOf(command.status());
             } catch (final IllegalArgumentException | NullPointerException invalid) {
-                return Either.left(Notification.create(
-                        new DomainException("Invalid charge status: " + command.status())));
+                return Either.left(
+                        Notification.create(new DomainException("Invalid charge status: " + command.status())));
             }
             final var found = orderGateway.findByChargeId(ChargeID.from(command.chargeId()));
             if (found.isEmpty()) {
@@ -77,8 +83,8 @@ public class DefaultConfirmPaymentUseCase extends ConfirmPaymentUseCase {
             }
             order.markAsPaid(clock);
             for (final var item : order.getItems()) {
-                ticketGateway.create(Ticket.issue(order.getId(), item.getSpotId(),
-                        order.getCustomerId(), ticketSigner));
+                ticketGateway.create(
+                        Ticket.issue(order.getId(), item.getSpotId(), order.getCustomerId(), ticketSigner));
             }
             sales.recordSale(order);
             return Either.right(ConfirmPaymentOutput.from(orderGateway.update(order)));

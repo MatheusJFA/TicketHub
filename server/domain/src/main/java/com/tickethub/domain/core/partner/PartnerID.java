@@ -25,5 +25,4 @@ public class PartnerID extends Identifier {
     public String getValue() {
         return value;
     }
-
 }

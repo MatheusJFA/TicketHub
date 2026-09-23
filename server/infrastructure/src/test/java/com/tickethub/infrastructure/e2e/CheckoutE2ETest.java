@@ -6,22 +6,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.Currency;
-import java.util.List;
-import java.util.UUID;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-
-import tools.jackson.databind.ObjectMapper;
-
 import com.tickethub.domain.shared.Money;
 import com.tickethub.infrastructure.ContainerSupport;
 import com.tickethub.infrastructure.E2ETest;
@@ -29,6 +13,19 @@ import com.tickethub.infrastructure.section.persistence.SectionDocument;
 import com.tickethub.infrastructure.shared.persistence.MoneyDocument;
 import com.tickethub.infrastructure.spot.persistence.SpotDocument;
 import com.tickethub.infrastructure.ticket.persistence.TicketDocument;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.Currency;
+import java.util.List;
+import java.util.UUID;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import tools.jackson.databind.ObjectMapper;
 
 @E2ETest
 @DisplayName("Checkout E2 e")
@@ -46,15 +43,43 @@ class CheckoutE2ETest extends ContainerSupport {
     private String givenPublishedSpots(final String... locations) {
         final var now = Instant.now();
         final var sectionId = "section-" + UUID.randomUUID().toString().substring(0, 8);
-        mongoTemplate.insert(new SectionDocument(sectionId, "VIP", "Front stage", true, locations.length,
-                0, MoneyDocument.from(Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"))),
-                List.of(), "show-1", "partner-1", now, now, null, null, null),
+        mongoTemplate.insert(
+                new SectionDocument(
+                        sectionId,
+                        "VIP",
+                        "Front stage",
+                        true,
+                        locations.length,
+                        0,
+                        MoneyDocument.from(Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"))),
+                        List.of(),
+                        "show-1",
+                        "partner-1",
+                        now,
+                        now,
+                        null,
+                        null,
+                        null),
                 SectionDocument.COLLECTION);
         final var spotIds = new java.util.ArrayList<String>();
         for (final String location : locations) {
             final var spotId = "spot-" + UUID.randomUUID().toString().substring(0, 8);
-            mongoTemplate.insert(new SpotDocument(spotId, location, true, true, false, "show-1",
-                    sectionId, "partner-1", now, now, null, null, null), SpotDocument.COLLECTION);
+            mongoTemplate.insert(
+                    new SpotDocument(
+                            spotId,
+                            location,
+                            true,
+                            true,
+                            false,
+                            "show-1",
+                            sectionId,
+                            "partner-1",
+                            now,
+                            now,
+                            null,
+                            null,
+                            null),
+                    SpotDocument.COLLECTION);
             spotIds.add(spotId);
         }
         return String.join("\",\"", spotIds);
@@ -71,7 +96,9 @@ class CheckoutE2ETest extends ContainerSupport {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"identifier\":\"" + email + "\",\"password\":\"secret-123\"}"))
                 .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
         return objectMapper.readTree(login).get("accessToken").asText();
     }
 
@@ -97,8 +124,10 @@ class CheckoutE2ETest extends ContainerSupport {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status").value("PENDING"))
                 .andReturn();
-        final var orderId = objectMapper.readTree(created.getResponse().getContentAsString())
-                .get("orderId").asText();
+        final var orderId = objectMapper
+                .readTree(created.getResponse().getContentAsString())
+                .get("orderId")
+                .asText();
 
         final var paid = mvc.perform(post("/orders/" + orderId + "/pay")
                         .header("Authorization", "Bearer " + token)
@@ -106,7 +135,9 @@ class CheckoutE2ETest extends ContainerSupport {
                         .content("{}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.paymentCode").exists())
-                .andReturn().getResponse().getContentAsString();
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
         final var chargeId = objectMapper.readTree(paid).get("chargeId").asText();
 
         mvc.perform(post("/payments/webhook")
@@ -115,14 +146,16 @@ class CheckoutE2ETest extends ContainerSupport {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.orderStatus").value("PAID"));
 
-        mvc.perform(get("/orders/" + orderId)
-                        .header("Authorization", "Bearer " + token))
+        mvc.perform(get("/orders/" + orderId).header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("PAID"));
 
-        assertEquals(2, mongoTemplate.count(
-                new org.springframework.data.mongodb.core.query.Query(
-                        org.springframework.data.mongodb.core.query.Criteria.where("orderId").is(orderId)),
-                TicketDocument.COLLECTION));
+        assertEquals(
+                2,
+                mongoTemplate.count(
+                        new org.springframework.data.mongodb.core.query.Query(
+                                org.springframework.data.mongodb.core.query.Criteria.where("orderId")
+                                        .is(orderId)),
+                        TicketDocument.COLLECTION));
     }
 }

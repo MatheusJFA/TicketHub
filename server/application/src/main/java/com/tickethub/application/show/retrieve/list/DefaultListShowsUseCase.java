@@ -1,15 +1,13 @@
 package com.tickethub.application.show.retrieve.list;
 
 import static java.util.Objects.requireNonNull;
-import com.tickethub.domain.core.show.Show;
 
 import com.tickethub.application.Either;
-import com.tickethub.domain.validation.Notification;
-import com.tickethub.domain.pagination.SearchQuery;
-import com.tickethub.domain.pagination.Pagination;
+import com.tickethub.domain.core.show.Show;
 import com.tickethub.domain.core.show.ShowGateway;
-
-
+import com.tickethub.domain.pagination.Pagination;
+import com.tickethub.domain.pagination.SearchQuery;
+import com.tickethub.domain.validation.Notification;
 
 public class DefaultListShowsUseCase extends ListShowsUseCase {
     private final ShowGateway showGateway;

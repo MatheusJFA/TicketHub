@@ -1,14 +1,13 @@
 package com.tickethub.application.section.retrieve.list;
 
 import static java.util.Objects.requireNonNull;
+
 import com.tickethub.application.Either;
-import com.tickethub.domain.validation.Notification;
-import com.tickethub.domain.pagination.SearchQuery;
-import com.tickethub.domain.pagination.Pagination;
-import com.tickethub.domain.core.section.SectionGateway;
 import com.tickethub.domain.core.section.Section;
-
-
+import com.tickethub.domain.core.section.SectionGateway;
+import com.tickethub.domain.pagination.Pagination;
+import com.tickethub.domain.pagination.SearchQuery;
+import com.tickethub.domain.validation.Notification;
 
 public class DefaultListSectionsUseCase extends ListSectionsUseCase {
     private final SectionGateway sectionGateway;

@@ -7,19 +7,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.web.servlet.MockMvc;
-import com.tickethub.infrastructure.shared.presenters.SharedMapperImpl;
-import com.tickethub.infrastructure.spot.presenters.SpotMapperImpl;
-
 import com.tickethub.application.Either;
 import com.tickethub.application.spot.changelocation.ChangeSpotLocationUseCase;
 import com.tickethub.application.spot.create.CreateSpotOutput;
@@ -33,6 +20,17 @@ import com.tickethub.application.spot.update.*;
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.infrastructure.ControllerTest;
 import com.tickethub.infrastructure.security.TestTokens;
+import com.tickethub.infrastructure.shared.presenters.SharedMapperImpl;
+import com.tickethub.infrastructure.spot.presenters.SpotMapperImpl;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
 
 @ControllerTest(controllers = SpotController.class)
 @Import({SharedMapperImpl.class, SpotMapperImpl.class})
@@ -44,19 +42,27 @@ class SecurityEnforcementTest {
 
     @MockitoBean
     ChangeSpotLocationUseCase changeSpotLocation;
+
     @MockitoBean
     CreateSpotUseCase createSpot;
+
     @MockitoBean
     DeleteSpotUseCase deleteSpot;
+
     @MockitoBean
     PublishSpotUseCase publishSpot;
+
     @MockitoBean
     GetSpotUseCase getSpot;
+
     @MockitoBean
     ListSpotsUseCase listSpots;
+
     @MockitoBean
     UnpublishSpotUseCase unpublishSpot;
-    @MockitoBean UpdateSpotUseCase updateSpot;
+
+    @MockitoBean
+    UpdateSpotUseCase updateSpot;
 
     @Value("${tickethub.security.jwt.secret}")
     String jwtSecret;
@@ -68,15 +74,15 @@ class SecurityEnforcementTest {
     @Test
     @DisplayName("Given no token, when calls protected endpoint, then returns401")
     void givenNoToken_whenCallsProtectedEndpoint_thenReturns401() throws Exception {
-        mvc.perform(post("/spots").contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"location\":\"A1\"}"))
+        mvc.perform(post("/spots").contentType(MediaType.APPLICATION_JSON).content("{\"location\":\"A1\"}"))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @DisplayName("Given token without authority, when calls protected endpoint, then returns403")
     void givenTokenWithoutAuthority_whenCallsProtectedEndpoint_thenReturns403() throws Exception {
-        mvc.perform(post("/spots").header("Authorization", bearer("spot:read"))
+        mvc.perform(post("/spots")
+                        .header("Authorization", bearer("spot:read"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"location\":\"A1\"}"))
                 .andExpect(status().isForbidden())
@@ -88,7 +94,8 @@ class SecurityEnforcementTest {
     void givenTokenWithAuthority_whenCallsProtectedEndpoint_thenSucceeds() throws Exception {
         when(createSpot.execute(any())).thenReturn(Either.right(new CreateSpotOutput("spot-1")));
 
-        mvc.perform(post("/spots").header("Authorization", bearer("spot:write"))
+        mvc.perform(post("/spots")
+                        .header("Authorization", bearer("spot:write"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"location\":\"A1\"}"))
                 .andExpect(status().isCreated())
@@ -98,10 +105,8 @@ class SecurityEnforcementTest {
     @Test
     @DisplayName("Given no token, when calls public catalog, then succeeds")
     void givenNoToken_whenCallsPublicCatalog_thenSucceeds() throws Exception {
-        when(listSpots.execute(any()))
-                .thenReturn(Either.right(new Pagination<>(0, 10, 0, List.of())));
+        when(listSpots.execute(any())).thenReturn(Either.right(new Pagination<>(0, 10, 0, List.of())));
 
-        mvc.perform(get("/spots"))
-                .andExpect(status().isOk());
+        mvc.perform(get("/spots")).andExpect(status().isOk());
     }
 }

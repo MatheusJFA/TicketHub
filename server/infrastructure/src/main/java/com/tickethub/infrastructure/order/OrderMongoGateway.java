@@ -2,13 +2,6 @@ package com.tickethub.infrastructure.order;
 
 import static java.util.Objects.requireNonNull;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.stereotype.Component;
-
 import com.tickethub.domain.core.order.Order;
 import com.tickethub.domain.core.order.OrderGateway;
 import com.tickethub.domain.core.order.OrderID;
@@ -16,6 +9,11 @@ import com.tickethub.domain.core.order.OrderStatus;
 import com.tickethub.domain.core.payment.ChargeID;
 import com.tickethub.infrastructure.order.persistence.OrderDocument;
 import com.tickethub.infrastructure.order.persistence.OrderRepository;
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.stereotype.Component;
 
 @Component
 public class OrderMongoGateway implements OrderGateway {
@@ -30,7 +28,9 @@ public class OrderMongoGateway implements OrderGateway {
 
     @Override
     public Order create(final Order order) {
-        return mongoTemplate.insert(OrderDocument.from(order), OrderDocument.COLLECTION).toDomain();
+        return mongoTemplate
+                .insert(OrderDocument.from(order), OrderDocument.COLLECTION)
+                .toDomain();
     }
 
     @Override
@@ -61,6 +61,8 @@ public class OrderMongoGateway implements OrderGateway {
 
     @Override
     public Order update(final Order order) {
-        return mongoTemplate.save(OrderDocument.from(order), OrderDocument.COLLECTION).toDomain();
+        return mongoTemplate
+                .save(OrderDocument.from(order), OrderDocument.COLLECTION)
+                .toDomain();
     }
 }

@@ -25,5 +25,4 @@ public class SpotID extends Identifier {
     public String getValue() {
         return value;
     }
-
 }

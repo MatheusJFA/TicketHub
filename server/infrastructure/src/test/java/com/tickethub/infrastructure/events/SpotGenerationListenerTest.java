@@ -9,17 +9,15 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import com.tickethub.application.Either;
 import com.tickethub.application.section.generatespots.GenerateSectionSpotsOutput;
 import com.tickethub.application.section.generatespots.GenerateSectionSpotsUseCase;
+import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.Notification;
 import com.tickethub.infrastructure.exception.SpotGenerationException;
-
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
-import com.tickethub.domain.validation.Error;
 
 @DisplayName("SpotGenerationListener")
 class SpotGenerationListenerTest {
@@ -37,13 +35,12 @@ class SpotGenerationListenerTest {
     @Test
     @DisplayName("Given spots requested, when message, then generates section spots")
     void givenSpotsRequested_whenMessage_thenGeneratesSectionSpots() {
-        when(useCase.execute(any()))
-                .thenReturn(Either.right(GenerateSectionSpotsOutput.from("section-1", 1500)));
+        when(useCase.execute(any())).thenReturn(Either.right(GenerateSectionSpotsOutput.from("section-1", 1500)));
 
         listener.onMessage(payload());
 
-        verify(useCase).execute(argThat(command ->
-                command.showId().equals("show-1")
+        verify(useCase)
+                .execute(argThat(command -> command.showId().equals("show-1")
                         && command.sectionId().equals("section-1")
                         && command.sectionCode().equals("B")));
     }
@@ -51,13 +48,16 @@ class SpotGenerationListenerTest {
     @Test
     @DisplayName("Given use case failure, when message, then throws for retry")
     void givenUseCaseFailure_whenMessage_thenThrowsForRetry() {
-        when(useCase.execute(any()))
-                .thenReturn(Either.left(Notification.create(new Error("mongo down"))));
+        when(useCase.execute(any())).thenReturn(Either.left(Notification.create(new Error("mongo down"))));
 
-        final var exception = assertThrows(SpotGenerationException.class, () -> listener.onMessage(payload()),
+        final var exception = assertThrows(
+                SpotGenerationException.class,
+                () -> listener.onMessage(payload()),
                 () -> "Failing use case should throw SpotGenerationException for retry");
 
-        assertEquals("Spot generation failed: mongo down", exception.getMessage(),
+        assertEquals(
+                "Spot generation failed: mongo down",
+                exception.getMessage(),
                 () -> "Exception message should include the use case failure detail");
     }
 
@@ -75,10 +75,14 @@ class SpotGenerationListenerTest {
     @Test
     @DisplayName("Given malformed payload, when message, then throws")
     void givenMalformedPayload_whenMessage_thenThrows() {
-        final var exception = assertThrows(SpotGenerationException.class, () -> listener.onMessage("not-json"),
+        final var exception = assertThrows(
+                SpotGenerationException.class,
+                () -> listener.onMessage("not-json"),
                 () -> "Malformed payload should throw SpotGenerationException");
 
-        assertEquals("Invalid spot generation message", exception.getMessage(),
+        assertEquals(
+                "Invalid spot generation message",
+                exception.getMessage(),
                 () -> "Exception message should indicate the invalid spot generation message");
     }
 }

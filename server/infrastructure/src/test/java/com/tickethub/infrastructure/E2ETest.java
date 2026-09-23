@@ -1,19 +1,16 @@
 package com.tickethub.infrastructure;
 
+import com.tickethub.infrastructure.payment.PaymentGatewayTestConfiguration;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.DisplayName;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.TestPropertySource;
-
-import com.tickethub.infrastructure.payment.PaymentGatewayTestConfiguration;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -24,9 +21,10 @@ import com.tickethub.infrastructure.payment.PaymentGatewayTestConfiguration;
 // E2E suites share the cached application context (and its per-IP rate
 // limiter); the generous test limits keep suites hermetic. Production default
 // stays strict. AuthRateLimitFilterTest covers the limiting behavior.
-@TestPropertySource(properties = {
-        "tickethub.auth.login-rate-limit-per-minute=1000",
-        "tickethub.checkout.order-rate-limit-per-minute=1000" })
+@TestPropertySource(
+        properties = {
+            "tickethub.auth.login-rate-limit-per-minute=1000",
+            "tickethub.checkout.order-rate-limit-per-minute=1000"
+        })
 @Tag("e2eTest")
-public @interface E2ETest {
-}
+public @interface E2ETest {}

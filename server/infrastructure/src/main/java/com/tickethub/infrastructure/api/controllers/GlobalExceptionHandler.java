@@ -27,19 +27,25 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ApiValidationException.class)
     ResponseEntity<ErrorResponse> validation(ApiValidationException exception) {
         final var errors = exception.notification().getErrors();
-        // Existing use cases represent missing entities as notifications ("X not found: id").
-        final boolean missing = errors.stream().anyMatch(error ->
-                nonNull(error.message()) && error.message().matches("^.+ not found: .*$"));
+        // Entidades ausentes sao notificacoes ("X not found: id").
+        // Filtra: mensagens de entidade nao encontrada no formato "X not found: id".
+        final boolean missing = errors.stream()
+                .anyMatch(error -> nonNull(error.message()) && error.message().matches("^.+ not found: .*$"));
         return ResponseEntity.status(missing ? 404 : 422).body(new ErrorResponse(errors));
     }
 
-    @ExceptionHandler({MethodArgumentNotValidException.class, HttpMessageNotReadableException.class,
-            MissingServletRequestParameterException.class, NoResourceFoundException.class})
+    @ExceptionHandler({
+        MethodArgumentNotValidException.class,
+        HttpMessageNotReadableException.class,
+        MissingServletRequestParameterException.class,
+        NoResourceFoundException.class
+    })
     ResponseEntity<ErrorResponse> badRequest(Exception exception) {
         final String message = exception instanceof MethodArgumentNotValidException validation
                 ? validation.getBindingResult().getFieldErrors().stream()
                         .map(field -> "'" + field.getField() + "' " + field.getDefaultMessage())
-                        .findFirst().orElse("Invalid request")
+                        .findFirst()
+                        .orElse("Invalid request")
                 : "Invalid request";
         return ResponseEntity.badRequest().body(ErrorResponse.from(message));
     }
@@ -56,15 +62,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResponseStatusException.class)
     ResponseEntity<ErrorResponse> status(ResponseStatusException exception) {
-        return ResponseEntity.status(exception.getStatusCode())
-                .body(ErrorResponse.from(exception.getReason()));
+        return ResponseEntity.status(exception.getStatusCode()).body(ErrorResponse.from(exception.getReason()));
     }
 
     @ExceptionHandler(InfrastructureException.class)
     ResponseEntity<ErrorResponse> infrastructure(InfrastructureException exception) {
         LOG.error("Infrastructure failure: {}", exception.getMessage(), exception);
-        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                .body(ErrorResponse.from(exception.getMessage()));
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(ErrorResponse.from(exception.getMessage()));
     }
 
     @ExceptionHandler(AccessDeniedException.class)

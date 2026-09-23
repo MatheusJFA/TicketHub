@@ -5,32 +5,37 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.tickethub.domain.exception.DomainException;
+import com.tickethub.domain.geography.ZipCodeAddress;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-
-import com.tickethub.domain.geography.ZipCodeAddress;import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.junit.jupiter.api.DisplayName;
-
-import com.tickethub.domain.exception.DomainException;
 
 @DisplayName("Address")
 class AddressTest {
-    private static final List<String> FIELDS = List.of("street", "number", "complement", "neighborhood",
-            "city", "state", "country", "zipCode");
+    private static final List<String> FIELDS =
+            List.of("street", "number", "complement", "neighborhood", "city", "state", "country", "zipCode");
 
     @Test
     @DisplayName("Given padded fields, when create, then normalize and expose address")
     void givenPaddedFields_whenCreate_thenNormalizeAndExposeAddress() {
-        final var address = Address.create("  Rua   São João  ", "  12-A ", " Sala\t 10 ", " Centro ",
-                " São\u00a0Paulo ", " SP ", " Brasil ", " 01035-000 ");
+        final var address = Address.create(
+                "  Rua   São João  ",
+                "  12-A ",
+                " Sala\t 10 ",
+                " Centro ",
+                " São\u00a0Paulo ",
+                " SP ",
+                " Brasil ",
+                " 01035-000 ");
 
         assertEquals("Rua São João", address.getStreet());
         assertEquals("12-A", address.getNumber());
@@ -55,9 +60,10 @@ class AddressTest {
     }
 
     private static Stream<Arguments> invalidRequiredFields() {
-        return IntStream.range(0, FIELDS.size()).filter(index -> index != 2).boxed()
-                .flatMap(index -> Stream.of(null, "", " \t\n ", "\u00a0")
-                        .map(value -> Arguments.of(index, value)));
+        return IntStream.range(0, FIELDS.size())
+                .filter(index -> index != 2)
+                .boxed()
+                .flatMap(index -> Stream.of(null, "", " \t\n ", "\u00a0").map(value -> Arguments.of(index, value)));
     }
 
     @ParameterizedTest
@@ -100,8 +106,8 @@ class AddressTest {
     @Test
     @DisplayName("Given international address, when create, then preserve postal format")
     void givenInternationalAddress_whenCreate_thenPreservePostalFormat() {
-        final var address = Address.create("Baker Street", "221B", null, "Marylebone", "London",
-                "Greater London", "United Kingdom", "NW1 6XE");
+        final var address = Address.create(
+                "Baker Street", "221B", null, "Marylebone", "London", "Greater London", "United Kingdom", "NW1 6XE");
 
         assertEquals("221B", address.getNumber());
         assertEquals("NW1 6XE", address.getZipCode());
@@ -110,7 +116,8 @@ class AddressTest {
     @Test
     @DisplayName("Given invalid street, when call constructor, then cannot bypass validation")
     void givenInvalidStreet_whenCallConstructor_thenCannotBypassValidation() {
-        final var exception = assertThrows(DomainException.class,
+        final var exception = assertThrows(
+                DomainException.class,
                 () -> new Address(null, "100", null, "Centro", "São Paulo", "SP", "Brasil", "01305-000"));
 
         assertEquals("'street' should not be null or blank", exception.getMessage());
@@ -120,8 +127,8 @@ class AddressTest {
     @DisplayName("Given ZIP code data, when enriched with, then overwrites except number and complement")
     void givenZipCodeData_whenEnrichedWith_thenOverwritesExceptNumberAndComplement() {
         final var address = create(validFields());
-        final var zipCode = new ZipCodeAddress("01305000", "Avenida Paulista", "Bela Vista", "São Paulo", "SP",
-                "Brasil");
+        final var zipCode =
+                new ZipCodeAddress("01305000", "Avenida Paulista", "Bela Vista", "São Paulo", "SP", "Brasil");
 
         final var enriched = address.enrichedWith(zipCode);
 

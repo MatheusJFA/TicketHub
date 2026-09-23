@@ -1,15 +1,8 @@
 package com.tickethub.application.section.create;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
-
-import java.math.BigDecimal;
-import java.util.Currency;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.mock;
 
 import com.tickethub.application.UseCaseTest;
@@ -17,6 +10,11 @@ import com.tickethub.domain.core.section.SectionGateway;
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.domain.shared.Money;
+import java.math.BigDecimal;
+import java.util.Currency;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Create section use case")
 public class CreateSectionUseCaseTest extends UseCaseTest {
@@ -45,18 +43,20 @@ public class CreateSectionUseCaseTest extends UseCaseTest {
 
         assertNotNull(output.id());
         verify(showGateway, times(1)).existsByIds(List.of(SHOW_ID));
-        verify(sectionGateway, times(1)).create(argThat(saved ->
-                saved.getId() != null
-                        && saved.getId().getValue().equals(output.id())
-                        && saved.getCreatedAt() != null
-                        && saved.getUpdatedAt() != null
-                        && saved.getDeletedAt() == null
-                        && saved.getName().getValue().equals("VIP")
-                        && saved.getDescription().getValue().equals("Description")
-                        && saved.getTotalSpots() == 3
-                        && saved.getSpots().size() == 3
-                        && saved.getPrice().equals(PRICE)
-                        && !saved.isPublished()), eq(SHOW_ID));
+        verify(sectionGateway, times(1))
+                .create(
+                        argThat(saved -> saved.getId() != null
+                                && saved.getId().getValue().equals(output.id())
+                                && saved.getCreatedAt() != null
+                                && saved.getUpdatedAt() != null
+                                && saved.getDeletedAt() == null
+                                && saved.getName().getValue().equals("VIP")
+                                && saved.getDescription().getValue().equals("Description")
+                                && saved.getTotalSpots() == 3
+                                && saved.getSpots().size() == 3
+                                && saved.getPrice().equals(PRICE)
+                                && !saved.isPublished()),
+                        eq(SHOW_ID));
     }
 
     @Test
@@ -68,7 +68,9 @@ public class CreateSectionUseCaseTest extends UseCaseTest {
         final var notification = useCase.execute(command).getLeft();
 
         assertEquals(1, notification.getErrors().size());
-        assertEquals("Show not found: " + SHOW_ID.getValue(), notification.firstError().message());
+        assertEquals(
+                "Show not found: " + SHOW_ID.getValue(),
+                notification.firstError().message());
         verify(showGateway, times(1)).existsByIds(List.of(SHOW_ID));
         verify(sectionGateway, never()).create(any(), any());
     }
@@ -86,16 +88,19 @@ public class CreateSectionUseCaseTest extends UseCaseTest {
         assertEquals(1, notification.getErrors().size());
         assertEquals(expectedMessage, notification.firstError().message());
         verify(showGateway, times(1)).existsByIds(List.of(SHOW_ID));
-        verify(sectionGateway, times(1)).create(argThat(saved -> saved.getId() != null
-                        && saved.getCreatedAt() != null
-                        && saved.getUpdatedAt() != null
-                        && saved.getDeletedAt() == null
-                        && saved.getName().getValue().equals("VIP")
-                        && saved.getDescription().getValue().equals("Description")
-                        && saved.getTotalSpots() == 3
-                        && saved.getSpots().size() == 3
-                        && saved.getPrice().equals(PRICE)
-                        && !saved.isPublished()), eq(SHOW_ID));
+        verify(sectionGateway, times(1))
+                .create(
+                        argThat(saved -> saved.getId() != null
+                                && saved.getCreatedAt() != null
+                                && saved.getUpdatedAt() != null
+                                && saved.getDeletedAt() == null
+                                && saved.getName().getValue().equals("VIP")
+                                && saved.getDescription().getValue().equals("Description")
+                                && saved.getTotalSpots() == 3
+                                && saved.getSpots().size() == 3
+                                && saved.getPrice().equals(PRICE)
+                                && !saved.isPublished()),
+                        eq(SHOW_ID));
     }
 
     @Test

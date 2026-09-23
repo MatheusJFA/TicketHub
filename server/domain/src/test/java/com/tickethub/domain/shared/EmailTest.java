@@ -4,36 +4,37 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.tickethub.domain.exception.DomainException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.junit.jupiter.api.DisplayName;
-
-import com.tickethub.domain.exception.DomainException;
 
 @DisplayName("Email")
 class EmailTest {
 
     @ParameterizedTest
     @NullAndEmptySource
-    @ValueSource(strings = {
-            " ",
-            "plainaddress",
-            "missing-at-sign.com",
-            "@missing-local.com",
-            "missing-domain@",
-            "missing-tld@domain",
-            "double..dot@domain.com",
-            ".leading-dot@domain.com",
-            "trailing-dot.@domain.com",
-            "user@.leading-dot.com",
-            "user@domain..com"
-    })
+    @ValueSource(
+            strings = {
+                " ",
+                "plainaddress",
+                "missing-at-sign.com",
+                "@missing-local.com",
+                "missing-domain@",
+                "missing-tld@domain",
+                "double..dot@domain.com",
+                ".leading-dot@domain.com",
+                "trailing-dot.@domain.com",
+                "user@.leading-dot.com",
+                "user@domain..com"
+            })
     @DisplayName("Given null empty or malformed email, when create, then throw domain exception")
     void givenNullEmptyOrMalformedEmail_whenCreate_thenThrowDomainException(String value) {
-        assertEquals("Invalid email", assertThrows(DomainException.class,
-                () -> Email.create(value)).getMessage());
+        assertEquals(
+                "Invalid email",
+                assertThrows(DomainException.class, () -> Email.create(value)).getMessage());
     }
 
     @Test

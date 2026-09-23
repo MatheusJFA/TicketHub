@@ -2,22 +2,21 @@ package com.tickethub.domain.core.show;
 
 import static java.util.Objects.isNull;
 
+import com.tickethub.domain.AggregateRoot;
+import com.tickethub.domain.core.partner.PartnerID;
+import com.tickethub.domain.core.section.Section;
+import com.tickethub.domain.exception.DomainException;
+import com.tickethub.domain.shared.Address;
+import com.tickethub.domain.shared.Location;
+import com.tickethub.domain.shared.Money;
+import com.tickethub.domain.shared.Name;
+import com.tickethub.domain.shared.Text;
+import com.tickethub.domain.validation.ValidationHandler;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
-import com.tickethub.domain.AggregateRoot;
-import com.tickethub.domain.core.partner.PartnerID;
-import com.tickethub.domain.core.section.Section;
-import com.tickethub.domain.exception.DomainException;
-import com.tickethub.domain.shared.Location;
-import com.tickethub.domain.shared.Money;
-import com.tickethub.domain.shared.Name;
-import com.tickethub.domain.shared.Text;
-import com.tickethub.domain.shared.Address;
-import com.tickethub.domain.validation.ValidationHandler;
 
 public class Show extends AggregateRoot<ShowID> {
     private Name name;
@@ -35,10 +34,22 @@ public class Show extends AggregateRoot<ShowID> {
 
     private final Set<Section> sections;
 
-    private Show(ShowID id, Name name, Text description, OffsetDateTime date, Address address, boolean isPublished, long totalSpots,
+    private Show(
+            ShowID id,
+            Name name,
+            Text description,
+            OffsetDateTime date,
+            Address address,
+            boolean isPublished,
+            long totalSpots,
             long totalSpotsSold,
-            PartnerID partnerId, Set<Section> sections,
-            Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
+            PartnerID partnerId,
+            Set<Section> sections,
+            Instant createdAt,
+            Instant updatedAt,
+            Instant deletedAt,
+            String createdBy,
+            String lastModifiedBy) {
         super(id, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
         this.name = name;
         this.description = description;
@@ -51,49 +62,134 @@ public class Show extends AggregateRoot<ShowID> {
         this.sections = sections;
     }
 
-    public static Show create(String name, String description, OffsetDateTime date, Address address, boolean isPublished,
+    public static Show create(
+            String name,
+            String description,
+            OffsetDateTime date,
+            Address address,
+            boolean isPublished,
             long totalSpots,
-            long totalSpotsSold, PartnerID partnerId, Set<Section> sections) {
-        final ShowID id = ShowID.generate();
-        final Set<Section> sectionList = isNull(sections) ? new HashSet<>() : new HashSet<>(sections);
-        final var now = Instant.now();
-        return new Show(id, Name.create(name), Text.create(description), date, address, isPublished, totalSpots, totalSpotsSold,
-                partnerId, sectionList, now, now, null, null, null);
-    }
-
-    public static Show create(String name, String description, OffsetDateTime date, Address address, long totalSpots,
+            long totalSpotsSold,
             PartnerID partnerId,
             Set<Section> sections) {
         final ShowID id = ShowID.generate();
         final Set<Section> sectionList = isNull(sections) ? new HashSet<>() : new HashSet<>(sections);
         final var now = Instant.now();
-        return new Show(id, Name.create(name), Text.create(description), date, address, false, totalSpots, 0, partnerId,
-                sectionList, now, now, null, null, null);
+        return new Show(
+                id,
+                Name.create(name),
+                Text.create(description),
+                date,
+                address,
+                isPublished,
+                totalSpots,
+                totalSpotsSold,
+                partnerId,
+                sectionList,
+                now,
+                now,
+                null,
+                null,
+                null);
     }
 
-    public static Show create(String name, String description, OffsetDateTime date, Address address, long totalSpots,
+    public static Show create(
+            String name,
+            String description,
+            OffsetDateTime date,
+            Address address,
+            long totalSpots,
+            PartnerID partnerId,
+            Set<Section> sections) {
+        final ShowID id = ShowID.generate();
+        final Set<Section> sectionList = isNull(sections) ? new HashSet<>() : new HashSet<>(sections);
+        final var now = Instant.now();
+        return new Show(
+                id,
+                Name.create(name),
+                Text.create(description),
+                date,
+                address,
+                false,
+                totalSpots,
+                0,
+                partnerId,
+                sectionList,
+                now,
+                now,
+                null,
+                null,
+                null);
+    }
+
+    public static Show create(
+            String name,
+            String description,
+            OffsetDateTime date,
+            Address address,
+            long totalSpots,
             PartnerID partnerId) {
         final ShowID id = ShowID.generate();
         final var now = Instant.now();
-        return new Show(id, Name.create(name), Text.create(description), date, address, false, totalSpots, 0, partnerId,
-                new HashSet<>(), now, now, null, null, null);
+        return new Show(
+                id,
+                Name.create(name),
+                Text.create(description),
+                date,
+                address,
+                false,
+                totalSpots,
+                0,
+                partnerId,
+                new HashSet<>(),
+                now,
+                now,
+                null,
+                null,
+                null);
     }
 
-    public static Show reconstitute(ShowID id, Name name, Text description, OffsetDateTime date, Address address,
-            boolean isPublished, long totalSpots, long totalSpotsSold, PartnerID partnerId, Set<Section> sections,
-            Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
+    public static Show reconstitute(
+            ShowID id,
+            Name name,
+            Text description,
+            OffsetDateTime date,
+            Address address,
+            boolean isPublished,
+            long totalSpots,
+            long totalSpotsSold,
+            PartnerID partnerId,
+            Set<Section> sections,
+            Instant createdAt,
+            Instant updatedAt,
+            Instant deletedAt,
+            String createdBy,
+            String lastModifiedBy) {
         final Set<Section> sectionList = isNull(sections) ? new HashSet<>() : new HashSet<>(sections);
-        return new Show(id, name, description, date, address, isPublished, totalSpots, totalSpotsSold,
-                partnerId, sectionList, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
+        return new Show(
+                id,
+                name,
+                description,
+                date,
+                address,
+                isPublished,
+                totalSpots,
+                totalSpotsSold,
+                partnerId,
+                sectionList,
+                createdAt,
+                updatedAt,
+                deletedAt,
+                createdBy,
+                lastModifiedBy);
     }
 
-    public void addSection(String name, String description, long totalSpots, Money price,
-            int seatNumberWidth) {
+    public void addSection(String name, String description, long totalSpots, Money price, int seatNumberWidth) {
         if (totalSpots < 0) {
             throw new DomainException("'totalSpots' should not be negative");
         }
-        final Section section = Section.create(name, description, totalSpots, price,
-                Location.sectionCode(sections.size()), seatNumberWidth);
+        final Section section = Section.create(
+                name, description, totalSpots, price, Location.sectionCode(sections.size()), seatNumberWidth);
         this.sections.add(section);
         this.totalSpots += totalSpots;
         this.markAsUpdated();
@@ -211,5 +307,4 @@ public class Show extends AggregateRoot<ShowID> {
         final var validator = new ShowValidator(this, handler);
         validator.validate();
     }
-
 }

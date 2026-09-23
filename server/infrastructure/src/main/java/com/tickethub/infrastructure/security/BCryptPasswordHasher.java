@@ -2,11 +2,9 @@ package com.tickethub.infrastructure.security;
 
 import static java.util.Objects.requireNonNull;
 
+import com.tickethub.domain.authentication.PasswordHasher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
-import com.tickethub.domain.authentication.PasswordHasher;
-import java.util.Objects;
 
 @Component
 public class BCryptPasswordHasher implements PasswordHasher {

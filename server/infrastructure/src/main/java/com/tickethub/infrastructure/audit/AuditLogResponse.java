@@ -15,5 +15,4 @@ public record AuditLogResponse(
         String input,
         AuditOutcome outcome,
         String error,
-        long durationMs) {
-}
+        long durationMs) {}

@@ -1,13 +1,13 @@
 package com.tickethub.application.show.changedescription;
 
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.show.Show;
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.domain.validation.Notification;
+import java.util.Optional;
 
 public class DefaultChangeShowDescriptionUseCase extends ChangeShowDescriptionUseCase {
     private final ShowGateway showGateway;
@@ -39,5 +39,4 @@ public class DefaultChangeShowDescriptionUseCase extends ChangeShowDescriptionUs
             return Either.left(notification);
         }
     }
-
 }

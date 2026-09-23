@@ -1,13 +1,13 @@
 package com.tickethub.application.show.changename;
 
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.show.Show;
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.domain.validation.Notification;
+import java.util.Optional;
 
 public class DefaultChangeShowNameUseCase extends ChangeShowNameUseCase {
     private final ShowGateway showGateway;
@@ -40,5 +40,4 @@ public class DefaultChangeShowNameUseCase extends ChangeShowNameUseCase {
             return Either.left(notification);
         }
     }
-
 }

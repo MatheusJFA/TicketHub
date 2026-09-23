@@ -1,10 +1,9 @@
 package com.tickethub.application.ticket.validate;
 
-import java.time.Instant;
-import java.time.OffsetDateTime;
-
 import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.core.ticket.Ticket;
+import java.time.Instant;
+import java.time.OffsetDateTime;
 
 public record ValidateTicketOutput(
         String showId,
@@ -15,8 +14,8 @@ public record ValidateTicketOutput(
         String location,
         OffsetDateTime showDate,
         Instant checkedInAt) {
-    public static ValidateTicketOutput from(final String showId, final Ticket ticket,
-            final Spot spot, final OffsetDateTime showDate) {
+    public static ValidateTicketOutput from(
+            final String showId, final Ticket ticket, final Spot spot, final OffsetDateTime showDate) {
         return new ValidateTicketOutput(
                 showId,
                 ticket.getId().getValue(),

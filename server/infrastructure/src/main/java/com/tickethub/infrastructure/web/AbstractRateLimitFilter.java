@@ -1,15 +1,7 @@
 package com.tickethub.infrastructure.web;
 
 import static java.util.Objects.requireNonNull;
-
-import java.io.IOException;
-import java.time.Duration;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.web.filter.OncePerRequestFilter;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import io.github.resilience4j.ratelimiter.RateLimiter;
 import io.github.resilience4j.ratelimiter.RateLimiterConfig;
@@ -18,7 +10,13 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import java.io.IOException;
+import java.time.Duration;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
  * Per-client (IP or X-Forwarded-For) token bucket backed by Resilience4j.
@@ -41,10 +39,11 @@ public abstract class AbstractRateLimitFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response,
-            final FilterChain chain) throws ServletException, IOException {
-        final RateLimiter limiter = limiters.computeIfAbsent(clientKey(request),
-                key -> RateLimiter.of(name + "-" + key, config));
+    protected void doFilterInternal(
+            final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain)
+            throws ServletException, IOException {
+        final RateLimiter limiter =
+                limiters.computeIfAbsent(clientKey(request), key -> RateLimiter.of(name + "-" + key, config));
         try {
             RateLimiter.decorateCheckedSupplier(limiter, () -> null).get();
         } catch (final RequestNotPermitted e) {
@@ -61,6 +60,7 @@ public abstract class AbstractRateLimitFilter extends OncePerRequestFilter {
     private static String clientKey(final HttpServletRequest request) {
         final String forwarded = request.getHeader("X-Forwarded-For");
         if (isNotBlank(forwarded)) {
+            // Filtra: primeiro IP da lista X-Forwarded-For separada por virgula.
             return forwarded.split(",")[0].trim();
         }
         return request.getRemoteAddr();

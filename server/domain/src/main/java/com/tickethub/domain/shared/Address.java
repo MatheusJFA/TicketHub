@@ -1,9 +1,8 @@
 package com.tickethub.domain.shared;
 
 import static java.util.Objects.isNull;
-
-import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 
 import com.tickethub.domain.ValueObject;
 import com.tickethub.domain.exception.DomainException;
@@ -21,8 +20,15 @@ public final class Address extends ValueObject {
     private final String country;
     private final String zipCode;
 
-    public Address(String street, String number, String complement, String neighborhood, String city, String state,
-            String country, String zipCode) {
+    public Address(
+            String street,
+            String number,
+            String complement,
+            String neighborhood,
+            String city,
+            String state,
+            String country,
+            String zipCode) {
         this.street = required(street, "street");
         this.number = required(number, "number");
         this.complement = normalize(complement);
@@ -33,8 +39,15 @@ public final class Address extends ValueObject {
         this.zipCode = required(zipCode, "zipCode");
     }
 
-    public static Address create(String street, String number, String complement, String neighborhood,
-            String city, String state, String country, String zipCode) {
+    public static Address create(
+            String street,
+            String number,
+            String complement,
+            String neighborhood,
+            String city,
+            String state,
+            String country,
+            String zipCode) {
         return new Address(street, number, complement, neighborhood, city, state, country, zipCode);
     }
 
@@ -67,8 +80,8 @@ public final class Address extends ValueObject {
     }
 
     private static String normalize(String value) {
-        if (isNull(value))
-            return null;
+        if (isNull(value)) return null;
+        // Filtra: sequencias de espacos Unicode para normalizar em espaco unico.
         final String normalized = value.replaceAll("(?U)\\s+", SPACE).strip();
         return normalized.isEmpty() ? null : normalized;
     }
@@ -108,17 +121,15 @@ public final class Address extends ValueObject {
     @Override
     public String toString() {
         final String complementPart = isNull(complement) ? "" : ", " + complement;
-        return "%s, %s%s - %s, %s - %s, %s, %s".formatted(
-                street, number, complementPart, neighborhood, city, state, zipCode, country);
+        return "%s, %s%s - %s, %s - %s, %s, %s"
+                .formatted(street, number, complementPart, neighborhood, city, state, zipCode, country);
     }
 
     @Override
     public boolean equals(Object other) {
-        if (this == other)
-            return true;
+        if (this == other) return true;
 
-        if (!(other instanceof Address address))
-            return false;
+        if (!(other instanceof Address address)) return false;
 
         return street.equals(address.street)
                 && number.equals(address.number)

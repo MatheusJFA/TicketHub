@@ -7,10 +7,9 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -33,10 +32,13 @@ class OwnerAccessTest {
                 .map(SimpleGrantedAuthority::new)
                 .map(authority -> (GrantedAuthority) authority)
                 .toList();
-        final var jwt = new Jwt("token", Instant.now(), Instant.now().plusSeconds(60),
-                Map.of("alg", "none"), Map.of("ownerId", ownerId));
-        SecurityContextHolder.getContext()
-                .setAuthentication(new JwtAuthenticationToken(jwt, granted));
+        final var jwt = new Jwt(
+                "token",
+                Instant.now(),
+                Instant.now().plusSeconds(60),
+                Map.of("alg", "none"),
+                Map.of("ownerId", ownerId));
+        SecurityContextHolder.getContext().setAuthentication(new JwtAuthenticationToken(jwt, granted));
     }
 
     @Test
@@ -58,8 +60,9 @@ class OwnerAccessTest {
     @Test
     @DisplayName("Given admin without owner, when is self or admin, then returns true")
     void givenAdminWithoutOwner_whenIsSelfOrAdmin_thenReturnsTrue() {
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
-                "admin", null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
+        SecurityContextHolder.getContext()
+                .setAuthentication(new UsernamePasswordAuthenticationToken(
+                        "admin", null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
 
         assertTrue(access.isSelfOrAdmin("customer-1"));
     }

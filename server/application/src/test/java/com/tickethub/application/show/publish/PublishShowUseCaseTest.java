@@ -1,31 +1,30 @@
 package com.tickethub.application.show.publish;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
+import static org.mockito.Mockito.*;
 
+import com.tickethub.application.UseCaseTest;
+import com.tickethub.domain.core.partner.PartnerID;
+import com.tickethub.domain.core.show.Show;
+import com.tickethub.domain.core.show.ShowGateway;
+import com.tickethub.domain.shared.Address;
+import com.tickethub.domain.shared.Money;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
-
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-
-import com.tickethub.application.UseCaseTest;
-import com.tickethub.domain.core.show.Show;
-import com.tickethub.domain.core.show.ShowGateway;
-import com.tickethub.domain.core.partner.PartnerID;
-import com.tickethub.domain.shared.Money;
-import com.tickethub.domain.shared.Address;
 
 @DisplayName("Publish show use case")
 public class PublishShowUseCaseTest extends UseCaseTest {
     private static final OffsetDateTime DATE = OffsetDateTime.parse("2027-01-15T20:00:00-03:00");
-    private static final Address ADDRESS = Address.create("Rua Augusta", "100", null, "Centro", "São Paulo", "SP", "Brasil", "01305-000");
+    private static final Address ADDRESS =
+            Address.create("Rua Augusta", "100", null, "Centro", "São Paulo", "SP", "Brasil", "01305-000");
     private static final Money PRICE = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
 
     @InjectMocks
@@ -52,15 +51,16 @@ public class PublishShowUseCaseTest extends UseCaseTest {
         assertNotNull(output.id());
         assertEquals(entity.getId().getValue(), output.id());
         verify(showGateway, times(1)).findById(entity.getId());
-        verify(showGateway, times(1)).update(argThat(saved ->
-                saved.getId() != null
+        verify(showGateway, times(1))
+                .update(argThat(saved -> saved.getId() != null
                         && saved.getId().getValue().equals(output.id())
                         && saved.getCreatedAt() != null
                         && saved.getUpdatedAt() != null
                         && saved.getDeletedAt() == null
                         && saved.isPublished()
-                        && saved.getSections().stream().allMatch(section -> !section.isPublished()
-                        && section.getSpots().stream().allMatch(spot -> !spot.isPublished()))));
+                        && saved.getSections().stream()
+                                .allMatch(section -> !section.isPublished()
+                                        && section.getSpots().stream().allMatch(spot -> !spot.isPublished()))));
     }
 
     @Test
@@ -77,13 +77,15 @@ public class PublishShowUseCaseTest extends UseCaseTest {
         assertEquals(1, notification.getErrors().size());
         assertEquals(expectedMessage, notification.firstError().message());
         verify(showGateway, times(1)).findById(entity.getId());
-        verify(showGateway, times(1)).update(argThat(saved -> saved.getId() != null
+        verify(showGateway, times(1))
+                .update(argThat(saved -> saved.getId() != null
                         && saved.getCreatedAt() != null
                         && saved.getUpdatedAt() != null
                         && saved.getDeletedAt() == null
                         && saved.isPublished()
-                        && saved.getSections().stream().allMatch(section -> !section.isPublished()
-                        && section.getSpots().stream().allMatch(spot -> !spot.isPublished()))));
+                        && saved.getSections().stream()
+                                .allMatch(section -> !section.isPublished()
+                                        && section.getSpots().stream().allMatch(spot -> !spot.isPublished()))));
     }
 
     @Test
@@ -96,7 +98,9 @@ public class PublishShowUseCaseTest extends UseCaseTest {
         final var notification = useCase.execute(command).getLeft();
 
         assertEquals(1, notification.getErrors().size());
-        assertEquals("Show not found: " + entity.getId().getValue(), notification.firstError().message());
+        assertEquals(
+                "Show not found: " + entity.getId().getValue(),
+                notification.firstError().message());
         verify(showGateway, times(1)).findById(entity.getId());
         verify(showGateway, never()).update(any());
     }

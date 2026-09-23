@@ -1,5 +1,7 @@
 package com.tickethub.infrastructure.configuration.usecases;
 
+import com.tickethub.application.section.generatespots.DefaultGenerateSectionSpotsUseCase;
+import com.tickethub.application.section.generatespots.GenerateSectionSpotsUseCase;
 import com.tickethub.application.show.addsection.AddSectionToShowUseCase;
 import com.tickethub.application.show.addsection.DefaultAddSectionToShowUseCase;
 import com.tickethub.application.show.changedescription.ChangeShowDescriptionUseCase;
@@ -8,34 +10,32 @@ import com.tickethub.application.show.changename.ChangeShowNameUseCase;
 import com.tickethub.application.show.changename.DefaultChangeShowNameUseCase;
 import com.tickethub.application.show.create.CreateShowUseCase;
 import com.tickethub.application.show.create.DefaultCreateShowUseCase;
-import com.tickethub.application.show.delete.DeleteShowUseCase;
 import com.tickethub.application.show.delete.DefaultDeleteShowUseCase;
-import com.tickethub.application.show.publish.PublishShowUseCase;
+import com.tickethub.application.show.delete.DeleteShowUseCase;
 import com.tickethub.application.show.publish.DefaultPublishShowUseCase;
-import com.tickethub.application.show.publishall.PublishAllShowUseCase;
+import com.tickethub.application.show.publish.PublishShowUseCase;
 import com.tickethub.application.show.publishall.DefaultPublishAllShowUseCase;
-import com.tickethub.application.show.reschedule.RescheduleShowUseCase;
+import com.tickethub.application.show.publishall.PublishAllShowUseCase;
 import com.tickethub.application.show.reschedule.DefaultRescheduleShowUseCase;
-import com.tickethub.application.show.retrieve.get.GetShowUseCase;
+import com.tickethub.application.show.reschedule.RescheduleShowUseCase;
 import com.tickethub.application.show.retrieve.get.DefaultGetShowUseCase;
-import com.tickethub.application.show.retrieve.list.ListShowsUseCase;
+import com.tickethub.application.show.retrieve.get.GetShowUseCase;
 import com.tickethub.application.show.retrieve.list.DefaultListShowsUseCase;
-import com.tickethub.application.show.unpublish.UnpublishShowUseCase;
+import com.tickethub.application.show.retrieve.list.ListShowsUseCase;
 import com.tickethub.application.show.unpublish.DefaultUnpublishShowUseCase;
-import com.tickethub.application.show.unpublishall.UnpublishAllShowUseCase;
+import com.tickethub.application.show.unpublish.UnpublishShowUseCase;
 import com.tickethub.application.show.unpublishall.DefaultUnpublishAllShowUseCase;
-import com.tickethub.application.section.generatespots.DefaultGenerateSectionSpotsUseCase;
-import com.tickethub.application.section.generatespots.GenerateSectionSpotsUseCase;
-import com.tickethub.application.show.update.UpdateShowUseCase;
+import com.tickethub.application.show.unpublishall.UnpublishAllShowUseCase;
 import com.tickethub.application.show.update.DefaultUpdateShowUseCase;
-import com.tickethub.domain.core.show.ShowGateway;
+import com.tickethub.application.show.update.UpdateShowUseCase;
 import com.tickethub.domain.core.partner.PartnerGateway;
+import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.event.DomainEventPublisher;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.util.Assert;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.util.Assert;
 
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnBean({ShowGateway.class, PartnerGateway.class})
@@ -44,7 +44,9 @@ public class ShowUseCaseConfig {
     private final PartnerGateway partnerGateway;
     private final DomainEventPublisher eventPublisher;
 
-    public ShowUseCaseConfig(final ShowGateway showGateway, final PartnerGateway partnerGateway,
+    public ShowUseCaseConfig(
+            final ShowGateway showGateway,
+            final PartnerGateway partnerGateway,
             final DomainEventPublisher eventPublisher) {
         this.showGateway = showGateway;
         this.partnerGateway = partnerGateway;
@@ -57,8 +59,7 @@ public class ShowUseCaseConfig {
             @Value("${tickethub.spots.seat-number-width:5}") final int seatNumberWidth) {
         Assert.isTrue(asyncSpotThreshold > 0, "tickethub.spots.async-threshold must be positive");
         Assert.isTrue(seatNumberWidth > 0, "tickethub.spots.seat-number-width must be positive");
-        return new DefaultAddSectionToShowUseCase(showGateway, eventPublisher, asyncSpotThreshold,
-                seatNumberWidth);
+        return new DefaultAddSectionToShowUseCase(showGateway, eventPublisher, asyncSpotThreshold, seatNumberWidth);
     }
 
     @Bean

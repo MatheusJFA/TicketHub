@@ -1,10 +1,10 @@
 package com.tickethub.infrastructure.shared.http;
 
 import static java.util.Objects.requireNonNull;
+
 import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -37,8 +37,7 @@ public abstract class BaseHttpClient {
                 .defaultHeader(HttpHeaders.USER_AGENT, "tickethub-server");
     }
 
-    public static ClientHttpRequestFactory timedFactory(final Duration connectTimeout,
-            final Duration readTimeout) {
+    public static ClientHttpRequestFactory timedFactory(final Duration connectTimeout, final Duration readTimeout) {
         final var requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(connectTimeout);
         requestFactory.setReadTimeout(readTimeout);
@@ -54,13 +53,11 @@ public abstract class BaseHttpClient {
         return getOptional(uri, Map.of(), responseType);
     }
 
-    protected <T> Optional<T> getOptional(final String uri, final Map<String, ?> uriVariables,
-            final Class<T> responseType) {
+    protected <T> Optional<T> getOptional(
+            final String uri, final Map<String, ?> uriVariables, final Class<T> responseType) {
         try {
-            return Optional.ofNullable(restClient.get()
-                    .uri(uri, uriVariables)
-                    .retrieve()
-                    .body(responseType));
+            return Optional.ofNullable(
+                    restClient.get().uri(uri, uriVariables).retrieve().body(responseType));
         } catch (final RestClientException e) {
             log.warn("Upstream call failed provider={} uri={} error={}", provider, uri, e.getMessage());
             return Optional.empty();
@@ -75,13 +72,10 @@ public abstract class BaseHttpClient {
         return getRequired(uri, Map.of(), responseType);
     }
 
-    protected <T> T getRequired(final String uri, final Map<String, ?> uriVariables,
-            final Class<T> responseType) {
+    protected <T> T getRequired(final String uri, final Map<String, ?> uriVariables, final Class<T> responseType) {
         try {
-            final var response = restClient.get()
-                    .uri(uri, uriVariables)
-                    .retrieve()
-                    .toEntity(responseType);
+            final var response =
+                    restClient.get().uri(uri, uriVariables).retrieve().toEntity(responseType);
             return Optional.ofNullable(response.getBody())
                     .orElseThrow(() -> new HttpUpstreamException(provider, 200, "Empty response body"));
         } catch (final HttpUpstreamException e) {

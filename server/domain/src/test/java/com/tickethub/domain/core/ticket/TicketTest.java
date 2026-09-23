@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 
 import com.tickethub.domain.core.customer.CustomerID;
 import com.tickethub.domain.core.order.OrderID;
@@ -13,6 +11,8 @@ import com.tickethub.domain.core.spot.SpotID;
 import com.tickethub.domain.exception.InvalidTicketSignatureException;
 import com.tickethub.domain.exception.TicketAlreadyUsedException;
 import com.tickethub.domain.validation.Notification;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Ticket")
 class TicketTest {
@@ -39,8 +39,8 @@ class TicketTest {
         assertEquals(customerId, ticket.getCustomerId());
         assertNotNull(ticket.getCode());
         assertEquals(8, ticket.getCode().length());
-        assertEquals("signed:" + Ticket.signedPayload(ticket.getId().getValue(), ticket.getCode()),
-                ticket.getSignature());
+        assertEquals(
+                "signed:" + Ticket.signedPayload(ticket.getId().getValue(), ticket.getCode()), ticket.getSignature());
         assertEquals(TicketStatus.ISSUED, ticket.getStatus());
         assertEquals(1, ticket.domainEvents().size());
         assertTrue(ticket.domainEvents().get(0) instanceof TicketIssued);
@@ -61,8 +61,7 @@ class TicketTest {
     void givenForgedSigner_whenVerifySignature_thenThrowInvalidSignature() {
         final var ticket = issued();
 
-        final var exception = assertThrows(InvalidTicketSignatureException.class,
-                () -> ticket.verifySignature(FORGED));
+        final var exception = assertThrows(InvalidTicketSignatureException.class, () -> ticket.verifySignature(FORGED));
 
         assertEquals("Invalid ticket signature", exception.getMessage());
     }

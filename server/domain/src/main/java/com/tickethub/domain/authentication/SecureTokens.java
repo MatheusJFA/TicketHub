@@ -11,8 +11,7 @@ public final class SecureTokens {
     private static final SecureRandom RANDOM = new SecureRandom();
     private static final int OPAQUE_TOKEN_BYTES = 32;
 
-    private SecureTokens() {
-    }
+    private SecureTokens() {}
 
     public static String generateOpaqueToken() {
         final byte[] bytes = new byte[OPAQUE_TOKEN_BYTES];
@@ -22,8 +21,7 @@ public final class SecureTokens {
 
     public static String sha256Hex(final String value) {
         try {
-            final byte[] digest = MessageDigest.getInstance("SHA-256")
-                    .digest(value.getBytes(StandardCharsets.UTF_8));
+            final byte[] digest = MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8));
             final var hex = new StringBuilder(digest.length * 2);
             for (final byte b : digest) {
                 hex.append(String.format("%02x", b));

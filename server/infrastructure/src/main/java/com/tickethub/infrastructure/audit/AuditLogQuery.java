@@ -1,6 +1,7 @@
 package com.tickethub.infrastructure.audit;
 
 import static java.util.Objects.requireNonNull;
+
 import java.time.Instant;
 import java.util.Optional;
 

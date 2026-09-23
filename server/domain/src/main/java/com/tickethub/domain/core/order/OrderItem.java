@@ -34,9 +34,7 @@ public class OrderItem extends ValueObject {
 
     @Override
     public boolean equals(final Object other) {
-        return other instanceof OrderItem item
-                && spotId.equals(item.spotId)
-                && price.equals(item.price);
+        return other instanceof OrderItem item && spotId.equals(item.spotId) && price.equals(item.price);
     }
 
     @Override

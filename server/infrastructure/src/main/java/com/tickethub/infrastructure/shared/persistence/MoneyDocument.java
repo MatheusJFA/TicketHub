@@ -1,10 +1,9 @@
 package com.tickethub.infrastructure.shared.persistence;
 
+import com.tickethub.domain.shared.Money;
 import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Optional;
-
-import com.tickethub.domain.shared.Money;
 
 public record MoneyDocument(BigDecimal value, String currency) {
 

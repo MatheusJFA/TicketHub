@@ -6,8 +6,8 @@ package com.tickethub.application.ticket.validate;
  * signed). The path identifies the show being controlled.
  */
 public record ValidateTicketCommand(String showId, String ticketId, String code, String signature) {
-    public static ValidateTicketCommand with(final String showId, final String ticketId,
-            final String code, final String signature) {
+    public static ValidateTicketCommand with(
+            final String showId, final String ticketId, final String code, final String signature) {
         return new ValidateTicketCommand(showId, ticketId, code, signature);
     }
 }

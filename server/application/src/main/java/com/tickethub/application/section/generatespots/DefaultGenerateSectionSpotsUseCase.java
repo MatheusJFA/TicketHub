@@ -21,8 +21,8 @@ public class DefaultGenerateSectionSpotsUseCase extends GenerateSectionSpotsUseC
     @Override
     public Either<Notification, GenerateSectionSpotsOutput> execute(final GenerateSectionSpotsCommand command) {
         try {
-            final var found = findOrNotFound(showGateway.findById(ShowID.from(command.showId())),
-                    Show.class.getSimpleName(), command.showId());
+            final var found = findOrNotFound(
+                    showGateway.findById(ShowID.from(command.showId())), Show.class.getSimpleName(), command.showId());
             if (found.isLeft()) {
                 return Either.left(found.getLeft());
             }

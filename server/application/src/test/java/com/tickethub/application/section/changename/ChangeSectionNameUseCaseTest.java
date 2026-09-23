@@ -1,22 +1,26 @@
 package com.tickethub.application.section.changename;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Currency;
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import com.tickethub.domain.shared.*;
-import com.tickethub.domain.core.partner.PartnerID;
-import com.tickethub.domain.pagination.*;
+
 import com.tickethub.domain.core.section.*;
+import com.tickethub.domain.pagination.*;
+import com.tickethub.domain.shared.*;
+import java.math.BigDecimal;
+import java.util.Currency;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Change section name use case")
 class ChangeSectionNameUseCaseTest {
-    private final Section entity = Section.create("Setor original", "Descricao original", 2, Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL")), "A", 5);
+    private final Section entity = Section.create(
+            "Setor original",
+            "Descricao original",
+            2,
+            Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL")),
+            "A",
+            5);
     private final SectionGateway gateway = mock(SectionGateway.class);
     private final DefaultChangeSectionNameUseCase useCase = new DefaultChangeSectionNameUseCase(gateway);
     private final String id = entity.getId().getValue();

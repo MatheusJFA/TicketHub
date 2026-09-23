@@ -1,5 +1,12 @@
 package com.tickethub.infrastructure.api.controllers;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import com.tickethub.application.Either;
 import com.tickethub.application.spot.changelocation.*;
 import com.tickethub.application.spot.create.*;
@@ -11,29 +18,25 @@ import com.tickethub.application.spot.unpublish.*;
 import com.tickethub.application.spot.update.*;
 import com.tickethub.infrastructure.ControllerTest;
 import com.tickethub.infrastructure.security.ShowAccess;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.web.servlet.MockMvc;
+import com.tickethub.infrastructure.security.TestTokens;
 import com.tickethub.infrastructure.shared.presenters.SharedMapperImpl;
 import com.tickethub.infrastructure.spot.presenters.SpotMapperImpl;
-import com.tickethub.infrastructure.security.TestTokens;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
 
 @ControllerTest(controllers = SpotController.class)
 @Import({SharedMapperImpl.class, SpotMapperImpl.class})
 @DisplayName("Spot controller")
 class SpotControllerTest {
-    @Autowired MockMvc mvc;
+    @Autowired
+    MockMvc mvc;
+
     @Value("${tickethub.security.jwt.secret}")
     String jwtSecret;
 
@@ -44,14 +47,31 @@ class SpotControllerTest {
     private String bearerAsOwner(final String ownerId, final String... authorities) {
         return "Bearer " + TestTokens.bearer(jwtSecret, ownerId, authorities);
     }
-    @MockitoBean ChangeSpotLocationUseCase changeSpotLocation;
-    @MockitoBean CreateSpotUseCase createSpot;
-    @MockitoBean DeleteSpotUseCase deleteSpot;
-    @MockitoBean PublishSpotUseCase publishSpot;
-    @MockitoBean GetSpotUseCase getSpot;
-    @MockitoBean ListSpotsUseCase listSpots;
-    @MockitoBean UnpublishSpotUseCase unpublishSpot;
-    @MockitoBean UpdateSpotUseCase updateSpot;
+
+    @MockitoBean
+    ChangeSpotLocationUseCase changeSpotLocation;
+
+    @MockitoBean
+    CreateSpotUseCase createSpot;
+
+    @MockitoBean
+    DeleteSpotUseCase deleteSpot;
+
+    @MockitoBean
+    PublishSpotUseCase publishSpot;
+
+    @MockitoBean
+    GetSpotUseCase getSpot;
+
+    @MockitoBean
+    ListSpotsUseCase listSpots;
+
+    @MockitoBean
+    UnpublishSpotUseCase unpublishSpot;
+
+    @MockitoBean
+    UpdateSpotUseCase updateSpot;
+
     @MockitoBean(name = "showAccess")
     ShowAccess showAccess;
 
@@ -60,7 +80,10 @@ class SpotControllerTest {
     void givenAValidCommand_whenCallsCreateSpot_shouldReturnSpotId() throws Exception {
         when(createSpot.execute(any())).thenReturn(Either.right(new CreateSpotOutput("spot-1")));
 
-        mvc.perform(post("/spots").header("Authorization", bearer("spot:write")).contentType(MediaType.APPLICATION_JSON).content("{\"sectionId\":\"section-1\",\"location\":\"A1\"}"))
+        mvc.perform(post("/spots")
+                        .header("Authorization", bearer("spot:write"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"sectionId\":\"section-1\",\"location\":\"A1\"}"))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/spots/spot-1"))
                 .andExpect(jsonPath("$.id").value("spot-1"));
@@ -82,8 +105,7 @@ class SpotControllerTest {
     @DisplayName("Given owner, when changes spot location, then succeeds")
     void givenOwner_whenChangesSpotLocation_thenSucceeds() throws Exception {
         when(showAccess.canWriteSpot("spot-1")).thenReturn(true);
-        when(changeSpotLocation.execute(any()))
-                .thenReturn(Either.right(new ChangeSpotLocationOutput("spot-1")));
+        when(changeSpotLocation.execute(any())).thenReturn(Either.right(new ChangeSpotLocationOutput("spot-1")));
 
         mvc.perform(patch("/spots/spot-1/location")
                         .header("Authorization", bearerAsOwner("partner-1", "spot:write"))
@@ -97,8 +119,7 @@ class SpotControllerTest {
     @DisplayName("Given owner, when calls update spot, then succeeds")
     void givenOwner_whenCallsUpdateSpot_thenSucceeds() throws Exception {
         when(showAccess.canWriteSpot("spot-1")).thenReturn(true);
-        when(updateSpot.execute(any()))
-                .thenReturn(Either.right(new UpdateSpotOutput("spot-1")));
+        when(updateSpot.execute(any())).thenReturn(Either.right(new UpdateSpotOutput("spot-1")));
 
         mvc.perform(put("/spots/spot-1")
                         .header("Authorization", bearerAsOwner("partner-1", "spot:write"))

@@ -2,13 +2,7 @@ package com.tickethub.domain.pagination;
 
 import com.tickethub.domain.exception.DomainException;
 
-public record SearchQuery(
-    int page,
-    int perPage,
-    String searchTerm,
-    String sort,
-    String direction
-) {
+public record SearchQuery(int page, int perPage, String searchTerm, String sort, String direction) {
     public SearchQuery {
         if (page < 0) {
             throw new DomainException("'page' must be >= 0");

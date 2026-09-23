@@ -1,19 +1,17 @@
 package com.tickethub.application.spot.create;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
-
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
+import static org.mockito.Mockito.*;
 
 import com.tickethub.application.UseCaseTest;
 import com.tickethub.domain.core.section.SectionGateway;
 import com.tickethub.domain.core.section.SectionID;
 import com.tickethub.domain.core.spot.SpotGateway;
 import com.tickethub.domain.shared.Location;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Create spot use case")
 public class CreateSpotUseCaseTest extends UseCaseTest {
@@ -42,15 +40,17 @@ public class CreateSpotUseCaseTest extends UseCaseTest {
 
         assertNotNull(output.id());
         verify(sectionGateway, times(1)).existsByIds(List.of(SECTION_ID));
-        verify(spotGateway, times(1)).create(argThat(saved ->
-                saved.getId() != null
-                        && saved.getId().getValue().equals(output.id())
-                        && saved.getCreatedAt() != null
-                        && saved.getUpdatedAt() != null
-                        && saved.getDeletedAt() == null
-                        && saved.getLocation().equals(Location.create("A1"))
-                        && saved.isAvailable()
-                        && !saved.isPublished()), eq(SECTION_ID));
+        verify(spotGateway, times(1))
+                .create(
+                        argThat(saved -> saved.getId() != null
+                                && saved.getId().getValue().equals(output.id())
+                                && saved.getCreatedAt() != null
+                                && saved.getUpdatedAt() != null
+                                && saved.getDeletedAt() == null
+                                && saved.getLocation().equals(Location.create("A1"))
+                                && saved.isAvailable()
+                                && !saved.isPublished()),
+                        eq(SECTION_ID));
     }
 
     @Test
@@ -62,7 +62,9 @@ public class CreateSpotUseCaseTest extends UseCaseTest {
         final var notification = useCase.execute(command).getLeft();
 
         assertEquals(1, notification.getErrors().size());
-        assertEquals("Section not found: " + SECTION_ID.getValue(), notification.firstError().message());
+        assertEquals(
+                "Section not found: " + SECTION_ID.getValue(),
+                notification.firstError().message());
         verify(sectionGateway, times(1)).existsByIds(List.of(SECTION_ID));
         verify(spotGateway, never()).create(any(), any());
     }
@@ -80,13 +82,16 @@ public class CreateSpotUseCaseTest extends UseCaseTest {
         assertEquals(1, notification.getErrors().size());
         assertEquals(expectedMessage, notification.firstError().message());
         verify(sectionGateway, times(1)).existsByIds(List.of(SECTION_ID));
-        verify(spotGateway, times(1)).create(argThat(saved -> saved.getId() != null
-                        && saved.getCreatedAt() != null
-                        && saved.getUpdatedAt() != null
-                        && saved.getDeletedAt() == null
-                        && saved.getLocation().equals(Location.create("A1"))
-                        && saved.isAvailable()
-                        && !saved.isPublished()), eq(SECTION_ID));
+        verify(spotGateway, times(1))
+                .create(
+                        argThat(saved -> saved.getId() != null
+                                && saved.getCreatedAt() != null
+                                && saved.getUpdatedAt() != null
+                                && saved.getDeletedAt() == null
+                                && saved.getLocation().equals(Location.create("A1"))
+                                && saved.isAvailable()
+                                && !saved.isPublished()),
+                        eq(SECTION_ID));
     }
 
     @Test
@@ -100,10 +105,12 @@ public class CreateSpotUseCaseTest extends UseCaseTest {
 
         assertNotNull(output.id());
         verify(sectionGateway, times(1)).existsByIds(List.of(SECTION_ID));
-        verify(spotGateway, times(1)).create(argThat(spot ->
-                spot.getLocation() != null
-                        && spot.getLocation().getValue().matches("[A-Z]\\d{5}")
-                        && spot.isAvailable()
-                        && !spot.isPublished()), eq(SECTION_ID));
+        verify(spotGateway, times(1))
+                .create(
+                        argThat(spot -> spot.getLocation() != null
+                                && spot.getLocation().getValue().matches("[A-Z]\\d{5}")
+                                && spot.isAvailable()
+                                && !spot.isPublished()),
+                        eq(SECTION_ID));
     }
 }

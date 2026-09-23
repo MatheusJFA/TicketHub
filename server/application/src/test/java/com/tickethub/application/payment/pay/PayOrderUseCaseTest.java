@@ -2,24 +2,12 @@ package com.tickethub.application.payment.pay;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.AdditionalAnswers.returnsFirstArg;
-
-import java.math.BigDecimal;
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.ZoneOffset;
-import java.util.Currency;
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
 import com.tickethub.application.UseCaseTest;
 import com.tickethub.domain.core.customer.CustomerID;
@@ -33,6 +21,16 @@ import com.tickethub.domain.core.payment.ChargeStatus;
 import com.tickethub.domain.core.payment.PaymentGateway;
 import com.tickethub.domain.core.spot.SpotID;
 import com.tickethub.domain.shared.Money;
+import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.Currency;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Pay order use case")
 class PayOrderUseCaseTest extends UseCaseTest {
@@ -43,8 +41,7 @@ class PayOrderUseCaseTest extends UseCaseTest {
 
     private final OrderGateway orderGateway = mock(OrderGateway.class);
     private final PaymentGateway paymentGateway = mock(PaymentGateway.class);
-    private final DefaultPayOrderUseCase useCase =
-            new DefaultPayOrderUseCase(orderGateway, paymentGateway, CLOCK);
+    private final DefaultPayOrderUseCase useCase = new DefaultPayOrderUseCase(orderGateway, paymentGateway, CLOCK);
 
     @Override
     protected List<Object> getMocks() {
@@ -52,14 +49,16 @@ class PayOrderUseCaseTest extends UseCaseTest {
     }
 
     private Order givenOrder() {
-        return Order.create(CustomerID.generate(),
+        return Order.create(
+                CustomerID.generate(),
                 List.of(OrderItem.of(SpotID.generate(), Money.create(new BigDecimal("50.00"), BRL))),
-                TTL, CLOCK);
+                TTL,
+                CLOCK);
     }
 
     private Charge givenCharge(final Order order) {
-        return Charge.create(ChargeID.from("ch_123"), order.getId(), order.getTotal(), ChargeStatus.PENDING,
-                "PIX-MOCK-ch_123");
+        return Charge.create(
+                ChargeID.from("ch_123"), order.getId(), order.getTotal(), ChargeStatus.PENDING, "PIX-MOCK-ch_123");
     }
 
     @Test
@@ -71,7 +70,8 @@ class PayOrderUseCaseTest extends UseCaseTest {
         when(paymentGateway.createCharge(order.getId(), order.getTotal())).thenReturn(charge);
         when(orderGateway.update(any())).thenAnswer(returnsFirstArg());
 
-        final var output = useCase.execute(PayOrderCommand.with(order.getId().getValue())).getRight();
+        final var output =
+                useCase.execute(PayOrderCommand.with(order.getId().getValue())).getRight();
 
         assertNotNull(output);
         assertEquals(order.getId().getValue(), output.orderId());
@@ -92,7 +92,8 @@ class PayOrderUseCaseTest extends UseCaseTest {
         when(orderGateway.findById(order.getId())).thenReturn(Optional.of(order));
         when(paymentGateway.findStatus(ChargeID.from("ch_123"))).thenReturn(charge);
 
-        final var output = useCase.execute(PayOrderCommand.with(order.getId().getValue())).getRight();
+        final var output =
+                useCase.execute(PayOrderCommand.with(order.getId().getValue())).getRight();
 
         assertEquals("ch_123", output.chargeId());
         verify(orderGateway, times(1)).findById(order.getId());
@@ -106,9 +107,12 @@ class PayOrderUseCaseTest extends UseCaseTest {
         final var orderId = OrderID.generate();
         when(orderGateway.findById(orderId)).thenReturn(Optional.empty());
 
-        final var notification = useCase.execute(PayOrderCommand.with(orderId.getValue())).getLeft();
+        final var notification =
+                useCase.execute(PayOrderCommand.with(orderId.getValue())).getLeft();
 
-        assertEquals("Order not found: " + orderId.getValue(), notification.firstError().message());
+        assertEquals(
+                "Order not found: " + orderId.getValue(),
+                notification.firstError().message());
         verify(orderGateway, times(1)).findById(orderId);
     }
 
@@ -118,7 +122,9 @@ class PayOrderUseCaseTest extends UseCaseTest {
         final var order = givenOrder();
         when(orderGateway.findById(order.getId())).thenReturn(Optional.of(order));
         when(orderGateway.update(any())).thenAnswer(returnsFirstArg());
-        final var late = new DefaultPayOrderUseCase(orderGateway, paymentGateway,
+        final var late = new DefaultPayOrderUseCase(
+                orderGateway,
+                paymentGateway,
                 Clock.fixed(CLOCK.instant().plus(TTL).plusSeconds(1), ZoneOffset.UTC));
 
         final var notification =

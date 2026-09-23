@@ -1,8 +1,7 @@
 package com.tickethub.infrastructure.shared.persistence;
 
-import java.util.Optional;
-
 import com.tickethub.domain.shared.Address;
+import java.util.Optional;
 
 public record AddressDocument(
         String street,
@@ -19,9 +18,15 @@ public record AddressDocument(
     }
 
     static AddressDocument with(final Address current) {
-        return new AddressDocument(current.getStreet(), current.getNumber(),
-                current.getComplement(), current.getNeighborhood(), current.getCity(),
-                current.getState(), current.getCountry(), current.getZipCode());
+        return new AddressDocument(
+                current.getStreet(),
+                current.getNumber(),
+                current.getComplement(),
+                current.getNeighborhood(),
+                current.getCity(),
+                current.getState(),
+                current.getCountry(),
+                current.getZipCode());
     }
 
     public Address toDomain() {

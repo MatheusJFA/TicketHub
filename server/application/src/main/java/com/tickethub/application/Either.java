@@ -1,11 +1,11 @@
 package com.tickethub.application;
 
 import static java.util.Objects.requireNonNull;
+
 import java.util.NoSuchElementException;
 import java.util.function.Function;
 
-public sealed interface Either<L, R>
-        permits Either.Left, Either.Right {
+public sealed interface Either<L, R> permits Either.Left, Either.Right {
 
     record Left<L, R>(L value) implements Either<L, R> {
         public Left {
@@ -46,22 +46,18 @@ public sealed interface Either<L, R>
     default L leftOrThrow() {
         return switch (this) {
             case Left<L, R>(var value) -> value;
-            case Right<L, R> ignored ->
-                    throw new NoSuchElementException("Expected Left, but found Right");
+            case Right<L, R> ignored -> throw new NoSuchElementException("Expected Left, but found Right");
         };
     }
 
     default R rightOrThrow() {
         return switch (this) {
-            case Left<L, R> ignored ->
-                    throw new NoSuchElementException("Expected Right, but found Left");
+            case Left<L, R> ignored -> throw new NoSuchElementException("Expected Right, but found Left");
             case Right<L, R>(var value) -> value;
         };
     }
 
-    default <T> Either<L, T> map(
-            Function<? super R, ? extends T> mapper
-    ) {
+    default <T> Either<L, T> map(Function<? super R, ? extends T> mapper) {
         requireNonNull(mapper, "mapper");
 
         return switch (this) {
@@ -70,9 +66,7 @@ public sealed interface Either<L, R>
         };
     }
 
-    default <T> Either<L, T> flatMap(
-            Function<? super R, ? extends Either<L, T>> mapper
-    ) {
+    default <T> Either<L, T> flatMap(Function<? super R, ? extends Either<L, T>> mapper) {
         requireNonNull(mapper, "mapper");
 
         return switch (this) {
@@ -81,10 +75,7 @@ public sealed interface Either<L, R>
         };
     }
 
-    default <T> T fold(
-            Function<? super L, ? extends T> onLeft,
-            Function<? super R, ? extends T> onRight
-    ) {
+    default <T> T fold(Function<? super L, ? extends T> onLeft, Function<? super R, ? extends T> onRight) {
         requireNonNull(onLeft, "onLeft");
         requireNonNull(onRight, "onRight");
 

@@ -1,18 +1,16 @@
 package com.tickethub.infrastructure.customer.persistence;
 
-import java.time.Instant;
-import java.util.Optional;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import com.tickethub.domain.core.customer.Customer;
+import com.tickethub.domain.core.customer.CustomerID;
 import com.tickethub.domain.shared.CPF;
+import com.tickethub.domain.shared.Email;
 import com.tickethub.domain.shared.Name;
 import com.tickethub.domain.shared.PasswordHash;
 import com.tickethub.infrastructure.audit.AuditActor;
-import com.tickethub.domain.shared.Email;
-import com.tickethub.domain.core.customer.CustomerID;
+import java.time.Instant;
+import java.util.Optional;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document("customers")
 public record CustomerDocument(
@@ -30,8 +28,8 @@ public record CustomerDocument(
     public static final String COLLECTION = "customers";
 
     public CustomerDocument withActors(final String createdBy, final String lastModifiedBy) {
-        return new CustomerDocument(id, cpf, name, email, passwordHash, createdAt, updatedAt,
-                deletedAt, createdBy, lastModifiedBy);
+        return new CustomerDocument(
+                id, cpf, name, email, passwordHash, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
     }
 
     public static CustomerDocument from(final Customer customer) {
@@ -40,7 +38,9 @@ public record CustomerDocument(
                 customer.getCpf().getValue(),
                 customer.getName().getValue(),
                 Optional.ofNullable(customer.getEmail()).map(Email::getValue).orElse(null),
-                Optional.ofNullable(customer.getPasswordHash()).map(PasswordHash::getValue).orElse(null),
+                Optional.ofNullable(customer.getPasswordHash())
+                        .map(PasswordHash::getValue)
+                        .orElse(null),
                 customer.getCreatedAt(),
                 customer.getUpdatedAt(),
                 customer.getDeletedAt(),
@@ -59,13 +59,18 @@ public record CustomerDocument(
         // validation/login instead of breaking reads.
         final Email email = Optional.ofNullable(this.email).map(Email::create).orElse(null);
         final PasswordHash passwordHash = Optional.ofNullable(this.passwordHash)
-                .map(PasswordHash::fromHash).orElse(null);
+                .map(PasswordHash::fromHash)
+                .orElse(null);
         return Customer.reconstitute(
                 CustomerID.from(id),
                 CPF.create(cpf),
                 Name.create(name),
                 email,
                 passwordHash,
-                createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
+                createdAt,
+                updatedAt,
+                deletedAt,
+                createdBy,
+                lastModifiedBy);
     }
 }

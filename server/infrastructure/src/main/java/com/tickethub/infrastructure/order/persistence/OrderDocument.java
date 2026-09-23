@@ -1,12 +1,5 @@
 package com.tickethub.infrastructure.order.persistence;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import com.tickethub.domain.core.customer.CustomerID;
 import com.tickethub.domain.core.order.Order;
 import com.tickethub.domain.core.order.OrderID;
@@ -16,6 +9,11 @@ import com.tickethub.domain.core.payment.ChargeID;
 import com.tickethub.domain.core.spot.SpotID;
 import com.tickethub.infrastructure.audit.AuditActor;
 import com.tickethub.infrastructure.shared.persistence.MoneyDocument;
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document("orders")
 public record OrderDocument(
@@ -38,21 +36,29 @@ public record OrderDocument(
     public record OrderItemDocument(String spotId, MoneyDocument price) {
 
         public static OrderItemDocument from(final OrderItem item) {
-            return new OrderItemDocument(
-                    item.getSpotId().getValue(),
-                    MoneyDocument.from(item.getPrice()));
+            return new OrderItemDocument(item.getSpotId().getValue(), MoneyDocument.from(item.getPrice()));
         }
 
         public OrderItem toDomain() {
-            return OrderItem.of(
-                    SpotID.from(spotId),
-                    price.toDomain());
+            return OrderItem.of(SpotID.from(spotId), price.toDomain());
         }
     }
 
     public OrderDocument withActors(final String createdBy, final String lastModifiedBy) {
-        return new OrderDocument(id, customerId, items, total, status, expiresAt, chargeId,
-                idempotencyKey, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
+        return new OrderDocument(
+                id,
+                customerId,
+                items,
+                total,
+                status,
+                expiresAt,
+                chargeId,
+                idempotencyKey,
+                createdAt,
+                updatedAt,
+                deletedAt,
+                createdBy,
+                lastModifiedBy);
     }
 
     public static OrderDocument from(final Order order) {
@@ -88,6 +94,10 @@ public record OrderDocument(
                 expiresAt,
                 Optional.ofNullable(chargeId).map(ChargeID::from).orElse(null),
                 idempotencyKey,
-                createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
+                createdAt,
+                updatedAt,
+                deletedAt,
+                createdBy,
+                lastModifiedBy);
     }
 }

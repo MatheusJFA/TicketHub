@@ -1,8 +1,8 @@
 package com.tickethub.application;
 
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import java.util.List;
 
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;

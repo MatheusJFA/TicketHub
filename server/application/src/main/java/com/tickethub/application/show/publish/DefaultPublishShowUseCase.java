@@ -1,13 +1,13 @@
 package com.tickethub.application.show.publish;
 
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.show.Show;
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.domain.validation.Notification;
+import java.util.Optional;
 
 public class DefaultPublishShowUseCase extends PublishShowUseCase {
     private final ShowGateway showGateway;

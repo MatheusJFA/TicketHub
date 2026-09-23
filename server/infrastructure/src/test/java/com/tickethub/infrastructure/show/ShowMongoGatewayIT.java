@@ -4,38 +4,35 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
-import java.util.Currency;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
-
 import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.core.show.Show;
 import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.domain.pagination.SearchQuery;
+import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.shared.Money;
 import com.tickethub.infrastructure.ContainerSupport;
 import com.tickethub.infrastructure.IntegrationTest;
 import com.tickethub.infrastructure.MongoCleanUpExtension;
-import com.tickethub.infrastructure.show.ShowMongoGateway;
-import com.tickethub.infrastructure.show.persistence.ShowDocument;
 import com.tickethub.infrastructure.section.persistence.SectionDocument;
+import com.tickethub.infrastructure.show.persistence.ShowDocument;
 import com.tickethub.infrastructure.spot.persistence.SpotDocument;
-import com.tickethub.domain.shared.Address;
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.util.Currency;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 
 @IntegrationTest
 @DisplayName("Show Mongo gateway")
 class ShowMongoGatewayIT extends ContainerSupport {
 
-    private static final Address ADDRESS = Address.create("Rua do Rock", "s/n", null, "Barra da Tijuca",
-            "Rio de Janeiro", "RJ", "Brasil", "22640-100");
+    private static final Address ADDRESS = Address.create(
+            "Rua do Rock", "s/n", null, "Barra da Tijuca", "Rio de Janeiro", "RJ", "Brasil", "22640-100");
     private static final Money PRICE = Money.create(new BigDecimal("350.00"), Currency.getInstance("BRL"));
     private static final OffsetDateTime DATE = OffsetDateTime.parse("2027-01-15T20:00:00-03:00");
 
@@ -47,8 +44,8 @@ class ShowMongoGatewayIT extends ContainerSupport {
 
     @BeforeEach
     void cleanUp() {
-        MongoCleanUpExtension.cleanCollections(mongoTemplate,
-                ShowDocument.COLLECTION, SectionDocument.COLLECTION, SpotDocument.COLLECTION);
+        MongoCleanUpExtension.cleanCollections(
+                mongoTemplate, ShowDocument.COLLECTION, SectionDocument.COLLECTION, SpotDocument.COLLECTION);
     }
 
     private long count(final String collection) {
@@ -80,9 +77,9 @@ class ShowMongoGatewayIT extends ContainerSupport {
         assertEquals("Rua do Rock", found.getAddress().getStreet());
         assertEquals(show.getPartnerId(), found.getPartnerId());
         assertEquals(2, found.getSections().size());
-        assertTrue(found.getSections().stream().allMatch(section -> section.getSpots().size() == 2));
         assertTrue(found.getSections().stream()
-                .allMatch(section -> PRICE.equals(section.getPrice())));
+                .allMatch(section -> section.getSpots().size() == 2));
+        assertTrue(found.getSections().stream().allMatch(section -> PRICE.equals(section.getPrice())));
         assertFalse(found.isPublished());
     }
 
@@ -97,7 +94,11 @@ class ShowMongoGatewayIT extends ContainerSupport {
 
         final var found = gateway.findById(show.getId()).orElseThrow();
         assertEquals(3, found.getSections().size());
-        assertEquals(7, found.getSections().stream().mapToLong(section -> section.getSpots().size()).sum());
+        assertEquals(
+                7,
+                found.getSections().stream()
+                        .mapToLong(section -> section.getSpots().size())
+                        .sum());
         assertTrue(found.isPublished());
         assertTrue(found.getSections().stream().allMatch(section -> section.isPublished()));
         assertEquals(3, count(SectionDocument.COLLECTION));
@@ -159,8 +160,7 @@ class ShowMongoGatewayIT extends ContainerSupport {
     @DisplayName("Given show ids, when exists by ids, then returns only persisted ids")
     void givenShowIds_whenExistsByIds_thenReturnsOnlyPersistedIds() {
         final var first = gateway.create(sample());
-        final var second = gateway.create(Show.create("Jazz Fest", "Suave", DATE, ADDRESS, 0,
-                PartnerID.generate()));
+        final var second = gateway.create(Show.create("Jazz Fest", "Suave", DATE, ADDRESS, 0, PartnerID.generate()));
         final var missing = ShowID.generate();
 
         final var existing = gateway.existsByIds(List.of(first.getId(), second.getId(), missing));

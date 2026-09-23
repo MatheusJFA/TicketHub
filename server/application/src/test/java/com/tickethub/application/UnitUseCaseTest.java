@@ -1,17 +1,15 @@
 package com.tickethub.application;
 
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-
-import com.tickethub.domain.validation.Notification;
-import com.tickethub.domain.validation.Error;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import com.tickethub.domain.validation.Error;
+import com.tickethub.domain.validation.Notification;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Unit use case")
 class UnitUseCaseTest {

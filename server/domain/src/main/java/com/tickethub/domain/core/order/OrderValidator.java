@@ -2,13 +2,12 @@ package com.tickethub.domain.core.order;
 
 import static java.util.Objects.isNull;
 
-import java.math.BigDecimal;
-import java.util.Currency;
-
 import com.tickethub.domain.shared.Money;
 import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.ValidationHandler;
 import com.tickethub.domain.validation.Validator;
+import java.math.BigDecimal;
+import java.util.Currency;
 
 public final class OrderValidator extends Validator {
     private final Order order;

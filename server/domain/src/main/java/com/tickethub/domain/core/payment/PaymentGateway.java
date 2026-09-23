@@ -9,6 +9,7 @@ import com.tickethub.domain.shared.Money;
  */
 public interface PaymentGateway {
     Charge createCharge(OrderID orderId, Money total);
+
     Charge findStatus(ChargeID chargeId);
     /**
      * Returns captured money for the charge. Callers re-read the charge

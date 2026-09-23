@@ -1,22 +1,20 @@
 package com.tickethub.infrastructure.show.persistence;
 
+import com.tickethub.domain.core.partner.PartnerID;
+import com.tickethub.domain.core.section.Section;
+import com.tickethub.domain.core.show.Show;
+import com.tickethub.domain.core.show.ShowID;
+import com.tickethub.domain.shared.Name;
+import com.tickethub.domain.shared.Text;
+import com.tickethub.infrastructure.audit.AuditActor;
+import com.tickethub.infrastructure.shared.persistence.AddressDocument;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import com.tickethub.domain.core.section.Section;
-import com.tickethub.domain.core.show.Show;
-import com.tickethub.domain.core.show.ShowID;
-import com.tickethub.domain.core.partner.PartnerID;
-import com.tickethub.domain.shared.Name;
-import com.tickethub.domain.shared.Text;
-import com.tickethub.infrastructure.audit.AuditActor;
-import com.tickethub.infrastructure.shared.persistence.AddressDocument;
 
 @Document("shows")
 public record ShowDocument(
@@ -39,8 +37,21 @@ public record ShowDocument(
     public static final String COLLECTION = "shows";
 
     public ShowDocument withActors(final String createdBy, final String lastModifiedBy) {
-        return new ShowDocument(id, name, description, date, address, published, totalSpots,
-                totalSpotsSold, partnerId, sectionIds, createdAt, updatedAt, deletedAt, createdBy,
+        return new ShowDocument(
+                id,
+                name,
+                description,
+                date,
+                address,
+                published,
+                totalSpots,
+                totalSpotsSold,
+                partnerId,
+                sectionIds,
+                createdAt,
+                updatedAt,
+                deletedAt,
+                createdBy,
                 lastModifiedBy);
     }
 
@@ -49,13 +60,19 @@ public record ShowDocument(
                 show.getId().getValue(),
                 show.getName().getValue(),
                 Optional.ofNullable(show.getDescription()).map(Text::getValue).orElse(null),
-                Optional.ofNullable(show.getDate()).map(OffsetDateTime::toString).orElse(null),
+                Optional.ofNullable(show.getDate())
+                        .map(OffsetDateTime::toString)
+                        .orElse(null),
                 AddressDocument.from(show.getAddress()),
                 show.isPublished(),
                 show.getTotalSpots(),
                 show.getTotalSpotsSold(),
-                Optional.ofNullable(show.getPartnerId()).map(PartnerID::getValue).orElse(null),
-                show.getSections().stream().map(section -> section.getId().getValue()).toList(),
+                Optional.ofNullable(show.getPartnerId())
+                        .map(PartnerID::getValue)
+                        .orElse(null),
+                show.getSections().stream()
+                        .map(section -> section.getId().getValue())
+                        .toList(),
                 show.getCreatedAt(),
                 show.getUpdatedAt(),
                 show.getDeletedAt(),
@@ -81,6 +98,10 @@ public record ShowDocument(
                 totalSpotsSold,
                 Optional.ofNullable(partnerId).map(PartnerID::from).orElse(null),
                 sections,
-                createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
+                createdAt,
+                updatedAt,
+                deletedAt,
+                createdBy,
+                lastModifiedBy);
     }
 }

@@ -6,22 +6,20 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.time.Instant;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.infrastructure.ControllerTest;
 import com.tickethub.infrastructure.audit.AuditLogReader;
 import com.tickethub.infrastructure.audit.AuditLogResponse;
 import com.tickethub.infrastructure.audit.AuditOutcome;
 import com.tickethub.infrastructure.security.TestTokens;
+import java.time.Instant;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
 
 @ControllerTest(controllers = AuditController.class)
 @DisplayName("Audit controller")
@@ -41,15 +39,22 @@ class AuditControllerTest {
     AuditLogReader reader;
 
     private static AuditLogResponse response() {
-        return new AuditLogResponse("entry-1", Instant.parse("2027-01-15T20:00:00Z"), "corr-1",
-                "alice", "DefaultCreateSpotUseCase", "[spot-1]", AuditOutcome.SUCCESS, null, 12);
+        return new AuditLogResponse(
+                "entry-1",
+                Instant.parse("2027-01-15T20:00:00Z"),
+                "corr-1",
+                "alice",
+                "DefaultCreateSpotUseCase",
+                "[spot-1]",
+                AuditOutcome.SUCCESS,
+                null,
+                12);
     }
 
     @Test
     @DisplayName("Given admin, when list, then returns page")
     void givenAdmin_whenList_thenReturnsPage() throws Exception {
-        when(reader.search(any()))
-                .thenReturn(new Pagination<>(0, 10, 1, List.of(response())));
+        when(reader.search(any())).thenReturn(new Pagination<>(0, 10, 1, List.of(response())));
 
         mvc.perform(get("/audit-logs").header("Authorization", bearer("ROLE_ADMIN")))
                 .andExpect(status().isOk())
@@ -61,8 +66,7 @@ class AuditControllerTest {
     @Test
     @DisplayName("Given filters, when list, then delegates to reader")
     void givenFilters_whenList_thenDelegatesToReader() throws Exception {
-        when(reader.search(any()))
-                .thenReturn(new Pagination<>(0, 10, 0, List.of()));
+        when(reader.search(any())).thenReturn(new Pagination<>(0, 10, 0, List.of()));
 
         mvc.perform(get("/audit-logs")
                         .header("Authorization", bearer("ROLE_ADMIN"))
@@ -85,8 +89,7 @@ class AuditControllerTest {
     @Test
     @DisplayName("Given no token, when list, then returns unauthorized")
     void givenNoToken_whenList_thenReturnsUnauthorized() throws Exception {
-        mvc.perform(get("/audit-logs"))
-                .andExpect(status().isUnauthorized());
+        mvc.perform(get("/audit-logs")).andExpect(status().isUnauthorized());
     }
 
     @Test

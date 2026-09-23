@@ -3,15 +3,13 @@ package com.tickethub.infrastructure.api;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
-import java.util.Optional;
-import java.util.function.Supplier;
-
 import com.tickethub.application.Either;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.validation.Notification;
-
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.retry.Retry;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * Retry + circuit breaker around use case execution.
@@ -50,8 +48,10 @@ public final class ResiliencePolicy {
             return isTransientFailure(((Either<Notification, ?>) either).getLeft());
         }
         if (result instanceof Optional<?> optional) {
-            return optional.filter(Notification.class::isInstance).map(Notification.class::cast)
-                    .map(ResiliencePolicy::isTransientFailure).orElse(false);
+            return optional.filter(Notification.class::isInstance)
+                    .map(Notification.class::cast)
+                    .map(ResiliencePolicy::isTransientFailure)
+                    .orElse(false);
         }
         return false;
     }
@@ -62,7 +62,7 @@ public final class ResiliencePolicy {
 
     public <T> Supplier<T> decorate(final Supplier<T> supplier) {
         requireNonNull(supplier, "'supplier' should not be null");
-        
+
         if (!enabled) {
             return supplier;
         }

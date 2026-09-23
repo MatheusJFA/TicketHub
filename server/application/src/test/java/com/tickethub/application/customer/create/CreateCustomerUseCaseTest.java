@@ -1,19 +1,17 @@
 package com.tickethub.application.customer.create;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
-
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import static org.mockito.Mockito.*;
 
 import com.tickethub.application.UseCaseTest;
 import com.tickethub.domain.authentication.PasswordHasher;
 import com.tickethub.domain.core.customer.CustomerGateway;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
 @DisplayName("Create customer use case")
 public class CreateCustomerUseCaseTest extends UseCaseTest {
@@ -47,8 +45,8 @@ public class CreateCustomerUseCaseTest extends UseCaseTest {
 
         assertNotNull(output.id());
         verify(passwordHasher, times(1)).hash(RAW_PASSWORD);
-        verify(customerGateway, times(1)).create(argThat(saved ->
-                saved.getId() != null
+        verify(customerGateway, times(1))
+                .create(argThat(saved -> saved.getId() != null
                         && saved.getId().getValue().equals(output.id())
                         && saved.getCreatedAt() != null
                         && saved.getUpdatedAt() != null
@@ -72,7 +70,8 @@ public class CreateCustomerUseCaseTest extends UseCaseTest {
         assertEquals(1, notification.getErrors().size());
         assertEquals(expectedMessage, notification.firstError().message());
         verify(passwordHasher, times(1)).hash(RAW_PASSWORD);
-        verify(customerGateway, times(1)).create(argThat(saved -> saved.getId() != null
+        verify(customerGateway, times(1))
+                .create(argThat(saved -> saved.getId() != null
                         && saved.getCreatedAt() != null
                         && saved.getUpdatedAt() != null
                         && saved.getDeletedAt() == null

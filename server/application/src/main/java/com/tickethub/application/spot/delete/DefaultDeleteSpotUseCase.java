@@ -1,13 +1,11 @@
 package com.tickethub.application.spot.delete;
 
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
-
-import com.tickethub.domain.validation.Notification;
 
 import com.tickethub.domain.core.spot.SpotGateway;
 import com.tickethub.domain.core.spot.SpotID;
-
+import com.tickethub.domain.validation.Notification;
+import java.util.Optional;
 
 public class DefaultDeleteSpotUseCase extends DeleteSpotUseCase {
     private final SpotGateway spotGateway;

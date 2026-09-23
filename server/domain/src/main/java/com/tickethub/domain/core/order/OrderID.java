@@ -25,5 +25,4 @@ public class OrderID extends Identifier {
     public String getValue() {
         return value;
     }
-
 }

@@ -1,14 +1,8 @@
 package com.tickethub.application.order.create;
 
-import static java.util.Objects.requireNonNull;
 import static java.util.Objects.isNull;
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-
-import java.time.Clock;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.customer.CustomerGateway;
@@ -27,6 +21,11 @@ import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.exception.SpotUnavailableException;
 import com.tickethub.domain.shared.Money;
 import com.tickethub.domain.validation.Notification;
+import java.time.Clock;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Opens a PENDING order and atomically reserves each spot. Spots must be
@@ -41,15 +40,22 @@ public class DefaultCreateOrderUseCase extends CreateOrderUseCase {
     private final Duration reservationTtl;
     private final Clock clock;
 
-    public DefaultCreateOrderUseCase(final CustomerGateway customerGateway, final SpotGateway spotGateway,
-            final SectionGateway sectionGateway, final OrderGateway orderGateway,
+    public DefaultCreateOrderUseCase(
+            final CustomerGateway customerGateway,
+            final SpotGateway spotGateway,
+            final SectionGateway sectionGateway,
+            final OrderGateway orderGateway,
             final Duration reservationTtl) {
         this(customerGateway, spotGateway, sectionGateway, orderGateway, reservationTtl, Clock.systemUTC());
     }
 
-    public DefaultCreateOrderUseCase(final CustomerGateway customerGateway, final SpotGateway spotGateway,
-            final SectionGateway sectionGateway, final OrderGateway orderGateway,
-            final Duration reservationTtl, final Clock clock) {
+    public DefaultCreateOrderUseCase(
+            final CustomerGateway customerGateway,
+            final SpotGateway spotGateway,
+            final SectionGateway sectionGateway,
+            final OrderGateway orderGateway,
+            final Duration reservationTtl,
+            final Clock clock) {
         this.customerGateway = requireNonNull(customerGateway, "'customerGateway' should not be null");
         this.spotGateway = requireNonNull(spotGateway, "'spotGateway' should not be null");
         this.sectionGateway = requireNonNull(sectionGateway, "'sectionGateway' should not be null");
@@ -70,8 +76,7 @@ public class DefaultCreateOrderUseCase extends CreateOrderUseCase {
                 return Either.left(notFound("Customer", customerId.getValue()));
             }
             if (isNull(command.spotIds()) || command.spotIds().isEmpty()) {
-                return Either.left(
-                        Notification.create(new DomainException("'spotIds' should not be empty")));
+                return Either.left(Notification.create(new DomainException("'spotIds' should not be empty")));
             }
 
             final var reserved = new ArrayList<Spot>();
@@ -97,14 +102,13 @@ public class DefaultCreateOrderUseCase extends CreateOrderUseCase {
                 final var price = sectionPrice(found.sectionId());
                 if (price.isEmpty()) {
                     releaseAll(reserved);
-                    return Either.left(Notification.create(
-                            new DomainException("Spot is not on sale: " + spotId.getValue())));
+                    return Either.left(
+                            Notification.create(new DomainException("Spot is not on sale: " + spotId.getValue())));
                 }
                 items.add(OrderItem.of(spotId, price.get()));
             }
 
-            final var order = Order.create(customerId, items, reservationTtl, clock,
-                    command.idempotencyKey());
+            final var order = Order.create(customerId, items, reservationTtl, clock, command.idempotencyKey());
             final Notification notification = Notification.create();
             order.validate(notification);
             if (notification.hasError()) {
@@ -138,8 +142,7 @@ public class DefaultCreateOrderUseCase extends CreateOrderUseCase {
         try {
             return orderGateway.create(order);
         } catch (final RuntimeException conflict) {
-            return findReplay(order.getIdempotencyKey())
-                    .orElseThrow(() -> conflict);
+            return findReplay(order.getIdempotencyKey()).orElseThrow(() -> conflict);
         }
     }
 

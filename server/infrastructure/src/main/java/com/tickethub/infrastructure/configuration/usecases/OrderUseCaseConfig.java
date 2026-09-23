@@ -1,12 +1,5 @@
 package com.tickethub.infrastructure.configuration.usecases;
 
-import java.time.Duration;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import com.tickethub.application.order.cancel.CancelOrderUseCase;
 import com.tickethub.application.order.cancel.DefaultCancelOrderUseCase;
 import com.tickethub.application.order.create.CreateOrderUseCase;
@@ -19,6 +12,11 @@ import com.tickethub.domain.core.customer.CustomerGateway;
 import com.tickethub.domain.core.order.OrderGateway;
 import com.tickethub.domain.core.section.SectionGateway;
 import com.tickethub.domain.core.spot.SpotGateway;
+import java.time.Duration;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnBean({CustomerGateway.class, SpotGateway.class, SectionGateway.class, OrderGateway.class})
@@ -29,8 +27,11 @@ public class OrderUseCaseConfig {
     private final OrderGateway orderGateway;
     private final Duration reservationTtl;
 
-    public OrderUseCaseConfig(final CustomerGateway customerGateway, final SpotGateway spotGateway,
-            final SectionGateway sectionGateway, final OrderGateway orderGateway,
+    public OrderUseCaseConfig(
+            final CustomerGateway customerGateway,
+            final SpotGateway spotGateway,
+            final SectionGateway sectionGateway,
+            final OrderGateway orderGateway,
             @Value("${tickethub.orders.reservation-ttl:15m}") final Duration reservationTtl) {
         this.customerGateway = customerGateway;
         this.spotGateway = spotGateway;
@@ -41,8 +42,8 @@ public class OrderUseCaseConfig {
 
     @Bean
     public CreateOrderUseCase createOrderUseCase() {
-        return new DefaultCreateOrderUseCase(customerGateway, spotGateway, sectionGateway,
-                orderGateway, reservationTtl);
+        return new DefaultCreateOrderUseCase(
+                customerGateway, spotGateway, sectionGateway, orderGateway, reservationTtl);
     }
 
     @Bean

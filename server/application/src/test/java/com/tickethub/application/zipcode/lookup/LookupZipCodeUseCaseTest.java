@@ -7,15 +7,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import com.tickethub.application.UseCaseTest;
 import com.tickethub.domain.geography.ZipCodeAddress;
 import com.tickethub.domain.geography.ZipCodeLookup;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Lookup ZIP code use case")
 class LookupZipCodeUseCaseTest extends UseCaseTest {
@@ -31,8 +29,8 @@ class LookupZipCodeUseCaseTest extends UseCaseTest {
     @Test
     @DisplayName("Given known zip, when execute, then returns address data")
     void givenKnownZip_whenExecute_thenReturnsAddressData() {
-        final var address = new ZipCodeAddress("01305000", "Avenida Paulista", "Bela Vista",
-                "São Paulo", "SP", "Brasil");
+        final var address =
+                new ZipCodeAddress("01305000", "Avenida Paulista", "Bela Vista", "São Paulo", "SP", "Brasil");
         when(zipCodeLookup.lookup("01305-000")).thenReturn(Optional.of(address));
 
         final var output = useCase.execute("01305-000").getRight();
@@ -54,7 +52,8 @@ class LookupZipCodeUseCaseTest extends UseCaseTest {
 
         final var notification = useCase.execute("99999-999").getLeft();
 
-        assertEquals("ZipCodeAddress not found: 99999999", notification.firstError().message());
+        assertEquals(
+                "ZipCodeAddress not found: 99999999", notification.firstError().message());
         verify(zipCodeLookup, times(1)).lookup("99999-999");
     }
 

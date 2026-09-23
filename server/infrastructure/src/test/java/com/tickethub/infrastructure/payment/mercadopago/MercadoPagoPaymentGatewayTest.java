@@ -2,22 +2,11 @@ package com.tickethub.infrastructure.payment.mercadopago;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-
-import java.math.BigDecimal;
-import java.util.Currency;
-import java.util.Optional;
-
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.RestClient;
 
 import com.tickethub.domain.core.customer.Customer;
 import com.tickethub.domain.core.customer.CustomerGateway;
@@ -30,14 +19,22 @@ import com.tickethub.domain.core.payment.ChargeStatus;
 import com.tickethub.domain.shared.Money;
 import com.tickethub.infrastructure.shared.http.BaseHttpClient;
 import com.tickethub.infrastructure.shared.http.HttpUpstreamException;
+import java.math.BigDecimal;
+import java.util.Currency;
+import java.util.Optional;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestClient;
 
 @DisplayName("Mercado Pago payment gateway")
 class MercadoPagoPaymentGatewayTest {
 
     private static final String BASE_URL = "https://api.mercadopago.com";
 
-    private record Fixture(MercadoPagoPaymentGateway gateway, MockRestServiceServer server) {
-    }
+    private record Fixture(MercadoPagoPaymentGateway gateway, MockRestServiceServer server) {}
 
     private Fixture fixture() {
         return fixtureWithCustomer("maria@domain.com");
@@ -61,8 +58,8 @@ class MercadoPagoPaymentGatewayTest {
             when(customerGateway.findById(CustomerID.from("cust-1"))).thenReturn(Optional.empty());
         }
         return new Fixture(
-                new MercadoPagoPaymentGateway(new MercadoPagoClient(builder.build()), properties,
-                        orderGateway, customerGateway),
+                new MercadoPagoPaymentGateway(
+                        new MercadoPagoClient(builder.build()), properties, orderGateway, customerGateway),
                 server);
     }
 
@@ -74,7 +71,8 @@ class MercadoPagoPaymentGatewayTest {
     @DisplayName("Given pending PIX payment, when create charge, then returns PENDING with QR code")
     void givenPendingPix_whenCreateCharge_thenReturnsPendingWithQrCode() {
         final var fixture = fixture();
-        fixture.server().expect(requestTo(BASE_URL + "/v1/payments"))
+        fixture.server()
+                .expect(requestTo(BASE_URL + "/v1/payments"))
                 .andExpect(content().string(Matchers.containsString("maria@domain.com")))
                 .andRespond(withSuccess("""
                         {"id":123,"status":"pending","transaction_amount":50.00,\
@@ -83,8 +81,7 @@ class MercadoPagoPaymentGatewayTest {
                         "qr_code":"000201010212","qr_code_base64":"e30="}}}\
                         """, MediaType.APPLICATION_JSON));
 
-        final var charge = fixture.gateway()
-                .createCharge(OrderID.from("order-1"), fifty());
+        final var charge = fixture.gateway().createCharge(OrderID.from("order-1"), fifty());
 
         assertEquals("123", charge.getChargeId().getValue());
         assertEquals(ChargeStatus.PENDING, charge.getStatus());
@@ -96,15 +93,15 @@ class MercadoPagoPaymentGatewayTest {
     @DisplayName("Given missing customer, when create charge, then falls back to configured payer email")
     void givenMissingCustomer_whenCreateCharge_thenFallsBackToConfiguredEmail() {
         final var fixture = fixtureWithCustomer(null);
-        fixture.server().expect(requestTo(BASE_URL + "/v1/payments"))
+        fixture.server()
+                .expect(requestTo(BASE_URL + "/v1/payments"))
                 .andExpect(content().string(Matchers.containsString("buyer@tickethub.local")))
                 .andRespond(withSuccess("""
                         {"id":124,"status":"pending","transaction_amount":50.00,\
                         "currency_id":"BRL","external_reference":"order-1"}\
                         """, MediaType.APPLICATION_JSON));
 
-        final var charge = fixture.gateway()
-                .createCharge(OrderID.from("order-1"), fifty());
+        final var charge = fixture.gateway().createCharge(OrderID.from("order-1"), fifty());
 
         assertEquals("124", charge.getChargeId().getValue());
         assertEquals(ChargeStatus.PENDING, charge.getStatus());
@@ -115,7 +112,8 @@ class MercadoPagoPaymentGatewayTest {
     @DisplayName("Given approved payment, when find status, then returns PAID")
     void givenApproved_whenFindStatus_thenReturnsPaid() {
         final var fixture = fixture();
-        fixture.server().expect(requestTo(BASE_URL + "/v1/payments/123"))
+        fixture.server()
+                .expect(requestTo(BASE_URL + "/v1/payments/123"))
                 .andRespond(withSuccess("""
                         {"id":123,"status":"approved","transaction_amount":50.00,\
                         "currency_id":"BRL","external_reference":"order-1",\
@@ -134,7 +132,8 @@ class MercadoPagoPaymentGatewayTest {
     @DisplayName("Given rejected payment, when find status, then returns FAILED")
     void givenRejected_whenFindStatus_thenReturnsFailed() {
         final var fixture = fixture();
-        fixture.server().expect(requestTo(BASE_URL + "/v1/payments/123"))
+        fixture.server()
+                .expect(requestTo(BASE_URL + "/v1/payments/123"))
                 .andRespond(withSuccess("""
                         {"id":123,"status":"rejected","transaction_amount":50.00,\
                         "currency_id":"BRL","external_reference":"order-1"}\
@@ -150,14 +149,14 @@ class MercadoPagoPaymentGatewayTest {
     @DisplayName("Given unknown status, when find status, then fails closed")
     void givenUnknownStatus_whenFindStatus_thenFailsClosed() {
         final var fixture = fixture();
-        fixture.server().expect(requestTo(BASE_URL + "/v1/payments/123"))
+        fixture.server()
+                .expect(requestTo(BASE_URL + "/v1/payments/123"))
                 .andRespond(withSuccess("""
                         {"id":123,"status":"mystery","transaction_amount":50.00,\
                         "currency_id":"BRL","external_reference":"order-1"}\
                         """, MediaType.APPLICATION_JSON));
 
-        assertThrows(HttpUpstreamException.class,
-                () -> fixture.gateway().findStatus(ChargeID.from("123")));
+        assertThrows(HttpUpstreamException.class, () -> fixture.gateway().findStatus(ChargeID.from("123")));
         fixture.server().verify();
     }
 
@@ -165,7 +164,8 @@ class MercadoPagoPaymentGatewayTest {
     @DisplayName("Given captured payment, when refund, then posts refund without error")
     void givenCapturedPayment_whenRefund_thenPostsRefund() {
         final var fixture = fixture();
-        fixture.server().expect(requestTo(BASE_URL + "/v1/payments/123/refunds"))
+        fixture.server()
+                .expect(requestTo(BASE_URL + "/v1/payments/123/refunds"))
                 .andRespond(withSuccess("{}", MediaType.APPLICATION_JSON));
 
         org.junit.jupiter.api.Assertions.assertDoesNotThrow(

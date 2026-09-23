@@ -1,8 +1,8 @@
 package com.tickethub.application.section.retrieve.get;
 
-import java.time.Instant;
-import com.tickethub.domain.shared.Money;
 import com.tickethub.domain.core.section.Section;
+import com.tickethub.domain.shared.Money;
+import java.time.Instant;
 
 public record GetSectionOutput(
         String id,

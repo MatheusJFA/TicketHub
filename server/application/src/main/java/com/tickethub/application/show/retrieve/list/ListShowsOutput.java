@@ -1,9 +1,9 @@
 package com.tickethub.application.show.retrieve.list;
 
-import java.time.Instant;
-import java.time.OffsetDateTime;
 import com.tickethub.domain.core.show.Show;
 import com.tickethub.domain.shared.Address;
+import java.time.Instant;
+import java.time.OffsetDateTime;
 
 public record ListShowsOutput(
         String id,

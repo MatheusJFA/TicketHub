@@ -3,14 +3,29 @@ package com.tickethub.application.order.create;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.AdditionalAnswers.returnsFirstArg;
 
+import com.tickethub.application.UseCaseTest;
+import com.tickethub.domain.core.customer.Customer;
+import com.tickethub.domain.core.customer.CustomerGateway;
+import com.tickethub.domain.core.customer.CustomerID;
+import com.tickethub.domain.core.order.Order;
+import com.tickethub.domain.core.order.OrderGateway;
+import com.tickethub.domain.core.order.OrderItem;
+import com.tickethub.domain.core.order.OrderStatus;
+import com.tickethub.domain.core.section.Section;
+import com.tickethub.domain.core.section.SectionGateway;
+import com.tickethub.domain.core.spot.Spot;
+import com.tickethub.domain.core.spot.SpotGateway;
+import com.tickethub.domain.core.spot.SpotID;
+import com.tickethub.domain.core.spot.SpotPlacement;
+import com.tickethub.domain.shared.Location;
+import com.tickethub.domain.shared.Money;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Duration;
@@ -20,26 +35,8 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.tickethub.application.UseCaseTest;
-import com.tickethub.domain.core.customer.Customer;
-import com.tickethub.domain.core.customer.CustomerID;
-import com.tickethub.domain.core.customer.CustomerGateway;
-import com.tickethub.domain.core.order.Order;
-import com.tickethub.domain.core.order.OrderGateway;
-import com.tickethub.domain.core.order.OrderItem;
-import com.tickethub.domain.core.order.OrderStatus;
-import com.tickethub.domain.core.section.Section;
-import com.tickethub.domain.core.section.SectionGateway;
-import com.tickethub.domain.core.spot.Spot;
-import com.tickethub.domain.core.spot.SpotID;
-import com.tickethub.domain.core.spot.SpotGateway;
-import com.tickethub.domain.core.spot.SpotPlacement;
-import com.tickethub.domain.shared.Location;
-import com.tickethub.domain.shared.Money;
 
 @DisplayName("Create order use case")
 class CreateOrderUseCaseTest extends UseCaseTest {
@@ -52,8 +49,8 @@ class CreateOrderUseCaseTest extends UseCaseTest {
     private final SpotGateway spotGateway = mock(SpotGateway.class);
     private final SectionGateway sectionGateway = mock(SectionGateway.class);
     private final OrderGateway orderGateway = mock(OrderGateway.class);
-    private final DefaultCreateOrderUseCase useCase = new DefaultCreateOrderUseCase(
-            customerGateway, spotGateway, sectionGateway, orderGateway, TTL, CLOCK);
+    private final DefaultCreateOrderUseCase useCase =
+            new DefaultCreateOrderUseCase(customerGateway, spotGateway, sectionGateway, orderGateway, TTL, CLOCK);
 
     @Override
     protected List<Object> getMocks() {
@@ -61,7 +58,9 @@ class CreateOrderUseCaseTest extends UseCaseTest {
     }
 
     private Customer givenCustomer() {
-        final var customer = Customer.create("52998224725", "Maria",
+        final var customer = Customer.create(
+                "52998224725",
+                "Maria",
                 "maria@domain.com",
                 "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
         when(customerGateway.findById(customer.getId())).thenReturn(Optional.of(customer));
@@ -72,7 +71,8 @@ class CreateOrderUseCaseTest extends UseCaseTest {
         final var spot = Spot.create(Location.create(location));
         spot.publish();
         when(spotGateway.findPlacement(spot.getId()))
-                .thenReturn(Optional.of(new SpotPlacement(spot, "show-1", section.getId().getValue())));
+                .thenReturn(Optional.of(
+                        new SpotPlacement(spot, "show-1", section.getId().getValue())));
         when(spotGateway.reserveIfAvailable(spot.getId())).thenReturn(Optional.of(spot));
         return spot;
     }
@@ -93,8 +93,10 @@ class CreateOrderUseCaseTest extends UseCaseTest {
         final var second = givenFreeSpot(section, "A2");
         when(orderGateway.create(any())).thenAnswer(returnsFirstArg());
 
-        final var output = useCase.execute(CreateOrderCommand.with(customer.getId().getValue(),
-                List.of(first.getId().getValue(), second.getId().getValue()))).getRight();
+        final var output = useCase.execute(CreateOrderCommand.with(
+                        customer.getId().getValue(),
+                        List.of(first.getId().getValue(), second.getId().getValue())))
+                .getRight();
 
         assertNotNull(output.orderId());
         assertEquals(customer.getId().getValue(), output.customerId());
@@ -116,10 +118,11 @@ class CreateOrderUseCaseTest extends UseCaseTest {
         final var customerId = CustomerID.generate();
         when(customerGateway.findById(customerId)).thenReturn(Optional.empty());
 
-        final var notification = useCase.execute(
-                CreateOrderCommand.with(customerId.getValue(), List.of("spot-1"))).getLeft();
+        final var notification = useCase.execute(CreateOrderCommand.with(customerId.getValue(), List.of("spot-1")))
+                .getLeft();
 
-        assertEquals("Customer not found: " + customerId.getValue(),
+        assertEquals(
+                "Customer not found: " + customerId.getValue(),
                 notification.firstError().message());
         verify(customerGateway, times(1)).findById(customerId);
         verify(spotGateway, times(0)).reserveIfAvailable(any());
@@ -134,10 +137,12 @@ class CreateOrderUseCaseTest extends UseCaseTest {
         when(spotGateway.findPlacement(spotId)).thenReturn(Optional.empty());
 
         final var notification = useCase.execute(
-                CreateOrderCommand.with(customer.getId().getValue(), List.of(spotId.getValue())))
+                        CreateOrderCommand.with(customer.getId().getValue(), List.of(spotId.getValue())))
                 .getLeft();
 
-        assertEquals("Spot not found: " + spotId.getValue(), notification.firstError().message());
+        assertEquals(
+                "Spot not found: " + spotId.getValue(),
+                notification.firstError().message());
         verify(customerGateway, times(1)).findById(customer.getId());
         verify(spotGateway, times(1)).findPlacement(spotId);
         verify(orderGateway, times(0)).create(any());
@@ -151,11 +156,13 @@ class CreateOrderUseCaseTest extends UseCaseTest {
         final var spot = Spot.create(Location.create("A1"));
         spot.publish();
         when(spotGateway.findPlacement(spot.getId()))
-                .thenReturn(Optional.of(new SpotPlacement(spot, "show-1", section.getId().getValue())));
+                .thenReturn(Optional.of(
+                        new SpotPlacement(spot, "show-1", section.getId().getValue())));
         when(spotGateway.reserveIfAvailable(spot.getId())).thenReturn(Optional.empty());
 
         final var notification = useCase.execute(CreateOrderCommand.with(
-                customer.getId().getValue(), List.of(spot.getId().getValue()))).getLeft();
+                        customer.getId().getValue(), List.of(spot.getId().getValue())))
+                .getLeft();
 
         assertEquals("Spot is unavailable", notification.firstError().message());
         verify(customerGateway, times(1)).findById(customer.getId());
@@ -175,10 +182,12 @@ class CreateOrderUseCaseTest extends UseCaseTest {
         when(spotGateway.update(any())).thenAnswer(returnsFirstArg());
 
         final var notification = useCase.execute(CreateOrderCommand.with(
-                customer.getId().getValue(),
-                List.of(first.getId().getValue(), missing.getValue()))).getLeft();
+                        customer.getId().getValue(), List.of(first.getId().getValue(), missing.getValue())))
+                .getLeft();
 
-        assertEquals("Spot not found: " + missing.getValue(), notification.firstError().message());
+        assertEquals(
+                "Spot not found: " + missing.getValue(),
+                notification.firstError().message());
         verify(orderGateway, times(0)).create(any());
         verify(customerGateway, times(1)).findById(customer.getId());
         verify(spotGateway, times(2)).findPlacement(any());
@@ -193,12 +202,13 @@ class CreateOrderUseCaseTest extends UseCaseTest {
     void givenKnownKey_whenExecute_thenReplaysOriginalOrder() {
         final var customer = givenCustomer();
         final var price = Money.create(new BigDecimal("50.00"), BRL);
-        final var original = Order.create(customer.getId(),
-                List.of(OrderItem.of(SpotID.generate(), price)), TTL, CLOCK, "key-1");
+        final var original =
+                Order.create(customer.getId(), List.of(OrderItem.of(SpotID.generate(), price)), TTL, CLOCK, "key-1");
         when(orderGateway.findByIdempotencyKey("key-1")).thenReturn(Optional.of(original));
 
-        final var output = useCase.execute(CreateOrderCommand.with(customer.getId().getValue(),
-                List.of("spot-9"), "key-1")).getRight();
+        final var output = useCase.execute(
+                        CreateOrderCommand.with(customer.getId().getValue(), List.of("spot-9"), "key-1"))
+                .getRight();
 
         assertEquals(original.getId().getValue(), output.orderId());
         verify(orderGateway, times(1)).findByIdempotencyKey("key-1");
@@ -214,15 +224,16 @@ class CreateOrderUseCaseTest extends UseCaseTest {
         final var price = Money.create(new BigDecimal("50.00"), BRL);
         final var section = givenSection(price);
         final var spot = givenFreeSpot(section, "A1");
-        final var winner = Order.create(customer.getId(),
-                List.of(OrderItem.of(spot.getId(), price)), TTL, CLOCK, "key-1");
+        final var winner =
+                Order.create(customer.getId(), List.of(OrderItem.of(spot.getId(), price)), TTL, CLOCK, "key-1");
         when(orderGateway.findByIdempotencyKey("key-1"))
                 .thenReturn(Optional.empty())
                 .thenReturn(Optional.of(winner));
         when(orderGateway.create(any())).thenThrow(new RuntimeException("duplicate key"));
 
-        final var output = useCase.execute(CreateOrderCommand.with(customer.getId().getValue(),
-                List.of(spot.getId().getValue()), "key-1")).getRight();
+        final var output = useCase.execute(CreateOrderCommand.with(
+                        customer.getId().getValue(), List.of(spot.getId().getValue()), "key-1"))
+                .getRight();
 
         assertEquals(winner.getId().getValue(), output.orderId());
         verify(orderGateway, times(2)).findByIdempotencyKey("key-1");

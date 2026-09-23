@@ -2,13 +2,12 @@ package com.tickethub.domain.core.spot;
 
 import static java.util.Objects.isNull;
 
-import java.time.Instant;
-
 import com.tickethub.domain.Entity;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.exception.SpotAlreadyUsedException;
 import com.tickethub.domain.exception.SpotUnavailableException;
 import com.tickethub.domain.shared.Location;
+import java.time.Instant;
 
 public class Spot extends Entity<SpotID> {
     private Location location;
@@ -16,8 +15,17 @@ public class Spot extends Entity<SpotID> {
     private boolean isPublished;
     private boolean isReserved;
 
-    private Spot(SpotID id, Location location, boolean isAvailable, boolean isPublished, boolean isReserved,
-            Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
+    private Spot(
+            SpotID id,
+            Location location,
+            boolean isAvailable,
+            boolean isPublished,
+            boolean isReserved,
+            Instant createdAt,
+            Instant updatedAt,
+            Instant deletedAt,
+            String createdBy,
+            String lastModifiedBy) {
         super(id, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
         this.location = location;
         this.isAvailable = isAvailable;
@@ -48,11 +56,28 @@ public class Spot extends Entity<SpotID> {
         return new Spot(id, Location.generateRandom(seatNumberWidth), true, false, false, now, now, null, null, null);
     }
 
-    public static Spot reconstitute(SpotID id, Location location, boolean isAvailable, boolean isPublished,
+    public static Spot reconstitute(
+            SpotID id,
+            Location location,
+            boolean isAvailable,
+            boolean isPublished,
             boolean isReserved,
-            Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
-        return new Spot(id, location, isAvailable, isPublished, isReserved,
-                createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
+            Instant createdAt,
+            Instant updatedAt,
+            Instant deletedAt,
+            String createdBy,
+            String lastModifiedBy) {
+        return new Spot(
+                id,
+                location,
+                isAvailable,
+                isPublished,
+                isReserved,
+                createdAt,
+                updatedAt,
+                deletedAt,
+                createdBy,
+                lastModifiedBy);
     }
 
     public void publish() {

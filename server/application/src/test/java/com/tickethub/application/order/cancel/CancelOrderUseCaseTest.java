@@ -3,21 +3,12 @@ package com.tickethub.application.order.cancel;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.AdditionalAnswers.returnsFirstArg;
-
-import java.math.BigDecimal;
-import java.time.Duration;
-import java.util.Currency;
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 
 import com.tickethub.application.UseCaseTest;
 import com.tickethub.domain.core.customer.CustomerID;
@@ -28,9 +19,15 @@ import com.tickethub.domain.core.order.OrderItem;
 import com.tickethub.domain.core.order.OrderStatus;
 import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.core.spot.SpotGateway;
-import com.tickethub.domain.core.spot.SpotID;
 import com.tickethub.domain.shared.Location;
 import com.tickethub.domain.shared.Money;
+import java.math.BigDecimal;
+import java.time.Duration;
+import java.util.Currency;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Cancel order use case")
 class CancelOrderUseCaseTest extends UseCaseTest {
@@ -47,7 +44,8 @@ class CancelOrderUseCaseTest extends UseCaseTest {
     }
 
     private Order givenOrder(final Spot spot) {
-        final var order = Order.create(CustomerID.generate(),
+        final var order = Order.create(
+                CustomerID.generate(),
                 List.of(OrderItem.of(spot.getId(), Money.create(new BigDecimal("50.00"), BRL))),
                 Duration.ofMinutes(15));
         when(orderGateway.findById(order.getId())).thenReturn(Optional.of(order));
@@ -64,7 +62,8 @@ class CancelOrderUseCaseTest extends UseCaseTest {
         final var spot = Spot.create(Location.create("A1"));
         final var order = givenOrder(spot);
 
-        final var output = useCase.execute(CancelOrderCommand.with(order.getId().getValue())).getRight();
+        final var output = useCase.execute(CancelOrderCommand.with(order.getId().getValue()))
+                .getRight();
 
         assertNotNull(output);
         assertEquals(OrderStatus.CANCELLED.name(), output.status());
@@ -82,10 +81,12 @@ class CancelOrderUseCaseTest extends UseCaseTest {
         final var order = givenOrder(spot);
         order.markAsPaid();
 
-        final var notification =
-                useCase.execute(CancelOrderCommand.with(order.getId().getValue())).getLeft();
+        final var notification = useCase.execute(
+                        CancelOrderCommand.with(order.getId().getValue()))
+                .getLeft();
 
-        assertEquals("Illegal order transition from PAID to CANCELLED",
+        assertEquals(
+                "Illegal order transition from PAID to CANCELLED",
                 notification.firstError().message());
         verify(orderGateway, times(1)).findById(order.getId());
         verify(orderGateway, times(0)).update(any());
@@ -97,9 +98,12 @@ class CancelOrderUseCaseTest extends UseCaseTest {
         final var orderId = OrderID.generate();
         when(orderGateway.findById(orderId)).thenReturn(Optional.empty());
 
-        final var notification = useCase.execute(CancelOrderCommand.with(orderId.getValue())).getLeft();
+        final var notification =
+                useCase.execute(CancelOrderCommand.with(orderId.getValue())).getLeft();
 
-        assertEquals("Order not found: " + orderId.getValue(), notification.firstError().message());
+        assertEquals(
+                "Order not found: " + orderId.getValue(),
+                notification.firstError().message());
         verify(orderGateway, times(1)).findById(orderId);
     }
 }

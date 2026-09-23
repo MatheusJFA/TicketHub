@@ -1,14 +1,7 @@
 package com.tickethub.infrastructure.partner;
 
-import static org.apache.commons.lang3.StringUtils.contains;
 import static java.util.Objects.requireNonNull;
-
-import java.util.Optional;
-import java.util.Set;
-
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.stereotype.Component;
+import static org.apache.commons.lang3.StringUtils.contains;
 
 import com.tickethub.domain.core.partner.Partner;
 import com.tickethub.domain.core.partner.PartnerGateway;
@@ -16,10 +9,15 @@ import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.domain.pagination.SearchQuery;
+import com.tickethub.domain.shared.Email;
 import com.tickethub.infrastructure.partner.persistence.PartnerDocument;
 import com.tickethub.infrastructure.partner.persistence.PartnerRepository;
 import com.tickethub.infrastructure.shared.persistence.MongoGatewaySupport;
-import com.tickethub.domain.shared.Email;
+import java.util.Optional;
+import java.util.Set;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.stereotype.Component;
 
 @Component
 public class PartnerMongoGateway implements PartnerGateway {
@@ -37,7 +35,9 @@ public class PartnerMongoGateway implements PartnerGateway {
     @Override
     public Partner create(final Partner partner) {
         try {
-            return mongoTemplate.insert(PartnerDocument.from(partner), PartnerDocument.COLLECTION).toDomain();
+            return mongoTemplate
+                    .insert(PartnerDocument.from(partner), PartnerDocument.COLLECTION)
+                    .toDomain();
         } catch (final DuplicateKeyException e) {
             throw duplicateKey(e);
         }
@@ -61,7 +61,9 @@ public class PartnerMongoGateway implements PartnerGateway {
     @Override
     public Partner update(final Partner partner) {
         try {
-            return mongoTemplate.save(PartnerDocument.from(partner), PartnerDocument.COLLECTION).toDomain();
+            return mongoTemplate
+                    .save(PartnerDocument.from(partner), PartnerDocument.COLLECTION)
+                    .toDomain();
         } catch (final DuplicateKeyException e) {
             throw duplicateKey(e);
         }
@@ -70,8 +72,14 @@ public class PartnerMongoGateway implements PartnerGateway {
     @Override
     public Pagination<Partner> findAll(final SearchQuery query) {
         final var mongoQuery = MongoGatewaySupport.searchQuery(query, "name", "cnpj");
-        return MongoGatewaySupport.paginate(mongoTemplate, mongoQuery, PartnerDocument.class,
-                PartnerDocument.COLLECTION, query, SORTABLE_FIELDS, PartnerDocument::toDomain);
+        return MongoGatewaySupport.paginate(
+                mongoTemplate,
+                mongoQuery,
+                PartnerDocument.class,
+                PartnerDocument.COLLECTION,
+                query,
+                SORTABLE_FIELDS,
+                PartnerDocument::toDomain);
     }
 
     private static DomainException duplicateKey(final DuplicateKeyException e) {

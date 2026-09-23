@@ -1,20 +1,18 @@
 package com.tickethub.application.spot.publish;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
-
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import static org.mockito.Mockito.*;
 
 import com.tickethub.application.UseCaseTest;
 import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.core.spot.SpotGateway;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
 @DisplayName("Publish spot use case")
 public class PublishSpotUseCaseTest extends UseCaseTest {
@@ -43,8 +41,8 @@ public class PublishSpotUseCaseTest extends UseCaseTest {
         assertNotNull(output.id());
         assertEquals(entity.getId().getValue(), output.id());
         verify(spotGateway, times(1)).findById(entity.getId());
-        verify(spotGateway, times(1)).update(argThat(saved ->
-                saved.getId() != null
+        verify(spotGateway, times(1))
+                .update(argThat(saved -> saved.getId() != null
                         && saved.getId().getValue().equals(output.id())
                         && saved.getCreatedAt() != null
                         && saved.getUpdatedAt() != null
@@ -66,7 +64,8 @@ public class PublishSpotUseCaseTest extends UseCaseTest {
         assertEquals(1, notification.getErrors().size());
         assertEquals(expectedMessage, notification.firstError().message());
         verify(spotGateway, times(1)).findById(entity.getId());
-        verify(spotGateway, times(1)).update(argThat(saved -> saved.getId() != null
+        verify(spotGateway, times(1))
+                .update(argThat(saved -> saved.getId() != null
                         && saved.getCreatedAt() != null
                         && saved.getUpdatedAt() != null
                         && saved.getDeletedAt() == null
@@ -83,7 +82,9 @@ public class PublishSpotUseCaseTest extends UseCaseTest {
         final var notification = useCase.execute(command).getLeft();
 
         assertEquals(1, notification.getErrors().size());
-        assertEquals("Spot not found: " + entity.getId().getValue(), notification.firstError().message());
+        assertEquals(
+                "Spot not found: " + entity.getId().getValue(),
+                notification.firstError().message());
         verify(spotGateway, times(1)).findById(entity.getId());
         verify(spotGateway, never()).update(any());
     }

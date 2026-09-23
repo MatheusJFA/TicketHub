@@ -2,14 +2,13 @@ package com.tickethub.application.order.expire;
 
 import static java.util.Objects.requireNonNull;
 
-import java.time.Clock;
-import java.util.ArrayList;
-
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.order.Order;
 import com.tickethub.domain.core.order.OrderGateway;
 import com.tickethub.domain.core.spot.SpotGateway;
 import com.tickethub.domain.validation.Notification;
+import java.time.Clock;
+import java.util.ArrayList;
 
 /**
  * Sweeps PENDING orders past their reservation TTL, expires them and
@@ -25,8 +24,8 @@ public class DefaultExpireOrdersUseCase extends ExpireOrdersUseCase {
         this(orderGateway, spotGateway, Clock.systemUTC());
     }
 
-    public DefaultExpireOrdersUseCase(final OrderGateway orderGateway, final SpotGateway spotGateway,
-            final Clock clock) {
+    public DefaultExpireOrdersUseCase(
+            final OrderGateway orderGateway, final SpotGateway spotGateway, final Clock clock) {
         this.orderGateway = requireNonNull(orderGateway, "'orderGateway' should not be null");
         this.spotGateway = requireNonNull(spotGateway, "'spotGateway' should not be null");
         this.clock = requireNonNull(clock, "'clock' should not be null");

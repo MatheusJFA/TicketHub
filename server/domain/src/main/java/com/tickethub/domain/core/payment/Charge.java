@@ -2,12 +2,11 @@ package com.tickethub.domain.core.payment;
 
 import static java.util.Objects.requireNonNull;
 
-import java.time.Instant;
-
 import com.tickethub.domain.Entity;
 import com.tickethub.domain.core.order.OrderID;
 import com.tickethub.domain.exception.IllegalChargeTransitionException;
 import com.tickethub.domain.shared.Money;
+import java.time.Instant;
 
 /**
  * A payment charge for an order. Created through {@link PaymentGateway} when
@@ -22,8 +21,13 @@ public class Charge extends Entity<ChargeID> {
     private final String paymentCode;
     private final Instant approvedAt;
 
-    private Charge(final ChargeID chargeId, final OrderID orderId, final Money total,
-            final ChargeStatus status, final String paymentCode, final Instant approvedAt) {
+    private Charge(
+            final ChargeID chargeId,
+            final OrderID orderId,
+            final Money total,
+            final ChargeStatus status,
+            final String paymentCode,
+            final Instant approvedAt) {
         super(chargeId);
         this.orderId = requireNonNull(orderId, "'orderId' should not be null");
         this.total = requireNonNull(total, "'total' should not be null");
@@ -32,13 +36,22 @@ public class Charge extends Entity<ChargeID> {
         this.approvedAt = approvedAt;
     }
 
-    public static Charge create(final ChargeID chargeId, final OrderID orderId, final Money total,
-            final ChargeStatus status, final String paymentCode) {
+    public static Charge create(
+            final ChargeID chargeId,
+            final OrderID orderId,
+            final Money total,
+            final ChargeStatus status,
+            final String paymentCode) {
         return new Charge(chargeId, orderId, total, status, paymentCode, null);
     }
 
-    public static Charge create(final ChargeID chargeId, final OrderID orderId, final Money total,
-            final ChargeStatus status, final String paymentCode, final Instant approvedAt) {
+    public static Charge create(
+            final ChargeID chargeId,
+            final OrderID orderId,
+            final Money total,
+            final ChargeStatus status,
+            final String paymentCode,
+            final Instant approvedAt) {
         return new Charge(chargeId, orderId, total, status, paymentCode, approvedAt);
     }
 
@@ -94,7 +107,7 @@ public class Charge extends Entity<ChargeID> {
 
     @Override
     public String toString() {
-        return "Charge[chargeId=" + getId().getValue() + ", orderId=" + orderId.getValue()
-                + ", total=" + total + ", status=" + status + "]";
+        return "Charge[chargeId=" + getId().getValue() + ", orderId=" + orderId.getValue() + ", total=" + total
+                + ", status=" + status + "]";
     }
 }

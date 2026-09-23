@@ -2,17 +2,12 @@ package com.tickethub.domain.core.order;
 
 import static java.util.Objects.requireNonNull;
 
-import java.time.Instant;
-
 import com.tickethub.domain.event.DomainEvent;
 import com.tickethub.domain.shared.Money;
+import java.time.Instant;
 
-public record OrderCreated(
-        String orderId,
-        String customerId,
-        Money total,
-        Instant expiresAt,
-        Instant occurredOn) implements DomainEvent {
+public record OrderCreated(String orderId, String customerId, Money total, Instant expiresAt, Instant occurredOn)
+        implements DomainEvent {
 
     public OrderCreated {
         requireNonNull(orderId, "'orderId' should not be null");

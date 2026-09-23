@@ -2,11 +2,9 @@ package com.tickethub.infrastructure.audit;
 
 import static java.util.Objects.requireNonNull;
 
-import java.time.Duration;
-
-import org.springframework.stereotype.Component;
-
 import io.micrometer.core.instrument.MeterRegistry;
+import java.time.Duration;
+import org.springframework.stereotype.Component;
 
 /**
  * Business-observable use case executions, recorded by
@@ -27,10 +25,9 @@ public class UseCaseMetrics {
     public void record(final String action, final AuditOutcome outcome, final long durationNanos) {
         requireNonNull(action, "'action' should not be null");
         requireNonNull(outcome, "'outcome' should not be null");
-        registry.counter("tickethub.usecase.executions",
-                "action", action, "outcome", outcome.name()).increment();
-        registry.timer("tickethub.usecase.duration",
-                "action", action, "outcome", outcome.name())
+        registry.counter("tickethub.usecase.executions", "action", action, "outcome", outcome.name())
+                .increment();
+        registry.timer("tickethub.usecase.duration", "action", action, "outcome", outcome.name())
                 .record(Duration.ofNanos(Math.max(0, durationNanos)));
     }
 }

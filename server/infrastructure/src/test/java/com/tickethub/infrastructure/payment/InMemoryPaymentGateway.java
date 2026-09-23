@@ -2,11 +2,6 @@ package com.tickethub.infrastructure.payment;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.tickethub.domain.core.order.OrderID;
 import com.tickethub.domain.core.payment.Charge;
 import com.tickethub.domain.core.payment.ChargeID;
@@ -14,6 +9,10 @@ import com.tickethub.domain.core.payment.ChargeStatus;
 import com.tickethub.domain.core.payment.PaymentGateway;
 import com.tickethub.domain.exception.ResourceNotFoundException;
 import com.tickethub.domain.shared.Money;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * In-memory {@link PaymentGateway} for full-context tests (IT/E2E/Cucumber),
@@ -29,9 +28,10 @@ public class InMemoryPaymentGateway implements PaymentGateway {
     public Charge createCharge(final OrderID orderId, final Money total) {
         requireNonNull(orderId, "'orderId' should not be null");
         requireNonNull(total, "'total' should not be null");
-        final var chargeId = ChargeID.from("ch_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12));
-        final var charge = Charge.create(chargeId, orderId, total, ChargeStatus.PENDING,
-                "PIX-TEST-" + chargeId.getValue());
+        final var chargeId = ChargeID.from(
+                "ch_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12));
+        final var charge =
+                Charge.create(chargeId, orderId, total, ChargeStatus.PENDING, "PIX-TEST-" + chargeId.getValue());
         charges.put(chargeId.getValue(), charge);
         return charge;
     }

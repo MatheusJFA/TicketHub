@@ -1,12 +1,11 @@
 package com.tickethub.infrastructure.order.models;
 
-import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.List;
-
 import com.tickethub.application.order.cancel.CancelOrderOutput;
 import com.tickethub.application.order.create.CreateOrderOutput;
 import com.tickethub.application.order.retrieve.get.GetOrderOutput;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.List;
 
 public record OrderResponse(
         String orderId,

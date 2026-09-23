@@ -1,9 +1,7 @@
 package com.tickethub.infrastructure.payment.mercadopago;
 
-import static java.util.Objects.requireNonNull;
 import static java.util.Objects.nonNull;
-
-import java.util.Optional;
+import static java.util.Objects.requireNonNull;
 
 import com.tickethub.application.Either;
 import com.tickethub.application.payment.confirm.ConfirmPaymentCommand;
@@ -14,6 +12,7 @@ import com.tickethub.domain.core.payment.PaymentGateway;
 import com.tickethub.domain.exception.ResourceNotFoundException;
 import com.tickethub.domain.validation.Error;
 import com.tickethub.domain.validation.Notification;
+import java.util.Optional;
 
 /**
  * Handles Mercado Pago payment notifications with verify-then-fetch: the
@@ -28,25 +27,27 @@ public class MercadoPagoWebhookHandler {
     private final PaymentGateway paymentGateway;
     private final ConfirmPaymentUseCase confirmPayment;
 
-    public MercadoPagoWebhookHandler(final MercadoPagoWebhookVerifier verifier,
-            final PaymentGateway paymentGateway, final ConfirmPaymentUseCase confirmPayment) {
+    public MercadoPagoWebhookHandler(
+            final MercadoPagoWebhookVerifier verifier,
+            final PaymentGateway paymentGateway,
+            final ConfirmPaymentUseCase confirmPayment) {
         this.verifier = requireNonNull(verifier, "'verifier' should not be null");
         this.paymentGateway = requireNonNull(paymentGateway, "'paymentGateway' should not be null");
         this.confirmPayment = requireNonNull(confirmPayment, "'confirmPayment' should not be null");
     }
 
-    public Optional<Either<Notification, ConfirmPaymentOutput>> handle(final String xSignature,
-            final String xRequestId, final String dataId, final String type) {
+    public Optional<Either<Notification, ConfirmPaymentOutput>> handle(
+            final String xSignature, final String xRequestId, final String dataId, final String type) {
         if (nonNull(type) && !"payment".equalsIgnoreCase(type)) {
             return Optional.empty();
         }
         verifier.verify(xSignature, xRequestId, dataId);
         final String status;
         try {
-            status = paymentGateway.findStatus(ChargeID.from(dataId)).getStatus().name();
+            status =
+                    paymentGateway.findStatus(ChargeID.from(dataId)).getStatus().name();
         } catch (final ResourceNotFoundException e) {
-            return Optional.of(Either.left(
-                    Notification.create(new Error("Charge not found: " + dataId))));
+            return Optional.of(Either.left(Notification.create(new Error("Charge not found: " + dataId))));
         }
         return Optional.of(confirmPayment.execute(ConfirmPaymentCommand.with(dataId, status)));
     }

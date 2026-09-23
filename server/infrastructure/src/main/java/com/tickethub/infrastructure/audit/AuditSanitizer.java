@@ -18,11 +18,11 @@ public final class AuditSanitizer {
     private static final String MASK = "***";
     private static final String TRUNCATION_MARKER = "...[truncated]";
 
+    // Filtra: pares chave=valor/JSON sensiveis (password, secret, token, api-key, authorization) para mascarar.
     private static final Pattern KEY_VALUE = Pattern.compile(
             "(?i)([\"']?)(password|passwd|pwd|secret|client[_-]?secret|token|access[_-]?token|refresh[_-]?token|authorization|api[_-]?key)\\1(\\s*[=:]\\s*)([\"']?)([^,\"'}\\]\\s]+|\"[^\"]*\"|'[^']*')\\4");
 
-    private AuditSanitizer() {
-    }
+    private AuditSanitizer() {}
 
     public static Optional<String> sanitize(final String input) {
         return Optional.ofNullable(input).map(AuditSanitizer::mask).map(AuditSanitizer::truncate);

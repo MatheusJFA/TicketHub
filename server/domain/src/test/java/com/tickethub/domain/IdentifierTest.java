@@ -1,25 +1,23 @@
 package com.tickethub.domain;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Stream;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.api.DisplayName;
 
-import com.tickethub.domain.Identifier;
+import com.tickethub.domain.core.customer.CustomerID;
 import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.core.section.SectionID;
 import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.domain.core.spot.SpotID;
-import com.tickethub.domain.core.customer.CustomerID;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 @DisplayName("Identifier")
 class IdentifierTest {
@@ -77,7 +75,8 @@ class IdentifierTest {
     @Test
     @DisplayName("Given different types with same value, when compare, then keep identities separate")
     void givenDifferentTypesWithSameValue_whenCompare_thenKeepIdentitiesSeparate() {
-        var identifiers = identifierFactories().map(factory -> factory.apply(VALUE)).toList();
+        var identifiers =
+                identifierFactories().map(factory -> factory.apply(VALUE)).toList();
 
         for (int i = 0; i < identifiers.size(); i++) {
             for (int j = i + 1; j < identifiers.size(); j++) {

@@ -1,7 +1,7 @@
 package com.tickethub.application.zipcode.lookup;
 
-import static java.util.Objects.requireNonNull;
 import static java.util.Objects.isNull;
+import static java.util.Objects.requireNonNull;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.geography.ZipCodeAddress;
@@ -24,7 +24,8 @@ public class DefaultLookupZipCodeUseCase extends LookupZipCodeUseCase {
             }
             return findOrNotFound(
                     zipCodeLookup.lookup(zipCode).map(LookupZipCodeOutput::from),
-                    ZipCodeAddress.class.getSimpleName(), normalized);
+                    ZipCodeAddress.class.getSimpleName(),
+                    normalized);
         } catch (final RuntimeException exception) {
             return Either.left(Notification.create(exception));
         }

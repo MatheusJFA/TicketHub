@@ -7,8 +7,6 @@ import com.tickethub.domain.ValueObject;
 import com.tickethub.domain.exception.DomainException;
 import java.util.Objects;
 
-
-
 public final class Name extends ValueObject {
     private static final int MIN_LENGTH = 2;
     private static final int MAX_LENGTH = 100;
@@ -41,6 +39,7 @@ public final class Name extends ValueObject {
             return false;
         }
 
+        // Filtra: nomes com letras Unicode, marcas diacriticas, espaco, ponto, hifen e apostofo.
         return name.matches("[\\p{L}\\p{M} .'-]+");
     }
 
@@ -49,8 +48,8 @@ public final class Name extends ValueObject {
             return null;
         }
 
-        return value
-                .trim()
+        return value.trim()
+                // Filtra: sequencias de espacos em branco para colapsar em espaco unico.
                 .replaceAll("\\s+", SPACE);
     }
 
@@ -72,5 +71,4 @@ public final class Name extends ValueObject {
     public String toString() {
         return value;
     }
-
 }

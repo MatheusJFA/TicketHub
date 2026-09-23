@@ -1,13 +1,13 @@
 package com.tickethub.application.partner.retrieve.get;
 
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.partner.Partner;
 import com.tickethub.domain.core.partner.PartnerGateway;
 import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.validation.Notification;
+import java.util.Optional;
 
 public class DefaultGetPartnerUseCase extends GetPartnerUseCase {
     private final PartnerGateway partnerGateway;
@@ -35,5 +35,4 @@ public class DefaultGetPartnerUseCase extends GetPartnerUseCase {
             return Either.left(notification);
         }
     }
-
 }

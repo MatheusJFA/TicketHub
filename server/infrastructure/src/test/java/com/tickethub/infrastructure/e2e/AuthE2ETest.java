@@ -6,22 +6,21 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 import com.tickethub.infrastructure.ContainerSupport;
 import com.tickethub.infrastructure.E2ETest;
 import com.tickethub.infrastructure.MongoCleanUpExtension;
 import com.tickethub.infrastructure.authentication.persistence.RefreshSessionDocument;
 import com.tickethub.infrastructure.customer.persistence.CustomerDocument;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @E2ETest
 @DisplayName("Auth E2 e")
@@ -38,8 +37,8 @@ class AuthE2ETest extends ContainerSupport {
 
     @BeforeEach
     void cleanUp() {
-        MongoCleanUpExtension.cleanCollections(mongoTemplate, CustomerDocument.COLLECTION,
-                RefreshSessionDocument.COLLECTION);
+        MongoCleanUpExtension.cleanCollections(
+                mongoTemplate, CustomerDocument.COLLECTION, RefreshSessionDocument.COLLECTION);
     }
 
     private JsonNode registerCustomer(final String cpf, final String email) throws Exception {
@@ -50,7 +49,9 @@ class AuthE2ETest extends ContainerSupport {
                                 "email":"%s","password":"secret-123"}\
                                 """.formatted(cpf, email)))
                 .andExpect(status().isCreated())
-                .andReturn().getResponse().getContentAsString();
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
         return objectMapper.readTree(response);
     }
 
@@ -64,7 +65,9 @@ class AuthE2ETest extends ContainerSupport {
                 .andExpect(jsonPath("$.tokenType").value("Bearer"))
                 .andExpect(jsonPath("$.accessToken").exists())
                 .andExpect(jsonPath("$.refreshToken").exists())
-                .andReturn().getResponse().getContentAsString();
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
         return objectMapper.readTree(response);
     }
 
@@ -73,18 +76,24 @@ class AuthE2ETest extends ContainerSupport {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"refreshToken\":\"%s\"}".formatted(refreshToken)))
                 .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
         return objectMapper.readTree(response);
     }
 
     @Test
     @DisplayName("Given registered customer, when login, then access token authorizes self service")
     void givenRegisteredCustomer_whenLogin_thenAccessTokenAuthorizesSelfService() throws Exception {
-        final var customerId = registerCustomer("52998224725", "auth-login@domain.com").get("id").asText();
+        final var customerId = registerCustomer("52998224725", "auth-login@domain.com")
+                .get("id")
+                .asText();
         final var session = login("auth-login@domain.com", "secret-123");
 
         mvc.perform(patch("/customers/" + customerId + "/name")
-                        .header("Authorization", "Bearer " + session.get("accessToken").asText())
+                        .header(
+                                "Authorization",
+                                "Bearer " + session.get("accessToken").asText())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Maria Souza\"}"))
                 .andExpect(status().isOk())
@@ -123,7 +132,8 @@ class AuthE2ETest extends ContainerSupport {
         // The rotated token belonged to the same family: also revoked.
         mvc.perform(post("/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"refreshToken\":\"%s\"}".formatted(rotated.get("refreshToken").asText())))
+                        .content("{\"refreshToken\":\"%s\"}"
+                                .formatted(rotated.get("refreshToken").asText())))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -156,7 +166,9 @@ class AuthE2ETest extends ContainerSupport {
 
         final var session = objectMapper.readTree(login.getResponse().getContentAsString());
         mvc.perform(patch("/customers/any-id/name")
-                        .header("Authorization", "Bearer " + session.get("accessToken").asText())
+                        .header(
+                                "Authorization",
+                                "Bearer " + session.get("accessToken").asText())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Maria Souza\"}"))
                 .andExpect(status().isNotFound());

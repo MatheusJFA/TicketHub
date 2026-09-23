@@ -2,11 +2,14 @@ package com.tickethub.infrastructure.configuration;
 
 import static java.util.Objects.isNull;
 
+import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import com.tickethub.infrastructure.authentication.AuthSessionProperties;
+import com.tickethub.infrastructure.security.SecurityProperties;
+import com.tickethub.infrastructure.web.CheckoutProperties;
+import com.tickethub.infrastructure.web.CorsProperties;
 import java.nio.charset.StandardCharsets;
-
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,38 +33,46 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.nimbusds.jose.jwk.source.ImmutableSecret;
-import com.tickethub.infrastructure.authentication.AuthSessionProperties;
-import com.tickethub.infrastructure.security.SecurityProperties;
-import com.tickethub.infrastructure.web.CheckoutProperties;
-import com.tickethub.infrastructure.web.CorsProperties;
-
 @Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
 @EnableMethodSecurity(proxyTargetClass = true)
-@EnableConfigurationProperties({ SecurityProperties.class, AuthSessionProperties.class,
-        CorsProperties.class, CheckoutProperties.class })
+@EnableConfigurationProperties({
+    SecurityProperties.class,
+    AuthSessionProperties.class,
+    CorsProperties.class,
+    CheckoutProperties.class
+})
 public class SecurityConfiguration {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(final HttpSecurity http, final JwtDecoder jwtDecoder,
+    public SecurityFilterChain securityFilterChain(
+            final HttpSecurity http,
+            final JwtDecoder jwtDecoder,
             final JwtAuthenticationConverter jwtAuthenticationConverter,
-            final CorsConfigurationSource corsConfigurationSource) throws Exception {
+            final CorsConfigurationSource corsConfigurationSource)
+            throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/refresh", "/auth/logout", "/actuator/health",
-                                "/actuator/prometheus", "/payments/webhook", "/payments/mercadopago", "/swagger-ui/**", "/v3/api-docs/**")
+                .authorizeHttpRequests(auth -> auth.requestMatchers(
+                                "/auth/login",
+                                "/auth/refresh",
+                                "/auth/logout",
+                                "/actuator/health",
+                                "/actuator/prometheus",
+                                "/payments/webhook",
+                                "/payments/mercadopago",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**")
                         .permitAll()
                         .requestMatchers(HttpMethod.GET, "/shows/**", "/sections/**", "/spots/**", "/zipcode/**")
                         .permitAll()
                         .requestMatchers(HttpMethod.POST, "/customers/**", "/partners/**")
                         .permitAll()
-                        .anyRequest().authenticated())
-                .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> jwt
-                        .decoder(jwtDecoder)
-                        .jwtAuthenticationConverter(jwtAuthenticationConverter)));
+                        .anyRequest()
+                        .authenticated())
+                .oauth2ResourceServer(oauth -> oauth.jwt(
+                        jwt -> jwt.decoder(jwtDecoder).jwtAuthenticationConverter(jwtAuthenticationConverter)));
         return http.build();
     }
 
@@ -105,8 +116,7 @@ public class SecurityConfiguration {
     private static SecretKey secretKey(final SecurityProperties properties) {
         final String secret = properties.getJwt().getSecret();
         if (isNull(secret) || secret.getBytes(StandardCharsets.UTF_8).length < 32) {
-            throw new IllegalStateException(
-                    "tickethub.security.jwt.secret must be at least 32 bytes long");
+            throw new IllegalStateException("tickethub.security.jwt.secret must be at least 32 bytes long");
         }
         return new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
     }

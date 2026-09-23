@@ -1,11 +1,5 @@
 package com.tickethub.infrastructure.ticket.persistence;
 
-import java.time.Instant;
-import java.util.Optional;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import com.tickethub.domain.core.customer.CustomerID;
 import com.tickethub.domain.core.order.OrderID;
 import com.tickethub.domain.core.spot.SpotID;
@@ -13,6 +7,10 @@ import com.tickethub.domain.core.ticket.Ticket;
 import com.tickethub.domain.core.ticket.TicketID;
 import com.tickethub.domain.core.ticket.TicketStatus;
 import com.tickethub.infrastructure.audit.AuditActor;
+import java.time.Instant;
+import java.util.Optional;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document("tickets")
 public record TicketDocument(
@@ -32,8 +30,19 @@ public record TicketDocument(
     public static final String COLLECTION = "tickets";
 
     public TicketDocument withActors(final String createdBy, final String lastModifiedBy) {
-        return new TicketDocument(id, orderId, spotId, customerId, code, signature, status,
-                createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
+        return new TicketDocument(
+                id,
+                orderId,
+                spotId,
+                customerId,
+                code,
+                signature,
+                status,
+                createdAt,
+                updatedAt,
+                deletedAt,
+                createdBy,
+                lastModifiedBy);
     }
 
     public static TicketDocument from(final Ticket ticket) {
@@ -67,6 +76,10 @@ public record TicketDocument(
                 code,
                 signature,
                 TicketStatus.valueOf(status),
-                createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
+                createdAt,
+                updatedAt,
+                deletedAt,
+                createdBy,
+                lastModifiedBy);
     }
 }

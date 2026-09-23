@@ -1,8 +1,8 @@
 package com.tickethub.domain.validation;
 
 import static java.util.Objects.requireNonNull;
-import com.tickethub.domain.exception.DomainException;
 
+import com.tickethub.domain.exception.DomainException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +26,8 @@ public class Notification implements ValidationHandler {
     }
 
     public static Notification create(final Throwable throwable) {
-        final var notification = create(new Error(Objects.requireNonNullElse(throwable.getMessage(), throwable.getClass().getSimpleName())));
+        final var notification = create(new Error(Objects.requireNonNullElse(
+                throwable.getMessage(), throwable.getClass().getSimpleName())));
         notification.cause = throwable;
         return notification;
     }
@@ -56,7 +57,8 @@ public class Notification implements ValidationHandler {
         } catch (final DomainException e) {
             errors.add(new Error(Objects.requireNonNullElse(e.getMessage(), DomainException.class.getSimpleName())));
         } catch (final RuntimeException e) {
-            errors.add(new Error(Objects.requireNonNullElse(e.getMessage(), e.getClass().getSimpleName())));
+            errors.add(new Error(
+                    Objects.requireNonNullElse(e.getMessage(), e.getClass().getSimpleName())));
         }
         return null;
     }

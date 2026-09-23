@@ -1,8 +1,8 @@
 package com.tickethub.application.spot.retrieve.list;
 
-import java.time.Instant;
-import com.tickethub.domain.shared.Location;
 import com.tickethub.domain.core.spot.Spot;
+import com.tickethub.domain.shared.Location;
+import java.time.Instant;
 
 public record ListSpotsOutput(
         String id,

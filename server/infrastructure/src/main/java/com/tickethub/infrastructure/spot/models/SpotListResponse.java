@@ -1,7 +1,12 @@
 package com.tickethub.infrastructure.spot.models;
 
 import java.time.Instant;
-import java.time.OffsetDateTime;
 
-public record SpotListResponse(String id, String location, boolean available, boolean published, Instant createdAt, Instant updatedAt, Instant deletedAt) {
-}
+public record SpotListResponse(
+        String id,
+        String location,
+        boolean available,
+        boolean published,
+        Instant createdAt,
+        Instant updatedAt,
+        Instant deletedAt) {}

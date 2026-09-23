@@ -4,5 +4,4 @@ import com.tickethub.application.Either;
 import com.tickethub.application.UseCase;
 import com.tickethub.domain.validation.Notification;
 
-public abstract class GetOrderUseCase extends UseCase<String, Either<Notification, GetOrderOutput>> {
-}
+public abstract class GetOrderUseCase extends UseCase<String, Either<Notification, GetOrderOutput>> {}

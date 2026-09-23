@@ -4,17 +4,15 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-import java.util.Locale;
-import java.util.Optional;
-
-import org.springframework.web.server.ResponseStatusException;
-
 import com.tickethub.application.Either;
 import com.tickethub.domain.authentication.AuthenticationException;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.pagination.SearchQuery;
 import com.tickethub.domain.validation.Notification;
 import com.tickethub.infrastructure.exception.InfrastructureException;
+import java.util.Locale;
+import java.util.Optional;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Pure translation between use case results and the HTTP layer: unwraps
@@ -26,8 +24,7 @@ import com.tickethub.infrastructure.exception.InfrastructureException;
  */
 public final class HttpResults {
 
-    private HttpResults() {
-    }
+    private HttpResults() {}
 
     public static <O> O require(final Either<Notification, O> result) {
         if (result.isRight()) {
@@ -47,7 +44,7 @@ public final class HttpResults {
         if (notification.getCause() instanceof ResponseStatusException status) {
             return status;
         }
-        
+
         if (notification.getCause() instanceof AuthenticationException authentication) {
             return authentication;
         }
@@ -61,10 +58,14 @@ public final class HttpResults {
     }
 
     public static SearchQuery search(String search, int page, int perPage, String sort, String direction) {
-        if (page < 0 || perPage < 1 || perPage > 100 || isBlank(sort)
+        if (page < 0
+                || perPage < 1
+                || perPage > 100
+                || isBlank(sort)
                 || isNull(direction)
                 || !(direction.equalsIgnoreCase("asc") || direction.equalsIgnoreCase("desc"))) {
-            throw new DomainException("Invalid pagination parameters: page >= 0, perPage between 1 and 100, sort non-blank, dir asc or desc");
+            throw new DomainException(
+                    "Invalid pagination parameters: page >= 0, perPage between 1 and 100, sort non-blank, dir asc or desc");
         }
         return new SearchQuery(page, perPage, search, sort, direction.toLowerCase(Locale.ROOT));
     }

@@ -1,7 +1,6 @@
 package com.tickethub.application.show.create;
 
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.partner.Partner;
@@ -10,6 +9,7 @@ import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.core.show.Show;
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.validation.Notification;
+import java.util.Optional;
 
 public class DefaultCreateShowUseCase extends CreateShowUseCase {
     private final ShowGateway showGateway;
@@ -33,11 +33,7 @@ public class DefaultCreateShowUseCase extends CreateShowUseCase {
 
             final Partner partner = entity.get();
             final Show show = partner.createShow(
-                    command.name(),
-                    command.description(),
-                    command.date(),
-                    command.address(),
-                    command.totalSpots());
+                    command.name(), command.description(), command.date(), command.address(), command.totalSpots());
 
             final Notification notification = Notification.create();
             show.validate(notification);

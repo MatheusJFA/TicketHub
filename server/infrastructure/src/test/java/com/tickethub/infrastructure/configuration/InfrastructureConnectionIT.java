@@ -5,18 +5,20 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
+import com.tickethub.infrastructure.ContainerSupport;
+import com.tickethub.infrastructure.IntegrationTest;
 import java.time.Duration;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.common.TopicPartition;
 import org.bson.Document;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.kafka.core.ConsumerFactory;
@@ -24,10 +26,6 @@ import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-
-import com.tickethub.infrastructure.ContainerSupport;
-import com.tickethub.infrastructure.IntegrationTest;
-import java.util.UUID;
 
 @IntegrationTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -40,12 +38,16 @@ class InfrastructureConnectionIT extends ContainerSupport {
 
     @Autowired
     private MongoTemplate mongoTemplate;
+
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
+
     @Autowired
     private ConsumerFactory<String, String> consumerFactory;
+
     @Autowired
     private KafkaAdmin kafkaAdmin;
+
     @Autowired
     private NewTopic eventsTopic;
 

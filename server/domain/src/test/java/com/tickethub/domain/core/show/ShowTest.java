@@ -6,6 +6,15 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.tickethub.domain.Entity;
+import com.tickethub.domain.core.partner.Partner;
+import com.tickethub.domain.core.partner.PartnerID;
+import com.tickethub.domain.core.section.Section;
+import com.tickethub.domain.core.spot.Spot;
+import com.tickethub.domain.exception.DomainException;
+import com.tickethub.domain.shared.Address;
+import com.tickethub.domain.shared.Money;
+import com.tickethub.domain.validation.Notification;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -13,25 +22,15 @@ import java.util.ArrayList;
 import java.util.Currency;
 import java.util.HashSet;
 import java.util.List;
-
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.junit.jupiter.api.DisplayName;
-
-import com.tickethub.domain.Entity;
-import com.tickethub.domain.core.partner.Partner;
-import com.tickethub.domain.core.partner.PartnerID;
-import com.tickethub.domain.core.section.Section;
-import com.tickethub.domain.core.spot.Spot;
-import com.tickethub.domain.exception.DomainException;
-import com.tickethub.domain.shared.Money;
-import com.tickethub.domain.validation.Notification;
-import com.tickethub.domain.shared.Address;
 
 @DisplayName("Show")
 class ShowTest {
-    private static final Address ADDRESS = Address.create("Rua Augusta", "100", null, "Centro", "São Paulo", "SP", "Brasil", "01305-000");
+    private static final Address ADDRESS =
+            Address.create("Rua Augusta", "100", null, "Centro", "São Paulo", "SP", "Brasil", "01305-000");
     private static final OffsetDateTime DATE = OffsetDateTime.parse("2027-01-15T20:00:00-03:00");
     private static final Money PRICE = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
 
@@ -48,13 +47,14 @@ class ShowTest {
 
         final var actualShow = Show.create(
                 expectedName,
-                expectedDescription, DATE, ADDRESS,
+                expectedDescription,
+                DATE,
+                ADDRESS,
                 expectedPublished,
                 expectedTotalSpots,
                 expectedTotalSpotsSold,
                 expectedPartnerId,
-                expectedSections
-        );
+                expectedSections);
 
         assertNotNull(actualShow);
         assertNotNull(actualShow.getId());
@@ -68,7 +68,8 @@ class ShowTest {
     }
 
     @Test
-    @DisplayName("Given valid params, when create without publish flag, then instantiate show with default publish false")
+    @DisplayName(
+            "Given valid params, when create without publish flag, then instantiate show with default publish false")
     void givenValidParams_whenCreateWithoutPublishFlag_thenInstantiateShowWithDefaultPublishFalse() {
         final var expectedName = "O Rei Leão";
         final var expectedDescription = "Uma grande apresentação";
@@ -76,7 +77,14 @@ class ShowTest {
         final var expectedPartnerId = PartnerID.generate();
         final var expectedSections = new HashSet<Section>();
 
-        final var actualShow = Show.create(expectedName, expectedDescription, DATE, ADDRESS, expectedTotalSpots, expectedPartnerId, expectedSections);
+        final var actualShow = Show.create(
+                expectedName,
+                expectedDescription,
+                DATE,
+                ADDRESS,
+                expectedTotalSpots,
+                expectedPartnerId,
+                expectedSections);
 
         assertNotNull(actualShow);
         assertNotNull(actualShow.getId());
@@ -92,8 +100,7 @@ class ShowTest {
     @Test
     @DisplayName("Given show, when register sale and refund, then counts without going negative")
     void givenShow_whenRegisterSaleAndRefund_thenCounts() {
-        final var show = Show.create("Show", "Desc", DATE, ADDRESS, 10L,
-                PartnerID.generate(), new HashSet<Section>());
+        final var show = Show.create("Show", "Desc", DATE, ADDRESS, 10L, PartnerID.generate(), new HashSet<Section>());
 
         show.registerSale();
         show.registerSale();
@@ -108,7 +115,16 @@ class ShowTest {
     @DisplayName("Given valid show, when publish, then change to published")
     void givenValidShow_whenPublish_thenChangeToPublished() {
         final var expectedPartnerId = PartnerID.generate();
-        final var actualShow = Show.create("O Rei Leão", "Uma grande apresentação", DATE, ADDRESS, false, 50L, 0L, expectedPartnerId, new HashSet<Section>());
+        final var actualShow = Show.create(
+                "O Rei Leão",
+                "Uma grande apresentação",
+                DATE,
+                ADDRESS,
+                false,
+                50L,
+                0L,
+                expectedPartnerId,
+                new HashSet<Section>());
 
         assertFalse(actualShow.isPublished());
 
@@ -121,7 +137,16 @@ class ShowTest {
     @DisplayName("Given valid show, when unpublish, then change to unpublished")
     void givenValidShow_whenUnpublish_thenChangeToUnpublished() {
         final var expectedPartnerId = PartnerID.generate();
-        final var actualShow = Show.create("O Rei Leão", "Uma grande apresentação", DATE, ADDRESS, true, 50L, 0L, expectedPartnerId, new HashSet<Section>());
+        final var actualShow = Show.create(
+                "O Rei Leão",
+                "Uma grande apresentação",
+                DATE,
+                ADDRESS,
+                true,
+                50L,
+                0L,
+                expectedPartnerId,
+                new HashSet<Section>());
 
         assertTrue(actualShow.isPublished());
 
@@ -145,24 +170,27 @@ class ShowTest {
                 DomainException.class,
                 () -> Show.create(
                         expectedName,
-                        expectedDescription, DATE, ADDRESS,
+                        expectedDescription,
+                        DATE,
+                        ADDRESS,
                         expectedPublished,
                         expectedTotalSpots,
                         expectedTotalSpotsSold,
                         expectedPartnerId,
-                        expectedSections
-                )
-        );
+                        expectedSections));
 
         assertEquals("Invalid name " + expectedName, exception.getMessage());
     }
 
-
-
     @Test
     @DisplayName("Given partner, when create show, then associate partner and initialize defaults")
     void givenPartner_whenCreateShow_thenAssociatePartnerAndInitializeDefaults() {
-        final var partner = Partner.create("Cinema Nova", "11222333000181", Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), "cinema@domain.com", "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
+        final var partner = Partner.create(
+                "Cinema Nova",
+                "11222333000181",
+                Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"),
+                "cinema@domain.com",
+                "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
         final var show = partner.createShow("Concert", "Description", DATE, ADDRESS, 10);
 
         assertNotNull(show.getId());
@@ -186,7 +214,9 @@ class ShowTest {
         final var section = Section.create("VIP", "Description", capacity, PRICE, "A", 5);
 
         assertEquals(capacity, section.getSpots().size());
-        assertEquals(capacity, section.getSpots().stream().map(Spot::getId).distinct().count());
+        assertEquals(
+                capacity,
+                section.getSpots().stream().map(Spot::getId).distinct().count());
         assertEquals(capacity, section.getTotalSpots());
         assertEquals(0, section.getTotalSpotsSold());
         assertFalse(section.isPublished());
@@ -235,7 +265,13 @@ class ShowTest {
         assertTrue(show.getSections().contains(firstSection));
         assertEquals(15, show.getTotalSpots());
         assertEquals(0, show.getTotalSpotsSold());
-        assertEquals(5, show.getSections().stream().flatMap(s -> s.getSpots().stream()).map(Spot::getId).distinct().count());
+        assertEquals(
+                5,
+                show.getSections().stream()
+                        .flatMap(s -> s.getSpots().stream())
+                        .map(Spot::getId)
+                        .distinct()
+                        .count());
         final var codes = show.getSections().stream()
                 .flatMap(s -> s.getSpots().stream())
                 .map(spot -> spot.getLocation().getValue())
@@ -252,8 +288,8 @@ class ShowTest {
         final var show = Show.create("Concert", "Description", DATE, ADDRESS, 10, PartnerID.generate());
         final var updatedAt = show.getUpdatedAt();
 
-        final var exception = assertThrows(DomainException.class,
-                () -> show.addSection("A", "Description", 2, PRICE, 5));
+        final var exception =
+                assertThrows(DomainException.class, () -> show.addSection("A", "Description", 2, PRICE, 5));
 
         assertEquals("Invalid name A", exception.getMessage());
         assertTrue(show.getSections().isEmpty());
@@ -318,7 +354,8 @@ class ShowTest {
 
         show.validate(notification);
 
-        assertEquals(List.of("'address' should not be null"),
+        assertEquals(
+                List.of("'address' should not be null"),
                 notification.getErrors().stream().map(error -> error.message()).toList());
     }
 
@@ -328,8 +365,11 @@ class ShowTest {
         final var show = Show.create("Concert", "Description", DATE, ADDRESS, false, -1, -1, null, null);
         final var notification = Notification.create();
         show.validate(notification);
-        assertEquals(List.of("'partnerId' should not be null", "'totalSpots' should not be negative",
-                "'totalSpotsSold' should not be negative"),
+        assertEquals(
+                List.of(
+                        "'partnerId' should not be null",
+                        "'totalSpots' should not be negative",
+                        "'totalSpotsSold' should not be negative"),
                 notification.getErrors().stream().map(error -> error.message()).toList());
     }
 
@@ -339,8 +379,11 @@ class ShowTest {
         final var section = Section.create("VIP", "Description", false, -1, -1, null, null);
         final var notification = Notification.create();
         section.validate(notification);
-        assertEquals(List.of("'price' should not be null", "'totalSpots' should not be negative",
-                "'totalSpotsSold' should not be negative"),
+        assertEquals(
+                List.of(
+                        "'price' should not be null",
+                        "'totalSpots' should not be negative",
+                        "'totalSpotsSold' should not be negative"),
                 notification.getErrors().stream().map(error -> error.message()).toList());
     }
 

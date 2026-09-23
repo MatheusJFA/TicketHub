@@ -1,16 +1,20 @@
 package com.tickethub.domain.core.order;
 
+import com.tickethub.domain.core.payment.ChargeID;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-import com.tickethub.domain.core.payment.ChargeID;
-
 public interface OrderGateway {
     Order create(Order order);
+
     Optional<Order> findById(OrderID id);
+
     Optional<Order> findByChargeId(ChargeID chargeId);
+
     Optional<Order> findByIdempotencyKey(String idempotencyKey);
+
     List<Order> findPendingExpired(Instant now);
+
     Order update(Order order);
 }

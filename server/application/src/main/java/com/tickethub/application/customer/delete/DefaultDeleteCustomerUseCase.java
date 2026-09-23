@@ -1,13 +1,11 @@
 package com.tickethub.application.customer.delete;
 
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
-
-import com.tickethub.domain.validation.Notification;
 
 import com.tickethub.domain.core.customer.CustomerGateway;
 import com.tickethub.domain.core.customer.CustomerID;
-
+import com.tickethub.domain.validation.Notification;
+import java.util.Optional;
 
 public class DefaultDeleteCustomerUseCase extends DeleteCustomerUseCase {
     private final CustomerGateway customerGateway;

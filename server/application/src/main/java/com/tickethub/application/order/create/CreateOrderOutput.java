@@ -1,10 +1,9 @@
 package com.tickethub.application.order.create;
 
+import com.tickethub.domain.core.order.Order;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
-
-import com.tickethub.domain.core.order.Order;
 
 public record CreateOrderOutput(
         String orderId,
@@ -22,6 +21,8 @@ public record CreateOrderOutput(
                 order.getTotal().getValue(),
                 order.getTotal().getCurrency().getCurrencyCode(),
                 order.getExpiresAt(),
-                order.getItems().stream().map(item -> item.getSpotId().getValue()).toList());
+                order.getItems().stream()
+                        .map(item -> item.getSpotId().getValue())
+                        .toList());
     }
 }

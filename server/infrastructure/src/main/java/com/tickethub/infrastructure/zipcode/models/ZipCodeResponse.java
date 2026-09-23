@@ -3,12 +3,7 @@ package com.tickethub.infrastructure.zipcode.models;
 import com.tickethub.application.zipcode.lookup.LookupZipCodeOutput;
 
 public record ZipCodeResponse(
-        String zipCode,
-        String street,
-        String neighborhood,
-        String city,
-        String state,
-        String country) {
+        String zipCode, String street, String neighborhood, String city, String state, String country) {
     public static ZipCodeResponse from(final LookupZipCodeOutput output) {
         return new ZipCodeResponse(
                 output.zipCode(),

@@ -1,7 +1,6 @@
 package com.tickethub.infrastructure.web;
 
 import java.util.List;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "tickethub.cors")

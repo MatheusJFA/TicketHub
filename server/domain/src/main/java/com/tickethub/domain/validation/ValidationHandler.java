@@ -20,13 +20,17 @@ public interface ValidationHandler {
     }
 
     default Error firstError() {
-        return Optional.ofNullable(getErrors()).filter(errors -> !errors.isEmpty())
-                .map(errors -> errors.get(0)).orElse(null);
+        return Optional.ofNullable(getErrors())
+                .filter(errors -> !errors.isEmpty())
+                .map(errors -> errors.get(0))
+                .orElse(null);
     }
 
     default Error lastError() {
-        return Optional.ofNullable(getErrors()).filter(errors -> !errors.isEmpty())
-                .map(errors -> errors.get(errors.size() - 1)).orElse(null);
+        return Optional.ofNullable(getErrors())
+                .filter(errors -> !errors.isEmpty())
+                .map(errors -> errors.get(errors.size() - 1))
+                .orElse(null);
     }
 
     interface Validation<T> {

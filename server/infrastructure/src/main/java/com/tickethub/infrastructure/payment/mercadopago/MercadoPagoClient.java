@@ -1,22 +1,20 @@
 package com.tickethub.infrastructure.payment.mercadopago;
 
-import static java.util.Objects.requireNonNull;
 import static java.util.Objects.isNull;
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.springframework.http.MediaType;
-import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientException;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tickethub.infrastructure.shared.http.BaseHttpClient;
 import com.tickethub.infrastructure.shared.http.HttpUpstreamException;
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.http.MediaType;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
 /**
  * Thin REST client for the Mercado Pago Payments API ({@code /v1/payments}).
@@ -29,8 +27,12 @@ public class MercadoPagoClient extends BaseHttpClient {
         super(restClient, "mercadopago");
     }
 
-    public PaymentResponse createPixPayment(final BigDecimal amount, final String description,
-            final String externalReference, final String payerEmail, final String notificationUrl) {
+    public PaymentResponse createPixPayment(
+            final BigDecimal amount,
+            final String description,
+            final String externalReference,
+            final String payerEmail,
+            final String notificationUrl) {
         requireNonNull(amount, "'amount' should not be null");
         requireNonNull(externalReference, "'externalReference' should not be null");
         requireNonNull(payerEmail, "'payerEmail' should not be null");
@@ -44,15 +46,15 @@ public class MercadoPagoClient extends BaseHttpClient {
             if (isNotBlank(notificationUrl)) {
                 body.put("notification_url", notificationUrl);
             }
-            final var response = restClient.post()
+            final var response = restClient
+                    .post()
                     .uri("/v1/payments")
                     .header("X-Idempotency-Key", externalReference)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(body)
                     .retrieve()
                     .toEntity(PaymentResponse.class);
-            return requireNonNull(response.getBody(),
-                    "'response body' should not be null");
+            return requireNonNull(response.getBody(), "'response body' should not be null");
         } catch (final RestClientException e) {
             throw new HttpUpstreamException(provider, e);
         }
@@ -66,7 +68,8 @@ public class MercadoPagoClient extends BaseHttpClient {
     public void refundPayment(final String paymentId) {
         requireNonNull(paymentId, "'paymentId' should not be null");
         try {
-            restClient.post()
+            restClient
+                    .post()
                     .uri("/v1/payments/{id}/refunds", Map.of("id", paymentId))
                     .header("X-Idempotency-Key", paymentId)
                     .retrieve()
@@ -96,12 +99,10 @@ public class MercadoPagoClient extends BaseHttpClient {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record PointOfInteraction(
-            @JsonProperty("transaction_data") TransactionData transactionData) {
-    }
+            @JsonProperty("transaction_data") TransactionData transactionData) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record TransactionData(
             @JsonProperty("qr_code") String qrCode,
-            @JsonProperty("qr_code_base64") String qrCodeBase64) {
-    }
+            @JsonProperty("qr_code_base64") String qrCodeBase64) {}
 }

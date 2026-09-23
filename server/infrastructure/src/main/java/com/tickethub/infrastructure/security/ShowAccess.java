@@ -2,21 +2,19 @@ package com.tickethub.infrastructure.security;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static java.util.Objects.requireNonNull;
-
-
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.stereotype.Component;
 
 import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.infrastructure.section.persistence.SectionDocument;
 import com.tickethub.infrastructure.show.persistence.ShowDocument;
 import com.tickethub.infrastructure.spot.persistence.SpotDocument;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Component;
 
 @Component("showAccess")
 public class ShowAccess {
@@ -78,8 +76,7 @@ public class ShowAccess {
             return false;
         }
         try {
-            final var section = mongoTemplate.findById(sectionId, SectionDocument.class,
-                    SectionDocument.COLLECTION);
+            final var section = mongoTemplate.findById(sectionId, SectionDocument.class, SectionDocument.COLLECTION);
             if (isNull(section)) {
                 return false;
             }
@@ -93,7 +90,8 @@ public class ShowAccess {
             // Legacy fallback: sections written before the denormalized links.
             final var show = mongoTemplate.findOne(
                     Query.query(Criteria.where("sectionIds").is(sectionId)),
-                    ShowDocument.class, ShowDocument.COLLECTION);
+                    ShowDocument.class,
+                    ShowDocument.COLLECTION);
             return nonNull(show) && ownerId.equals(show.partnerId());
         } catch (final RuntimeException e) {
             return false;
@@ -126,7 +124,8 @@ public class ShowAccess {
             // Legacy fallback: spots written before the denormalized links.
             final var section = mongoTemplate.findOne(
                     Query.query(Criteria.where("spotIds").is(spotId)),
-                    SectionDocument.class, SectionDocument.COLLECTION);
+                    SectionDocument.class,
+                    SectionDocument.COLLECTION);
             return nonNull(section) && ownsSection(section.id());
         } catch (final RuntimeException e) {
             return false;
@@ -142,7 +141,8 @@ public class ShowAccess {
             return false;
         }
         try {
-            return showGateway.findById(ShowID.from(showId))
+            return showGateway
+                    .findById(ShowID.from(showId))
                     .map(show -> nonNull(show.getPartnerId())
                             && ownerId.equals(show.getPartnerId().getValue()))
                     .orElse(false);

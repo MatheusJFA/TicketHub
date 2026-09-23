@@ -1,16 +1,13 @@
 package com.tickethub.domain.core.section;
 
 import static java.util.Objects.requireNonNull;
-import java.time.Instant;
 
 import com.tickethub.domain.event.DomainEvent;
+import java.time.Instant;
 
 public record SpotsGenerationRequested(
-        String showId,
-        String sectionId,
-        String sectionCode,
-        long totalSpots,
-        Instant occurredOn) implements DomainEvent {
+        String showId, String sectionId, String sectionCode, long totalSpots, Instant occurredOn)
+        implements DomainEvent {
 
     public SpotsGenerationRequested {
         requireNonNull(showId, "'showId' should not be null");

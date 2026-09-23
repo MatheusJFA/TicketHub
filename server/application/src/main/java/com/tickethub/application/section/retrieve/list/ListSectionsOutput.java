@@ -1,8 +1,8 @@
 package com.tickethub.application.section.retrieve.list;
 
-import java.time.Instant;
-import com.tickethub.domain.shared.Money;
 import com.tickethub.domain.core.section.Section;
+import com.tickethub.domain.shared.Money;
+import java.time.Instant;
 
 public record ListSectionsOutput(
         String id,

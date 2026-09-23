@@ -9,23 +9,21 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.time.Duration;
-import java.util.List;
-import java.util.Optional;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.DisplayName;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import com.tickethub.domain.authentication.IssuedToken;
 import com.tickethub.domain.authentication.RefreshSession;
 import com.tickethub.domain.authentication.RefreshSessionGateway;
 import com.tickethub.domain.authentication.SecureTokens;
 import com.tickethub.domain.authentication.TokenIssuer;
+import java.time.Duration;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Refresh token use case")
@@ -48,8 +46,12 @@ class RefreshTokenUseCaseTest {
     @DisplayName("Given active session, when execute, then rotates and returns new tokens")
     void givenActiveSession_whenExecute_thenRotatesAndReturnsNewTokens() {
         final var presented = SecureTokens.generateOpaqueToken();
-        final var session = RefreshSession.issue(SecureTokens.sha256Hex(presented), "maria@domain.com",
-                List.of("ROLE_CUSTOMER"), "customer-1", Duration.ofDays(7));
+        final var session = RefreshSession.issue(
+                SecureTokens.sha256Hex(presented),
+                "maria@domain.com",
+                List.of("ROLE_CUSTOMER"),
+                "customer-1",
+                Duration.ofDays(7));
         when(refreshSessions.findByTokenHash(session.getTokenHash())).thenReturn(Optional.of(session));
         when(tokenIssuer.issueAccess("maria@domain.com", List.of("ROLE_CUSTOMER"), "customer-1"))
                 .thenReturn(new IssuedToken("new-access", 900));
@@ -63,7 +65,8 @@ class RefreshTokenUseCaseTest {
         assertTrue(session.isRotated());
         final var saved = ArgumentCaptor.forClass(RefreshSession.class);
         verify(refreshSessions, times(2)).save(saved.capture());
-        assertTrue(saved.getAllValues().stream().anyMatch(found -> found.getTokenHash().equals(session.getTokenHash())));
+        assertTrue(saved.getAllValues().stream()
+                .anyMatch(found -> found.getTokenHash().equals(session.getTokenHash())));
     }
 
     @Test
@@ -71,7 +74,8 @@ class RefreshTokenUseCaseTest {
     void givenUnknownToken_whenExecute_thenReturns401() {
         when(refreshSessions.findByTokenHash(any())).thenReturn(Optional.empty());
 
-        final var notification = useCase.execute(RefreshTokenCommand.with("unknown")).getLeft();
+        final var notification =
+                useCase.execute(RefreshTokenCommand.with("unknown")).getLeft();
 
         assertEquals("Invalid refresh token", notification.firstError().message());
         verify(refreshSessions, never()).save(any());
@@ -82,12 +86,13 @@ class RefreshTokenUseCaseTest {
     @DisplayName("Given revoked session, when execute, then returns401")
     void givenRevokedSession_whenExecute_thenReturns401() {
         final var presented = SecureTokens.generateOpaqueToken();
-        final var session = RefreshSession.issue(SecureTokens.sha256Hex(presented), "maria@domain.com",
-                List.of(), null, Duration.ofDays(7));
+        final var session = RefreshSession.issue(
+                SecureTokens.sha256Hex(presented), "maria@domain.com", List.of(), null, Duration.ofDays(7));
         session.revoke();
         when(refreshSessions.findByTokenHash(session.getTokenHash())).thenReturn(Optional.of(session));
 
-        final var notification = useCase.execute(RefreshTokenCommand.with(presented)).getLeft();
+        final var notification =
+                useCase.execute(RefreshTokenCommand.with(presented)).getLeft();
 
         assertEquals("Invalid refresh token", notification.firstError().message());
         verify(refreshSessions, never()).save(any());
@@ -97,13 +102,14 @@ class RefreshTokenUseCaseTest {
     @DisplayName("Given rotated token reuse, when execute, then revokes family and returns401")
     void givenRotatedTokenReuse_whenExecute_thenRevokesFamilyAndReturns401() {
         final var first = SecureTokens.generateOpaqueToken();
-        final var session = RefreshSession.issue(SecureTokens.sha256Hex(first), "maria@domain.com",
-                List.of(), null, Duration.ofDays(7));
+        final var session = RefreshSession.issue(
+                SecureTokens.sha256Hex(first), "maria@domain.com", List.of(), null, Duration.ofDays(7));
         session.rotate(SecureTokens.sha256Hex(SecureTokens.generateOpaqueToken()), Duration.ofDays(7));
         when(refreshSessions.findByTokenHash(session.getTokenHash())).thenReturn(Optional.of(session));
         when(refreshSessions.findByFamilyId(session.getFamilyId())).thenReturn(List.of(session));
 
-        final var notification = useCase.execute(RefreshTokenCommand.with(first)).getLeft();
+        final var notification =
+                useCase.execute(RefreshTokenCommand.with(first)).getLeft();
 
         assertEquals("Invalid refresh token", notification.firstError().message());
         assertTrue(session.isRevoked());

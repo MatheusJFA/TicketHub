@@ -3,7 +3,6 @@ package com.tickethub.infrastructure.configuration;
 import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.concurrent.ThreadPoolExecutor;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
@@ -43,12 +42,12 @@ public class AuditAsyncConfiguration implements AsyncConfigurer {
         return AuditAsyncConfiguration::logFailure;
     }
 
-    private static void logFailure(final Throwable failure, final Method method,
-            final Object... parameters) {
-        final var action = parameters.length == 0
-                ? Optional.<Object>empty()
-                : Optional.ofNullable(parameters[0]);
-        LOG.warn("audit trail background write failed in {} for {}", method.getName(),
-                action.map(Object::toString).orElse("unknown entry"), failure);
+    private static void logFailure(final Throwable failure, final Method method, final Object... parameters) {
+        final var action = parameters.length == 0 ? Optional.<Object>empty() : Optional.ofNullable(parameters[0]);
+        LOG.warn(
+                "audit trail background write failed in {} for {}",
+                method.getName(),
+                action.map(Object::toString).orElse("unknown entry"),
+                failure);
     }
 }

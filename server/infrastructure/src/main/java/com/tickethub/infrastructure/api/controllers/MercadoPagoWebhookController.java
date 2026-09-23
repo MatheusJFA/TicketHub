@@ -2,49 +2,50 @@ package com.tickethub.infrastructure.api.controllers;
 
 import static java.util.Objects.isNull;
 
-import java.util.Objects;
-import java.util.stream.Stream;
-
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.tickethub.infrastructure.api.HttpResults;
 import com.tickethub.infrastructure.api.MercadoPagoWebhookAPI;
 import com.tickethub.infrastructure.cache.TickethubCacheProperties;
 import com.tickethub.infrastructure.exception.InfrastructureException;
 import com.tickethub.infrastructure.notification.OrderConfirmationMailer;
+import com.tickethub.infrastructure.payment.mercadopago.MercadoPagoWebhookHandler;
 import com.tickethub.infrastructure.payment.models.ConfirmPaymentResponse;
 import com.tickethub.infrastructure.payment.models.MercadoPagoNotification;
-import com.tickethub.infrastructure.payment.mercadopago.MercadoPagoWebhookHandler;
-
+import java.util.Objects;
+import java.util.stream.Stream;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class MercadoPagoWebhookController implements MercadoPagoWebhookAPI {
     private final ObjectProvider<MercadoPagoWebhookHandler> webhook;
     private final OrderConfirmationMailer confirmationMailer;
 
-    public MercadoPagoWebhookController(final ObjectProvider<MercadoPagoWebhookHandler> webhook,
-            final OrderConfirmationMailer confirmationMailer) {
+    public MercadoPagoWebhookController(
+            final ObjectProvider<MercadoPagoWebhookHandler> webhook, final OrderConfirmationMailer confirmationMailer) {
         this.webhook = webhook;
         this.confirmationMailer = confirmationMailer;
     }
 
     @Override
-    @Caching(evict = {
-            @CacheEvict(value = TickethubCacheProperties.SHOWS, allEntries = true),
-            @CacheEvict(value = TickethubCacheProperties.SECTIONS, allEntries = true),
-            @CacheEvict(value = TickethubCacheProperties.SPOTS, allEntries = true) })
-    public ResponseEntity<ConfirmPaymentResponse> mercadoPagoWebhook(final String xSignature,
-            final String xRequestId, final String dataId, final String type,
+    @Caching(
+            evict = {
+                @CacheEvict(value = TickethubCacheProperties.SHOWS, allEntries = true),
+                @CacheEvict(value = TickethubCacheProperties.SECTIONS, allEntries = true),
+                @CacheEvict(value = TickethubCacheProperties.SPOTS, allEntries = true)
+            })
+    public ResponseEntity<ConfirmPaymentResponse> mercadoPagoWebhook(
+            final String xSignature,
+            final String xRequestId,
+            final String dataId,
+            final String type,
             final MercadoPagoNotification body) {
         final var handler = webhook.getIfAvailable();
         if (isNull(handler)) {
-            throw new InfrastructureException(
-                    "Mercado Pago webhook is not configured: set MERCADOPAGO_ACCESS_TOKEN");
+            throw new InfrastructureException("Mercado Pago webhook is not configured: set MERCADOPAGO_ACCESS_TOKEN");
         }
         final var paymentId = firstPresent(dataId, isNull(body) ? null : body.dataId());
         final var topic = firstPresent(type, isNull(body) ? null : body.type());

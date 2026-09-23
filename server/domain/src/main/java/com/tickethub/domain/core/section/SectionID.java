@@ -25,5 +25,4 @@ public class SectionID extends Identifier {
     public String getValue() {
         return value;
     }
-
 }

@@ -3,13 +3,13 @@ package com.tickethub.domain.core.customer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import com.tickethub.domain.exception.DomainException;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.junit.jupiter.api.DisplayName;
-
-import com.tickethub.domain.exception.DomainException;
 
 @DisplayName("Customer")
 class CustomerTest {
@@ -22,8 +22,10 @@ class CustomerTest {
     @ValueSource(strings = {" ", "123", "12345678900"})
     @DisplayName("Given invalid CPF, when create, then throw domain exception")
     void givenInvalidCpf_whenCreate_thenThrowDomainException(String cpf) {
-        assertEquals("Invalid CPF", assertThrows(DomainException.class,
-                () -> Customer.create(cpf, "John Doe", VALID_EMAIL, VALID_HASH)).getMessage());
+        assertEquals(
+                "Invalid CPF",
+                assertThrows(DomainException.class, () -> Customer.create(cpf, "John Doe", VALID_EMAIL, VALID_HASH))
+                        .getMessage());
     }
 
     @ParameterizedTest
@@ -31,8 +33,10 @@ class CustomerTest {
     @ValueSource(strings = {" ", "J", "John123"})
     @DisplayName("Given invalid name, when create, then throw domain exception")
     void givenInvalidName_whenCreate_thenThrowDomainException(String name) {
-        assertEquals("Invalid name " + name, assertThrows(DomainException.class,
-                () -> Customer.create("12345678909", name, VALID_EMAIL, VALID_HASH)).getMessage());
+        assertEquals(
+                "Invalid name " + name,
+                assertThrows(DomainException.class, () -> Customer.create("12345678909", name, VALID_EMAIL, VALID_HASH))
+                        .getMessage());
     }
 
     @ParameterizedTest
@@ -40,8 +44,10 @@ class CustomerTest {
     @ValueSource(strings = {" ", "plainaddress", "missing-domain@"})
     @DisplayName("Given invalid email, when create, then throw domain exception")
     void givenInvalidEmail_whenCreate_thenThrowDomainException(String email) {
-        assertEquals("Invalid email", assertThrows(DomainException.class,
-                () -> Customer.create("12345678909", "John Doe", email, VALID_HASH)).getMessage());
+        assertEquals(
+                "Invalid email",
+                assertThrows(DomainException.class, () -> Customer.create("12345678909", "John Doe", email, VALID_HASH))
+                        .getMessage());
     }
 
     @ParameterizedTest
@@ -49,8 +55,12 @@ class CustomerTest {
     @ValueSource(strings = {" ", "plain-password"})
     @DisplayName("Given invalid password hash, when create, then throw domain exception")
     void givenInvalidPasswordHash_whenCreate_thenThrowDomainException(String passwordHash) {
-        assertEquals("Invalid password hash", assertThrows(DomainException.class,
-                () -> Customer.create("12345678909", "John Doe", VALID_EMAIL, passwordHash)).getMessage());
+        assertEquals(
+                "Invalid password hash",
+                assertThrows(
+                                DomainException.class,
+                                () -> Customer.create("12345678909", "John Doe", VALID_EMAIL, passwordHash))
+                        .getMessage());
     }
 
     @Test
@@ -76,9 +86,7 @@ class CustomerTest {
         final var expectedName = "John Doe";
 
         DomainException exception = assertThrows(
-                DomainException.class,
-                () -> Customer.create(expectedCpf, expectedName, VALID_EMAIL, VALID_HASH)
-        );
+                DomainException.class, () -> Customer.create(expectedCpf, expectedName, VALID_EMAIL, VALID_HASH));
 
         assertEquals("Invalid CPF", exception.getMessage());
     }
@@ -90,9 +98,7 @@ class CustomerTest {
         final var expectedName = "J";
 
         DomainException exception = assertThrows(
-                DomainException.class,
-                () -> Customer.create(expectedCpf, expectedName, VALID_EMAIL, VALID_HASH)
-        );
+                DomainException.class, () -> Customer.create(expectedCpf, expectedName, VALID_EMAIL, VALID_HASH));
 
         assertEquals("Invalid name " + expectedName, exception.getMessage());
     }

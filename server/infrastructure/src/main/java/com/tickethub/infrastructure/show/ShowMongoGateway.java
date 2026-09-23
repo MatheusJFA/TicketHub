@@ -1,21 +1,8 @@
 package com.tickethub.infrastructure.show;
 
 import static java.util.Objects.nonNull;
-import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static java.util.Objects.requireNonNull;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.stereotype.Component;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
 import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.core.section.Section;
@@ -26,15 +13,26 @@ import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.domain.pagination.SearchQuery;
-import com.tickethub.infrastructure.show.persistence.ShowDocument;
-import com.tickethub.infrastructure.show.persistence.ShowRepository;
 import com.tickethub.infrastructure.section.persistence.SectionDocument;
 import com.tickethub.infrastructure.section.persistence.SectionRepository;
-import com.tickethub.infrastructure.spot.persistence.SpotDocument;
-import com.tickethub.infrastructure.spot.persistence.SpotRepository;
 import com.tickethub.infrastructure.shared.persistence.MongoGatewaySupport;
 import com.tickethub.infrastructure.shared.persistence.MongoUnitOfWork;
+import com.tickethub.infrastructure.show.persistence.ShowDocument;
+import com.tickethub.infrastructure.show.persistence.ShowRepository;
+import com.tickethub.infrastructure.spot.persistence.SpotDocument;
+import com.tickethub.infrastructure.spot.persistence.SpotRepository;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.stereotype.Component;
 
 @Component
 public class ShowMongoGateway implements ShowGateway {
@@ -46,8 +44,11 @@ public class ShowMongoGateway implements ShowGateway {
     private final SectionRepository sections;
     private final SpotRepository spots;
 
-    public ShowMongoGateway(final MongoTemplate mongoTemplate, final ShowRepository repository,
-            final SectionRepository sections, final SpotRepository spots) {
+    public ShowMongoGateway(
+            final MongoTemplate mongoTemplate,
+            final ShowRepository repository,
+            final SectionRepository sections,
+            final SpotRepository spots) {
         this.mongoTemplate = requireNonNull(mongoTemplate, "'mongoTemplate' should not be null");
         this.repository = requireNonNull(repository, "'repository' should not be null");
         this.sections = requireNonNull(sections, "'sections' should not be null");
@@ -66,9 +67,8 @@ public class ShowMongoGateway implements ShowGateway {
     @Override
     public void deleteById(final ShowID id) {
         final var unitOfWork = new MongoUnitOfWork(mongoTemplate);
-        final var sectionIds = repository.findById(id.getValue())
-                .map(ShowDocument::sectionIds)
-                .orElseGet(List::of);
+        final var sectionIds =
+                repository.findById(id.getValue()).map(ShowDocument::sectionIds).orElseGet(List::of);
         final var spotIds = sections.findAllById(sectionIds).stream()
                 .filter(section -> nonNull(section.spotIds()))
                 .flatMap(section -> section.spotIds().stream())
@@ -101,8 +101,14 @@ public class ShowMongoGateway implements ShowGateway {
     @Override
     public Pagination<Show> findAll(final SearchQuery query) {
         final var mongoQuery = MongoGatewaySupport.searchQuery(query, "name", "description");
-        return MongoGatewaySupport.paginate(mongoTemplate, mongoQuery, ShowDocument.class,
-                ShowDocument.COLLECTION, query, SORTABLE_FIELDS, this::toDomain);
+        return MongoGatewaySupport.paginate(
+                mongoTemplate,
+                mongoQuery,
+                ShowDocument.class,
+                ShowDocument.COLLECTION,
+                query,
+                SORTABLE_FIELDS,
+                this::toDomain);
     }
 
     @Override
@@ -125,26 +131,33 @@ public class ShowMongoGateway implements ShowGateway {
         if (!sections.existsById(sectionId.getValue())) {
             return;
         }
-        final String partnerId = repository.findById(showId.getValue())
+        final String partnerId = repository
+                .findById(showId.getValue())
                 .map(ShowDocument::partnerId)
                 .orElse(null);
         final var unitOfWork = new MongoUnitOfWork(mongoTemplate);
         for (final Spot spot : spots) {
-            unitOfWork.registerNew(SpotDocument.COLLECTION,
+            unitOfWork.registerNew(
+                    SpotDocument.COLLECTION,
                     SpotDocument.from(spot, showId.getValue(), sectionId.getValue(), partnerId));
         }
         unitOfWork.commit();
         mongoTemplate.updateFirst(
                 Query.query(Criteria.where("_id").is(sectionId.getValue())),
-                new Update().push("spotIds").each(
-                        spots.stream().map(spot -> spot.getId().getValue()).toArray()),
-                SectionDocument.class, SectionDocument.COLLECTION);
+                new Update()
+                        .push("spotIds")
+                        .each(spots.stream()
+                                .map(spot -> spot.getId().getValue())
+                                .toArray()),
+                SectionDocument.class,
+                SectionDocument.COLLECTION);
     }
 
     private void registerGraph(final MongoUnitOfWork unitOfWork, final Show show, final boolean dirty) {
         final String showId = show.getId().getValue();
         final String partnerId = Optional.ofNullable(show.getPartnerId())
-                .map(PartnerID::getValue).orElse(null);
+                .map(PartnerID::getValue)
+                .orElse(null);
         for (final Section section : show.getSections()) {
             final var sectionDocument = SectionDocument.from(section, showId, partnerId);
             if (dirty) {
@@ -153,7 +166,8 @@ public class ShowMongoGateway implements ShowGateway {
                 unitOfWork.registerNew(SectionDocument.COLLECTION, sectionDocument);
             }
             for (final Spot spot : section.getSpots()) {
-                final var spotDocument = SpotDocument.from(spot, showId, section.getId().getValue(), partnerId);
+                final var spotDocument =
+                        SpotDocument.from(spot, showId, section.getId().getValue(), partnerId);
                 if (dirty) {
                     unitOfWork.registerDirty(SpotDocument.COLLECTION, spotDocument.id(), spotDocument);
                 } else {

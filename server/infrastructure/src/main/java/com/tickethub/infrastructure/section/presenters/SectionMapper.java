@@ -1,9 +1,5 @@
 package com.tickethub.infrastructure.section.presenters;
 
-import org.mapstruct.Mapper;
-
-import com.tickethub.infrastructure.shared.presenters.SharedMapper;
-
 import com.tickethub.application.section.changedescription.ChangeSectionDescriptionCommand;
 import com.tickethub.application.section.changename.ChangeSectionNameCommand;
 import com.tickethub.application.section.changeprice.ChangeSectionPriceCommand;
@@ -18,6 +14,8 @@ import com.tickethub.infrastructure.section.models.CreateSectionRequest;
 import com.tickethub.infrastructure.section.models.SectionListResponse;
 import com.tickethub.infrastructure.section.models.SectionResponse;
 import com.tickethub.infrastructure.section.models.UpdateSectionRequest;
+import com.tickethub.infrastructure.shared.presenters.SharedMapper;
+import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring", uses = SharedMapper.class)
 public interface SectionMapper {

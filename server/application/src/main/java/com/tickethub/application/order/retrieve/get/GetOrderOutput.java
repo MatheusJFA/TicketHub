@@ -1,12 +1,11 @@
 package com.tickethub.application.order.retrieve.get;
 
+import com.tickethub.domain.core.order.Order;
+import com.tickethub.domain.core.payment.ChargeID;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-
-import com.tickethub.domain.core.order.Order;
-import com.tickethub.domain.core.payment.ChargeID;
 
 public record GetOrderOutput(
         String orderId,
@@ -26,6 +25,8 @@ public record GetOrderOutput(
                 order.getTotal().getCurrency().getCurrencyCode(),
                 order.getExpiresAt(),
                 Optional.ofNullable(order.getChargeId()).map(ChargeID::getValue).orElse(null),
-                order.getItems().stream().map(item -> item.getSpotId().getValue()).toList());
+                order.getItems().stream()
+                        .map(item -> item.getSpotId().getValue())
+                        .toList());
     }
 }

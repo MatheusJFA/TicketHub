@@ -1,11 +1,9 @@
 package com.tickethub.infrastructure.audit;
 
-import java.util.Optional;
-
-import org.slf4j.MDC;
-
 import com.tickethub.infrastructure.web.CorrelationIdFilter;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.MDC;
 
 /**
  * Resolves the actor responsible for a write: the authenticated principal
@@ -14,12 +12,10 @@ import org.apache.commons.lang3.StringUtils;
  */
 public final class AuditActor {
 
-    private AuditActor() {
-    }
+    private AuditActor() {}
 
     public static Optional<String> current() {
-        return Optional.ofNullable(MDC.get(CorrelationIdFilter.ACTOR_KEY))
-                .filter(StringUtils::isNotBlank);
+        return Optional.ofNullable(MDC.get(CorrelationIdFilter.ACTOR_KEY)).filter(StringUtils::isNotBlank);
     }
 
     public static String currentOrAnonymous() {

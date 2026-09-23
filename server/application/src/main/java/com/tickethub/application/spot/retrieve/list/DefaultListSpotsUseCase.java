@@ -1,15 +1,13 @@
 package com.tickethub.application.spot.retrieve.list;
 
 import static java.util.Objects.requireNonNull;
-import com.tickethub.domain.core.spot.Spot;
 
 import com.tickethub.application.Either;
-import com.tickethub.domain.validation.Notification;
-import com.tickethub.domain.pagination.SearchQuery;
-import com.tickethub.domain.pagination.Pagination;
+import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.core.spot.SpotGateway;
-
-
+import com.tickethub.domain.pagination.Pagination;
+import com.tickethub.domain.pagination.SearchQuery;
+import com.tickethub.domain.validation.Notification;
 
 public class DefaultListSpotsUseCase extends ListSpotsUseCase {
     private final SpotGateway spotGateway;

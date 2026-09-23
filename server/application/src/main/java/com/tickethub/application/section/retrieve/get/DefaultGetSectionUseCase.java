@@ -1,13 +1,13 @@
 package com.tickethub.application.section.retrieve.get;
 
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.section.Section;
 import com.tickethub.domain.core.section.SectionGateway;
 import com.tickethub.domain.core.section.SectionID;
 import com.tickethub.domain.validation.Notification;
+import java.util.Optional;
 
 public class DefaultGetSectionUseCase extends GetSectionUseCase {
     private final SectionGateway sectionGateway;
@@ -30,9 +30,8 @@ public class DefaultGetSectionUseCase extends GetSectionUseCase {
             final GetSectionOutput output = GetSectionOutput.from(entity);
             return Either.right(output);
         } catch (final RuntimeException exception) {
-            final Notification notification = Notification.create(exception); 
+            final Notification notification = Notification.create(exception);
             return Either.left(notification);
         }
     }
-    
 }

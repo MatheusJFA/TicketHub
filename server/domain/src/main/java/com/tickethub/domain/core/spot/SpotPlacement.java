@@ -6,5 +6,4 @@ package com.tickethub.domain.core.spot;
  * Used by ticket validation to prove the QR code really belongs to the
  * show/section presented at the door.
  */
-public record SpotPlacement(Spot spot, String showId, String sectionId) {
-}
+public record SpotPlacement(Spot spot, String showId, String sectionId) {}

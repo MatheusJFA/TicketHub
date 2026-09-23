@@ -20,8 +20,7 @@ public class DefaultListShowSectionsUseCase extends ListShowSectionsUseCase {
     @Override
     public Either<Notification, Pagination<ListSectionsOutput>> execute(final ListShowSectionsCommand input) {
         try {
-            final Pagination<Section> page =
-                    sectionGateway.findByShowId(ShowID.from(input.showId()), input.query());
+            final Pagination<Section> page = sectionGateway.findByShowId(ShowID.from(input.showId()), input.query());
             return Either.right(page.map(ListSectionsOutput::from));
         } catch (final RuntimeException exception) {
             return Either.left(Notification.create(exception));

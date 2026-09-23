@@ -1,15 +1,13 @@
 package com.tickethub.domain.core.customer;
 
-
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import java.util.UUID;
 
+import java.util.UUID;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Customer ID")
 public class CustomerIDTest {
@@ -47,10 +45,7 @@ public class CustomerIDTest {
     @Test
     @DisplayName("Given a null value, when from, then throw null pointer exception")
     void givenANullValue_whenFrom_thenThrowNullPointerException() {
-        NullPointerException exception = assertThrows(
-                NullPointerException.class,
-                () -> CustomerID.from(null)
-        );
+        NullPointerException exception = assertThrows(NullPointerException.class, () -> CustomerID.from(null));
 
         assertEquals("'CustomerID' should not be null", exception.getMessage());
     }

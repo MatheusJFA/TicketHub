@@ -5,17 +5,15 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.Instant;
-import java.util.List;
-
-import org.bson.Document;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-
 import com.tickethub.infrastructure.ContainerSupport;
 import com.tickethub.infrastructure.IntegrationTest;
+import java.time.Instant;
+import java.util.List;
+import org.bson.Document;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
 @IntegrationTest
 @DisplayName("Mongo audit trail")
@@ -28,8 +26,15 @@ class MongoAuditTrailIT extends ContainerSupport {
     private MongoAuditTrail trail;
 
     private static AuditEntry entry(final String correlationId) {
-        return new AuditEntry(Instant.parse("2027-01-15T20:00:00Z"), correlationId, "alice",
-                "CreateSpotUseCase", "CreateSpotCommand[A1]", AuditOutcome.SUCCESS, null, 12);
+        return new AuditEntry(
+                Instant.parse("2027-01-15T20:00:00Z"),
+                correlationId,
+                "alice",
+                "CreateSpotUseCase",
+                "CreateSpotCommand[A1]",
+                AuditOutcome.SUCCESS,
+                null,
+                12);
     }
 
     private List<Document> awaitEntries(final int expected) throws InterruptedException {
@@ -52,7 +57,9 @@ class MongoAuditTrailIT extends ContainerSupport {
         assertEquals(1, stored.size());
         final var document = stored.get(0);
         assertNotNull(document.getObjectId("_id"));
-        assertEquals(Instant.parse("2027-01-15T20:00:00Z"), document.getDate("occurredAt").toInstant());
+        assertEquals(
+                Instant.parse("2027-01-15T20:00:00Z"),
+                document.getDate("occurredAt").toInstant());
         assertEquals("corr-1", document.getString("correlationId"));
         assertEquals("alice", document.getString("actor"));
         assertEquals("CreateSpotUseCase", document.getString("action"));
@@ -64,7 +71,9 @@ class MongoAuditTrailIT extends ContainerSupport {
     @Test
     @DisplayName("Given entries from previous tests, when starting, then collection is clean")
     void givenEntriesFromPreviousTests_whenStarting_thenCollectionIsClean() throws InterruptedException {
-        assertTrue(mongoTemplate.findAll(Document.class, MongoAuditTrail.COLLECTION).isEmpty());
+        assertTrue(mongoTemplate
+                .findAll(Document.class, MongoAuditTrail.COLLECTION)
+                .isEmpty());
 
         trail.record(entry("corr-2"));
         trail.record(entry("corr-3"));

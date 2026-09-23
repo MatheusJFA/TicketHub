@@ -1,9 +1,5 @@
 package com.tickethub.infrastructure.partner.presenters;
 
-import org.mapstruct.Mapper;
-
-import com.tickethub.infrastructure.shared.presenters.SharedMapper;
-
 import com.tickethub.application.partner.changeaddress.ChangePartnerAddressCommand;
 import com.tickethub.application.partner.changename.ChangePartnerNameCommand;
 import com.tickethub.application.partner.create.CreatePartnerCommand;
@@ -16,6 +12,8 @@ import com.tickethub.infrastructure.partner.models.CreatePartnerRequest;
 import com.tickethub.infrastructure.partner.models.PartnerListResponse;
 import com.tickethub.infrastructure.partner.models.PartnerResponse;
 import com.tickethub.infrastructure.partner.models.UpdatePartnerRequest;
+import com.tickethub.infrastructure.shared.presenters.SharedMapper;
+import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring", uses = SharedMapper.class)
 public interface PartnerMapper {

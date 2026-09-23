@@ -6,21 +6,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.List;
-
-import org.bson.Document;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-
-import tools.jackson.databind.ObjectMapper;
 import com.tickethub.infrastructure.ContainerSupport;
 import com.tickethub.infrastructure.E2ETest;
 import com.tickethub.infrastructure.audit.MongoAuditTrail;
 import com.tickethub.infrastructure.section.persistence.SectionDocument;
+import java.util.List;
+import org.bson.Document;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
 @E2ETest
 @DisplayName("Spot E2 e")
@@ -41,7 +39,9 @@ class SpotE2ETest extends ContainerSupport {
                         .content("{\"identifier\":\"admin\",\"password\":\"admin-local\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.tokenType").value("Bearer"))
-                .andReturn().getResponse().getContentAsString();
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
         return objectMapper.readTree(response).get("accessToken").asText();
     }
 
@@ -54,9 +54,7 @@ class SpotE2ETest extends ContainerSupport {
     @Test
     @DisplayName("Given no token, when create spot, then returns401")
     void givenNoToken_whenCreateSpot_thenReturns401() throws Exception {
-        mvc.perform(post("/spots")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"location\":\"A1\"}"))
+        mvc.perform(post("/spots").contentType(MediaType.APPLICATION_JSON).content("{\"location\":\"A1\"}"))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -64,8 +62,10 @@ class SpotE2ETest extends ContainerSupport {
     @DisplayName("Given admin token, when create spot, then persists and audits")
     void givenAdminToken_whenCreateSpot_thenPersistsAndAudits() throws Exception {
         // Standalone spot creation requires an existing parent section.
-        mongoTemplate.insert(new SectionDocument("section-1", null, null, false, 0, 0, null,
-                null, null, null, null, null, null, null, null), SectionDocument.COLLECTION);
+        mongoTemplate.insert(
+                new SectionDocument(
+                        "section-1", null, null, false, 0, 0, null, null, null, null, null, null, null, null, null),
+                SectionDocument.COLLECTION);
 
         mvc.perform(post("/spots")
                         .header("Authorization", "Bearer " + adminToken())
@@ -97,7 +97,6 @@ class SpotE2ETest extends ContainerSupport {
     @Test
     @DisplayName("Given public catalog, when list spots, then succeeds")
     void givenPublicCatalog_whenListSpots_thenSucceeds() throws Exception {
-        mvc.perform(get("/spots"))
-                .andExpect(status().isOk());
+        mvc.perform(get("/spots")).andExpect(status().isOk());
     }
 }

@@ -6,22 +6,20 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.tickethub.domain.Entity;
+import com.tickethub.domain.core.spot.Spot;
+import com.tickethub.domain.exception.DomainException;
+import com.tickethub.domain.shared.Money;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.HashSet;
 import java.util.List;
-
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.junit.jupiter.api.DisplayName;
-
-import com.tickethub.domain.Entity;
-import com.tickethub.domain.core.spot.Spot;
-import com.tickethub.domain.exception.DomainException;
-import com.tickethub.domain.shared.Money;
 
 @DisplayName("Section")
 class SectionTest {
@@ -107,8 +105,7 @@ class SectionTest {
                 expectedTotalSpots,
                 expectedTotalSpotsSold,
                 expectedPrice,
-                expectedSpots
-        );
+                expectedSpots);
 
         assertNotNull(actualSection);
         assertNotNull(actualSection.getId());
@@ -121,7 +118,8 @@ class SectionTest {
     }
 
     @Test
-    @DisplayName("Given valid params, when create without publish flag, then instantiate section with default publish false")
+    @DisplayName(
+            "Given valid params, when create without publish flag, then instantiate section with default publish false")
     void givenValidParams_whenCreateWithoutPublishFlag_thenInstantiateSectionWithDefaultPublishFalse() {
         final var expectedName = "Comum";
         final var expectedDescription = "Descrição";
@@ -129,7 +127,8 @@ class SectionTest {
         final var expectedPrice = Money.create(new BigDecimal("20.00"), Currency.getInstance("BRL"));
         final var expectedSpots = new HashSet<Spot>();
 
-        final var actualSection = Section.create(expectedName, expectedDescription, expectedTotalSpots, expectedPrice, "A", 5);
+        final var actualSection =
+                Section.create(expectedName, expectedDescription, expectedTotalSpots, expectedPrice, "A", 5);
 
         assertNotNull(actualSection);
         assertNotNull(actualSection.getId());
@@ -161,9 +160,7 @@ class SectionTest {
                         expectedTotalSpots,
                         expectedTotalSpotsSold,
                         expectedPrice,
-                        expectedSpots
-                )
-        );
+                        expectedSpots));
 
         assertEquals("Invalid name " + expectedName, exception.getMessage());
     }

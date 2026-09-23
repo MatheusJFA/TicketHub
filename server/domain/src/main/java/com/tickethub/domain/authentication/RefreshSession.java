@@ -2,16 +2,16 @@ package com.tickethub.domain.authentication;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static java.util.Objects.requireNonNull;
 
+import com.tickethub.domain.exception.DomainException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-
-import com.tickethub.domain.exception.DomainException;
 import java.util.UUID;
+
 public class RefreshSession {
 
     public static final Duration DEFAULT_TTL = Duration.ofDays(7);
@@ -27,9 +27,17 @@ public class RefreshSession {
     private boolean revoked;
     private String replacedByTokenHash;
 
-    private RefreshSession(String id, String familyId, String tokenHash, String subject,
-            List<String> authorities, String ownerId, Instant createdAt, Instant expiresAt,
-            boolean revoked, String replacedByTokenHash) {
+    private RefreshSession(
+            String id,
+            String familyId,
+            String tokenHash,
+            String subject,
+            List<String> authorities,
+            String ownerId,
+            Instant createdAt,
+            Instant expiresAt,
+            boolean revoked,
+            String replacedByTokenHash) {
         this.id = requireNonNull(id, "'id' should not be null");
         this.familyId = requireNonNull(familyId, "'familyId' should not be null");
         this.tokenHash = requireNonNull(tokenHash, "'tokenHash' should not be null");
@@ -42,8 +50,12 @@ public class RefreshSession {
         this.replacedByTokenHash = replacedByTokenHash;
     }
 
-    public static RefreshSession issue(final String tokenHash, final String subject,
-            final List<String> authorities, final String ownerId, final Duration ttl) {
+    public static RefreshSession issue(
+            final String tokenHash,
+            final String subject,
+            final List<String> authorities,
+            final String ownerId,
+            final Duration ttl) {
         if (isBlank(tokenHash)) {
             throw new DomainException("'tokenHash' should not be null or blank");
         }
@@ -52,17 +64,41 @@ public class RefreshSession {
         }
         final var now = Instant.now();
         final var effectiveTtl = isNull(ttl) || ttl.isNegative() || ttl.isZero() ? DEFAULT_TTL : ttl;
-        return new RefreshSession(UUID.randomUUID().toString(), UUID.randomUUID().toString(), tokenHash,
-                subject, List.copyOf(emptyIfNull(authorities)), ownerId, now,
-                now.plus(effectiveTtl), false, null);
+        return new RefreshSession(
+                UUID.randomUUID().toString(),
+                UUID.randomUUID().toString(),
+                tokenHash,
+                subject,
+                List.copyOf(emptyIfNull(authorities)),
+                ownerId,
+                now,
+                now.plus(effectiveTtl),
+                false,
+                null);
     }
 
-    public static RefreshSession reconstitute(final String id, final String familyId, final String tokenHash,
-            final String subject, final List<String> authorities, final String ownerId,
-            final Instant createdAt, final Instant expiresAt, final boolean revoked,
+    public static RefreshSession reconstitute(
+            final String id,
+            final String familyId,
+            final String tokenHash,
+            final String subject,
+            final List<String> authorities,
+            final String ownerId,
+            final Instant createdAt,
+            final Instant expiresAt,
+            final boolean revoked,
             final String replacedByTokenHash) {
-        return new RefreshSession(id, familyId, tokenHash, subject, authorities, ownerId, createdAt,
-                expiresAt, revoked, replacedByTokenHash);
+        return new RefreshSession(
+                id,
+                familyId,
+                tokenHash,
+                subject,
+                authorities,
+                ownerId,
+                createdAt,
+                expiresAt,
+                revoked,
+                replacedByTokenHash);
     }
 
     public RefreshSession rotate(final String newTokenHash, final Duration ttl) {
@@ -76,8 +112,17 @@ public class RefreshSession {
             throw new DomainException("Refresh session is expired");
         }
         final RefreshSession next = issue(newTokenHash, subject, authorities, ownerId, ttl);
-        final var rotated = new RefreshSession(next.id, familyId, next.tokenHash, next.subject,
-                next.authorities, next.ownerId, next.createdAt, next.expiresAt, false, null);
+        final var rotated = new RefreshSession(
+                next.id,
+                familyId,
+                next.tokenHash,
+                next.subject,
+                next.authorities,
+                next.ownerId,
+                next.createdAt,
+                next.expiresAt,
+                false,
+                null);
         this.replacedByTokenHash = newTokenHash;
         return rotated;
     }

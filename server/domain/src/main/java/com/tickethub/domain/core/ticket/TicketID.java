@@ -25,5 +25,4 @@ public class TicketID extends Identifier {
     public String getValue() {
         return value;
     }
-
 }

@@ -1,14 +1,13 @@
 package com.tickethub.infrastructure.zipcode;
 
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import com.tickethub.domain.geography.ZipCodeAddress;
 import com.tickethub.domain.geography.ZipCodeLookup;
+import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 @Component
 public class ViaCepLookup implements ZipCodeLookup {
@@ -32,8 +31,12 @@ public class ViaCepLookup implements ZipCodeLookup {
             return Optional.ofNullable(ZipCodeAddress.normalize(zipCode))
                     .flatMap(digits -> client.findByCep(digits)
                             .filter(response -> !response.hasError())
-                            .map(response -> new ZipCodeAddress(digits, response.logradouro(),
-                                    response.bairro(), response.localidade(), response.uf(),
+                            .map(response -> new ZipCodeAddress(
+                                    digits,
+                                    response.logradouro(),
+                                    response.bairro(),
+                                    response.localidade(),
+                                    response.uf(),
                                     "Brasil")));
         } catch (final RuntimeException e) {
             // Fail-open contract: never break registration because of the provider.

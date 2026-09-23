@@ -1,13 +1,13 @@
 package com.tickethub.application.section.unpublish;
 
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.section.Section;
 import com.tickethub.domain.core.section.SectionGateway;
 import com.tickethub.domain.core.section.SectionID;
 import com.tickethub.domain.validation.Notification;
+import java.util.Optional;
 
 public class DefaultUnpublishSectionUseCase extends UnpublishSectionUseCase {
     private final SectionGateway sectionGateway;
@@ -44,5 +44,4 @@ public class DefaultUnpublishSectionUseCase extends UnpublishSectionUseCase {
             return Either.left(notification);
         }
     }
-
 }

@@ -6,22 +6,20 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-
 import com.tickethub.domain.core.customer.Customer;
+import com.tickethub.domain.core.customer.CustomerID;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.pagination.SearchQuery;
+import com.tickethub.domain.shared.Email;
 import com.tickethub.infrastructure.ContainerSupport;
 import com.tickethub.infrastructure.IntegrationTest;
 import com.tickethub.infrastructure.MongoCleanUpExtension;
-import com.tickethub.infrastructure.customer.CustomerMongoGateway;
 import com.tickethub.infrastructure.customer.persistence.CustomerDocument;
-import com.tickethub.domain.shared.Email;
-import com.tickethub.domain.core.customer.CustomerID;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
 @IntegrationTest
 @DisplayName("Customer Mongo gateway")
@@ -63,8 +61,10 @@ class CustomerMongoGatewayIT extends ContainerSupport {
     void givenDuplicateCpf_whenCreate_thenThrowsDomainException() {
         gateway.create(Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH));
 
-        final var exception = assertThrows(DomainException.class,
-                () -> gateway.create(Customer.create("52998224725", "Maria Souza", "maria.souza@domain.com", PASSWORD_HASH)));
+        final var exception = assertThrows(
+                DomainException.class,
+                () -> gateway.create(
+                        Customer.create("52998224725", "Maria Souza", "maria.souza@domain.com", PASSWORD_HASH)));
 
         assertEquals("'cpf' already in use", exception.getMessage());
     }
@@ -74,7 +74,8 @@ class CustomerMongoGatewayIT extends ContainerSupport {
     void givenDuplicateEmail_whenCreate_thenThrowsDomainException() {
         gateway.create(Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH));
 
-        final var exception = assertThrows(DomainException.class,
+        final var exception = assertThrows(
+                DomainException.class,
                 () -> gateway.create(Customer.create("12345678909", "Maria Souza", "maria@domain.com", PASSWORD_HASH)));
 
         assertEquals("'email' already in use", exception.getMessage());
@@ -83,8 +84,8 @@ class CustomerMongoGatewayIT extends ContainerSupport {
     @Test
     @DisplayName("Given a customer, when find by email, then returns customer")
     void givenACustomer_whenFindByEmail_thenReturnsCustomer() {
-        final var customer = gateway.create(
-                Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH));
+        final var customer =
+                gateway.create(Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH));
 
         final var found = gateway.findByEmail(Email.create("MARIA@domain.com"));
 
@@ -95,19 +96,23 @@ class CustomerMongoGatewayIT extends ContainerSupport {
     @Test
     @DisplayName("Given a customer, when update, then persists changes")
     void givenACustomer_whenUpdate_thenPersistsChanges() {
-        final var customer = gateway.create(Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH));
+        final var customer =
+                gateway.create(Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH));
 
         customer.changeName("Maria Souza");
         final var updated = gateway.update(customer);
 
         assertEquals("Maria Souza", updated.getName().getValue());
-        assertEquals("Maria Souza", gateway.findById(customer.getId()).orElseThrow().getName().getValue());
+        assertEquals(
+                "Maria Souza",
+                gateway.findById(customer.getId()).orElseThrow().getName().getValue());
     }
 
     @Test
     @DisplayName("Given a customer, when delete, then removes")
     void givenACustomer_whenDelete_thenRemoves() {
-        final var customer = gateway.create(Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH));
+        final var customer =
+                gateway.create(Customer.create("52998224725", "Maria Silva", "maria@domain.com", PASSWORD_HASH));
 
         gateway.deleteById(customer.getId());
 
@@ -141,7 +146,6 @@ class CustomerMongoGatewayIT extends ContainerSupport {
     @Test
     @DisplayName("Given missing customer, when find by id, then returns empty")
     void givenMissingCustomer_whenFindById_thenReturnsEmpty() {
-        assertFalse(gateway
-                .findById(CustomerID.generate()).isPresent());
+        assertFalse(gateway.findById(CustomerID.generate()).isPresent());
     }
 }

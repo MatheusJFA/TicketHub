@@ -1,16 +1,10 @@
 package com.tickethub.application.partner.create;
 
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -20,6 +14,11 @@ import com.tickethub.application.UseCaseTest;
 import com.tickethub.domain.authentication.PasswordHasher;
 import com.tickethub.domain.core.partner.PartnerGateway;
 import com.tickethub.domain.shared.Address;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
 @DisplayName("Create partner use case")
 public class CreatePartnerUseCaseTest extends UseCaseTest {
@@ -45,7 +44,12 @@ public class CreatePartnerUseCaseTest extends UseCaseTest {
     @Test
     @DisplayName("Given valid command, when execute, should persist and return id")
     public void givenValidCommand_whenExecute_shouldPersistAndReturnId() {
-        final var command = CreatePartnerCommand.with("Cinema Nova", "11222333000181", Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), VALID_EMAIL, RAW_PASSWORD);
+        final var command = CreatePartnerCommand.with(
+                "Cinema Nova",
+                "11222333000181",
+                Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"),
+                VALID_EMAIL,
+                RAW_PASSWORD);
         when(passwordHasher.hash(RAW_PASSWORD)).thenReturn(PASSWORD_HASH);
         when(partnerGateway.create(any())).thenAnswer(returnsFirstArg());
 
@@ -53,8 +57,8 @@ public class CreatePartnerUseCaseTest extends UseCaseTest {
 
         assertNotNull(output.id());
         verify(passwordHasher, times(1)).hash(RAW_PASSWORD);
-        verify(partnerGateway, times(1)).create(argThat(saved ->
-                saved.getId() != null
+        verify(partnerGateway, times(1))
+                .create(argThat(saved -> saved.getId() != null
                         && saved.getId().getValue().equals(output.id())
                         && saved.getCreatedAt() != null
                         && saved.getUpdatedAt() != null
@@ -68,7 +72,12 @@ public class CreatePartnerUseCaseTest extends UseCaseTest {
     @Test
     @DisplayName("Given gateway failure, when execute, should return notification")
     public void givenGatewayFailure_whenExecute_shouldReturnNotification() {
-        final var command = CreatePartnerCommand.with("Cinema Nova", "11222333000181", Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), VALID_EMAIL, RAW_PASSWORD);
+        final var command = CreatePartnerCommand.with(
+                "Cinema Nova",
+                "11222333000181",
+                Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"),
+                VALID_EMAIL,
+                RAW_PASSWORD);
         final var expectedMessage = "Gateway error";
         when(passwordHasher.hash(RAW_PASSWORD)).thenReturn(PASSWORD_HASH);
         when(partnerGateway.create(any())).thenThrow(new IllegalStateException(expectedMessage));
@@ -78,7 +87,8 @@ public class CreatePartnerUseCaseTest extends UseCaseTest {
         assertEquals(1, notification.getErrors().size());
         assertEquals(expectedMessage, notification.firstError().message());
         verify(passwordHasher, times(1)).hash(RAW_PASSWORD);
-        verify(partnerGateway, times(1)).create(argThat(saved -> saved.getId() != null
+        verify(partnerGateway, times(1))
+                .create(argThat(saved -> saved.getId() != null
                         && saved.getCreatedAt() != null
                         && saved.getUpdatedAt() != null
                         && saved.getDeletedAt() == null
@@ -91,7 +101,12 @@ public class CreatePartnerUseCaseTest extends UseCaseTest {
     @Test
     @DisplayName("Given invalid command, when execute, should return validation errors without persisting")
     public void givenInvalidCommand_whenExecute_shouldReturnValidationErrorsWithoutPersisting() {
-        final var command = CreatePartnerCommand.with("Cinema Nova", "invalid", Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"), VALID_EMAIL, RAW_PASSWORD);
+        final var command = CreatePartnerCommand.with(
+                "Cinema Nova",
+                "invalid",
+                Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"),
+                VALID_EMAIL,
+                RAW_PASSWORD);
         when(passwordHasher.hash(RAW_PASSWORD)).thenReturn(PASSWORD_HASH);
 
         final var notification = useCase.execute(command).getLeft();
@@ -105,14 +120,19 @@ public class CreatePartnerUseCaseTest extends UseCaseTest {
     @Test
     @DisplayName("Given submitted address, when execute, should persist it as is without lookup")
     public void givenSubmittedAddress_whenExecute_shouldPersistItAsIs() {
-        final var command = CreatePartnerCommand.with("Cinema Nova", "11222333000181", Address.create("Rua X", "42", "Sala 9", "Bairro X", "Cidade X", "XX", "Brasil", "01305-000"), VALID_EMAIL, RAW_PASSWORD);
+        final var command = CreatePartnerCommand.with(
+                "Cinema Nova",
+                "11222333000181",
+                Address.create("Rua X", "42", "Sala 9", "Bairro X", "Cidade X", "XX", "Brasil", "01305-000"),
+                VALID_EMAIL,
+                RAW_PASSWORD);
         when(passwordHasher.hash(RAW_PASSWORD)).thenReturn(PASSWORD_HASH);
         when(partnerGateway.create(any())).thenAnswer(returnsFirstArg());
 
         useCase.execute(command).getRight();
 
-        verify(partnerGateway, times(1)).create(argThat(saved ->
-                saved.getAddress().getStreet().equals("Rua X")
+        verify(partnerGateway, times(1))
+                .create(argThat(saved -> saved.getAddress().getStreet().equals("Rua X")
                         && saved.getAddress().getNeighborhood().equals("Bairro X")
                         && saved.getAddress().getCity().equals("Cidade X")
                         && saved.getAddress().getState().equals("XX")

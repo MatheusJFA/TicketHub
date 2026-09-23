@@ -2,16 +2,13 @@ package com.tickethub.infrastructure.web;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.tickethub.infrastructure.authentication.AuthSessionProperties;
+import jakarta.servlet.FilterChain;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-
-import com.tickethub.infrastructure.authentication.AuthSessionProperties;
-
-import jakarta.servlet.FilterChain;
 
 @DisplayName("Auth rate limit filter")
 class AuthRateLimitFilterTest {
@@ -42,8 +39,7 @@ class AuthRateLimitFilterTest {
         final var properties = new AuthSessionProperties();
         properties.setLoginRateLimitPerMinute(1);
         final var filter = new AuthRateLimitFilter(properties);
-        final FilterChain chain = (req, res) -> {
-        };
+        final FilterChain chain = (req, res) -> {};
 
         filter.doFilter(request("/auth/login"), new MockHttpServletResponse(), chain);
         final var response = new MockHttpServletResponse();

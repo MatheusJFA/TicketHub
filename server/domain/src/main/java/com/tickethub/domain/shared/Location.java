@@ -6,7 +6,6 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import com.tickethub.domain.ValueObject;
 import com.tickethub.domain.exception.DomainException;
 import java.util.UUID;
-import java.util.Objects;
 
 public final class Location extends ValueObject {
     private static final String SPACE = " ";
@@ -51,6 +50,7 @@ public final class Location extends ValueObject {
      * {@code tickethub.spots.seat-number-width}); it is never assumed here.
      */
     public static Location generateSeat(String sectionCode, long seatNumber, int seatNumberWidth) {
+        // Filtra: codigo de secao com 1 a 3 letras maiusculas (ex.: A, AA).
         if (isNull(sectionCode) || !sectionCode.matches("[A-Z]{1,3}")) {
             throw new DomainException("Invalid section code");
         }
@@ -88,6 +88,7 @@ public final class Location extends ValueObject {
             return null;
         }
 
+        // Filtra: sequencias de espacos Unicode para normalizar em espaco unico.
         return value.replaceAll("(?U)\\s+", SPACE).strip();
     }
 

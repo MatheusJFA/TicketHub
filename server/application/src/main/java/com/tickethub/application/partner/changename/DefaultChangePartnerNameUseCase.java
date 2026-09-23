@@ -1,13 +1,13 @@
 package com.tickethub.application.partner.changename;
 
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.partner.Partner;
 import com.tickethub.domain.core.partner.PartnerGateway;
 import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.validation.Notification;
+import java.util.Optional;
 
 public class DefaultChangePartnerNameUseCase extends ChangePartnerNameUseCase {
     private final PartnerGateway partnerGateway;
@@ -44,5 +44,4 @@ public class DefaultChangePartnerNameUseCase extends ChangePartnerNameUseCase {
             return Either.left(notification);
         }
     }
-
 }

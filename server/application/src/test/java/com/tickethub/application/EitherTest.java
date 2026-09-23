@@ -3,8 +3,9 @@ package com.tickethub.application;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.Test;
+
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Either")
 class EitherTest {
@@ -53,8 +54,7 @@ class EitherTest {
     void flatMapChainsRight() {
         final Either<String, Integer> either = Either.right(21);
 
-        assertEquals("R:42", either.flatMap(v -> Either.right(v * 2))
-            .fold(l -> "L:" + l, r -> "R:" + r));
+        assertEquals("R:42", either.flatMap(v -> Either.right(v * 2)).fold(l -> "L:" + l, r -> "R:" + r));
     }
 
     @Test
@@ -72,8 +72,7 @@ class EitherTest {
     void flatMapIsNoOpOnLeft() {
         final Either<String, Integer> either = Either.left("err");
 
-        assertEquals("L:err", either.flatMap(v -> Either.right(v * 2))
-            .fold(l -> "L:" + l, r -> "R:" + r));
+        assertEquals("L:err", either.flatMap(v -> Either.right(v * 2)).fold(l -> "L:" + l, r -> "R:" + r));
     }
 
     @Test
@@ -88,10 +87,11 @@ class EitherTest {
     void supportsExhaustivePatternMatching() {
         final Either<String, Integer> either = Either.right(42);
 
-        final var description = switch (either) {
-            case Either.Left<String, Integer>(var l) -> "left " + l;
-            case Either.Right<String, Integer>(var r) -> "right " + r;
-        };
+        final var description =
+                switch (either) {
+                    case Either.Left<String, Integer>(var l) -> "left " + l;
+                    case Either.Right<String, Integer>(var r) -> "right " + r;
+                };
 
         assertEquals("right 42", description);
     }

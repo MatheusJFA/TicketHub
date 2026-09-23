@@ -1,9 +1,8 @@
 package com.tickethub.infrastructure.order.models;
 
-import java.util.List;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import java.util.List;
 
 /**
  * Body for opening an order: the buying customer and the spots to reserve.
@@ -11,6 +10,4 @@ import jakarta.validation.constraints.NotEmpty;
  * the whole order and releases the spots already reserved.
  */
 public record CreateOrderRequest(
-        @NotBlank String customerId,
-        @NotEmpty List<@NotBlank String> spotIds) {
-}
+        @NotBlank String customerId, @NotEmpty List<@NotBlank String> spotIds) {}

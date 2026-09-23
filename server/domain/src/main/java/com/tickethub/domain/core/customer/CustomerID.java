@@ -25,5 +25,4 @@ public class CustomerID extends Identifier {
     public String getValue() {
         return value;
     }
-
 }

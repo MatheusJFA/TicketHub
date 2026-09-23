@@ -5,9 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
-
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Audit sanitizer")
 class AuditSanitizerTest {
@@ -21,14 +20,14 @@ class AuditSanitizerTest {
     @Test
     @DisplayName("Given plain input, when sanitize, then keeps unchanged")
     void givenPlainInput_whenSanitize_thenKeepsUnchanged() {
-        assertEquals(Optional.of("CreateSpotCommand[A1]"),
-                AuditSanitizer.sanitize("CreateSpotCommand[A1]"));
+        assertEquals(Optional.of("CreateSpotCommand[A1]"), AuditSanitizer.sanitize("CreateSpotCommand[A1]"));
     }
 
     @Test
     @DisplayName("Given equals notation, when sanitize, then masks password")
     void givenEqualsNotation_whenSanitize_thenMasksPassword() {
-        assertEquals(Optional.of("CreateCustomerCommand[password=***]"),
+        assertEquals(
+                Optional.of("CreateCustomerCommand[password=***]"),
                 AuditSanitizer.sanitize("CreateCustomerCommand[password=secret-123]"));
     }
 
@@ -36,7 +35,7 @@ class AuditSanitizerTest {
     @DisplayName("Given json notation, when sanitize, then masks password and tokens")
     void givenJsonNotation_whenSanitize_thenMasksPasswordAndTokens() {
         final var sanitized = AuditSanitizer.sanitize(
-                "{\"identifier\":\"admin\",\"password\":\"admin-local\",\"refreshToken\":\"abc.def.ghi\"}")
+                        "{\"identifier\":\"admin\",\"password\":\"admin-local\",\"refreshToken\":\"abc.def.ghi\"}")
                 .orElseThrow();
 
         assertTrue(sanitized.contains("\"password\":\"***\""), sanitized);
@@ -48,8 +47,7 @@ class AuditSanitizerTest {
     @Test
     @DisplayName("Given mixed case key, when sanitize, then masks")
     void givenMixedCaseKey_whenSanitize_thenMasks() {
-        assertEquals(Optional.of("[Password=***]"),
-                AuditSanitizer.sanitize("[Password=hunter2]"));
+        assertEquals(Optional.of("[Password=***]"), AuditSanitizer.sanitize("[Password=hunter2]"));
     }
 
     @Test

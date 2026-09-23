@@ -21,12 +21,11 @@ public class DefaultCreatePartnerUseCase extends CreatePartnerUseCase {
     public Either<Notification, CreatePartnerOutput> execute(final CreatePartnerCommand command) {
         try {
             final Partner entity = Partner.create(
-                command.name(),
-                command.cnpj(),
-                command.address(),
-                command.email(),
-                passwordHasher.hash(command.password())
-            );
+                    command.name(),
+                    command.cnpj(),
+                    command.address(),
+                    command.email(),
+                    passwordHasher.hash(command.password()));
 
             final Notification notification = Notification.create();
             entity.validate(notification);

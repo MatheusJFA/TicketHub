@@ -1,7 +1,6 @@
 package com.tickethub.application.section.create;
 
 import static java.util.Objects.requireNonNull;
-import java.util.List;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.section.Section;
@@ -11,15 +10,15 @@ import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.domain.shared.Location;
 import com.tickethub.domain.validation.Notification;
-import com.tickethub.domain.validation.Error;
+import java.util.List;
 
 public class DefaultCreateSectionUseCase extends CreateSectionUseCase {
     private final SectionGateway sectionGateway;
     private final ShowGateway showGateway;
     private final int seatNumberWidth;
 
-    public DefaultCreateSectionUseCase(final SectionGateway sectionGateway, final ShowGateway showGateway,
-            final int seatNumberWidth) {
+    public DefaultCreateSectionUseCase(
+            final SectionGateway sectionGateway, final ShowGateway showGateway, final int seatNumberWidth) {
         this.sectionGateway = requireNonNull(sectionGateway);
         this.showGateway = requireNonNull(showGateway);
         this.seatNumberWidth = seatNumberWidth;
@@ -35,12 +34,12 @@ public class DefaultCreateSectionUseCase extends CreateSectionUseCase {
             }
 
             final Section entity = Section.create(
-                command.name(),
-                command.description(),
-                command.totalSpots(),
-                command.price(),
-                Location.sectionCode(0),
-                seatNumberWidth);
+                    command.name(),
+                    command.description(),
+                    command.totalSpots(),
+                    command.price(),
+                    Location.sectionCode(0),
+                    seatNumberWidth);
 
             final Notification notification = Notification.create();
 

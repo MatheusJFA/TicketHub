@@ -4,14 +4,6 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.in;
 import static java.util.Objects.requireNonNull;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.bson.Document;
-import org.springframework.data.mongodb.core.MongoTemplate;
-
 import com.mongodb.client.model.BulkWriteOptions;
 import com.mongodb.client.model.DeleteManyModel;
 import com.mongodb.client.model.DeleteOneModel;
@@ -19,6 +11,12 @@ import com.mongodb.client.model.InsertOneModel;
 import com.mongodb.client.model.ReplaceOneModel;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.WriteModel;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.bson.Document;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
 /**
  * Collects inserts, replacements and removals across collections and flushes
@@ -52,8 +50,8 @@ public final class MongoUnitOfWork {
         requireNonNull(collection, "'collection' should not be null");
         requireNonNull(id, "'id' should not be null");
         requireNonNull(document, "'document' should not be null");
-        pending(collection).add(new ReplaceOneModel<>(eq("_id", id), toBson(document),
-                new ReplaceOptions().upsert(true)));
+        pending(collection)
+                .add(new ReplaceOneModel<>(eq("_id", id), toBson(document), new ReplaceOptions().upsert(true)));
         return this;
     }
 

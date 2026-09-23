@@ -7,13 +7,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-
 import com.tickethub.application.Either;
 import com.tickethub.application.authentication.login.LoginOutput;
 import com.tickethub.application.authentication.login.LoginUseCase;
@@ -23,8 +16,13 @@ import com.tickethub.application.authentication.refresh.RefreshTokenUseCase;
 import com.tickethub.domain.authentication.AuthenticationException;
 import com.tickethub.domain.validation.Notification;
 import com.tickethub.infrastructure.ControllerTest;
-
 import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
 
 @ControllerTest(controllers = AuthController.class)
 @DisplayName("Auth controller")
@@ -48,7 +46,8 @@ class AuthControllerTest {
         when(loginUseCase.execute(any()))
                 .thenReturn(Either.right(new LoginOutput("access-token", "Bearer", 900, "refresh-token")));
 
-        mvc.perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"identifier\":\"maria@domain.com\",\"password\":\"secret-123\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").value("access-token"))
@@ -63,7 +62,8 @@ class AuthControllerTest {
         when(loginUseCase.execute(any()))
                 .thenReturn(Either.left(Notification.create(new AuthenticationException("Invalid credentials"))));
 
-        mvc.perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"identifier\":\"maria@domain.com\",\"password\":\"wrong\"}"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.errors[0].message").value("Invalid credentials"));
@@ -72,7 +72,8 @@ class AuthControllerTest {
     @Test
     @DisplayName("Given blank identifier, when login, then returns400")
     void givenBlankIdentifier_whenLogin_thenReturns400() throws Exception {
-        mvc.perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"identifier\":\"\",\"password\":\"secret-123\"}"))
                 .andExpect(status().isBadRequest());
     }
@@ -80,10 +81,11 @@ class AuthControllerTest {
     @Test
     @DisplayName("Given valid refresh token, when refresh, then returns new session")
     void givenValidRefreshToken_whenRefresh_thenReturnsNewSession() throws Exception {
-        when(refreshTokenUseCase.execute(any())).thenReturn(
-                Either.right(new RefreshTokenOutput("new-access", "Bearer", 900, "new-refresh")));
+        when(refreshTokenUseCase.execute(any()))
+                .thenReturn(Either.right(new RefreshTokenOutput("new-access", "Bearer", 900, "new-refresh")));
 
-        mvc.perform(post("/auth/refresh").contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(post("/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"refreshToken\":\"old-refresh\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").value("new-access"))
@@ -93,10 +95,11 @@ class AuthControllerTest {
     @Test
     @DisplayName("Given invalid refresh token, when refresh, then returns401")
     void givenInvalidRefreshToken_whenRefresh_thenReturns401() throws Exception {
-        when(refreshTokenUseCase.execute(any())).thenReturn(
-                Either.left(Notification.create(new AuthenticationException("Invalid refresh token"))));
+        when(refreshTokenUseCase.execute(any()))
+                .thenReturn(Either.left(Notification.create(new AuthenticationException("Invalid refresh token"))));
 
-        mvc.perform(post("/auth/refresh").contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(post("/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"refreshToken\":\"unknown\"}"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.errors[0].message").value("Invalid refresh token"));
@@ -107,7 +110,8 @@ class AuthControllerTest {
     void givenRefreshToken_whenLogout_thenReturns204() throws Exception {
         when(logoutUseCase.execute(any())).thenReturn(Optional.empty());
 
-        mvc.perform(post("/auth/logout").contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(post("/auth/logout")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"refreshToken\":\"refresh-token\"}"))
                 .andExpect(status().isNoContent());
 

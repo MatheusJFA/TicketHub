@@ -4,19 +4,19 @@ import com.tickethub.application.customer.changename.ChangeCustomerNameUseCase;
 import com.tickethub.application.customer.changename.DefaultChangeCustomerNameUseCase;
 import com.tickethub.application.customer.create.CreateCustomerUseCase;
 import com.tickethub.application.customer.create.DefaultCreateCustomerUseCase;
-import com.tickethub.application.customer.delete.DeleteCustomerUseCase;
 import com.tickethub.application.customer.delete.DefaultDeleteCustomerUseCase;
-import com.tickethub.application.customer.retrieve.get.GetCustomerUseCase;
+import com.tickethub.application.customer.delete.DeleteCustomerUseCase;
 import com.tickethub.application.customer.retrieve.get.DefaultGetCustomerUseCase;
-import com.tickethub.application.customer.retrieve.list.ListCustomersUseCase;
+import com.tickethub.application.customer.retrieve.get.GetCustomerUseCase;
 import com.tickethub.application.customer.retrieve.list.DefaultListCustomersUseCase;
-import com.tickethub.application.customer.update.UpdateCustomerUseCase;
+import com.tickethub.application.customer.retrieve.list.ListCustomersUseCase;
 import com.tickethub.application.customer.update.DefaultUpdateCustomerUseCase;
-import com.tickethub.domain.core.customer.CustomerGateway;
+import com.tickethub.application.customer.update.UpdateCustomerUseCase;
 import com.tickethub.domain.authentication.PasswordHasher;
+import com.tickethub.domain.core.customer.CustomerGateway;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnBean({CustomerGateway.class})

@@ -9,27 +9,25 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.tickethub.domain.core.partner.PartnerID;
+import com.tickethub.domain.core.show.Show;
+import com.tickethub.domain.core.show.ShowGateway;
+import com.tickethub.domain.shared.Address;
+import com.tickethub.domain.shared.Money;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
-
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
-
-import com.tickethub.domain.core.partner.PartnerID;
-import com.tickethub.domain.core.show.Show;
-import com.tickethub.domain.core.show.ShowGateway;
-import com.tickethub.domain.shared.Money;
-import com.tickethub.domain.shared.Address;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Generate section spots use case")
 class GenerateSectionSpotsUseCaseTest {
 
     private static final OffsetDateTime DATE = OffsetDateTime.parse("2027-01-15T20:00:00-03:00");
-    private static final Address ADDRESS = Address.create("Rua Augusta", "100", null, "Centro",
-            "São Paulo", "SP", "Brasil", "01305-000");
+    private static final Address ADDRESS =
+            Address.create("Rua Augusta", "100", null, "Centro", "São Paulo", "SP", "Brasil", "01305-000");
     private static final Money PRICE = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
 
     private final ShowGateway gateway = mock(ShowGateway.class);
@@ -58,8 +56,8 @@ class GenerateSectionSpotsUseCaseTest {
         final var show = entity();
         when(gateway.findById(show.getId())).thenReturn(Optional.of(show));
 
-        final var result = useCase.execute(
-                GenerateSectionSpotsCommand.with(show.getId().getValue(), "missing", "B"));
+        final var result =
+                useCase.execute(GenerateSectionSpotsCommand.with(show.getId().getValue(), "missing", "B"));
 
         assertEquals("Section not found: missing", result.getLeft().firstError().message());
         verify(gateway, never()).appendSpots(any(), any(), any());
@@ -73,7 +71,8 @@ class GenerateSectionSpotsUseCaseTest {
         when(gateway.findById(show.getId())).thenReturn(Optional.of(show));
 
         final var output = useCase.execute(GenerateSectionSpotsCommand.with(
-                show.getId().getValue(), shell.getId().getValue(), "B")).getRight();
+                        show.getId().getValue(), shell.getId().getValue(), "B"))
+                .getRight();
 
         assertEquals(shell.getId().getValue(), output.sectionId());
         assertEquals(3, output.generatedSpots());
@@ -96,7 +95,8 @@ class GenerateSectionSpotsUseCaseTest {
         when(gateway.findById(show.getId())).thenReturn(Optional.of(show));
 
         final var output = useCase.execute(GenerateSectionSpotsCommand.with(
-                show.getId().getValue(), section.getId().getValue(), "A")).getRight();
+                        show.getId().getValue(), section.getId().getValue(), "A"))
+                .getRight();
 
         assertEquals(0, output.generatedSpots());
         verify(gateway, never()).appendSpots(any(), any(), any());

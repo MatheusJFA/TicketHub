@@ -5,5 +5,4 @@ import com.tickethub.application.UseCase;
 import com.tickethub.domain.validation.Notification;
 
 public abstract class ConfirmPaymentUseCase
-        extends UseCase<ConfirmPaymentCommand, Either<Notification, ConfirmPaymentOutput>> {
-}
+        extends UseCase<ConfirmPaymentCommand, Either<Notification, ConfirmPaymentOutput>> {}

@@ -1,7 +1,6 @@
 package com.tickethub.infrastructure.payment.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import java.util.Optional;
 
 /**
@@ -17,6 +16,5 @@ public record MercadoPagoNotification(String type, NotificationData data) {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record NotificationData(String id) {
-    }
+    public record NotificationData(String id) {}
 }

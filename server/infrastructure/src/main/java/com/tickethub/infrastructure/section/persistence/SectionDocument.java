@@ -1,13 +1,5 @@
 package com.tickethub.infrastructure.section.persistence;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import com.tickethub.domain.core.section.Section;
 import com.tickethub.domain.core.section.SectionID;
 import com.tickethub.domain.core.spot.Spot;
@@ -15,6 +7,12 @@ import com.tickethub.domain.shared.Name;
 import com.tickethub.domain.shared.Text;
 import com.tickethub.infrastructure.audit.AuditActor;
 import com.tickethub.infrastructure.shared.persistence.MoneyDocument;
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document("sections")
 public record SectionDocument(
@@ -37,8 +35,21 @@ public record SectionDocument(
     public static final String COLLECTION = "sections";
 
     public SectionDocument withActors(final String createdBy, final String lastModifiedBy) {
-        return new SectionDocument(id, name, description, published, totalSpots, totalSpotsSold,
-                price, spotIds, showId, partnerId, createdAt, updatedAt, deletedAt, createdBy,
+        return new SectionDocument(
+                id,
+                name,
+                description,
+                published,
+                totalSpots,
+                totalSpotsSold,
+                price,
+                spotIds,
+                showId,
+                partnerId,
+                createdAt,
+                updatedAt,
+                deletedAt,
+                createdBy,
                 lastModifiedBy);
     }
 
@@ -50,7 +61,9 @@ public record SectionDocument(
         return stamped(new SectionDocument(
                 section.getId().getValue(),
                 section.getName().getValue(),
-                Optional.ofNullable(section.getDescription()).map(Text::getValue).orElse(null),
+                Optional.ofNullable(section.getDescription())
+                        .map(Text::getValue)
+                        .orElse(null),
                 section.isPublished(),
                 section.getTotalSpots(),
                 section.getTotalSpotsSold(),
@@ -81,6 +94,10 @@ public record SectionDocument(
                 totalSpotsSold,
                 Optional.ofNullable(price).map(MoneyDocument::toDomain).orElse(null),
                 spots,
-                createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
+                createdAt,
+                updatedAt,
+                deletedAt,
+                createdBy,
+                lastModifiedBy);
     }
 }

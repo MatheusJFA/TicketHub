@@ -4,7 +4,6 @@ import static java.util.Objects.isNull;
 
 import com.tickethub.domain.ValueObject;
 import com.tickethub.domain.exception.DomainException;
-import java.util.Objects;
 
 public final class CNPJ extends ValueObject {
     private static final int CNPJ_LENGTH = 14;
@@ -31,6 +30,7 @@ public final class CNPJ extends ValueObject {
             return false;
         }
 
+        // Filtra: CNPJ alfanumerico com 12 caracteres base + 2 digitos verificadores.
         if (!cnpj.matches("[A-Z0-9]{12}[0-9]{2}") || hasAllDigitsEqual(cnpj)) {
             return false;
         }
@@ -38,8 +38,7 @@ public final class CNPJ extends ValueObject {
         int firstDigit = calculateDigit(cnpj.substring(0, 12));
         int secondDigit = calculateDigit(cnpj.substring(0, 13));
 
-        return firstDigit == cnpj.charAt(12) - '0'
-                && secondDigit == cnpj.charAt(13) - '0';
+        return firstDigit == cnpj.charAt(12) - '0' && secondDigit == cnpj.charAt(13) - '0';
     }
 
     private static int calculateDigit(String value) {
@@ -58,6 +57,7 @@ public final class CNPJ extends ValueObject {
     }
 
     private static boolean hasAllDigitsEqual(String cnpj) {
+        // Filtra: CNPJs invalidos com os 14 digitos iguais (ex.: 00000000000000).
         return cnpj.matches("(\\d)\\1{13}");
     }
 
@@ -66,6 +66,7 @@ public final class CNPJ extends ValueObject {
             return null;
         }
 
+        // Filtra: caracteres de mascara (ponto, barra, espaco, hifen) para normalizar o CNPJ.
         return value.replaceAll("[./\\s-]", EMPTY_STRING);
     }
 
@@ -85,8 +86,7 @@ public final class CNPJ extends ValueObject {
 
     @Override
     public String toString() {
-        return value.replaceFirst(
-                "([A-Z0-9]{2})([A-Z0-9]{3})([A-Z0-9]{3})([A-Z0-9]{4})([0-9]{2})",
-                "$1.$2.$3/$4-$5");
+        // Filtra: grupos 2-3-3-4-2 para formatar como XX.XXX.XXX/XXXX-XX.
+        return value.replaceFirst("([A-Z0-9]{2})([A-Z0-9]{3})([A-Z0-9]{3})([A-Z0-9]{4})([0-9]{2})", "$1.$2.$3/$4-$5");
     }
 }

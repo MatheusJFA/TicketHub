@@ -8,7 +8,6 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -41,7 +40,8 @@ class MercadoPagoWebhookVerifierTest {
     @Test
     @DisplayName("Given tampered hash, when verify, then rejects with 401")
     void givenTamperedHash_whenVerify_thenRejects() {
-        final var exception = assertThrows(InvalidWebhookSignatureException.class,
+        final var exception = assertThrows(
+                InvalidWebhookSignatureException.class,
                 () -> verifier().verify(header("0".repeat(64)), REQUEST_ID, DATA_ID));
         assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
@@ -51,24 +51,20 @@ class MercadoPagoWebhookVerifierTest {
     void givenStaleTimestamp_whenVerify_thenRejects() {
         final var clock = Clock.fixed(Instant.ofEpochSecond(1704908010 + 3600), ZoneOffset.UTC);
         final var verifier = new MercadoPagoWebhookVerifier(SECRET, Duration.ofMinutes(5), clock);
-        assertThrows(InvalidWebhookSignatureException.class,
-                () -> verifier.verify(header(V1), REQUEST_ID, DATA_ID));
+        assertThrows(InvalidWebhookSignatureException.class, () -> verifier.verify(header(V1), REQUEST_ID, DATA_ID));
     }
 
     @Test
     @DisplayName("Given missing parts, when verify, then rejects")
     void givenMissingParts_whenVerify_thenRejects() {
-        assertThrows(InvalidWebhookSignatureException.class,
-                () -> verifier().verify("ts=" + TS, REQUEST_ID, DATA_ID));
-        assertThrows(InvalidWebhookSignatureException.class,
-                () -> verifier().verify(header(V1), REQUEST_ID, null));
+        assertThrows(InvalidWebhookSignatureException.class, () -> verifier().verify("ts=" + TS, REQUEST_ID, DATA_ID));
+        assertThrows(InvalidWebhookSignatureException.class, () -> verifier().verify(header(V1), REQUEST_ID, null));
     }
 
     @Test
     @DisplayName("Given blank secret, when verify, then rejects")
     void givenBlankSecret_whenVerify_thenRejects() {
         final var verifier = new MercadoPagoWebhookVerifier("", Duration.ofMinutes(5));
-        assertThrows(InvalidWebhookSignatureException.class,
-                () -> verifier.verify(header(V1), REQUEST_ID, DATA_ID));
+        assertThrows(InvalidWebhookSignatureException.class, () -> verifier.verify(header(V1), REQUEST_ID, DATA_ID));
     }
 }

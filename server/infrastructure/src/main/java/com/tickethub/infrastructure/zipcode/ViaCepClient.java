@@ -1,12 +1,10 @@
 package com.tickethub.infrastructure.zipcode;
 
-import java.util.Map;
-import java.util.Optional;
-
-import org.springframework.web.client.RestClient;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tickethub.infrastructure.shared.http.BaseHttpClient;
+import java.util.Map;
+import java.util.Optional;
+import org.springframework.web.client.RestClient;
 
 public class ViaCepClient extends BaseHttpClient {
 
@@ -19,8 +17,14 @@ public class ViaCepClient extends BaseHttpClient {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record ViaCepResponse(String cep, String logradouro, String complemento, String bairro,
-            String localidade, String uf, Boolean erro) {
+    public record ViaCepResponse(
+            String cep,
+            String logradouro,
+            String complemento,
+            String bairro,
+            String localidade,
+            String uf,
+            Boolean erro) {
 
         public boolean hasError() {
             return Boolean.TRUE.equals(erro);

@@ -5,21 +5,20 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
-
-import tools.jackson.databind.ObjectMapper;
 import com.tickethub.infrastructure.ContainerSupport;
 import com.tickethub.infrastructure.E2ETest;
 import com.tickethub.infrastructure.MongoCleanUpExtension;
 import com.tickethub.infrastructure.customer.persistence.CustomerDocument;
 import com.tickethub.infrastructure.partner.persistence.PartnerDocument;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
 @E2ETest
 @TestPropertySource(properties = "tickethub.zipcode.base-url=http://127.0.0.1:1")
@@ -37,8 +36,7 @@ class ZipCodeEnrichmentE2ETest extends ContainerSupport {
 
     @BeforeEach
     void cleanUp() {
-        MongoCleanUpExtension.cleanCollections(mongoTemplate, PartnerDocument.COLLECTION,
-                CustomerDocument.COLLECTION);
+        MongoCleanUpExtension.cleanCollections(mongoTemplate, PartnerDocument.COLLECTION, CustomerDocument.COLLECTION);
     }
 
     @Test
@@ -54,13 +52,17 @@ class ZipCodeEnrichmentE2ETest extends ContainerSupport {
                                 """))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").exists())
-                .andReturn().getResponse().getContentAsString();
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
         final var id = objectMapper.readTree(created).get("id").asText();
         final var login = mvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"identifier\":\"admin\",\"password\":\"admin-local\"}"))
                 .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
         final var adminToken = objectMapper.readTree(login).get("accessToken").asText();
 
         mvc.perform(get("/partners/" + id).header("Authorization", "Bearer " + adminToken))
@@ -72,7 +74,6 @@ class ZipCodeEnrichmentE2ETest extends ContainerSupport {
     @Test
     @DisplayName("Given unreachable ZIP code provider, when lookup, then returns not found")
     void givenUnreachableZipCodeProvider_whenLookup_thenReturnsNotFound() throws Exception {
-        mvc.perform(get("/zipcode/01305-000"))
-                .andExpect(status().isNotFound());
+        mvc.perform(get("/zipcode/01305-000")).andExpect(status().isNotFound());
     }
 }

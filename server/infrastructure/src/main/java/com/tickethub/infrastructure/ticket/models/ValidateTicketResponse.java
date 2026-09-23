@@ -1,9 +1,8 @@
 package com.tickethub.infrastructure.ticket.models;
 
+import com.tickethub.application.ticket.validate.ValidateTicketOutput;
 import java.time.Instant;
 import java.time.OffsetDateTime;
-
-import com.tickethub.application.ticket.validate.ValidateTicketOutput;
 
 public record ValidateTicketResponse(
         String showId,

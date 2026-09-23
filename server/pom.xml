@@ -25,6 +25,8 @@
   <properties>
     <java.version>25</java.version>
     <liquibase.version>5.0.3</liquibase.version>
+    <spotless.version>2.46.1</spotless.version>
+    <palantir-java-format.version>2.97.0</palantir-java-format.version>
   </properties>
 
   <dependencyManagement>
@@ -46,4 +48,30 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <version>${spotless.version}</version>
+        <configuration>
+          <java>
+            <palantirJavaFormat>
+              <version>${palantir-java-format.version}</version>
+            </palantirJavaFormat>
+          </java>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <phase>verify</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>

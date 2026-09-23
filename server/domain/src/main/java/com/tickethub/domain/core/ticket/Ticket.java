@@ -2,11 +2,6 @@ package com.tickethub.domain.core.ticket;
 
 import static java.util.Objects.requireNonNull;
 
-import java.security.MessageDigest;
-import java.security.SecureRandom;
-import java.time.Instant;
-import java.nio.charset.StandardCharsets;
-
 import com.tickethub.domain.AggregateRoot;
 import com.tickethub.domain.core.customer.CustomerID;
 import com.tickethub.domain.core.order.OrderID;
@@ -14,6 +9,10 @@ import com.tickethub.domain.core.spot.SpotID;
 import com.tickethub.domain.exception.InvalidTicketSignatureException;
 import com.tickethub.domain.exception.TicketAlreadyUsedException;
 import com.tickethub.domain.validation.ValidationHandler;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
+import java.time.Instant;
 
 public class Ticket extends AggregateRoot<TicketID> {
     private static final String CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -27,9 +26,19 @@ public class Ticket extends AggregateRoot<TicketID> {
     private final String signature;
     private TicketStatus status;
 
-    private Ticket(TicketID id, OrderID orderId, SpotID spotId, CustomerID customerId,
-            String code, String signature, TicketStatus status,
-            Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
+    private Ticket(
+            TicketID id,
+            OrderID orderId,
+            SpotID spotId,
+            CustomerID customerId,
+            String code,
+            String signature,
+            TicketStatus status,
+            Instant createdAt,
+            Instant updatedAt,
+            Instant deletedAt,
+            String createdBy,
+            String lastModifiedBy) {
         super(id, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
         this.orderId = orderId;
         this.spotId = spotId;
@@ -44,8 +53,8 @@ public class Ticket extends AggregateRoot<TicketID> {
      * {@code ticketId:code:signature}, where the signature is computed over
      * {@code ticketId:code} so scanners reject forged codes.
      */
-    public static Ticket issue(final OrderID orderId, final SpotID spotId, final CustomerID customerId,
-            final TicketSigner signer) {
+    public static Ticket issue(
+            final OrderID orderId, final SpotID spotId, final CustomerID customerId, final TicketSigner signer) {
         requireNonNull(orderId, "'orderId' should not be null");
         requireNonNull(spotId, "'spotId' should not be null");
         requireNonNull(customerId, "'customerId' should not be null");
@@ -54,17 +63,38 @@ public class Ticket extends AggregateRoot<TicketID> {
         final var code = generateCode();
         final var signature = signer.sign(signedPayload(id.getValue(), code));
         final var now = Instant.now();
-        final var ticket = new Ticket(id, orderId, spotId, customerId, code, signature,
-                TicketStatus.ISSUED, now, now, null, null, null);
+        final var ticket = new Ticket(
+                id, orderId, spotId, customerId, code, signature, TicketStatus.ISSUED, now, now, null, null, null);
         ticket.registerEvent(new TicketIssued(id.getValue(), orderId.getValue(), now));
         return ticket;
     }
 
-    public static Ticket reconstitute(TicketID id, OrderID orderId, SpotID spotId, CustomerID customerId,
-            String code, String signature, TicketStatus status,
-            Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
-        return new Ticket(id, orderId, spotId, customerId, code, signature, status,
-                createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
+    public static Ticket reconstitute(
+            TicketID id,
+            OrderID orderId,
+            SpotID spotId,
+            CustomerID customerId,
+            String code,
+            String signature,
+            TicketStatus status,
+            Instant createdAt,
+            Instant updatedAt,
+            Instant deletedAt,
+            String createdBy,
+            String lastModifiedBy) {
+        return new Ticket(
+                id,
+                orderId,
+                spotId,
+                customerId,
+                code,
+                signature,
+                status,
+                createdAt,
+                updatedAt,
+                deletedAt,
+                createdBy,
+                lastModifiedBy);
     }
 
     /**
@@ -74,8 +104,8 @@ public class Ticket extends AggregateRoot<TicketID> {
     public void verifySignature(final TicketSigner signer) {
         requireNonNull(signer, "'signer' should not be null");
         final var expected = signer.sign(signedPayload(getId().getValue(), code));
-        if (!MessageDigest.isEqual(expected.getBytes(StandardCharsets.UTF_8),
-                signature.getBytes(StandardCharsets.UTF_8))) {
+        if (!MessageDigest.isEqual(
+                expected.getBytes(StandardCharsets.UTF_8), signature.getBytes(StandardCharsets.UTF_8))) {
             throw new InvalidTicketSignatureException();
         }
     }

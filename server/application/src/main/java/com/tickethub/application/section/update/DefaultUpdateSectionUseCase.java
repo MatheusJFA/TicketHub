@@ -1,13 +1,13 @@
 package com.tickethub.application.section.update;
 
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.section.Section;
 import com.tickethub.domain.core.section.SectionGateway;
 import com.tickethub.domain.core.section.SectionID;
 import com.tickethub.domain.validation.Notification;
+import java.util.Optional;
 
 public class DefaultUpdateSectionUseCase extends UpdateSectionUseCase {
     private final SectionGateway sectionGateway;
@@ -46,5 +46,4 @@ public class DefaultUpdateSectionUseCase extends UpdateSectionUseCase {
             return Either.left(notification);
         }
     }
-
 }

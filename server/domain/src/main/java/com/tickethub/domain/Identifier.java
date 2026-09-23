@@ -1,8 +1,8 @@
 package com.tickethub.domain;
-import java.util.Objects;
 
 import static java.util.Objects.isNull;
 
+import java.util.Objects;
 
 public abstract class Identifier extends ValueObject {
 

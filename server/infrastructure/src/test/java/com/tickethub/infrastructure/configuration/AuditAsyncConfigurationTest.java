@@ -2,16 +2,16 @@ package com.tickethub.infrastructure.configuration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.core.task.TaskExecutor;
 
 @DisplayName("Audit async configuration")
 class AuditAsyncConfigurationTest {
 
-    private final ApplicationContextRunner runner = new ApplicationContextRunner()
-            .withUserConfiguration(AuditAsyncConfiguration.class);
+    private final ApplicationContextRunner runner =
+            new ApplicationContextRunner().withUserConfiguration(AuditAsyncConfiguration.class);
 
     @Test
     @DisplayName("Wires audit executor")

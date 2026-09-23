@@ -4,12 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.Instant;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-
 import com.tickethub.domain.validation.ValidationHandler;
+import java.time.Instant;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Entity actor")
 class EntityActorTest {
@@ -23,8 +21,13 @@ class EntityActorTest {
             super(id, Instant.now(), Instant.now(), null, createdBy, createdBy);
         }
 
-        ActorEntity(final EntityTest.DummyId id, final Instant createdAt, final Instant updatedAt,
-                final Instant deletedAt, final String createdBy, final String lastModifiedBy) {
+        ActorEntity(
+                final EntityTest.DummyId id,
+                final Instant createdAt,
+                final Instant updatedAt,
+                final Instant deletedAt,
+                final String createdBy,
+                final String lastModifiedBy) {
             super(id, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
         }
 
@@ -33,8 +36,7 @@ class EntityActorTest {
         }
 
         @Override
-        public void validate(final ValidationHandler handler) {
-        }
+        public void validate(final ValidationHandler handler) {}
     }
 
     @Test

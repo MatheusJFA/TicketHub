@@ -25,5 +25,4 @@ public class ChargeID extends Identifier {
     public String getValue() {
         return value;
     }
-
 }

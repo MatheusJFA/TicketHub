@@ -3,23 +3,22 @@ package com.tickethub.infrastructure.configuration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import com.tickethub.infrastructure.audit.AuditTrail;
+import com.tickethub.infrastructure.audit.MongoAuditTrail;
+import com.tickethub.infrastructure.web.CorrelationIdFilter;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import com.tickethub.infrastructure.audit.AuditTrail;
-import com.tickethub.infrastructure.audit.MongoAuditTrail;
-import com.tickethub.infrastructure.web.CorrelationIdFilter;
-
 @DisplayName("Audit configuration")
 class AuditConfigurationTest {
 
-    private final ApplicationContextRunner runner = new ApplicationContextRunner()
-            .withUserConfiguration(AuditConfiguration.class);
+    private final ApplicationContextRunner runner =
+            new ApplicationContextRunner().withUserConfiguration(AuditConfiguration.class);
 
     @AfterEach
     void clearMdc() {

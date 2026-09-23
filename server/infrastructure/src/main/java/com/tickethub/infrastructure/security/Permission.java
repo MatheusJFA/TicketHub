@@ -1,7 +1,6 @@
 package com.tickethub.infrastructure.security;
 
 public enum Permission {
-
     CUSTOMER_WRITE("customer:write"),
     CUSTOMER_DELETE("customer:delete"),
 

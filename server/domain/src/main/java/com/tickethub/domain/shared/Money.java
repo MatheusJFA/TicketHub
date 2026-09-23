@@ -3,12 +3,11 @@ package com.tickethub.domain.shared;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
+import com.tickethub.domain.ValueObject;
+import com.tickethub.domain.exception.DomainException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Currency;
-
-import com.tickethub.domain.ValueObject;
-import com.tickethub.domain.exception.DomainException;
 import java.util.Objects;
 
 public final class Money extends ValueObject {
@@ -26,7 +25,8 @@ public final class Money extends ValueObject {
         }
 
         try {
-            final BigDecimal normalizedValue = value.setScale(currency.getDefaultFractionDigits(), RoundingMode.UNNECESSARY);
+            final BigDecimal normalizedValue =
+                    value.setScale(currency.getDefaultFractionDigits(), RoundingMode.UNNECESSARY);
             return new Money(normalizedValue, currency);
         } catch (final ArithmeticException e) {
             throw new DomainException("Invalid money", e);
@@ -65,9 +65,7 @@ public final class Money extends ValueObject {
 
     @Override
     public boolean equals(Object other) {
-        return other instanceof Money money
-                && value.equals(money.value)
-                && currency.equals(money.currency);
+        return other instanceof Money money && value.equals(money.value) && currency.equals(money.currency);
     }
 
     @Override

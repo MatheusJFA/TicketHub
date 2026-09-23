@@ -6,9 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.EnumSet;
 import java.util.Set;
-
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Role")
 class RoleTest {
@@ -36,8 +35,9 @@ class RoleTest {
     @Test
     @DisplayName("Given customer, when permissions, then manages own account and buys tickets")
     void givenCustomer_whenPermissions_thenManagesOwnAccount() {
-        assertEquals(Set.of(Permission.CUSTOMER_WRITE, Permission.CUSTOMER_DELETE,
-                Permission.ORDER_WRITE), Role.CUSTOMER.permissions());
+        assertEquals(
+                Set.of(Permission.CUSTOMER_WRITE, Permission.CUSTOMER_DELETE, Permission.ORDER_WRITE),
+                Role.CUSTOMER.permissions());
     }
 
     @Test

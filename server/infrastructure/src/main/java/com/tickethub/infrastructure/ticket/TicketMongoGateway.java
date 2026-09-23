@@ -2,20 +2,18 @@ package com.tickethub.infrastructure.ticket;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.stereotype.Component;
-
 import com.tickethub.domain.core.order.OrderID;
 import com.tickethub.domain.core.ticket.Ticket;
 import com.tickethub.domain.core.ticket.TicketGateway;
 import com.tickethub.domain.core.ticket.TicketID;
 import com.tickethub.infrastructure.ticket.persistence.TicketDocument;
 import com.tickethub.infrastructure.ticket.persistence.TicketRepository;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Component;
 
 @Component
 public class TicketMongoGateway implements TicketGateway {
@@ -30,7 +28,9 @@ public class TicketMongoGateway implements TicketGateway {
 
     @Override
     public Ticket create(final Ticket ticket) {
-        return mongoTemplate.insert(TicketDocument.from(ticket), TicketDocument.COLLECTION).toDomain();
+        return mongoTemplate
+                .insert(TicketDocument.from(ticket), TicketDocument.COLLECTION)
+                .toDomain();
     }
 
     @Override
@@ -42,14 +42,20 @@ public class TicketMongoGateway implements TicketGateway {
     @Override
     public List<Ticket> findByOrderId(final OrderID orderId) {
         requireNonNull(orderId, "'orderId' should not be null");
-        return mongoTemplate.find(Query.query(Criteria.where("orderId").is(orderId.getValue())),
-                TicketDocument.class, TicketDocument.COLLECTION).stream()
+        return mongoTemplate
+                .find(
+                        Query.query(Criteria.where("orderId").is(orderId.getValue())),
+                        TicketDocument.class,
+                        TicketDocument.COLLECTION)
+                .stream()
                 .map(TicketDocument::toDomain)
                 .toList();
     }
 
     @Override
     public Ticket update(final Ticket ticket) {
-        return mongoTemplate.save(TicketDocument.from(ticket), TicketDocument.COLLECTION).toDomain();
+        return mongoTemplate
+                .save(TicketDocument.from(ticket), TicketDocument.COLLECTION)
+                .toDomain();
     }
 }

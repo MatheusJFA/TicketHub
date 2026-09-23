@@ -8,11 +8,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import com.tickethub.application.UseCaseTest;
 import com.tickethub.domain.core.section.SectionID;
 import com.tickethub.domain.core.spot.Spot;
@@ -20,6 +15,9 @@ import com.tickethub.domain.core.spot.SpotGateway;
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.domain.pagination.SearchQuery;
 import com.tickethub.domain.shared.Location;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("List section spots use case")
 class ListSectionSpotsUseCaseTest extends UseCaseTest {
@@ -41,7 +39,8 @@ class ListSectionSpotsUseCaseTest extends UseCaseTest {
         when(spotGateway.findBySection(SectionID.from("section-1"), query))
                 .thenReturn(new Pagination<>(0, 10, 1, List.of(spot)));
 
-        final var output = useCase.execute(ListSectionSpotsCommand.with("section-1", query)).getRight();
+        final var output = useCase.execute(ListSectionSpotsCommand.with("section-1", query))
+                .getRight();
 
         assertEquals(1, output.totalItems());
         assertEquals(spot.getId().getValue(), output.items().get(0).id());
@@ -54,8 +53,8 @@ class ListSectionSpotsUseCaseTest extends UseCaseTest {
         final var query = new SearchQuery(0, 10, "", "createdAt", "asc");
         when(spotGateway.findBySection(any(), any())).thenThrow(new RuntimeException("boom"));
 
-        final var notification =
-                useCase.execute(ListSectionSpotsCommand.with("section-1", query)).getLeft();
+        final var notification = useCase.execute(ListSectionSpotsCommand.with("section-1", query))
+                .getLeft();
 
         assertTrue(notification.getErrors().size() == 1);
         verify(spotGateway, times(1)).findBySection(SectionID.from("section-1"), query);

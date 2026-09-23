@@ -4,7 +4,6 @@ import static java.util.Objects.isNull;
 
 import com.tickethub.domain.ValueObject;
 import com.tickethub.domain.exception.DomainException;
-import java.util.Objects;
 
 public final class CPF extends ValueObject {
     private static final int CPF_LENGTH = 11;
@@ -58,6 +57,7 @@ public final class CPF extends ValueObject {
     }
 
     private static boolean hasAllDigitsEqual(String cpf) {
+        // Filtra: CPFs invalidos com os 11 digitos iguais (ex.: 00000000000).
         return cpf.matches("(\\d)\\1{10}");
     }
 
@@ -66,6 +66,7 @@ public final class CPF extends ValueObject {
             return null;
         }
 
+        // Filtra: tudo que nao e digito para normalizar o CPF so com numeros.
         return value.replaceAll("\\D", EMPTY_STRING);
     }
 
@@ -85,9 +86,7 @@ public final class CPF extends ValueObject {
 
     @Override
     public String toString() {
-        return value.replaceFirst(
-                "(\\d{3})(\\d{3})(\\d{3})(\\d{2})",
-                "$1.$2.$3-$4");
+        // Filtra: grupos 3-3-3-2 digitos para formatar como XXX.XXX.XXX-XX.
+        return value.replaceFirst("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4");
     }
-
 }

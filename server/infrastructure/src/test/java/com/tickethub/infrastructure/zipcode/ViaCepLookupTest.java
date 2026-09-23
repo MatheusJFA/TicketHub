@@ -5,11 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.DisplayName;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -32,8 +31,9 @@ class ViaCepLookupTest {
     @Test
     @DisplayName("Given known CEP, when lookup, then returns CEP address")
     void givenKnownCep_whenLookup_thenReturnsZipCodeAddress() {
-        when(client.findByCep("01305000")).thenReturn(Optional.of(new ViaCepClient.ViaCepResponse(
-                "01305-000", "Rua Augusta", "", "Centro", "São Paulo", "SP", null)));
+        when(client.findByCep("01305000"))
+                .thenReturn(Optional.of(new ViaCepClient.ViaCepResponse(
+                        "01305-000", "Rua Augusta", "", "Centro", "São Paulo", "SP", null)));
 
         final var address = lookup.lookup("01305-000").orElseThrow();
 
@@ -48,8 +48,8 @@ class ViaCepLookupTest {
     @Test
     @DisplayName("Given unknown CEP, when lookup, then returns empty")
     void givenUnknownCep_whenLookup_thenReturnsEmpty() {
-        when(client.findByCep("00000000")).thenReturn(Optional.of(new ViaCepClient.ViaCepResponse(
-                "00000-000", "", "", "", "", "", true)));
+        when(client.findByCep("00000000"))
+                .thenReturn(Optional.of(new ViaCepClient.ViaCepResponse("00000-000", "", "", "", "", "", true)));
 
         assertTrue(lookup.lookup("00000000").isEmpty());
     }

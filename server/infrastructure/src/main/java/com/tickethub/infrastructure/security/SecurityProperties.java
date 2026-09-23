@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "tickethub.security")
@@ -25,8 +24,8 @@ public class SecurityProperties {
         return users.stream()
                 .filter(user -> user.getUsername().equals(username))
                 .findFirst()
-                .map(user -> new SecurityUser(user.getUsername(), user.getPassword(), user.getRoles(),
-                        user.getOwnerId()));
+                .map(user ->
+                        new SecurityUser(user.getUsername(), user.getPassword(), user.getRoles(), user.getOwnerId()));
     }
 
     public static class Jwt {

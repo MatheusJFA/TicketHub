@@ -1,12 +1,11 @@
 package com.tickethub.infrastructure;
 
+import com.tickethub.infrastructure.audit.MongoAuditTrail;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import com.tickethub.infrastructure.audit.MongoAuditTrail;
 
 public class MongoCleanUpExtension implements BeforeEachCallback {
 

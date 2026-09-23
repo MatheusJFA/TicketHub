@@ -19,7 +19,9 @@ import org.springframework.data.mongodb.MongoDatabaseFactory;
 @ConditionalOnProperty(prefix = "tickethub.liquibase", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class LiquibaseConfiguration {
     @Bean
-    InitializingBean mongoMigrations(MongoClient client, MongoDatabaseFactory factory,
+    InitializingBean mongoMigrations(
+            MongoClient client,
+            MongoDatabaseFactory factory,
             @Value("${tickethub.liquibase.change-log}") String changeLog) {
         return () -> migrate(client, factory, changeLog);
     }
@@ -42,7 +44,7 @@ public class LiquibaseConfiguration {
         final var database = new MongoLiquibaseDatabase();
         database.setConnection(connection);
         try (final var resources = new ClassLoaderResourceAccessor();
-             final var liquibase = new Liquibase(changeLog, resources, database)) {
+                final var liquibase = new Liquibase(changeLog, resources, database)) {
             liquibase.update(new Contexts(), new LabelExpression());
         }
     }

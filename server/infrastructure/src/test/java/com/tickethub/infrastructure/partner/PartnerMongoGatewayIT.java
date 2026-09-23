@@ -6,30 +6,28 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-
 import com.tickethub.domain.core.partner.Partner;
 import com.tickethub.domain.core.partner.PartnerID;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.pagination.SearchQuery;
+import com.tickethub.domain.shared.Address;
+import com.tickethub.domain.shared.Email;
 import com.tickethub.infrastructure.ContainerSupport;
 import com.tickethub.infrastructure.IntegrationTest;
 import com.tickethub.infrastructure.MongoCleanUpExtension;
-import com.tickethub.infrastructure.partner.PartnerMongoGateway;
 import com.tickethub.infrastructure.partner.persistence.PartnerDocument;
-import com.tickethub.domain.shared.Address;
-import com.tickethub.domain.shared.Email;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
 @IntegrationTest
 @DisplayName("Partner Mongo gateway")
 class PartnerMongoGatewayIT extends ContainerSupport {
 
-    private static final Address ADDRESS = Address.create("Rua Augusta", "100", "Sala 10", "Centro",
-            "São Paulo", "SP", "Brasil", "01305-000");
+    private static final Address ADDRESS =
+            Address.create("Rua Augusta", "100", "Sala 10", "Centro", "São Paulo", "SP", "Brasil", "01305-000");
     private static final String PASSWORD_HASH = "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS";
 
     @Autowired
@@ -46,7 +44,8 @@ class PartnerMongoGatewayIT extends ContainerSupport {
     @Test
     @DisplayName("Given a partner, when create, then persists and finds")
     void givenAPartner_whenCreate_thenPersistsAndFinds() {
-        final var partner = Partner.create("Cinema Nova", "11222333000181", ADDRESS, "cinema@domain.com", PASSWORD_HASH);
+        final var partner =
+                Partner.create("Cinema Nova", "11222333000181", ADDRESS, "cinema@domain.com", PASSWORD_HASH);
 
         gateway.create(partner);
 
@@ -66,8 +65,10 @@ class PartnerMongoGatewayIT extends ContainerSupport {
     void givenDuplicateCnpj_whenCreate_thenThrowsDomainException() {
         gateway.create(Partner.create("Cinema Nova", "11222333000181", ADDRESS, "cinema@domain.com", PASSWORD_HASH));
 
-        final var exception = assertThrows(DomainException.class,
-                () -> gateway.create(Partner.create("Cinema Velha", "11222333000181", ADDRESS, "velha@domain.com", PASSWORD_HASH)));
+        final var exception = assertThrows(
+                DomainException.class,
+                () -> gateway.create(
+                        Partner.create("Cinema Velha", "11222333000181", ADDRESS, "velha@domain.com", PASSWORD_HASH)));
 
         assertEquals("'cnpj' already in use", exception.getMessage());
     }
@@ -77,8 +78,10 @@ class PartnerMongoGatewayIT extends ContainerSupport {
     void givenDuplicateEmail_whenCreate_thenThrowsDomainException() {
         gateway.create(Partner.create("Cinema Nova", "11222333000181", ADDRESS, "cinema@domain.com", PASSWORD_HASH));
 
-        final var exception = assertThrows(DomainException.class,
-                () -> gateway.create(Partner.create("Cinema Velha", "04252011000110", ADDRESS, "cinema@domain.com", PASSWORD_HASH)));
+        final var exception = assertThrows(
+                DomainException.class,
+                () -> gateway.create(
+                        Partner.create("Cinema Velha", "04252011000110", ADDRESS, "cinema@domain.com", PASSWORD_HASH)));
 
         assertEquals("'email' already in use", exception.getMessage());
     }
@@ -98,18 +101,22 @@ class PartnerMongoGatewayIT extends ContainerSupport {
     @Test
     @DisplayName("Given a partner, when update, then persists changes")
     void givenAPartner_whenUpdate_thenPersistsChanges() {
-        final var partner = gateway.create(Partner.create("Cinema Nova", "11222333000181", ADDRESS, "cinema@domain.com", PASSWORD_HASH));
+        final var partner = gateway.create(
+                Partner.create("Cinema Nova", "11222333000181", ADDRESS, "cinema@domain.com", PASSWORD_HASH));
 
         partner.changeName("Cinema Novo");
         gateway.update(partner);
 
-        assertEquals("Cinema Novo", gateway.findById(partner.getId()).orElseThrow().getName().getValue());
+        assertEquals(
+                "Cinema Novo",
+                gateway.findById(partner.getId()).orElseThrow().getName().getValue());
     }
 
     @Test
     @DisplayName("Given a partner, when delete, then removes")
     void givenAPartner_whenDelete_thenRemoves() {
-        final var partner = gateway.create(Partner.create("Cinema Nova", "11222333000181", ADDRESS, "cinema@domain.com", PASSWORD_HASH));
+        final var partner = gateway.create(
+                Partner.create("Cinema Nova", "11222333000181", ADDRESS, "cinema@domain.com", PASSWORD_HASH));
 
         gateway.deleteById(partner.getId());
 

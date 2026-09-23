@@ -6,8 +6,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Optional;
-
+import com.tickethub.application.Either;
+import com.tickethub.application.zipcode.lookup.LookupZipCodeOutput;
+import com.tickethub.application.zipcode.lookup.LookupZipCodeUseCase;
+import com.tickethub.domain.validation.Error;
+import com.tickethub.domain.validation.Notification;
+import com.tickethub.infrastructure.ControllerTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,27 +19,22 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.tickethub.application.Either;
-import com.tickethub.application.zipcode.lookup.LookupZipCodeOutput;
-import com.tickethub.application.zipcode.lookup.LookupZipCodeUseCase;
-import com.tickethub.domain.validation.Notification;
-import com.tickethub.infrastructure.ControllerTest;
-import com.tickethub.domain.validation.Error;
-
 @ControllerTest(controllers = ZipCodeController.class)
 @Import({})
 @DisplayName("ZIP code controller")
 class ZipCodeControllerTest {
-    @Autowired MockMvc mvc;
+    @Autowired
+    MockMvc mvc;
 
-    @MockitoBean LookupZipCodeUseCase lookupZipCode;
+    @MockitoBean
+    LookupZipCodeUseCase lookupZipCode;
 
     @Test
     @DisplayName("Given known zip, when lookup, then returns address without authentication")
     void givenKnownZip_whenLookup_thenReturnsAddress() throws Exception {
-        when(lookupZipCode.execute("01305-000")).thenReturn(Either.right(
-                new LookupZipCodeOutput("01305000", "Avenida Paulista", "Bela Vista",
-                        "São Paulo", "SP", "Brasil")));
+        when(lookupZipCode.execute("01305-000"))
+                .thenReturn(Either.right(new LookupZipCodeOutput(
+                        "01305000", "Avenida Paulista", "Bela Vista", "São Paulo", "SP", "Brasil")));
 
         mvc.perform(get("/zipcode/01305-000"))
                 .andExpect(status().isOk())
@@ -47,10 +46,9 @@ class ZipCodeControllerTest {
     @Test
     @DisplayName("Given unknown zip, when lookup, then returns not found")
     void givenUnknownZip_whenLookup_thenReturnsNotFound() throws Exception {
-        when(lookupZipCode.execute(any())).thenReturn(Either.left(
-                Notification.create(new Error("ZipCodeAddress not found: 99999999"))));
+        when(lookupZipCode.execute(any()))
+                .thenReturn(Either.left(Notification.create(new Error("ZipCodeAddress not found: 99999999"))));
 
-        mvc.perform(get("/zipcode/99999-999"))
-                .andExpect(status().isNotFound());
+        mvc.perform(get("/zipcode/99999-999")).andExpect(status().isNotFound());
     }
 }

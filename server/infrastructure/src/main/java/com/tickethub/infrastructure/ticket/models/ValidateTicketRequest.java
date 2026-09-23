@@ -10,5 +10,4 @@ import jakarta.validation.constraints.NotBlank;
 public record ValidateTicketRequest(
         @NotBlank String ticketId,
         @NotBlank String code,
-        @NotBlank String signature) {
-}
+        @NotBlank String signature) {}

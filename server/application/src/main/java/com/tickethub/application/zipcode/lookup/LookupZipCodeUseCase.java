@@ -9,5 +9,4 @@ import com.tickethub.domain.validation.Notification;
  * registration. Create/update flows no longer call the provider: they
  * persist the address exactly as submitted.
  */
-public abstract class LookupZipCodeUseCase extends UseCase<String, Either<Notification, LookupZipCodeOutput>> {
-}
+public abstract class LookupZipCodeUseCase extends UseCase<String, Either<Notification, LookupZipCodeOutput>> {}

@@ -1,10 +1,10 @@
 package com.tickethub.domain.validation;
 
-import com.tickethub.domain.exception.DomainException;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-
 import static org.junit.jupiter.api.Assertions.*;
+
+import com.tickethub.domain.exception.DomainException;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Notification")
 class NotificationTest {

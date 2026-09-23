@@ -1,10 +1,8 @@
 package com.tickethub.application.authentication.login;
 
 import static java.util.Objects.isNull;
-import static org.apache.commons.lang3.StringUtils.defaultString;
 import static java.util.Objects.requireNonNull;
-
-import java.time.Duration;
+import static org.apache.commons.lang3.StringUtils.defaultString;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.authentication.AuthAccountGateway;
@@ -15,6 +13,7 @@ import com.tickethub.domain.authentication.RefreshSessionGateway;
 import com.tickethub.domain.authentication.SecureTokens;
 import com.tickethub.domain.authentication.TokenIssuer;
 import com.tickethub.domain.validation.Notification;
+import java.time.Duration;
 
 public class DefaultLoginUseCase extends LoginUseCase {
 
@@ -26,8 +25,12 @@ public class DefaultLoginUseCase extends LoginUseCase {
     private final RefreshSessionGateway refreshSessions;
     private final Duration refreshTtl;
 
-    public DefaultLoginUseCase(final AuthAccountGateway authAccounts, final PasswordHasher passwordHasher,
-            final TokenIssuer tokenIssuer, final RefreshSessionGateway refreshSessions, final Duration refreshTtl) {
+    public DefaultLoginUseCase(
+            final AuthAccountGateway authAccounts,
+            final PasswordHasher passwordHasher,
+            final TokenIssuer tokenIssuer,
+            final RefreshSessionGateway refreshSessions,
+            final Duration refreshTtl) {
         this.authAccounts = requireNonNull(authAccounts);
         this.passwordHasher = requireNonNull(passwordHasher);
         this.tokenIssuer = requireNonNull(tokenIssuer);
@@ -40,14 +43,17 @@ public class DefaultLoginUseCase extends LoginUseCase {
         try {
             final var identifier = defaultString(command.identifier()).trim();
             final var account = authAccounts.findByIdentifier(identifier).orElse(null);
-            if (isNull(account)
-                    || !passwordHasher.matches(defaultString(command.password()), account.passwordHash())) {
+            if (isNull(account) || !passwordHasher.matches(defaultString(command.password()), account.passwordHash())) {
                 return Either.left(unauthorized());
             }
             final var access = tokenIssuer.issueAccess(account.subject(), account.authorities(), account.ownerId());
             final var refreshToken = SecureTokens.generateOpaqueToken();
-            refreshSessions.save(RefreshSession.issue(SecureTokens.sha256Hex(refreshToken),
-                    account.subject(), account.authorities(), account.ownerId(), refreshTtl));
+            refreshSessions.save(RefreshSession.issue(
+                    SecureTokens.sha256Hex(refreshToken),
+                    account.subject(),
+                    account.authorities(),
+                    account.ownerId(),
+                    refreshTtl));
             return Either.right(new LoginOutput(access.token(), "Bearer", access.expiresInSeconds(), refreshToken));
         } catch (final RuntimeException exception) {
             return Either.left(Notification.create(exception));

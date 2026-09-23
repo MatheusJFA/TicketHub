@@ -3,14 +3,6 @@ package com.tickethub.domain.core.order;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Currency;
-import java.util.List;
-
 import com.tickethub.domain.AggregateRoot;
 import com.tickethub.domain.core.customer.CustomerID;
 import com.tickethub.domain.core.payment.ChargeID;
@@ -19,6 +11,13 @@ import com.tickethub.domain.exception.IllegalOrderTransitionException;
 import com.tickethub.domain.exception.OrderExpiredException;
 import com.tickethub.domain.shared.Money;
 import com.tickethub.domain.validation.ValidationHandler;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Currency;
+import java.util.List;
 
 public class Order extends AggregateRoot<OrderID> {
     private final CustomerID customerId;
@@ -29,9 +28,20 @@ public class Order extends AggregateRoot<OrderID> {
     private ChargeID chargeId;
     private final String idempotencyKey;
 
-    private Order(OrderID id, CustomerID customerId, List<OrderItem> items, Money total,
-            OrderStatus status, Instant expiresAt, ChargeID chargeId, String idempotencyKey,
-            Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
+    private Order(
+            OrderID id,
+            CustomerID customerId,
+            List<OrderItem> items,
+            Money total,
+            OrderStatus status,
+            Instant expiresAt,
+            ChargeID chargeId,
+            String idempotencyKey,
+            Instant createdAt,
+            Instant updatedAt,
+            Instant deletedAt,
+            String createdBy,
+            String lastModifiedBy) {
         super(id, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
         this.customerId = customerId;
         this.items = items;
@@ -46,13 +56,16 @@ public class Order extends AggregateRoot<OrderID> {
      * Opens a PENDING order and reserves its spots for {@code reservationTtl}.
      * Item prices must share a single currency; the total is their sum.
      */
-    public static Order create(final CustomerID customerId, final List<OrderItem> items,
-            final Duration reservationTtl) {
+    public static Order create(
+            final CustomerID customerId, final List<OrderItem> items, final Duration reservationTtl) {
         return create(customerId, items, reservationTtl, Clock.systemUTC());
     }
 
-    public static Order create(final CustomerID customerId, final List<OrderItem> items,
-            final Duration reservationTtl, final Clock clock) {
+    public static Order create(
+            final CustomerID customerId,
+            final List<OrderItem> items,
+            final Duration reservationTtl,
+            final Clock clock) {
         return create(customerId, items, reservationTtl, clock, null);
     }
 
@@ -61,8 +74,12 @@ public class Order extends AggregateRoot<OrderID> {
      * with the same key return the original order instead of reserving twice.
      * A null key keeps the previous behavior (no deduplication).
      */
-    public static Order create(final CustomerID customerId, final List<OrderItem> items,
-            final Duration reservationTtl, final Clock clock, final String idempotencyKey) {
+    public static Order create(
+            final CustomerID customerId,
+            final List<OrderItem> items,
+            final Duration reservationTtl,
+            final Clock clock,
+            final String idempotencyKey) {
         requireNonNull(customerId, "'customerId' should not be null");
         requireNonNull(items, "'items' should not be null");
         requireNonNull(reservationTtl, "'reservationTtl' should not be null");
@@ -75,19 +92,53 @@ public class Order extends AggregateRoot<OrderID> {
         }
         final var total = sum(items);
         final var now = clock.instant();
-        final var order = new Order(OrderID.generate(), customerId, List.copyOf(items), total,
-                OrderStatus.PENDING, now.plus(reservationTtl), null, idempotencyKey,
-                now, now, null, null, null);
-        order.registerEvent(new OrderCreated(order.getId().getValue(), customerId.getValue(),
-                total, order.expiresAt, now));
+        final var order = new Order(
+                OrderID.generate(),
+                customerId,
+                List.copyOf(items),
+                total,
+                OrderStatus.PENDING,
+                now.plus(reservationTtl),
+                null,
+                idempotencyKey,
+                now,
+                now,
+                null,
+                null,
+                null);
+        order.registerEvent(
+                new OrderCreated(order.getId().getValue(), customerId.getValue(), total, order.expiresAt, now));
         return order;
     }
 
-    public static Order reconstitute(OrderID id, CustomerID customerId, List<OrderItem> items, Money total,
-            OrderStatus status, Instant expiresAt, ChargeID chargeId, String idempotencyKey,
-            Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
-        return new Order(id, customerId, items, total, status, expiresAt, chargeId, idempotencyKey,
-                createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
+    public static Order reconstitute(
+            OrderID id,
+            CustomerID customerId,
+            List<OrderItem> items,
+            Money total,
+            OrderStatus status,
+            Instant expiresAt,
+            ChargeID chargeId,
+            String idempotencyKey,
+            Instant createdAt,
+            Instant updatedAt,
+            Instant deletedAt,
+            String createdBy,
+            String lastModifiedBy) {
+        return new Order(
+                id,
+                customerId,
+                items,
+                total,
+                status,
+                expiresAt,
+                chargeId,
+                idempotencyKey,
+                createdAt,
+                updatedAt,
+                deletedAt,
+                createdBy,
+                lastModifiedBy);
     }
 
     private static Money sum(final List<OrderItem> items) {

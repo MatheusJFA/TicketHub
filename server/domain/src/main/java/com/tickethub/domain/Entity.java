@@ -4,11 +4,9 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 
-import java.time.Instant;
-
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.validation.ValidationHandler;
-import java.util.Objects;
+import java.time.Instant;
 
 public abstract class Entity<ID extends Identifier> {
 
@@ -24,12 +22,7 @@ public abstract class Entity<ID extends Identifier> {
         this(id, now, now, null, null, null);
     }
 
-    protected Entity(
-            final ID id,
-            final Instant createdAt,
-            final Instant updatedAt,
-            final Instant deletedAt
-    ) {
+    protected Entity(final ID id, final Instant createdAt, final Instant updatedAt, final Instant deletedAt) {
         this(id, createdAt, updatedAt, deletedAt, null, null);
     }
 
@@ -39,8 +32,7 @@ public abstract class Entity<ID extends Identifier> {
             final Instant updatedAt,
             final Instant deletedAt,
             final String createdBy,
-            final String lastModifiedBy
-    ) {
+            final String lastModifiedBy) {
         if (isNull(id)) {
             throw new DomainException("'id' should not be null");
         }

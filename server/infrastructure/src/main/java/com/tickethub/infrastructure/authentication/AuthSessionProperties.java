@@ -1,7 +1,6 @@
 package com.tickethub.infrastructure.authentication;
 
 import java.time.Duration;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "tickethub.auth")

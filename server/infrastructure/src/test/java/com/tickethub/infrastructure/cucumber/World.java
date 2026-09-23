@@ -1,12 +1,10 @@
 package com.tickethub.infrastructure.cucumber;
 
+import io.cucumber.spring.ScenarioScope;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.MvcResult;
-
-import io.cucumber.spring.ScenarioScope;
 
 @Component
 @ScenarioScope
@@ -71,6 +69,7 @@ public class World {
     public String spotId() {
         return spotId;
     }
+
     public void spotId(final String spotId) {
         this.spotId = spotId;
     }

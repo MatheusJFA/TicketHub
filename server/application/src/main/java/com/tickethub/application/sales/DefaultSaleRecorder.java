@@ -21,8 +21,8 @@ public class DefaultSaleRecorder implements SaleRecorder {
     private final SectionGateway sectionGateway;
     private final ShowGateway showGateway;
 
-    public DefaultSaleRecorder(final SpotGateway spotGateway, final SectionGateway sectionGateway,
-            final ShowGateway showGateway) {
+    public DefaultSaleRecorder(
+            final SpotGateway spotGateway, final SectionGateway sectionGateway, final ShowGateway showGateway) {
         this.spotGateway = requireNonNull(spotGateway, "'spotGateway' should not be null");
         this.sectionGateway = requireNonNull(sectionGateway, "'sectionGateway' should not be null");
         this.showGateway = requireNonNull(showGateway, "'showGateway' should not be null");

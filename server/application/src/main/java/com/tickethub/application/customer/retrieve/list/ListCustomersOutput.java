@@ -1,16 +1,10 @@
 package com.tickethub.application.customer.retrieve.list;
 
+import com.tickethub.domain.core.customer.Customer;
 import java.time.Instant;
 
-import com.tickethub.domain.core.customer.Customer;
-
 public record ListCustomersOutput(
-        String id,
-        String name,
-        String cpf,
-        Instant createdAt,
-        Instant updatedAt,
-        Instant deletedAt) {
+        String id, String name, String cpf, Instant createdAt, Instant updatedAt, Instant deletedAt) {
     public static ListCustomersOutput from(final Customer entity) {
         return new ListCustomersOutput(
                 entity.getId().getValue(),

@@ -1,13 +1,13 @@
 package com.tickethub.application.partner.retrieve.list;
+
 import static java.util.Objects.requireNonNull;
+
 import com.tickethub.application.Either;
-import com.tickethub.domain.validation.Notification;
+import com.tickethub.domain.core.partner.Partner;
+import com.tickethub.domain.core.partner.PartnerGateway;
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.domain.pagination.SearchQuery;
-import com.tickethub.domain.core.partner.PartnerGateway;
-import com.tickethub.domain.core.partner.Partner;
-
-
+import com.tickethub.domain.validation.Notification;
 
 public class DefaultListPartnersUseCase extends ListPartnersUseCase {
     private final PartnerGateway partnerGateway;

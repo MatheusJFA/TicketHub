@@ -4,23 +4,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import java.util.Optional;
-import java.util.Set;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.DisplayName;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
 import com.tickethub.domain.core.customer.Customer;
 import com.tickethub.domain.core.customer.CustomerGateway;
 import com.tickethub.domain.core.partner.Partner;
 import com.tickethub.domain.core.partner.PartnerGateway;
 import com.tickethub.domain.shared.Address;
 import com.tickethub.domain.shared.Email;
+import java.util.Optional;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Mongo auth account gateway")
@@ -67,8 +65,8 @@ class MongoAuthAccountGatewayTest {
     @DisplayName("Given partner email, when find by identifier, then returns partner account")
     void givenPartnerEmail_whenFindByIdentifier_thenReturnsPartnerAccount() {
         final var address = Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000");
-        final var partner = Partner.create("Cinema Nova", "11222333000181", address, "cinema@domain.com",
-                PASSWORD_HASH);
+        final var partner =
+                Partner.create("Cinema Nova", "11222333000181", address, "cinema@domain.com", PASSWORD_HASH);
         when(customers.findByEmail(Email.create("cinema@domain.com"))).thenReturn(Optional.empty());
         when(partners.findByEmail(Email.create("cinema@domain.com"))).thenReturn(Optional.of(partner));
 

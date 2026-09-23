@@ -6,14 +6,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-
 import com.tickethub.application.Either;
 import com.tickethub.application.payment.confirm.ConfirmPaymentOutput;
 import com.tickethub.application.payment.confirm.ConfirmPaymentUseCase;
@@ -23,26 +15,35 @@ import com.tickethub.infrastructure.ControllerTest;
 import com.tickethub.infrastructure.notification.OrderConfirmationMailer;
 import com.tickethub.infrastructure.payment.mercadopago.InvalidWebhookSignatureException;
 import com.tickethub.infrastructure.payment.mercadopago.MercadoPagoWebhookHandler;
-
 import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
 
 @ControllerTest(controllers = {PaymentController.class, MercadoPagoWebhookController.class})
 @Import({})
 @DisplayName("Payment controller")
 class PaymentControllerTest {
-    @Autowired MockMvc mvc;
+    @Autowired
+    MockMvc mvc;
 
-    @MockitoBean ConfirmPaymentUseCase confirmPayment;
+    @MockitoBean
+    ConfirmPaymentUseCase confirmPayment;
 
-    @MockitoBean MercadoPagoWebhookHandler mercadoPagoWebhook;
+    @MockitoBean
+    MercadoPagoWebhookHandler mercadoPagoWebhook;
 
-    @MockitoBean OrderConfirmationMailer confirmationMailer;
+    @MockitoBean
+    OrderConfirmationMailer confirmationMailer;
 
     @Test
     @DisplayName("Given paid charge, when webhook arrives without token, then settles order")
     void givenPaidCharge_whenWebhookArrives_thenSettlesOrder() throws Exception {
-        when(confirmPayment.execute(any())).thenReturn(Either.right(
-                new ConfirmPaymentOutput("order-1", "PAID")));
+        when(confirmPayment.execute(any())).thenReturn(Either.right(new ConfirmPaymentOutput("order-1", "PAID")));
 
         mvc.perform(post("/payments/webhook")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -57,8 +58,8 @@ class PaymentControllerTest {
     @Test
     @DisplayName("Given unknown charge, when webhook arrives, then returns not found")
     void givenUnknownCharge_whenWebhookArrives_thenReturnsNotFound() throws Exception {
-        when(confirmPayment.execute(any())).thenReturn(Either.left(
-                Notification.create(new Error("Charge not found: ch_missing"))));
+        when(confirmPayment.execute(any()))
+                .thenReturn(Either.left(Notification.create(new Error("Charge not found: ch_missing"))));
 
         mvc.perform(post("/payments/webhook")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -78,8 +79,8 @@ class PaymentControllerTest {
     @Test
     @DisplayName("Given verified MP notification, when webhook arrives, then settles order")
     void givenVerifiedMpNotification_whenWebhookArrives_thenSettlesOrder() throws Exception {
-        when(mercadoPagoWebhook.handle(any(), any(), any(), any())).thenReturn(Optional.of(Either.right(
-                new ConfirmPaymentOutput("order-1", "PAID"))));
+        when(mercadoPagoWebhook.handle(any(), any(), any(), any()))
+                .thenReturn(Optional.of(Either.right(new ConfirmPaymentOutput("order-1", "PAID"))));
 
         mvc.perform(post("/payments/mercadopago")
                         .queryParam("data.id", "123")

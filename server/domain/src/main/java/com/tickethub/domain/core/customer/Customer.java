@@ -1,13 +1,12 @@
 package com.tickethub.domain.core.customer;
 
-import java.time.Instant;
-
 import com.tickethub.domain.AggregateRoot;
 import com.tickethub.domain.shared.CPF;
+import com.tickethub.domain.shared.Email;
 import com.tickethub.domain.shared.Name;
 import com.tickethub.domain.shared.PasswordHash;
-import com.tickethub.domain.shared.Email;
 import com.tickethub.domain.validation.ValidationHandler;
+import java.time.Instant;
 
 public class Customer extends AggregateRoot<CustomerID> {
     private final CPF cpf;
@@ -15,8 +14,17 @@ public class Customer extends AggregateRoot<CustomerID> {
     private Email email;
     private PasswordHash passwordHash;
 
-    private Customer(CustomerID id, CPF cpf, Name name, Email email, PasswordHash passwordHash,
-            Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
+    private Customer(
+            CustomerID id,
+            CPF cpf,
+            Name name,
+            Email email,
+            PasswordHash passwordHash,
+            Instant createdAt,
+            Instant updatedAt,
+            Instant deletedAt,
+            String createdBy,
+            String lastModifiedBy) {
         super(id, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
         this.cpf = cpf;
         this.name = name;
@@ -33,14 +41,26 @@ public class Customer extends AggregateRoot<CustomerID> {
                 Name.create(name),
                 Email.create(email),
                 PasswordHash.fromHash(passwordHash),
-                now, now, null, null, null);
+                now,
+                now,
+                null,
+                null,
+                null);
     }
 
-    public static Customer reconstitute(CustomerID id, CPF cpf, Name name, Email email,
+    public static Customer reconstitute(
+            CustomerID id,
+            CPF cpf,
+            Name name,
+            Email email,
             PasswordHash passwordHash,
-            Instant createdAt, Instant updatedAt, Instant deletedAt, String createdBy, String lastModifiedBy) {
-        return new Customer(id, cpf, name, email, passwordHash, createdAt, updatedAt, deletedAt, createdBy,
-                lastModifiedBy);
+            Instant createdAt,
+            Instant updatedAt,
+            Instant deletedAt,
+            String createdBy,
+            String lastModifiedBy) {
+        return new Customer(
+                id, cpf, name, email, passwordHash, createdAt, updatedAt, deletedAt, createdBy, lastModifiedBy);
     }
 
     public Customer changeName(final String name) {

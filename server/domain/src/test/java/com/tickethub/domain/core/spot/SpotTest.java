@@ -6,13 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.exception.SpotAlreadyUsedException;
 import com.tickethub.domain.exception.SpotUnavailableException;
 import com.tickethub.domain.shared.Location;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Spot")
 class SpotTest {
@@ -52,10 +52,7 @@ class SpotTest {
     void givenInvalidLocation_whenCreate_thenThrowDomainException() {
         final var expectedLocation = "   ";
 
-        DomainException exception = assertThrows(
-                DomainException.class,
-                () -> Location.create(expectedLocation)
-        );
+        DomainException exception = assertThrows(DomainException.class, () -> Location.create(expectedLocation));
 
         assertEquals("Invalid location", exception.getMessage());
     }
@@ -86,8 +83,7 @@ class SpotTest {
 
         spot.checkIn();
 
-        assertFalse(spot.isAvailable(),
-                () -> "Spot should be unavailable after check-in");
+        assertFalse(spot.isAvailable(), () -> "Spot should be unavailable after check-in");
     }
 
     @Test
@@ -96,10 +92,12 @@ class SpotTest {
         final var spot = Spot.create(Location.create("A1"));
         spot.checkIn();
 
-        final var exception = assertThrows(SpotAlreadyUsedException.class, spot::checkIn,
-                () -> "Checking in an already used spot should throw");
+        final var exception = assertThrows(
+                SpotAlreadyUsedException.class, spot::checkIn, () -> "Checking in an already used spot should throw");
 
-        assertEquals("Spot is already used", exception.getMessage(),
+        assertEquals(
+                "Spot is already used",
+                exception.getMessage(),
                 () -> "Exception message should indicate the spot was already used");
     }
 
@@ -110,10 +108,8 @@ class SpotTest {
 
         spot.reserve();
 
-        assertTrue(spot.isReserved(),
-                () -> "Spot should be reserved after reserve");
-        assertTrue(spot.isAvailable(),
-                () -> "Reservation should not consume availability");
+        assertTrue(spot.isReserved(), () -> "Spot should be reserved after reserve");
+        assertTrue(spot.isAvailable(), () -> "Reservation should not consume availability");
     }
 
     @Test
@@ -122,8 +118,8 @@ class SpotTest {
         final var spot = Spot.create(Location.create("A1"));
         spot.reserve();
 
-        final var exception = assertThrows(SpotUnavailableException.class, spot::reserve,
-                () -> "Reserving an already reserved spot should throw");
+        final var exception = assertThrows(
+                SpotUnavailableException.class, spot::reserve, () -> "Reserving an already reserved spot should throw");
 
         assertEquals("Spot is unavailable", exception.getMessage());
     }
@@ -134,8 +130,7 @@ class SpotTest {
         final var spot = Spot.create(Location.create("A1"));
         spot.checkIn();
 
-        assertThrows(SpotUnavailableException.class, spot::reserve,
-                () -> "Reserving a used spot should throw");
+        assertThrows(SpotUnavailableException.class, spot::reserve, () -> "Reserving a used spot should throw");
     }
 
     @Test
@@ -146,8 +141,7 @@ class SpotTest {
 
         spot.release();
 
-        assertFalse(spot.isReserved(),
-                () -> "Spot should be unreserved after release");
+        assertFalse(spot.isReserved(), () -> "Spot should be unreserved after release");
     }
 
     @Test
@@ -157,7 +151,6 @@ class SpotTest {
 
         spot.release();
 
-        assertFalse(spot.isReserved(),
-                () -> "Releasing a non-reserved spot should be a no-op");
+        assertFalse(spot.isReserved(), () -> "Releasing a non-reserved spot should be a no-op");
     }
 }

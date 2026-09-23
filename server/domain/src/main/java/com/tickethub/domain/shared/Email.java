@@ -1,19 +1,17 @@
 package com.tickethub.domain.shared;
 
 import static java.util.Objects.isNull;
-
-import java.util.regex.Pattern;
-
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import com.tickethub.domain.ValueObject;
 import com.tickethub.domain.exception.DomainException;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 public final class Email extends ValueObject {
     private static final int MAX_LENGTH = 254;
-    private static final Pattern PATTERN =
-            Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+    // Filtra: e-mails no formato local@dominio.tld (parte local + @ + dominio + . + TLD com 2+ letras).
+    private static final Pattern PATTERN = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
     private final String value;
 
@@ -40,6 +38,7 @@ public final class Email extends ValueObject {
             return false;
         }
 
+        // Filtra: separa a parte local do dominio pelo "@".
         final String[] parts = email.split("@", -1);
         if (parts.length != 2) {
             return false;

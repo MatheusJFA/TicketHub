@@ -1,13 +1,13 @@
 package com.tickethub.application.spot.publish;
 
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
 
 import com.tickethub.application.Either;
 import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.core.spot.SpotGateway;
 import com.tickethub.domain.core.spot.SpotID;
 import com.tickethub.domain.validation.Notification;
+import java.util.Optional;
 
 public class DefaultPublishSpotUseCase extends PublishSpotUseCase {
     private final SpotGateway spotGateway;

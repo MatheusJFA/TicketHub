@@ -1,12 +1,13 @@
 package com.tickethub.application.spot.update;
 
-import java.util.Optional;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import com.tickethub.domain.shared.*;
+
 import com.tickethub.domain.core.spot.*;
+import com.tickethub.domain.shared.*;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Update spot use case")
 class UpdateSpotUseCaseTest {

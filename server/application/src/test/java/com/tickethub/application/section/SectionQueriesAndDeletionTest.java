@@ -1,25 +1,30 @@
 package com.tickethub.application.section;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Currency;
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import com.tickethub.domain.shared.*;
-import com.tickethub.domain.core.partner.PartnerID;
-import com.tickethub.domain.pagination.*;
-import com.tickethub.domain.core.section.*;
+
+import com.tickethub.application.section.delete.*;
 import com.tickethub.application.section.retrieve.get.*;
 import com.tickethub.application.section.retrieve.list.*;
-import com.tickethub.application.section.delete.*;
+import com.tickethub.domain.core.section.*;
+import com.tickethub.domain.pagination.*;
+import com.tickethub.domain.shared.*;
+import java.math.BigDecimal;
+import java.util.Currency;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Section queries and deletion")
 class SectionQueriesAndDeletionTest {
-    private final Section entity = Section.create("Setor original", "Descricao original", 2, Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL")), "A", 5);
+    private final Section entity = Section.create(
+            "Setor original",
+            "Descricao original",
+            2,
+            Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL")),
+            "A",
+            5);
     private final SectionGateway gateway = mock(SectionGateway.class);
     private final String id = entity.getId().getValue();
     private final SearchQuery query = new SearchQuery(2, 10, "search", "id", "asc");

@@ -4,12 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 
-import com.tickethub.domain.Entity;
-import com.tickethub.domain.Identifier;
 import com.tickethub.domain.exception.DomainException;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Entity")
 class EntityTest {
@@ -25,8 +23,6 @@ class EntityTest {
         public String getValue() {
             return value;
         }
-
-
     }
 
     static class DummyEntity extends Entity<DummyId> {

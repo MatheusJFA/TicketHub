@@ -1,13 +1,11 @@
 package com.tickethub.application.partner.delete;
 
 import static java.util.Objects.requireNonNull;
-import java.util.Optional;
-
-import com.tickethub.domain.validation.Notification;
 
 import com.tickethub.domain.core.partner.PartnerGateway;
 import com.tickethub.domain.core.partner.PartnerID;
-
+import com.tickethub.domain.validation.Notification;
+import java.util.Optional;
 
 public class DefaultDeletePartnerUseCase extends DeletePartnerUseCase {
     private final PartnerGateway partnerGateway;

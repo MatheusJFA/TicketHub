@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
 import com.tickethub.domain.validation.ValidationHandler;
 import java.util.UUID;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Entity audit")
 class EntityAuditTest {
@@ -54,14 +54,28 @@ class EntityAuditTest {
     }
 
     private static final class TestEntity extends Entity<TestEntityId> {
-        private TestEntity(TestEntityId id) { super(id); }
-        @Override public void validate(final ValidationHandler handler) { }
+        private TestEntity(TestEntityId id) {
+            super(id);
+        }
+
+        @Override
+        public void validate(final ValidationHandler handler) {}
     }
 
     private static final class TestEntityId extends Identifier {
         private final UUID value;
-        private TestEntityId(UUID value) { this.value = value; }
-        private static TestEntityId generate() { return new TestEntityId(UUID.randomUUID()); }
-        @Override public String getValue() { return value.toString(); }
+
+        private TestEntityId(UUID value) {
+            this.value = value;
+        }
+
+        private static TestEntityId generate() {
+            return new TestEntityId(UUID.randomUUID());
+        }
+
+        @Override
+        public String getValue() {
+            return value.toString();
+        }
     }
 }
