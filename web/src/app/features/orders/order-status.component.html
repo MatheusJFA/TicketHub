@@ -1,29 +1,47 @@
-<section>
-  <h1>Meu pedido</h1>
-  <form class="search" (ngSubmit)="lookup()">
-    <input name="orderId" [(ngModel)]="orderId" placeholder="ID do pedido" />
-    <button type="submit">Consultar</button>
+<section class="max-w-xl">
+  <h1 class="mb-4 text-2xl font-bold">Meu pedido</h1>
+  <form class="mb-4 flex gap-2" (ngSubmit)="lookup()">
+    <input
+      name="orderId"
+      [(ngModel)]="orderId"
+      placeholder="ID do pedido"
+      class="flex-1 rounded-md border border-slate-700 bg-[#171b22] px-3 py-2 text-slate-100" />
+    <button type="submit" class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white">Consultar</button>
   </form>
   @if (loading()) {
-    <p>Carregando…</p>
+    <p class="text-slate-400">Carregando…</p>
   } @else if (error()) {
-    <p class="error">{{ error() }}</p>
+    <p class="text-sm text-red-400">{{ error() }}</p>
   } @else if (order()) {
-    <dl class="detail">
-      <dt>Pedido</dt>
+    <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
+      <dt class="text-slate-400">Pedido</dt>
       <dd>{{ order()!.orderId }}</dd>
-      <dt>Status</dt>
-      <dd><strong>{{ order()!.status }}</strong></dd>
-      <dt>Total</dt>
+      <dt class="text-slate-400">Status</dt>
+      <dd>
+        <strong>{{ order()!.status }}</strong>
+      </dd>
+      <dt class="text-slate-400">Total</dt>
       <dd>{{ order()!.currency }} {{ order()!.totalValue }}</dd>
-      <dt>Expira em</dt>
+      <dt class="text-slate-400">Expira em</dt>
       <dd>{{ order()!.expiresAt }}</dd>
-      <dt>Assentos</dt>
+      <dt class="text-slate-400">Assentos</dt>
       <dd>{{ order()!.spotIds.join(', ') }}</dd>
       @if (order()!.chargeId) {
-        <dt>Cobrança</dt>
+        <dt class="text-slate-400">Cobrança</dt>
         <dd>{{ order()!.chargeId }}</dd>
       }
     </dl>
+    @if (order()!.status === 'PENDING') {
+      <button
+        type="button"
+        (click)="cancel()"
+        [disabled]="cancelling()"
+        class="mt-4 rounded-md border border-red-400 px-4 py-2 font-medium text-red-400 disabled:opacity-50">
+        {{ cancelling() ? 'Cancelando…' : 'Cancelar pedido' }}
+      </button>
+    }
+    @if (cancelError()) {
+      <p class="mt-2 text-sm text-red-400">{{ cancelError() }}</p>
+    }
   }
 </section>

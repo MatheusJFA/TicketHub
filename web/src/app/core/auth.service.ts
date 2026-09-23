@@ -1,8 +1,8 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { tap } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { Observable, catchError, finalize, map, share, tap, throwError } from 'rxjs';
+import { ConfigService } from './config.service';
 import { SessionResponse } from './models';
 
 interface JwtClaims {
@@ -19,9 +19,11 @@ const REFRESH_KEY = 'tickethub.refreshToken';
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
+  private readonly config = inject(ConfigService);
 
   private readonly accessToken = signal<string | null>(localStorage.getItem(ACCESS_KEY));
   private readonly refreshToken = signal<string | null>(localStorage.getItem(REFRESH_KEY));
+  private refreshInFlight: Observable<string> | null = null;
 
   readonly isLoggedIn = computed(() => this.accessToken() !== null);
   readonly claims = computed<JwtClaims | null>(() => decode(this.accessToken()));
@@ -33,12 +35,12 @@ export class AuthService {
 
   login(identifier: string, password: string) {
     return this.http
-      .post<SessionResponse>(`${environment.apiUrl}/auth/login`, { identifier, password })
+      .post<SessionResponse>(`${this.config.url()}/auth/login`, { identifier, password })
       .pipe(tap((session) => this.store(session)));
   }
 
   signup(cpf: string, name: string, email: string, password: string) {
-    return this.http.post(`${environment.apiUrl}/customers`, { cpf, name, email, password });
+    return this.http.post(`${this.config.url()}/customers`, { cpf, name, email, password });
   }
 
   logout() {
@@ -46,10 +48,39 @@ export class AuthService {
     this.clear();
     this.router.navigate(['/login']);
     if (refresh) {
-      this.http.post(`${environment.apiUrl}/auth/logout`, { refreshToken: refresh }).subscribe({
+      this.http.post(`${this.config.url()}/auth/logout`, { refreshToken: refresh }).subscribe({
         error: () => undefined,
       });
     }
+  }
+
+  /**
+   * Rotates the session using the stored refresh token. Concurrent callers
+   * share a single in-flight request; failure clears the session.
+   */
+  refreshAccessToken(): Observable<string> {
+    if (!this.refreshInFlight) {
+      const refresh = this.refreshToken();
+      if (!refresh) {
+        return throwError(() => new Error('no refresh token'));
+      }
+      this.refreshInFlight = this.http
+        .post<SessionResponse>(`${this.config.url()}/auth/refresh`, { refreshToken: refresh })
+        .pipe(
+          tap((session) => this.store(session)),
+          map((session) => session.accessToken),
+          catchError((err) => {
+            this.clear();
+            this.router.navigate(['/login']);
+            return throwError(() => err);
+          }),
+          finalize(() => {
+            this.refreshInFlight = null;
+          }),
+          share(),
+        );
+    }
+    return this.refreshInFlight;
   }
 
   private store(session: SessionResponse): void {

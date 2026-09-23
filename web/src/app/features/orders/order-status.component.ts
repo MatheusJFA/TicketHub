@@ -18,6 +18,8 @@ export class OrderStatusComponent {
   readonly order = signal<OrderResponse | null>(null);
   readonly error = signal<string | null>(null);
   readonly loading = signal(false);
+  readonly cancelling = signal(false);
+  readonly cancelError = signal<string | null>(null);
 
   constructor() {
     if (this.orderId) {
@@ -39,6 +41,27 @@ export class OrderStatusComponent {
       error: () => {
         this.error.set('Pedido não encontrado.');
         this.loading.set(false);
+      },
+    });
+  }
+
+  cancel(): void {
+    const order = this.order();
+    if (!order || order.status !== 'PENDING') {
+      return;
+    }
+    this.cancelling.set(true);
+    this.cancelError.set(null);
+    this.orders.cancelOrder(order.orderId).subscribe({
+      next: (cancelled) => {
+        this.order.set(cancelled);
+        this.cancelling.set(false);
+      },
+      error: (err) => {
+        this.cancelling.set(false);
+        this.cancelError.set(
+          err?.error?.errors?.[0]?.message ?? 'Não foi possível cancelar.',
+        );
       },
     });
   }

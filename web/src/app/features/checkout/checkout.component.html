@@ -1,42 +1,58 @@
 <section>
-  <h1>Checkout</h1>
+  <h1 class="mb-4 text-2xl font-bold">Checkout</h1>
 
   @if (phase() === 'review') {
-    <ul class="cart">
+    <ul class="mb-4 list-none space-y-1 p-0">
       @for (spot of cart.spots(); track spot.id) {
-        <li>{{ spot.location }}</li>
+        <li class="rounded-md border border-slate-800 bg-[#171b22] px-3 py-2 text-sm">{{ spot.location }}</li>
       }
     </ul>
     @if (error()) {
-      <p class="error">{{ error() }}</p>
+      <p class="text-sm text-red-400">{{ error() }}</p>
     }
-    <button type="button" (click)="confirm()" [disabled]="cart.spots().length === 0">
+    <button
+      type="button"
+      (click)="confirm()"
+      [disabled]="cart.spots().length === 0"
+      class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white disabled:opacity-50">
       Confirmar e gerar PIX
     </button>
-    <p class="hint"><a routerLink="/seats">Voltar aos assentos</a></p>
+    <p class="mt-3 text-sm text-slate-400"><a routerLink="/seats" class="text-sky-400">Voltar aos assentos</a></p>
   }
 
   @if (phase() === 'paying') {
-    <p>Reservando assentos e gerando cobrança…</p>
+    <p class="text-slate-400">Reservando assentos e gerando cobrança…</p>
   }
 
   @if ((phase() === 'waiting' || phase() === 'done') && payment()) {
     <p>Status do pedido: <strong>{{ order()?.status }}</strong></p>
-    <p>Pague com o código PIX copia e cola:</p>
-    <pre class="pix">{{ payment()!.paymentCode }}</pre>
-    <button type="button" (click)="copyCode()">Copiar código</button>
+    <p class="mt-2">Pague com o código PIX copia e cola:</p>
+    <pre class="mt-2 wrap-anywhere rounded-md border border-dashed border-sky-400 bg-[#171b22] p-4 text-sm select-all">{{
+      payment()!.paymentCode
+    }}</pre>
+    <button
+      type="button"
+      (click)="copyCode()"
+      class="mt-2 rounded-md bg-blue-600 px-4 py-2 font-medium text-white">
+      Copiar código
+    </button>
     @if (phase() === 'waiting') {
-      <p class="hint">Aguardando confirmação do pagamento…</p>
+      <p class="mt-2 text-sm text-slate-400">Aguardando confirmação do pagamento…</p>
     } @else if (order()?.status === 'PAID') {
-      <p class="success">Pagamento confirmado! Seus ingressos foram emitidos.</p>
-      <p class="hint">Pedido {{ order()?.orderId }} · assentos: {{ order()?.spotIds?.join(', ') }}</p>
+      <p class="mt-2 font-medium text-emerald-400">Pagamento confirmado! Seus ingressos foram emitidos.</p>
+      <p class="mt-1 text-sm text-slate-400">Pedido {{ order()?.orderId }} · assentos: {{ order()?.spotIds?.join(', ') }}</p>
     } @else {
-      <p class="error">Pedido {{ order()?.status }}. Fale com o suporte se você pagou.</p>
+      <p class="mt-2 text-sm text-red-400">Pedido {{ order()?.status }}. Fale com o suporte se você pagou.</p>
     }
   }
 
   @if (phase() === 'error') {
-    <p class="error">{{ error() }}</p>
-    <button type="button" (click)="confirm()">Tentar novamente</button>
+    <p class="text-sm text-red-400">{{ error() }}</p>
+    <button
+      type="button"
+      (click)="confirm()"
+      class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white">
+      Tentar novamente
+    </button>
   }
 </section>
