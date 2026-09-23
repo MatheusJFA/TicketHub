@@ -1,0 +1,85 @@
+@if (loading()) {
+  <p class="text-slate-400">Carregando…</p>
+} @else if (error() && !show()) {
+  <p class="text-sm text-red-400">{{ error() }}</p>
+} @else {
+  <section>
+    <p class="text-sm text-slate-400"><a routerLink="/admin" class="text-sky-400">← Admin</a></p>
+    <h1 class="mt-1 text-2xl font-bold">{{ show()?.name }}</h1>
+
+    <form (ngSubmit)="addSection()" class="mb-6 mt-4 grid max-w-xl gap-3 rounded-lg border border-slate-800 bg-[#171b22] p-4">
+      <h2 class="font-semibold">Novo setor</h2>
+      <div class="grid grid-cols-2 gap-3">
+        <label class="grid gap-1 text-sm">
+          Nome
+          <input name="sectionName" [(ngModel)]="sectionName" required
+            class="rounded-md border border-slate-700 bg-[#0f1115] px-3 py-2 text-slate-100" />
+        </label>
+        <label class="grid gap-1 text-sm">
+          Descrição
+          <input name="sectionDescription" [(ngModel)]="sectionDescription" required
+            class="rounded-md border border-slate-700 bg-[#0f1115] px-3 py-2 text-slate-100" />
+        </label>
+        <label class="grid gap-1 text-sm">
+          Total de assentos
+          <input name="sectionSpots" [(ngModel)]="sectionSpots" type="number" min="1" required
+            class="rounded-md border border-slate-700 bg-[#0f1115] px-3 py-2 text-slate-100" />
+        </label>
+        <label class="grid gap-1 text-sm">
+          Preço (BRL)
+          <input name="sectionPrice" [(ngModel)]="sectionPrice" type="number" min="0" step="0.01" required
+            class="rounded-md border border-slate-700 bg-[#0f1115] px-3 py-2 text-slate-100" />
+        </label>
+      </div>
+      <button type="submit" class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white">
+        Adicionar setor
+      </button>
+    </form>
+
+    @if (error()) {
+      <p class="mb-4 text-sm text-red-400">{{ error() }}</p>
+    }
+
+    @for (entry of map(); track entry.section.id) {
+      <article class="mb-4 rounded-lg border border-slate-800 bg-[#171b22] p-4">
+        <h2 class="font-semibold">
+          {{ entry.section.name }}
+          <span class="text-sm font-normal text-slate-400">
+            {{ entry.section.published ? 'Publicado' : 'Rascunho' }} ·
+            {{ entry.section.totalSpotsSold }}/{{ entry.section.totalSpots }}
+          </span>
+          @if (!entry.section.published) {
+            <button type="button" (click)="publishSection(entry.section.id)" class="ml-2 text-sm text-emerald-400">
+              Publicar setor
+            </button>
+          }
+        </h2>
+        <div class="mt-2 flex flex-wrap gap-2">
+          @for (spot of entry.spots; track spot.id) {
+            <span
+              class="rounded-md border px-2 py-1 text-sm"
+              [class.border-slate-700]="spot.published"
+              [class.border-dashed]="!spot.published"
+              [class.text-slate-500]="!spot.available"
+              [title]="spot.location + (spot.available ? '' : ' (indisponível)')">
+              {{ spot.location }}
+              @if (!spot.published) {
+                <button type="button" (click)="publishSpot(spot.id)" class="ml-1 text-emerald-400" [title]="'Publicar ' + spot.location">+</button>
+              }
+            </span>
+          }
+        </div>
+        <form (ngSubmit)="createSpot(entry.section.id)" class="mt-3 flex gap-2">
+          <input
+            [name]="'spot-' + entry.section.id"
+            [(ngModel)]="newSpotLocation[entry.section.id]"
+            placeholder="Novo assento (ex.: B12)"
+            class="flex-1 rounded-md border border-slate-700 bg-[#0f1115] px-3 py-1.5 text-sm text-slate-100" />
+          <button type="submit" class="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white">
+            Adicionar
+          </button>
+        </form>
+      </article>
+    }
+  </section>
+}

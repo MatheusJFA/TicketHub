@@ -29,6 +29,14 @@ export class AuthService {
   readonly claims = computed<JwtClaims | null>(() => decode(this.accessToken()));
   readonly customerId = computed(() => this.claims()?.ownerId ?? null);
 
+  hasAuthority(authority: string): boolean {
+    return this.claims()?.authorities?.includes(authority) ?? false;
+  }
+
+  get canManageCatalog(): boolean {
+    return this.hasAuthority('show:create') || this.hasAuthority('show:write');
+  }
+
   token(): string | null {
     return this.accessToken();
   }
