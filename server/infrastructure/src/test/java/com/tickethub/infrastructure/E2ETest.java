@@ -22,9 +22,11 @@ import com.tickethub.infrastructure.payment.PaymentGatewayTestConfiguration;
 @AutoConfigureMockMvc
 @ExtendWith(MongoCleanUpExtension.class)
 // E2E suites share the cached application context (and its per-IP rate
-// limiter); the generous test limit keeps suites hermetic. Production default
+// limiter); the generous test limits keep suites hermetic. Production default
 // stays strict. AuthRateLimitFilterTest covers the limiting behavior.
-@TestPropertySource(properties = "tickethub.auth.login-rate-limit-per-minute=1000")
+@TestPropertySource(properties = {
+        "tickethub.auth.login-rate-limit-per-minute=1000",
+        "tickethub.checkout.order-rate-limit-per-minute=1000" })
 @Tag("e2eTest")
 public @interface E2ETest {
 }

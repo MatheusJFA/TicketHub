@@ -67,6 +67,8 @@ tickethub:
   auth:
     refresh-ttl: ${TICKETHUB_AUTH_REFRESH_TTL:7d}
     login-rate-limit-per-minute: ${TICKETHUB_AUTH_LOGIN_RATE_LIMIT_PER_MINUTE:10}
+  checkout:
+    order-rate-limit-per-minute: ${CHECKOUT_ORDER_RATE_LIMIT_PER_MINUTE:30}
   zipcode:
     enabled: ${TICKETHUB_ZIPCODE_ENABLED:true}
     base-url: ${TICKETHUB_ZIPCODE_BASE_URL:https://viacep.com.br}
