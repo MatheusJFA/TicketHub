@@ -46,9 +46,14 @@ public class PaymentReconciliationScheduler {
         LOG.info("Payment reconciliation settled={} refunded={} expired={}",
                 output.settled().size(), output.refunded().size(), output.expired().size());
         final var manager = cacheManager.getIfAvailable();
-        final var spots = manager != null ? manager.getCache(TickethubCacheProperties.SPOTS) : null;
-        if (spots != null) {
-            spots.clear();
+        if (manager != null) {
+            for (final var name : new String[] { TickethubCacheProperties.SHOWS,
+                    TickethubCacheProperties.SECTIONS, TickethubCacheProperties.SPOTS }) {
+                final var cache = manager.getCache(name);
+                if (cache != null) {
+                    cache.clear();
+                }
+            }
         }
     }
 }

@@ -15,6 +15,7 @@ import com.tickethub.infrastructure.payment.models.MercadoPagoNotification;
 import com.tickethub.infrastructure.payment.mercadopago.MercadoPagoWebhookHandler;
 
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 
 @RestController
 public class MercadoPagoWebhookController implements MercadoPagoWebhookAPI {
@@ -28,7 +29,10 @@ public class MercadoPagoWebhookController implements MercadoPagoWebhookAPI {
     }
 
     @Override
-    @CacheEvict(value = TickethubCacheProperties.SPOTS, allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = TickethubCacheProperties.SHOWS, allEntries = true),
+            @CacheEvict(value = TickethubCacheProperties.SECTIONS, allEntries = true),
+            @CacheEvict(value = TickethubCacheProperties.SPOTS, allEntries = true) })
     public ResponseEntity<ConfirmPaymentResponse> mercadoPagoWebhook(final String xSignature,
             final String xRequestId, final String dataId, final String type,
             final MercadoPagoNotification body) {

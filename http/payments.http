@@ -1,0 +1,31 @@
+@baseUrl = http://localhost:8080
+@chargeId = REPLACE_WITH_CHARGE_ID
+
+### Generic webhook (local dev only)
+# Trusts chargeId + status from the body. Disabled in production
+# (GENERIC_WEBHOOK_ENABLED=false) — use the MP webhook below.
+# @name genericWebhook
+POST {{baseUrl}}/payments/webhook
+Content-Type: application/json
+
+{
+  "chargeId": "{{chargeId}}",
+  "status": "PAID"
+}
+
+### Mercado Pago webhook (verified)
+# Real provider callback. data.id goes in the query string; authenticity
+# comes from x-signature (HMAC-SHA256 with the webhook secret, see ADR-017).
+# Non-payment topics are acknowledged without effect.
+# @name mercadoPagoWebhook
+POST {{baseUrl}}/payments/mercadopago?data.id={{chargeId}}&type=payment
+Content-Type: application/json
+x-signature: ts=REPLACE_WITH_TS,v1=REPLACE_WITH_HMAC
+x-request-id: REPLACE_WITH_REQUEST_ID
+
+{
+  "type": "payment",
+  "data": {
+    "id": "{{chargeId}}"
+  }
+}

@@ -90,6 +90,21 @@ class ShowTest {
     }
 
     @Test
+    @DisplayName("Given show, when register sale and refund, then counts without going negative")
+    void givenShow_whenRegisterSaleAndRefund_thenCounts() {
+        final var show = Show.create("Show", "Desc", DATE, ADDRESS, 10L,
+                PartnerID.generate(), new HashSet<Section>());
+
+        show.registerSale();
+        show.registerSale();
+        assertEquals(2L, show.getTotalSpotsSold());
+        show.registerRefund();
+        show.registerRefund();
+        show.registerRefund();
+        assertEquals(0L, show.getTotalSpotsSold());
+    }
+
+    @Test
     @DisplayName("Given valid show, when publish, then change to published")
     void givenValidShow_whenPublish_thenChangeToPublished() {
         final var expectedPartnerId = PartnerID.generate();

@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import java.time.Clock;
 
 import com.tickethub.application.Either;
+import com.tickethub.application.sales.SaleRecorder;
 import com.tickethub.domain.core.order.Order;
 import com.tickethub.domain.core.order.OrderGateway;
 import com.tickethub.domain.core.order.OrderStatus;
@@ -29,19 +30,23 @@ public class DefaultConfirmPaymentUseCase extends ConfirmPaymentUseCase {
     private final TicketGateway ticketGateway;
     private final TicketSigner ticketSigner;
     private final PaymentGateway paymentGateway;
+    private final SaleRecorder sales;
     private final Clock clock;
 
     public DefaultConfirmPaymentUseCase(final OrderGateway orderGateway, final TicketGateway ticketGateway,
-            final TicketSigner ticketSigner, final PaymentGateway paymentGateway) {
-        this(orderGateway, ticketGateway, ticketSigner, paymentGateway, Clock.systemUTC());
+            final TicketSigner ticketSigner, final PaymentGateway paymentGateway,
+            final SaleRecorder sales) {
+        this(orderGateway, ticketGateway, ticketSigner, paymentGateway, sales, Clock.systemUTC());
     }
 
     public DefaultConfirmPaymentUseCase(final OrderGateway orderGateway, final TicketGateway ticketGateway,
-            final TicketSigner ticketSigner, final PaymentGateway paymentGateway, final Clock clock) {
+            final TicketSigner ticketSigner, final PaymentGateway paymentGateway, final SaleRecorder sales,
+            final Clock clock) {
         this.orderGateway = requireNonNull(orderGateway, "'orderGateway' should not be null");
         this.ticketGateway = requireNonNull(ticketGateway, "'ticketGateway' should not be null");
         this.ticketSigner = requireNonNull(ticketSigner, "'ticketSigner' should not be null");
         this.paymentGateway = requireNonNull(paymentGateway, "'paymentGateway' should not be null");
+        this.sales = requireNonNull(sales, "'sales' should not be null");
         this.clock = requireNonNull(clock, "'clock' should not be null");
     }
 
@@ -75,6 +80,7 @@ public class DefaultConfirmPaymentUseCase extends ConfirmPaymentUseCase {
                 ticketGateway.create(Ticket.issue(order.getId(), item.getSpotId(),
                         order.getCustomerId(), ticketSigner));
             }
+            sales.recordSale(order);
             return Either.right(ConfirmPaymentOutput.from(orderGateway.update(order)));
         } catch (final RuntimeException exception) {
             return Either.left(Notification.create(exception));

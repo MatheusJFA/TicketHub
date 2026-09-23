@@ -22,6 +22,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.tickethub.application.UseCaseTest;
+import com.tickethub.application.sales.SaleRecorder;
 import com.tickethub.domain.core.customer.CustomerID;
 import com.tickethub.domain.core.order.Order;
 import com.tickethub.domain.core.order.OrderGateway;
@@ -47,12 +48,13 @@ class ConfirmPaymentUseCaseTest extends UseCaseTest {
     private final OrderGateway orderGateway = mock(OrderGateway.class);
     private final TicketGateway ticketGateway = mock(TicketGateway.class);
     private final PaymentGateway paymentGateway = mock(PaymentGateway.class);
+    private final SaleRecorder sales = mock(SaleRecorder.class);
     private final DefaultConfirmPaymentUseCase useCase =
-            new DefaultConfirmPaymentUseCase(orderGateway, ticketGateway, SIGNER, paymentGateway, CLOCK);
+            new DefaultConfirmPaymentUseCase(orderGateway, ticketGateway, SIGNER, paymentGateway, sales, CLOCK);
 
     @Override
     protected List<Object> getMocks() {
-        return List.of(orderGateway, ticketGateway, paymentGateway);
+        return List.of(orderGateway, ticketGateway, paymentGateway, sales);
     }
 
     private Order givenChargedOrder() {
@@ -84,6 +86,7 @@ class ConfirmPaymentUseCaseTest extends UseCaseTest {
         verify(orderGateway, times(1)).findByChargeId(ChargeID.from("ch_123"));
         verify(paymentGateway, times(1)).findStatus(ChargeID.from("ch_123"));
         verify(ticketGateway, times(2)).create(any());
+        verify(sales, times(1)).recordSale(any());
         verify(orderGateway, times(1)).update(any());
     }
 

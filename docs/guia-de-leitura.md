@@ -52,6 +52,11 @@ não conhece framework (verificado por `ArchitectureTest`).
 | Login, refresh rotativo, logout | `adr/0010-login-email-refresh-logout.md`, `application/authentication/`, `http/auth.http` |
 | Trilha de auditoria | `adr/0006-trilha-de-auditoria.md`, `infrastructure/audit/`, `GET /audit-logs`, `http/audit-logs.http` |
 | Resiliência (retry/circuito) | `adr/0005-resilience4j-retry-circuit-breaker.md`, `ResiliencePolicy.java` |
+| Rate limit (auth/checkout) | `adr/0021-rate-limit-checkout.md`, `AbstractRateLimitFilter.java` |
+| Pagamentos (PIX, webhook, reconciliação) | `adr/0015-pagamento-pix-mercado-pago.md`, `adr/0017-webhook-mercado-pago-assinado.md`, `adr/0018-idempotencia-criacao-pedidos.md`, `adr/0019-reconciliacao-auto-refund.md`, `infrastructure/payment/` |
+| Cache de leitura | `adr/0016-cache-redis-leituras.md`, `CacheConfiguration.java` |
+| Email de confirmação | `adr/0022-email-confirmacao.md`, `OrderConfirmationMailer.java` |
+| Frontend | `adr/0020-frontend-angular.md`, `web/` |
 | MongoDB e migrações | `adr/0002-mongodb-como-banco-principal.md`, `MongoConfiguration.java`, `db/changelog/`, `LiquibaseMigrationIT.java` |
 | Kafka e eventos | `adr/0003-kafka-para-eventos-de-dominio.md`, `KafkaConfiguration.java`, `SpotGenerationListener.java` |
 | Estratégia de testes | `adr/0008-testcontainers-testes-integracao.md`, `adr/0009-cucumber-testes-aceitacao.md`, `ControllerTest.java`, `ContainerSupport.java` |

@@ -158,6 +158,21 @@ public class Section extends Entity<SectionID> {
         return this;
     }
 
+    /**
+     * Counts one sold seat (ticket issuance). Refunds go through
+     * {@link #registerRefund()} so the counter never goes negative, even
+     * for sales recorded before counters existed.
+     */
+    public void registerSale() {
+        this.totalSpotsSold++;
+        markAsUpdated();
+    }
+
+    public void registerRefund() {
+        this.totalSpotsSold = Math.max(0, totalSpotsSold - 1);
+        markAsUpdated();
+    }
+
     public Name getName() {
         return name;
     }

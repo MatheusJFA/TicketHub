@@ -1,0 +1,39 @@
+@baseUrl = http://localhost:8080
+# Login via auth.http as customer, then paste the token below.
+@token = PASTE_JWT_HERE
+@orderId = REPLACE_WITH_ORDER_ID
+
+### Create order (idempotent)
+# Retries with the same Idempotency-Key return the original order.
+# @name createOrder
+POST {{baseUrl}}/orders
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Idempotency-Key: 00000000-0000-4000-8000-000000000001
+
+{
+  "customerId": "REPLACE_WITH_CUSTOMER_ID",
+  "spotIds": ["REPLACE_WITH_SPOT_ID"]
+}
+
+### Pay order (PIX)
+# @name payOrder
+POST {{baseUrl}}/orders/{{orderId}}/pay
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{}
+
+### Get order (poll until PAID)
+# @name getOrder
+GET {{baseUrl}}/orders/{{orderId}}
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Cancel order (releases spots, PENDING only)
+# @name cancelOrder
+POST {{baseUrl}}/orders/{{orderId}}/cancel
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{}

@@ -20,3 +20,4 @@ Resilience4j aplicado pelo `UseCaseMonitoringAspect` (`@Around` em `*UseCase.exe
 
 - **Pró:** um ponto único de resiliência para ~40 casos de uso, sem try/catch por endpoint; controllers chamam casos de uso diretamente.
 - **Contra:** retry acontece dentro do aspecto, invisível para quem lê o caso de uso ou o controller (documentado aqui e nos testes `UseCaseMonitoringAspectTest`).
+- **Rate limiting (ADR-021):** mecanismo separado, em filtros (`AbstractRateLimitFilter` por IP/`X-Forwarded-For`, 429): `POST /auth/*`, `POST /orders` e `POST /orders/{id}/pay`. Não passa pelo aspecto.

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.tickethub.application.Either;
+import com.tickethub.application.sales.SaleRecorder;
 import com.tickethub.domain.core.order.Order;
 import com.tickethub.domain.core.order.OrderGateway;
 import com.tickethub.domain.core.payment.ChargeStatus;
@@ -31,22 +32,24 @@ public class DefaultReconcileOrdersUseCase extends ReconcileOrdersUseCase {
     private final TicketSigner ticketSigner;
     private final PaymentGateway paymentGateway;
     private final SpotGateway spotGateway;
+    private final SaleRecorder sales;
     private final Clock clock;
 
     public DefaultReconcileOrdersUseCase(final OrderGateway orderGateway, final TicketGateway ticketGateway,
             final TicketSigner ticketSigner, final PaymentGateway paymentGateway,
-            final SpotGateway spotGateway) {
-        this(orderGateway, ticketGateway, ticketSigner, paymentGateway, spotGateway, Clock.systemUTC());
+            final SpotGateway spotGateway, final SaleRecorder sales) {
+        this(orderGateway, ticketGateway, ticketSigner, paymentGateway, spotGateway, sales, Clock.systemUTC());
     }
 
     public DefaultReconcileOrdersUseCase(final OrderGateway orderGateway, final TicketGateway ticketGateway,
             final TicketSigner ticketSigner, final PaymentGateway paymentGateway,
-            final SpotGateway spotGateway, final Clock clock) {
+            final SpotGateway spotGateway, final SaleRecorder sales, final Clock clock) {
         this.orderGateway = requireNonNull(orderGateway, "'orderGateway' should not be null");
         this.ticketGateway = requireNonNull(ticketGateway, "'ticketGateway' should not be null");
         this.ticketSigner = requireNonNull(ticketSigner, "'ticketSigner' should not be null");
         this.paymentGateway = requireNonNull(paymentGateway, "'paymentGateway' should not be null");
         this.spotGateway = requireNonNull(spotGateway, "'spotGateway' should not be null");
+        this.sales = requireNonNull(sales, "'sales' should not be null");
         this.clock = requireNonNull(clock, "'clock' should not be null");
     }
 
@@ -91,6 +94,7 @@ public class DefaultReconcileOrdersUseCase extends ReconcileOrdersUseCase {
                 ticketGateway.create(Ticket.issue(order.getId(), item.getSpotId(),
                         order.getCustomerId(), ticketSigner));
             }
+            sales.recordSale(order);
             orderGateway.update(order);
             settled.add(order.getId().getValue());
             return;
@@ -98,6 +102,7 @@ public class DefaultReconcileOrdersUseCase extends ReconcileOrdersUseCase {
         paymentGateway.refund(order.getChargeId());
         order.expireIfElapsed(now);
         order.refund();
+        sales.recordRefund(order);
         releaseSpots(order);
         orderGateway.update(order);
         refunded.add(order.getId().getValue());

@@ -23,3 +23,6 @@ Decisões arquiteturais do TicketHub, em ordem cronológica. Convenção: `NNNN-
 | [017](./0017-webhook-mercado-pago-assinado.md) | Webhook do Mercado Pago com assinatura verificada | Aceito |
 | [018](./0018-idempotencia-criacao-pedidos.md) | Idempotency-Key na criação de pedidos | Aceito |
 | [019](./0019-reconciliacao-auto-refund.md) | Reconciliação de pagamentos e auto-refund | Aceito |
+| [020](./0020-frontend-angular.md) | Frontend Angular (SPA) | Aceito |
+| [021](./0021-rate-limit-checkout.md) | Rate limit no checkout | Aceito |
+| [022](./0022-email-confirmacao.md) | Email de confirmação com ingressos | Aceito |

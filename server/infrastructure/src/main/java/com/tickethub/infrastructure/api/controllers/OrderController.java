@@ -19,6 +19,7 @@ import com.tickethub.infrastructure.order.models.CreateOrderRequest;
 import com.tickethub.infrastructure.order.models.OrderResponse;
 import com.tickethub.infrastructure.order.models.PayOrderResponse;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 
 @RestController
 public class OrderController implements OrderAPI {
@@ -36,7 +37,10 @@ public class OrderController implements OrderAPI {
     }
 
     @Override
-    @CacheEvict(value = TickethubCacheProperties.SPOTS, allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = TickethubCacheProperties.SHOWS, allEntries = true),
+            @CacheEvict(value = TickethubCacheProperties.SECTIONS, allEntries = true),
+            @CacheEvict(value = TickethubCacheProperties.SPOTS, allEntries = true) })
     public ResponseEntity<OrderResponse> createOrder(final String idempotencyKey,
             final CreateOrderRequest input) {
         final var output = HttpResults.require(createOrder.execute(
@@ -46,14 +50,20 @@ public class OrderController implements OrderAPI {
     }
 
     @Override
-    @CacheEvict(value = TickethubCacheProperties.SPOTS, allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = TickethubCacheProperties.SHOWS, allEntries = true),
+            @CacheEvict(value = TickethubCacheProperties.SECTIONS, allEntries = true),
+            @CacheEvict(value = TickethubCacheProperties.SPOTS, allEntries = true) })
     public ResponseEntity<PayOrderResponse> payOrder(final String id) {
         final var output = HttpResults.require(payOrder.execute(PayOrderCommand.with(id)));
         return ResponseEntity.ok(PayOrderResponse.from(output));
     }
 
     @Override
-    @CacheEvict(value = TickethubCacheProperties.SPOTS, allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = TickethubCacheProperties.SHOWS, allEntries = true),
+            @CacheEvict(value = TickethubCacheProperties.SECTIONS, allEntries = true),
+            @CacheEvict(value = TickethubCacheProperties.SPOTS, allEntries = true) })
     public ResponseEntity<OrderResponse> cancelOrder(final String id) {
         final var output = HttpResults.require(cancelOrder.execute(CancelOrderCommand.with(id)));
         return ResponseEntity.ok(OrderResponse.from(output));
