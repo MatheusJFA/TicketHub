@@ -1,34 +1,35 @@
 @if (loading()) {
-  <p>Carregando mapa de assentos…</p>
+  <p class="text-slate-400">Carregando mapa de assentos…</p>
 } @else if (error()) {
-  <p class="error">{{ error() }}</p>
+  <p class="text-sm text-red-400">{{ error() }}</p>
 } @else {
   <section>
-    <h1>{{ show()?.name }}</h1>
+    <h1 class="text-2xl font-bold">{{ show()?.name }}</h1>
     @if (map().length === 0) {
-      <p>Nenhum setor publicado para este show.</p>
+      <p class="mt-2 text-slate-400">Nenhum setor publicado para este show.</p>
     }
     @for (entry of map(); track entry.section.id) {
-      <article class="sector">
-        <h2>
+      <article class="mt-6">
+        <h2 class="text-lg font-semibold">
           {{ entry.section.name }}
-          <span class="muted">
+          <span class="text-sm font-normal text-slate-400">
             {{ entry.section.price.currency }} {{ entry.section.price.value }} ·
             {{ entry.section.totalSpotsSold }}/{{ entry.section.totalSpots }} vendidos
           </span>
         </h2>
         @if (entry.spots.length === 0) {
-          <p class="muted">Sem assentos publicados neste setor.</p>
+          <p class="text-sm text-slate-400">Sem assentos publicados neste setor.</p>
         } @else {
-          <div class="seats">
+          <div class="mt-2 grid grid-cols-[repeat(auto-fill,minmax(64px,1fr))] gap-2">
             @for (spot of entry.spots; track spot.id) {
               <button
                 type="button"
-                class="seat"
-                [class.selected]="cart.contains(spot.id)"
-                [disabled]="!spot.available"
                 (click)="toggle(spot)"
-                [title]="spot.location">
+                [disabled]="!spot.available"
+                [title]="spot.location"
+                [class.bg-blue-600]="cart.contains(spot.id)"
+                [class.border-blue-600]="cart.contains(spot.id)"
+                class="rounded-md border border-slate-700 bg-[#171b22] py-2 text-sm text-slate-100 disabled:border-slate-800 disabled:bg-transparent disabled:text-slate-500">
                 {{ spot.location }}
               </button>
             }
@@ -36,12 +37,16 @@
         }
       </article>
     }
-    <div class="cart-bar">
-      <span>{{ cart.spots().length }} selecionado(s)</span>
-      <button type="button" (click)="checkout()" [disabled]="cart.spots().length === 0">
+    <div class="mt-6 flex items-center justify-between gap-4">
+      <span class="text-slate-400">{{ cart.spots().length }} selecionado(s)</span>
+      <button
+        type="button"
+        (click)="checkout()"
+        [disabled]="cart.spots().length === 0"
+        class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white disabled:opacity-50">
         Ir para o checkout
       </button>
     </div>
-    <p class="hint"><a routerLink="/">Voltar aos shows</a></p>
+    <p class="mt-3 text-sm text-slate-400"><a routerLink="/" class="text-sky-400">Voltar aos shows</a></p>
   </section>
 }

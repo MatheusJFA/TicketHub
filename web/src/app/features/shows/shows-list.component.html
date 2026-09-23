@@ -1,20 +1,20 @@
 <section>
-  <h1>Shows</h1>
+  <h1 class="mb-4 text-2xl font-bold">Shows</h1>
   @if (loading()) {
-    <p>Carregando…</p>
+    <p class="text-slate-400">Carregando…</p>
   } @else if (error()) {
-    <p class="error">{{ error() }}</p>
+    <p class="text-sm text-red-400">{{ error() }}</p>
   } @else if (shows().length === 0) {
-    <p>Nenhum show publicado no momento.</p>
+    <p class="text-slate-400">Nenhum show publicado no momento.</p>
   } @else {
-    <div class="cards">
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       @for (show of shows(); track show.id) {
-        <article class="card">
-          <h2>{{ show.name }}</h2>
-          <p class="muted">{{ show.date | date: 'dd/MM/yyyy HH:mm' }}</p>
-          <p>{{ show.description }}</p>
-          <p class="muted">{{ show.totalSpotsSold }} / {{ show.totalSpots }} vendidos</p>
-          <a [routerLink]="['/shows', show.id]">Ver detalhes</a>
+        <article class="rounded-lg border border-slate-800 bg-[#171b22] p-4">
+          <h2 class="mb-1 text-lg font-semibold">{{ show.name }}</h2>
+          <p class="text-sm text-slate-400">{{ show.date | date: 'dd/MM/yyyy HH:mm' }}</p>
+          <p class="mt-2 text-sm">{{ show.description }}</p>
+          <p class="mt-2 text-sm text-slate-400">{{ show.totalSpotsSold }} / {{ show.totalSpots }} vendidos</p>
+          <a [routerLink]="['/shows', show.id]" class="mt-2 inline-block text-sky-400">Ver detalhes</a>
         </article>
       }
     </div>

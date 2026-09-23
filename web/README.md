@@ -11,7 +11,8 @@ npm start
 ```
 
 Abre em http://localhost:4200 com a API em http://localhost:8080
-(`src/environments/environment.ts`). O backend libera CORS para
+(`public/app-config.json`, lido no boot — a mesma imagem Docker aponta para
+outro backend trocando o arquivo, sem rebuild). O backend libera CORS para
 `http://localhost:4200` (`tickethub.cors.allowed-origins`).
 
 ## Produção

@@ -1,16 +1,16 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environment';
+import { ConfigService } from './config.service';
 import { OrderResponse, PayOrderResponse } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class OrdersService {
   private readonly http = inject(HttpClient);
-  private readonly base = environment.apiUrl;
+  private readonly config = inject(ConfigService);
 
   createOrder(customerId: string, spotIds: string[], idempotencyKey: string) {
     return this.http.post<OrderResponse>(
-      `${this.base}/orders`,
+      `${this.config.url()}/orders`,
       { customerId, spotIds },
       { headers: { 'Idempotency-Key': idempotencyKey } },
     );
@@ -18,12 +18,16 @@ export class OrdersService {
 
   payOrder(orderId: string) {
     return this.http.post<PayOrderResponse>(
-      `${this.base}/orders/${orderId}/pay`,
+      `${this.config.url()}/orders/${orderId}/pay`,
       {},
     );
   }
 
   getOrder(orderId: string) {
-    return this.http.get<OrderResponse>(`${this.base}/orders/${orderId}`);
+    return this.http.get<OrderResponse>(`${this.config.url()}/orders/${orderId}`);
+  }
+
+  cancelOrder(orderId: string) {
+    return this.http.post<OrderResponse>(`${this.config.url()}/orders/${orderId}/cancel`, {});
   }
 }
