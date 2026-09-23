@@ -55,6 +55,7 @@ não conhece framework (verificado por `ArchitectureTest`).
 | MongoDB e migrações | `adr/0002-mongodb-como-banco-principal.md`, `MongoConfiguration.java`, `db/changelog/`, `LiquibaseMigrationIT.java` |
 | Kafka e eventos | `adr/0003-kafka-para-eventos-de-dominio.md`, `KafkaConfiguration.java`, `SpotGenerationListener.java` |
 | Estratégia de testes | `adr/0008-testcontainers-testes-integracao.md`, `adr/0009-cucumber-testes-aceitacao.md`, `ControllerTest.java`, `ContainerSupport.java` |
+| Produção | `production-checklist.md` (segredos, tempos, backup, alertas) |
 | Enriquecimento de endereço (ZIP code) | `adr/0011-enriquecimento-endereco-cep.md`, `ViaCepLookup.java` |
 | Estilo de código | `Optional` em vez de ternário de `null`; `isNull`/`nonNull` (`java.util.Objects`, import estático); `StringUtils`/`CollectionUtils` (Apache Commons, import estático); sem nomes abreviados (`INFRASTRUCTURE_ERROR`, não `INFRA_ERROR`) |
 
