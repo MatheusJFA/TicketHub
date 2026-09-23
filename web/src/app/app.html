@@ -8,6 +8,9 @@
       }</a
     >
     <a routerLink="/orders" class="hover:text-slate-100">Meu pedido</a>
+    @if (auth.canManageCatalog) {
+      <a routerLink="/admin" class="hover:text-slate-100">Admin</a>
+    }
     @if (auth.isLoggedIn()) {
       <button type="button" (click)="logout()" class="hover:text-slate-100">Sair</button>
     } @else {

@@ -145,6 +145,11 @@ management:
   endpoint:
     health:
       show-details: never
+  health:
+    # Outbound mail is best effort (see OrderConfirmationMailer); an SMTP
+    # blip must never flip readiness.
+    mail:
+      enabled: false
   metrics:
     tags:
       application: ${spring.application.name}
