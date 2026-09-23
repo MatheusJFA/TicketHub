@@ -135,6 +135,20 @@ public class Show extends AggregateRoot<ShowID> {
         this.markAsUpdated();
     }
 
+    /**
+     * Counts one sold seat (ticket issuance). See
+     * {@code Section.registerRefund} for why refunds clamp at zero.
+     */
+    public void registerSale() {
+        this.totalSpotsSold++;
+        this.markAsUpdated();
+    }
+
+    public void registerRefund() {
+        this.totalSpotsSold = Math.max(0, totalSpotsSold - 1);
+        this.markAsUpdated();
+    }
+
     public Show changeName(final String name) {
         this.name = Name.create(name);
         markAsUpdated();

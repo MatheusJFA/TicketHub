@@ -215,4 +215,19 @@ class SectionTest {
         section.generateMissingSpots("C", 5);
         assertEquals(3, section.getSpots().size());
     }
+
+    @Test
+    @DisplayName("Given section, when register sale and refund, then counts without going negative")
+    void givenSection_whenRegisterSaleAndRefund_thenCounts() {
+        final var price = Money.create(new BigDecimal("50.00"), Currency.getInstance("BRL"));
+        final var section = Section.create("VIP", "Description", 10, price, "A", 5);
+
+        section.registerSale();
+        section.registerSale();
+        assertEquals(2, section.getTotalSpotsSold());
+        section.registerRefund();
+        section.registerRefund();
+        section.registerRefund();
+        assertEquals(0, section.getTotalSpotsSold());
+    }
 }

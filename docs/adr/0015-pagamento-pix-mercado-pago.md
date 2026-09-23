@@ -1,6 +1,6 @@
 # ADR-015: Pagamento PIX via Mercado Pago
 
-- **Status:** Aceito
+- **Status:** Aceito, parcialmente evoluído pelo ADR-017 (webhook verificado; genérico com kill-switch) e ADR-019 (reconciliação + `refund` na porta)
 - **Data:** 2026-09-22
 
 ## Contexto
@@ -48,9 +48,10 @@ provedor, a aplicação faz fail-fast na subida.
   com mensagem clara em vez de 503 em runtime; pagamento real de ponta a ponta
   (`pay → PIX → webhook → tickets`).
 - **Contra:** boot exige `MERCADOPAGO_ACCESS_TOKEN` (dev local precisa de
-  token de teste); `createCharge` lê pedido + cliente (2 leituras extras);
-  moeda assumida `BRL` quando ausente; webhook sem verificação de assinatura
-  do provedor.
-- **Evolução:** adaptador de webhook no formato real do MP (`type` +
-  `data.id`), verificação de assinatura do callback, cartão/Checkout Pro como
+  token de teste; suítes full-context usam fake `@Primary`); `createCharge`
+  lê pedido + cliente (2 leituras extras); moeda assumida `BRL` quando
+  ausente.
+- **Evolução:** ~~adaptador de webhook no formato real do MP (`type` +
+  `data.id`), verificação de assinatura do callback~~ feito no ADR-017
+  (com kill-switch `GENERIC_WEBHOOK_ENABLED`); cartão/Checkout Pro como
   segundo método.

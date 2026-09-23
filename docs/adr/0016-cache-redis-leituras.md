@@ -1,6 +1,6 @@
 # ADR-016: Cache compartilhado de leitura em Redis
 
-- **Status:** Aceito
+- **Status:** Aceito (métricas de use-case em `docs/observability.md`; hit/miss de cache segue aberto)
 - **Data:** 2026-09-22
 
 ## Contexto

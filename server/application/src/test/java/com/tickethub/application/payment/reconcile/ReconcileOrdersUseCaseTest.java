@@ -22,6 +22,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.tickethub.application.UseCaseTest;
+import com.tickethub.application.sales.SaleRecorder;
 import com.tickethub.domain.core.customer.CustomerID;
 import com.tickethub.domain.core.order.Order;
 import com.tickethub.domain.core.order.OrderGateway;
@@ -52,12 +53,13 @@ class ReconcileOrdersUseCaseTest extends UseCaseTest {
     private final TicketGateway ticketGateway = mock(TicketGateway.class);
     private final PaymentGateway paymentGateway = mock(PaymentGateway.class);
     private final SpotGateway spotGateway = mock(SpotGateway.class);
+    private final SaleRecorder sales = mock(SaleRecorder.class);
     private final DefaultReconcileOrdersUseCase useCase = new DefaultReconcileOrdersUseCase(
-            orderGateway, ticketGateway, SIGNER, paymentGateway, spotGateway, CLOCK);
+            orderGateway, ticketGateway, SIGNER, paymentGateway, spotGateway, sales, CLOCK);
 
     @Override
     protected List<Object> getMocks() {
-        return List.of(orderGateway, ticketGateway, paymentGateway, spotGateway);
+        return List.of(orderGateway, ticketGateway, paymentGateway, spotGateway, sales);
     }
 
     private Order givenChargedOrder(final String charge) {
@@ -94,6 +96,8 @@ class ReconcileOrdersUseCaseTest extends UseCaseTest {
         assertEquals(OrderStatus.PAID, order.getStatus());
         verify(paymentGateway, times(1)).findStatus(order.getChargeId());
         verify(ticketGateway, times(1)).create(any());
+        verify(sales, times(1)).recordSale(any());
+        verify(sales, times(0)).recordRefund(any());
         verify(orderGateway, times(1)).update(any());
         verify(spotGateway, times(0)).update(any());
     }
@@ -115,6 +119,8 @@ class ReconcileOrdersUseCaseTest extends UseCaseTest {
         assertEquals(OrderStatus.REFUNDED, order.getStatus());
         verify(paymentGateway, times(1)).findStatus(order.getChargeId());
         verify(paymentGateway, times(1)).refund(order.getChargeId());
+        verify(sales, times(0)).recordSale(any());
+        verify(sales, times(1)).recordRefund(any());
         verify(ticketGateway, times(0)).create(any());
         verify(spotGateway, times(1)).findById(order.getItems().get(0).getSpotId());
         verify(spotGateway, times(1)).update(any());

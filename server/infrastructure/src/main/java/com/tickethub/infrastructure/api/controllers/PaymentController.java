@@ -14,6 +14,7 @@ import com.tickethub.infrastructure.payment.models.ConfirmPaymentResponse;
 import com.tickethub.infrastructure.payment.models.WebhookRequest;
 
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 
 /**
  * Legacy generic webhook (chargeId + status trusted from the body), kept for
@@ -35,7 +36,10 @@ public class PaymentController implements PaymentAPI {
     }
 
     @Override
-    @CacheEvict(value = TickethubCacheProperties.SPOTS, allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = TickethubCacheProperties.SHOWS, allEntries = true),
+            @CacheEvict(value = TickethubCacheProperties.SECTIONS, allEntries = true),
+            @CacheEvict(value = TickethubCacheProperties.SPOTS, allEntries = true) })
     public ResponseEntity<ConfirmPaymentResponse> paymentWebhook(final WebhookRequest input) {
         final var output = HttpResults.require(confirmPayment.execute(
                 ConfirmPaymentCommand.with(input.chargeId(), input.status())));

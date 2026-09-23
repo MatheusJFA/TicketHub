@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.MediaType;
@@ -32,7 +33,7 @@ public class MercadoPagoClient extends BaseHttpClient {
         requireNonNull(externalReference, "'externalReference' should not be null");
         requireNonNull(payerEmail, "'payerEmail' should not be null");
         try {
-            final var body = new java.util.HashMap<String, Object>(Map.of(
+            final var body = new HashMap<String, Object>(Map.of(
                     "transaction_amount", amount,
                     "description", description,
                     "payment_method_id", "pix",
