@@ -14,6 +14,7 @@ import com.tickethub.application.section.retrieve.list.*;
 import com.tickethub.application.section.unpublish.*;
 import com.tickethub.application.section.unpublishall.*;
 import com.tickethub.infrastructure.section.models.*;
+import com.tickethub.infrastructure.spot.models.SpotListResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -128,6 +129,24 @@ public interface SectionAPI {
         @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
     })
     SectionResponse getById(@PathVariable("id") String id);
+
+    @GetMapping("/{id}/spots")
+    @Operation(summary = "List Section Spots",
+            description = "Returns a page of spots belonging to the section, for the seat map")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Returns a page of spots belonging to the section"),
+        @ApiResponse(responseCode = "400", description = "The request body is missing or contains malformed JSON, or a request parameter has an incompatible type"),
+        @ApiResponse(responseCode = "422", description = "Invalid pagination or sorting parameters: page must be non-negative, perPage between 1 and 100, sort non-blank, and dir asc or desc"),
+        @ApiResponse(responseCode = "500", description = "An unexpected failure prevented the server from completing the operation"),
+        @ApiResponse(responseCode = "503", description = "The operation is unavailable because its required service dependencies are not configured")
+    })
+    Pagination<SpotListResponse> listSpots(
+            @PathVariable("id") String id,
+            @RequestParam(defaultValue = "") String search,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int perPage,
+            @RequestParam(defaultValue = "createdAt") String sort,
+            @RequestParam(name = "dir", defaultValue = "asc") String direction);
 
     @GetMapping
     @Operation(summary = "List Sections")

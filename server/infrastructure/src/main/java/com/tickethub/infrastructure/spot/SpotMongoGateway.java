@@ -115,6 +115,16 @@ public class SpotMongoGateway implements SpotGateway {
     }
 
     @Override
+    public Pagination<Spot> findBySection(final SectionID sectionId, final SearchQuery query) {
+        requireNonNull(sectionId, "'sectionId' should not be null");
+        final var mongoQuery = MongoGatewaySupport.searchQuery(query, "location");
+        mongoQuery.addCriteria(org.springframework.data.mongodb.core.query.Criteria
+                .where("sectionId").is(sectionId.getValue()));
+        return MongoGatewaySupport.paginate(mongoTemplate, mongoQuery, SpotDocument.class,
+                SpotDocument.COLLECTION, query, SORTABLE_FIELDS, SpotDocument::toDomain);
+    }
+
+    @Override
     public List<SpotID> existsByIds(final List<SpotID> ids) {
         if (isEmpty(ids)) {
             return List.of();

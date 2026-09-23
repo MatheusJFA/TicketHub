@@ -178,4 +178,20 @@ class SpotMongoGatewayIT extends ContainerSupport {
     void givenMissingSpot_whenReserveIfAvailable_thenReturnsEmpty() {
         assertTrue(gateway.reserveIfAvailable(SpotID.generate()).isEmpty());
     }
+
+    @Test
+    @DisplayName("Given spots of two sections, when find by section, then returns only theirs")
+    void givenSpotsOfTwoSections_whenFindBySection_thenReturnsOnlyTheirs() {
+        final var first = givenSection();
+        final var second = givenSection();
+        final var spot = Spot.create(Location.create("A1"));
+        gateway.create(spot, first);
+        gateway.create(Spot.create(Location.create("A2")), second);
+
+        final var found =
+                gateway.findBySection(first, new SearchQuery(0, 10, "", "createdAt", "asc"));
+
+        assertEquals(1, found.totalItems());
+        assertEquals(spot.getId(), found.items().get(0).getId());
+    }
 }

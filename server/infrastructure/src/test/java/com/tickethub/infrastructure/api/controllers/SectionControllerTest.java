@@ -10,6 +10,8 @@ import com.tickethub.application.section.publish.*;
 import com.tickethub.application.section.publishall.*;
 import com.tickethub.application.section.retrieve.get.*;
 import com.tickethub.application.section.retrieve.list.*;
+import com.tickethub.application.spot.retrieve.bysection.*;
+import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.application.section.unpublish.*;
 import com.tickethub.application.section.unpublishall.*;
 import com.tickethub.application.section.update.*;
@@ -25,16 +27,18 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 import com.tickethub.infrastructure.shared.presenters.SharedMapperImpl;
 import com.tickethub.infrastructure.section.presenters.SectionMapperImpl;
+import com.tickethub.infrastructure.spot.presenters.SpotMapperImpl;
 import com.tickethub.infrastructure.security.TestTokens;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ControllerTest(controllers = SectionController.class)
-@Import({SharedMapperImpl.class, SectionMapperImpl.class})
+@Import({SharedMapperImpl.class, SectionMapperImpl.class, SpotMapperImpl.class})
 @DisplayName("Section controller")
 class SectionControllerTest {
     @Autowired MockMvc mvc;
@@ -57,6 +61,7 @@ class SectionControllerTest {
     @MockitoBean PublishAllSectionUseCase publishAllSection;
     @MockitoBean GetSectionUseCase getSection;
     @MockitoBean ListSectionsUseCase listSections;
+    @MockitoBean ListSectionSpotsUseCase listSectionSpots;
     @MockitoBean UnpublishSectionUseCase unpublishSection;
     @MockitoBean UnpublishAllSectionUseCase unpublishAllSection;
     @MockitoBean UpdateSectionUseCase updateSection;
@@ -127,5 +132,16 @@ class SectionControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Pista\",\"description\":\"Geral\",\"price\":{\"value\":60.00,\"currency\":\"BRL\"}}"))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("Given spots, when lists section spots, then returns page without auth")
+    void givenSpots_whenListsSectionSpots_thenReturnsPage() throws Exception {
+        when(listSectionSpots.execute(any()))
+                .thenReturn(Either.right(new Pagination<>(0, 10, 0, java.util.List.of())));
+
+        mvc.perform(get("/sections/section-1/spots"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalItems").value(0));
     }
 }

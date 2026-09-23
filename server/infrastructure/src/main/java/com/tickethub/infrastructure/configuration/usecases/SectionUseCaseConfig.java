@@ -16,6 +16,8 @@ import com.tickethub.application.section.publishall.PublishAllSectionUseCase;
 import com.tickethub.application.section.publishall.DefaultPublishAllSectionUseCase;
 import com.tickethub.application.section.retrieve.get.GetSectionUseCase;
 import com.tickethub.application.section.retrieve.get.DefaultGetSectionUseCase;
+import com.tickethub.application.section.retrieve.byshow.ListShowSectionsUseCase;
+import com.tickethub.application.section.retrieve.byshow.DefaultListShowSectionsUseCase;
 import com.tickethub.application.section.retrieve.list.ListSectionsUseCase;
 import com.tickethub.application.section.retrieve.list.DefaultListSectionsUseCase;
 import com.tickethub.application.section.unpublish.UnpublishSectionUseCase;
@@ -88,6 +90,11 @@ public class SectionUseCaseConfig {
     @Bean
     public ListSectionsUseCase listSectionsUseCase() {
         return new DefaultListSectionsUseCase(sectionGateway);
+    }
+
+    @Bean
+    public ListShowSectionsUseCase listShowSectionsUseCase() {
+        return new DefaultListShowSectionsUseCase(sectionGateway);
     }
 
     @Bean

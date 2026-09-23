@@ -147,4 +147,19 @@ class SectionMongoGatewayIT extends ContainerSupport {
         assertTrue(existing.contains(second.getId()));
         assertEquals(List.of(), gateway.existsByIds(List.of()));
     }
+
+    @Test
+    @DisplayName("Given sections of two shows, when find by show id, then returns only theirs")
+    void givenSectionsOfTwoShows_whenFindByShowId_thenReturnsOnlyTheirs() {
+        final var first = givenShow();
+        final var second = givenShow();
+        final var vip = gateway.create(Section.create("VIP", "Front stage", 1, PRICE, "A", 5), first);
+        gateway.create(Section.create("Pista", "Geral", 1, PRICE, "A", 5), second);
+
+        final var found =
+                gateway.findByShowId(first, new SearchQuery(0, 10, "", "name", "asc"));
+
+        assertEquals(1, found.totalItems());
+        assertEquals(vip.getId(), found.items().get(0).getId());
+    }
 }

@@ -37,6 +37,21 @@ export interface ShowSummary {
 
 export type ShowDetail = ShowSummary;
 
+export interface Money {
+  value: number;
+  currency: string;
+}
+
+export interface SectionSummary {
+  id: string;
+  name: string;
+  description: string;
+  price: Money;
+  published: boolean;
+  totalSpots: number;
+  totalSpotsSold: number;
+}
+
 export interface SpotItem {
   id: string;
   location: string;

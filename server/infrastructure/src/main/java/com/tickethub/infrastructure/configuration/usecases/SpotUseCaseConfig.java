@@ -12,6 +12,8 @@ import com.tickethub.application.spot.retrieve.get.GetSpotUseCase;
 import com.tickethub.application.spot.retrieve.get.DefaultGetSpotUseCase;
 import com.tickethub.application.spot.retrieve.list.ListSpotsUseCase;
 import com.tickethub.application.spot.retrieve.list.DefaultListSpotsUseCase;
+import com.tickethub.application.spot.retrieve.bysection.ListSectionSpotsUseCase;
+import com.tickethub.application.spot.retrieve.bysection.DefaultListSectionSpotsUseCase;
 import com.tickethub.application.spot.unpublish.UnpublishSpotUseCase;
 import com.tickethub.application.spot.unpublish.DefaultUnpublishSpotUseCase;
 import com.tickethub.application.spot.update.UpdateSpotUseCase;
@@ -65,6 +67,11 @@ public class SpotUseCaseConfig {
     @Bean
     public ListSpotsUseCase listSpotsUseCase() {
         return new DefaultListSpotsUseCase(spotGateway);
+    }
+
+    @Bean
+    public ListSectionSpotsUseCase listSectionSpotsUseCase() {
+        return new DefaultListSectionSpotsUseCase(spotGateway);
     }
 
     @Bean

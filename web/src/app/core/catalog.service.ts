@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { Pagination, ShowDetail, ShowSummary, SpotItem } from './models';
+import { Pagination, SectionSummary, ShowDetail, ShowSummary, SpotItem } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class CatalogService {
@@ -20,5 +20,19 @@ export class CatalogService {
   listSpots(search = '', page = 0, perPage = 60) {
     const params = new HttpParams({ fromObject: { search, page, perPage, sort: 'createdAt', dir: 'asc' } });
     return this.http.get<Pagination<SpotItem>>(`${this.base}/spots`, { params });
+  }
+
+  listShowSections(showId: string, page = 0, perPage = 20) {
+    const params = new HttpParams({ fromObject: { page, perPage, sort: 'name', dir: 'asc' } });
+    return this.http.get<Pagination<SectionSummary>>(`${this.base}/shows/${showId}/sections`, {
+      params,
+    });
+  }
+
+  listSectionSpots(sectionId: string, page = 0, perPage = 100) {
+    const params = new HttpParams({ fromObject: { page, perPage, sort: 'createdAt', dir: 'asc' } });
+    return this.http.get<Pagination<SpotItem>>(`${this.base}/sections/${sectionId}/spots`, {
+      params,
+    });
   }
 }

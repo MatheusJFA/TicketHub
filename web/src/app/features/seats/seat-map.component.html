@@ -1,0 +1,47 @@
+@if (loading()) {
+  <p>Carregando mapa de assentos…</p>
+} @else if (error()) {
+  <p class="error">{{ error() }}</p>
+} @else {
+  <section>
+    <h1>{{ show()?.name }}</h1>
+    @if (map().length === 0) {
+      <p>Nenhum setor publicado para este show.</p>
+    }
+    @for (entry of map(); track entry.section.id) {
+      <article class="sector">
+        <h2>
+          {{ entry.section.name }}
+          <span class="muted">
+            {{ entry.section.price.currency }} {{ entry.section.price.value }} ·
+            {{ entry.section.totalSpotsSold }}/{{ entry.section.totalSpots }} vendidos
+          </span>
+        </h2>
+        @if (entry.spots.length === 0) {
+          <p class="muted">Sem assentos publicados neste setor.</p>
+        } @else {
+          <div class="seats">
+            @for (spot of entry.spots; track spot.id) {
+              <button
+                type="button"
+                class="seat"
+                [class.selected]="cart.contains(spot.id)"
+                [disabled]="!spot.available"
+                (click)="toggle(spot)"
+                [title]="spot.location">
+                {{ spot.location }}
+              </button>
+            }
+          </div>
+        }
+      </article>
+    }
+    <div class="cart-bar">
+      <span>{{ cart.spots().length }} selecionado(s)</span>
+      <button type="button" (click)="checkout()" [disabled]="cart.spots().length === 0">
+        Ir para o checkout
+      </button>
+    </div>
+    <p class="hint"><a routerLink="/">Voltar aos shows</a></p>
+  </section>
+}

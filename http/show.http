@@ -129,3 +129,8 @@ Content-Type: application/json
   "description": "Festival atualizado",
   "date": "2027-02-20T21:00:00-03:00"
 }
+
+### List show sections (seat map)
+# @name listShowSections
+GET {{baseUrl}}/shows/{{showId}}/sections?page=0&perPage=20&sort=name&dir=asc
+Accept: application/json
