@@ -111,3 +111,8 @@ Content-Type: application/json
     "currency": "BRL"
   }
 }
+
+### List section spots (seat map)
+# @name listSectionSpots
+GET {{baseUrl}}/sections/{{sectionId}}/spots?page=0&perPage=100&sort=createdAt&dir=asc
+Accept: application/json

@@ -11,6 +11,8 @@ import com.tickethub.application.show.publishall.*;
 import com.tickethub.application.show.reschedule.*;
 import com.tickethub.application.show.retrieve.get.*;
 import com.tickethub.application.show.retrieve.list.*;
+import com.tickethub.application.section.retrieve.byshow.*;
+import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.application.show.unpublish.*;
 import com.tickethub.application.show.unpublishall.*;
 import com.tickethub.application.show.update.*;
@@ -26,15 +28,17 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 import com.tickethub.infrastructure.shared.presenters.SharedMapperImpl;
 import com.tickethub.infrastructure.show.presenters.ShowMapperImpl;
+import com.tickethub.infrastructure.section.presenters.SectionMapperImpl;
 import com.tickethub.infrastructure.security.TestTokens;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ControllerTest(controllers = ShowController.class)
-@Import({SharedMapperImpl.class, ShowMapperImpl.class})
+@Import({SharedMapperImpl.class, ShowMapperImpl.class, SectionMapperImpl.class})
 @DisplayName("Show controller")
 class ShowControllerTest {
     @Autowired MockMvc mvc;
@@ -57,6 +61,7 @@ class ShowControllerTest {
     @MockitoBean UnpublishShowUseCase unpublishShow;
     @MockitoBean UnpublishAllShowUseCase unpublishAllShow;
     @MockitoBean UpdateShowUseCase updateShow;
+    @MockitoBean ListShowSectionsUseCase listShowSections;
     @MockitoBean(name = "showAccess") ShowAccess showAccess;
 
     @Test
@@ -96,5 +101,16 @@ class ShowControllerTest {
                 {"name":"Show","description":"Festival","date":"2027-02-20T21:00:00-03:00"}
                 """))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("Given sections, when lists show sections, then returns page without auth")
+    void givenSections_whenListsShowSections_thenReturnsPage() throws Exception {
+        when(listShowSections.execute(any()))
+                .thenReturn(Either.right(new Pagination<>(0, 10, 0, java.util.List.of())));
+
+        mvc.perform(get("/shows/show-1/sections"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalItems").value(0));
     }
 }

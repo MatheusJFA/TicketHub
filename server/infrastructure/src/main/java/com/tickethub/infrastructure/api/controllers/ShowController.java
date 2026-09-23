@@ -12,15 +12,18 @@ import com.tickethub.application.show.publishall.*;
 import com.tickethub.application.show.reschedule.*;
 import com.tickethub.application.show.retrieve.get.*;
 import com.tickethub.application.show.retrieve.list.*;
+import com.tickethub.application.section.retrieve.byshow.*;
 import com.tickethub.application.show.unpublish.*;
 import com.tickethub.application.show.unpublishall.*;
 import com.tickethub.application.show.update.*;
 import com.tickethub.infrastructure.show.models.*;
+import com.tickethub.infrastructure.section.models.SectionListResponse;
 import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import com.tickethub.infrastructure.api.ShowAPI;
 import com.tickethub.infrastructure.api.HttpResults;
 import com.tickethub.infrastructure.show.presenters.ShowMapper;
+import com.tickethub.infrastructure.section.presenters.SectionMapper;
 import com.tickethub.infrastructure.cache.TickethubCacheProperties;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -38,10 +41,12 @@ public class ShowController implements ShowAPI {
     private final RescheduleShowUseCase rescheduleShow;
     private final GetShowUseCase getShow;
     private final ListShowsUseCase listShows;
+    private final ListShowSectionsUseCase listShowSections;
     private final UnpublishShowUseCase unpublishShow;
     private final UnpublishAllShowUseCase unpublishAllShow;
     private final UpdateShowUseCase updateShow;
     private final ShowMapper mapper;
+    private final SectionMapper sectionMapper;
 
     public ShowController(AddSectionToShowUseCase addSectionToShow,
             ChangeShowDescriptionUseCase changeShowDescription,
@@ -53,10 +58,12 @@ public class ShowController implements ShowAPI {
             RescheduleShowUseCase rescheduleShow,
             GetShowUseCase getShow,
             ListShowsUseCase listShows,
+            ListShowSectionsUseCase listShowSections,
             UnpublishShowUseCase unpublishShow,
             UnpublishAllShowUseCase unpublishAllShow,
             UpdateShowUseCase updateShow,
-            ShowMapper mapper) {
+            ShowMapper mapper,
+            SectionMapper sectionMapper) {
         this.addSectionToShow = addSectionToShow;
         this.changeShowDescription = changeShowDescription;
         this.changeShowName = changeShowName;
@@ -67,10 +74,12 @@ public class ShowController implements ShowAPI {
         this.rescheduleShow = rescheduleShow;
         this.getShow = getShow;
         this.listShows = listShows;
+        this.listShowSections = listShowSections;
         this.unpublishShow = unpublishShow;
         this.unpublishAllShow = unpublishAllShow;
         this.updateShow = updateShow;
         this.mapper = mapper;
+        this.sectionMapper = sectionMapper;
     }
 
     @Override
@@ -139,6 +148,15 @@ public class ShowController implements ShowAPI {
     @Cacheable(TickethubCacheProperties.SHOWS)
     public Pagination<ShowListResponse> list(String search, int page, int perPage, String sort, String direction) {
         return HttpResults.require(listShows.execute(HttpResults.search(search, page, perPage, sort, direction))).map(mapper::toListResponse);
+    }
+
+    @Override
+    @Cacheable(TickethubCacheProperties.SECTIONS)
+    public Pagination<SectionListResponse> listSections(String id, String search, int page, int perPage,
+            String sort, String direction) {
+        return HttpResults.require(listShowSections.execute(ListShowSectionsCommand.with(id,
+                HttpResults.search(search, page, perPage, sort, direction))))
+                .map(sectionMapper::toListResponse);
     }
 
     @Override

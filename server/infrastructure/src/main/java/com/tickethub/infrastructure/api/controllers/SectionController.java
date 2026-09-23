@@ -11,15 +11,18 @@ import com.tickethub.application.section.publish.*;
 import com.tickethub.application.section.publishall.*;
 import com.tickethub.application.section.retrieve.get.*;
 import com.tickethub.application.section.retrieve.list.*;
+import com.tickethub.application.spot.retrieve.bysection.*;
 import com.tickethub.application.section.unpublish.*;
 import com.tickethub.application.section.unpublishall.*;
 import com.tickethub.application.section.update.*;
 import com.tickethub.infrastructure.section.models.*;
+import com.tickethub.infrastructure.spot.models.SpotListResponse;
 import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import com.tickethub.infrastructure.api.SectionAPI;
 import com.tickethub.infrastructure.api.HttpResults;
 import com.tickethub.infrastructure.section.presenters.SectionMapper;
+import com.tickethub.infrastructure.spot.presenters.SpotMapper;
 import com.tickethub.infrastructure.cache.TickethubCacheProperties;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -36,10 +39,12 @@ public class SectionController implements SectionAPI {
     private final PublishAllSectionUseCase publishAllSection;
     private final GetSectionUseCase getSection;
     private final ListSectionsUseCase listSections;
+    private final ListSectionSpotsUseCase listSectionSpots;
     private final UnpublishSectionUseCase unpublishSection;
     private final UnpublishAllSectionUseCase unpublishAllSection;
     private final UpdateSectionUseCase updateSection;
     private final SectionMapper mapper;
+    private final SpotMapper spotMapper;
 
     public SectionController(ChangeSectionDescriptionUseCase changeSectionDescription,
             ChangeSectionNameUseCase changeSectionName,
@@ -50,10 +55,12 @@ public class SectionController implements SectionAPI {
             PublishAllSectionUseCase publishAllSection,
             GetSectionUseCase getSection,
             ListSectionsUseCase listSections,
+            ListSectionSpotsUseCase listSectionSpots,
             UnpublishSectionUseCase unpublishSection,
             UnpublishAllSectionUseCase unpublishAllSection,
             UpdateSectionUseCase updateSection,
-            SectionMapper mapper) {
+            SectionMapper mapper,
+            SpotMapper spotMapper) {
         this.changeSectionDescription = changeSectionDescription;
         this.changeSectionName = changeSectionName;
         this.changeSectionPrice = changeSectionPrice;
@@ -63,10 +70,12 @@ public class SectionController implements SectionAPI {
         this.publishAllSection = publishAllSection;
         this.getSection = getSection;
         this.listSections = listSections;
+        this.listSectionSpots = listSectionSpots;
         this.unpublishSection = unpublishSection;
         this.unpublishAllSection = unpublishAllSection;
         this.updateSection = updateSection;
         this.mapper = mapper;
+        this.spotMapper = spotMapper;
     }
 
     @Override
@@ -128,6 +137,15 @@ public class SectionController implements SectionAPI {
     @Cacheable(TickethubCacheProperties.SECTIONS)
     public Pagination<SectionListResponse> list(String search, int page, int perPage, String sort, String direction) {
         return HttpResults.require(listSections.execute(HttpResults.search(search, page, perPage, sort, direction))).map(mapper::toListResponse);
+    }
+
+    @Override
+    @Cacheable(TickethubCacheProperties.SPOTS)
+    public Pagination<SpotListResponse> listSpots(String id, String search, int page, int perPage,
+            String sort, String direction) {
+        return HttpResults.require(listSectionSpots.execute(ListSectionSpotsCommand.with(id,
+                HttpResults.search(search, page, perPage, sort, direction))))
+                .map(spotMapper::toListResponse);
     }
 
     @Override

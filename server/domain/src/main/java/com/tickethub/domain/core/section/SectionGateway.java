@@ -13,5 +13,6 @@ public interface SectionGateway {
     Optional<Section> findById(SectionID id);
     Section update(Section section);
     Pagination<Section> findAll(SearchQuery query);
+    Pagination<Section> findByShowId(ShowID showId, SearchQuery query);
     List<SectionID> existsByIds(List<SectionID> ids);
 }

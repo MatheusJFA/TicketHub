@@ -12,6 +12,6 @@
       {{ show()!.address.city }}/{{ show()!.address.state }}
     </p>
     <p class="muted">{{ show()!.totalSpotsSold }} / {{ show()!.totalSpots }} vendidos</p>
-    <a class="button" routerLink="/seats">Escolher assentos</a>
+    <a class="button" [routerLink]="['/shows', show()!.id, 'seats']">Escolher assentos</a>
   </section>
 }

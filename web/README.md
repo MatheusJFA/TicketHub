@@ -25,7 +25,8 @@ build em http://localhost:4200, `WEB_PORT` para trocar a porta).
 
 ## Fluxo de compra
 
-Shows (público) → assentos (seleção múltipla) → login → checkout (cria o
+Shows (público) → mapa de assentos do show (`/shows/:id/seats`, agrupado por
+setor via `GET /shows/{id}/sections` + `GET /sections/{id}/spots`) → login → checkout (cria o
 pedido com `Idempotency-Key`, paga e exibe o PIX copia e cola) → polling do
 status até `PAID`. O `customerId` do pedido sai do claim `ownerId` do JWT;
 entre com um usuário cliente (ex.: `maria@domain.com`).

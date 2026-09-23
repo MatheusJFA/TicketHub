@@ -116,6 +116,16 @@ public class SectionMongoGateway implements SectionGateway {
     }
 
     @Override
+    public Pagination<Section> findByShowId(final ShowID showId, final SearchQuery query) {
+        requireNonNull(showId, "'showId' should not be null");
+        final var mongoQuery = MongoGatewaySupport.searchQuery(query, "name", "description");
+        mongoQuery.addCriteria(org.springframework.data.mongodb.core.query.Criteria
+                .where("showId").is(showId.getValue()));
+        return MongoGatewaySupport.paginate(mongoTemplate, mongoQuery, SectionDocument.class,
+                SectionDocument.COLLECTION, query, SORTABLE_FIELDS, this::toDomain);
+    }
+
+    @Override
     public List<SectionID> existsByIds(final List<SectionID> ids) {
         if (isEmpty(ids)) {
             return List.of();

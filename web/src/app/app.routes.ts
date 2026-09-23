@@ -13,6 +13,11 @@ export const routes: Routes = [
       import('./features/shows/show-detail.component').then((m) => m.ShowDetailComponent),
   },
   {
+    path: 'shows/:id/seats',
+    loadComponent: () =>
+      import('./features/seats/seat-map.component').then((m) => m.SeatMapComponent),
+  },
+  {
     path: 'seats',
     loadComponent: () =>
       import('./features/seats/seats.component').then((m) => m.SeatsComponent),

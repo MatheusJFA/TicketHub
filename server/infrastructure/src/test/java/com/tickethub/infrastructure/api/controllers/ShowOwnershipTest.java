@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 import com.tickethub.infrastructure.shared.presenters.SharedMapperImpl;
 import com.tickethub.infrastructure.show.presenters.ShowMapperImpl;
+import com.tickethub.infrastructure.section.presenters.SectionMapperImpl;
 
 import com.tickethub.application.Either;
 import com.tickethub.application.show.addsection.AddSectionToShowUseCase;
@@ -31,12 +32,13 @@ import com.tickethub.application.show.retrieve.list.ListShowsUseCase;
 import com.tickethub.application.show.unpublish.UnpublishShowUseCase;
 import com.tickethub.application.show.unpublishall.UnpublishAllShowUseCase;
 import com.tickethub.application.show.update.*;
+import com.tickethub.application.section.retrieve.byshow.*;
 import com.tickethub.infrastructure.ControllerTest;
 import com.tickethub.infrastructure.security.ShowAccess;
 import com.tickethub.infrastructure.security.TestTokens;
 
 @ControllerTest(controllers = ShowController.class)
-@Import({SharedMapperImpl.class, ShowMapperImpl.class})
+@Import({SharedMapperImpl.class, ShowMapperImpl.class, SectionMapperImpl.class})
 @DisplayName("Show ownership")
 class ShowOwnershipTest {
 
@@ -67,6 +69,7 @@ class ShowOwnershipTest {
     @MockitoBean
     UnpublishAllShowUseCase unpublishAllShow;
     @MockitoBean UpdateShowUseCase updateShow;
+    @MockitoBean ListShowSectionsUseCase listShowSections;
     @MockitoBean(name = "showAccess")
     ShowAccess showAccess;
 

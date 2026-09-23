@@ -24,5 +24,6 @@ public interface SpotGateway {
     Optional<SpotPlacement> findPlacement(SpotID id);
     Spot update(Spot spot);
     Pagination<Spot> findAll(SearchQuery query);
+    Pagination<Spot> findBySection(SectionID sectionId, SearchQuery query);
     List<SpotID> existsByIds(List<SpotID> ids);
 }
