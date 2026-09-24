@@ -20,6 +20,26 @@ Content-Type: application/json
   "password": "secret-123"
 }
 
+### Login as seeded dev customer (scripts/seed-dev.js)
+# @name loginSeedCustomer
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "identifier": "customer@tickethub.local",
+  "password": "customer-local"
+}
+
+### Login as seeded dev partner (scripts/seed-dev.js)
+# @name loginSeedPartner
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "identifier": "partner@tickethub.local",
+  "password": "partner-local"
+}
+
 ### Login with invalid credentials
 # @name loginInvalid
 POST {{baseUrl}}/auth/login

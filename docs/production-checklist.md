@@ -9,12 +9,13 @@ têm default de desenvolvimento no `application.yml` / `docker-compose.yml`.
 |---|---|---|
 | `TICKETHUB_JWT_SECRET` | `dev-only-change-me…` | ≥ 32 bytes; invalida todas as sessões ao trocar |
 | `TICKETHUB_TICKETS_SIGNATURE_SECRET` | `dev-only…` | Invalida QRs já emitidos ao trocar |
-| `MERCADOPAGO_ACCESS_TOKEN` | vazio (fail-fast no boot) | Token de produção da conta MP |
+| `MERCADOPAGO_ACCESS_TOKEN` | vazio (boot saudável; pay/webhook MP respondem 503) | Token de produção da conta MP |
 | `MERCADOPAGO_WEBHOOK_SECRET` | vazio (webhook responde 401) | Painel MP → Sua integração → Webhooks |
 | `MERCADOPAGO_NOTIFICATION_URL` | vazio (sem callback dirigido) | URL pública `https://…/payments/mercadopago` |
 | `MONGO_USERNAME`/`MONGO_PASSWORD` | `tickethub`/`tickethub-local` | Só valem com volume vazio |
 | `GRAFANA_ADMIN_USER`/`GRAFANA_ADMIN_PASSWORD` | `admin`/`admin-local` | |
 | Senhas seed (`*_PASSWORD_HASH`) | bcrypt de `admin-local` etc. | Trocar ou remover usuários bootstrap |
+| Carga dev (`scripts/seed-dev.js`) | só local | Nunca rodar em produção: cria `customer`/`partner` de dev |
 
 ## Endpoints e integrações
 

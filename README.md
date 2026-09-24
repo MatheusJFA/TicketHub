@@ -45,6 +45,14 @@ Essas são credenciais padrão de desenvolvimento local. Você pode definir `MON
 
 O Spring Boot 4 está conectado ao banco `tickethub`, e `/actuator/health` também verifica a conexão com o MongoDB. O Liquibase cria as coleções iniciais e registra as migrações ao iniciar a aplicação. As implementações dos gateways para persistir as entidades ainda não foram criadas. `LIQUIBASE_ENABLED=false` desabilita as migrações; o padrão é `true`. Veja o [guia de migrações](server/README.md#migrações-com-liquibase).
 
+Para carga inicial de dev (customer + partner com login conhecido, idempotente):
+
+```shell
+docker compose exec -T mongo mongosh -u tickethub -p tickethub-local --authenticationDatabase admin tickethub < scripts/seed-dev.js
+```
+
+Isso cria `customer@tickethub.local` / `customer-local` e `partner@tickethub.local` / `partner-local` (veja `http/auth.http`). Nunca rode em produção.
+
 Para iniciar apenas o banco e executar o backend localmente com mise:
 
 ```shell
