@@ -7,8 +7,9 @@ import org.springframework.context.annotation.Primary;
 
 /**
  * Exposes the in-memory payment gateway to full-context suites, which boot
- * without Mercado Pago credentials. Production stays fail-fast without a
- * token; slices and unit tests are unaffected (they never import this).
+ * without Mercado Pago credentials. Without a token production wires the
+ * disabled gateway (pay paths answer 503); slices and unit tests are
+ * unaffected (they never import this).
  */
 @TestConfiguration
 public class PaymentGatewayTestConfiguration {

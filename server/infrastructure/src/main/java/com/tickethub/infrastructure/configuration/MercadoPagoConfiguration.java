@@ -16,7 +16,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,8 +29,13 @@ public class MercadoPagoConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(MercadoPagoConfiguration.class);
 
+    // Only wires the real provider when explicitly enabled with a non-blank
+    // token. Otherwise the client (and the gateway built on it) stays out of
+    // the context and PaymentFallbackConfiguration exposes a disabled
+    // PaymentGateway: boot stays healthy and pay paths answer 503.
     @Bean
-    @ConditionalOnProperty(prefix = "tickethub.payment.mercadopago", name = "access-token")
+    @ConditionalOnExpression(
+            "'${tickethub.payment.mercadopago.enabled:true}'.equals('true') and '${tickethub.payment.mercadopago.access-token:}'.trim().length() > 0")
     public MercadoPagoClient mercadoPagoClient(
             final RestClient.Builder builder, final MercadoPagoProperties properties) {
         if (isBlank(properties.getAccessToken())) {
