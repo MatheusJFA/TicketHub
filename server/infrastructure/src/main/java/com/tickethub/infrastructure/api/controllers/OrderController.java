@@ -45,8 +45,8 @@ public class OrderController implements OrderAPI {
                 @CacheEvict(value = TickethubCacheProperties.SPOTS, allEntries = true)
             })
     public ResponseEntity<OrderResponse> createOrder(final String idempotencyKey, final CreateOrderRequest input) {
-        final var output = HttpResults.require(
-                createOrder.execute(CreateOrderCommand.with(input.customerId(), input.spotIds(), idempotencyKey)));
+        final var output = HttpResults.require(createOrder.execute(
+                CreateOrderCommand.with(input.customerId(), input.spotIds(), idempotencyKey, input.couponCode())));
         return ResponseEntity.created(URI.create("/orders/" + output.orderId())).body(OrderResponse.from(output));
     }
 

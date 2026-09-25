@@ -9,3 +9,6 @@ server/.project
 # frontend
 web/node_modules/
 web/dist/
+
+# build output legado
+**/target_test-classes/

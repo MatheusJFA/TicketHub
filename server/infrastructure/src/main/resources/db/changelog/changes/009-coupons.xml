@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd
+                   http://www.liquibase.org/xml/ns/dbchangelog-ext https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <changeSet id="009-1-create-coupons" author="tickethub">
+        <ext:createCollection collectionName="coupons"/>
+    </changeSet>
+    <changeSet id="009-2-coupons-code-index" author="tickethub">
+        <ext:createIndex collectionName="coupons">
+            <ext:keys>{ "code": 1 }</ext:keys>
+            <ext:options>{ "unique": true, "name": "uq_coupons_code" }</ext:options>
+        </ext:createIndex>
+    </changeSet>
+</databaseChangeLog>

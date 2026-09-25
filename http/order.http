@@ -13,7 +13,8 @@ Idempotency-Key: 00000000-0000-4000-8000-000000000001
 
 {
   "customerId": "REPLACE_WITH_CUSTOMER_ID",
-  "spotIds": ["REPLACE_WITH_SPOT_ID"]
+  "spotIds": ["REPLACE_WITH_SPOT_ID"],
+  "couponCode": "PISTA10"
 }
 
 ### Pay order (PIX)
