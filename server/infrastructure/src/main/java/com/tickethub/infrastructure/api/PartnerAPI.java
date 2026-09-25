@@ -51,6 +51,36 @@ public interface PartnerAPI {
     ResponseEntity<IdResponse> changePartnerAddress(
             @PathVariable("id") String id, @RequestBody ChangePartnerAddressRequest input);
 
+    @PutMapping(value = "/{id}/webhook", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Change Partner Webhook")
+    @ApiResponses({
+        @ApiResponse(
+                responseCode = "200",
+                description = "Partner webhook updated successfully; returns the resource identifier"),
+        @ApiResponse(
+                responseCode = "400",
+                description =
+                        "The request body is missing or contains malformed JSON, or a request parameter has an incompatible type"),
+        @ApiResponse(
+                responseCode = "404",
+                description =
+                        "The requested resource or a referenced resource was not found for the supplied identifier"),
+        @ApiResponse(
+                responseCode = "422",
+                description =
+                        "The request was parsed, but its values or the current resource state violate domain validation rules"),
+        @ApiResponse(
+                responseCode = "500",
+                description = "An unexpected failure prevented the server from completing the operation"),
+        @ApiResponse(
+                responseCode = "503",
+                description =
+                        "The operation is unavailable because its required service dependencies are not configured")
+    })
+    @PreAuthorize("hasAuthority('partner:write') and @ownerAccess.isSelfOrAdmin(#id)")
+    ResponseEntity<IdResponse> changePartnerWebhook(
+            @PathVariable("id") String id, @RequestBody ChangePartnerWebhookRequest input);
+
     @PatchMapping(value = "/{id}/name", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Change Partner Name")
     @ApiResponses({
@@ -82,12 +112,12 @@ public interface PartnerAPI {
             @PathVariable("id") String id, @RequestBody ChangePartnerNameRequest input);
 
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Create Partner")
+    @Operation(summary = "Request Partner registration (pending approval)")
     @ApiResponses({
         @ApiResponse(
                 responseCode = "201",
                 description =
-                        "Partner created successfully; returns its identifier and the resource URL in the Location header"),
+                        "Partner request received as pending; returns its identifier and the resource URL in the Location header"),
         @ApiResponse(
                 responseCode = "400",
                 description =
@@ -109,6 +139,56 @@ public interface PartnerAPI {
                         "The operation is unavailable because its required service dependencies are not configured")
     })
     ResponseEntity<IdResponse> createPartner(@RequestBody CreatePartnerRequest input);
+
+    @PostMapping("/{id}/approve")
+    @Operation(summary = "Approve Partner")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Partner approved successfully"),
+        @ApiResponse(
+                responseCode = "400",
+                description =
+                        "The request body is missing or contains malformed JSON, or a request parameter has an incompatible type"),
+        @ApiResponse(responseCode = "401", description = "Missing or invalid credentials"),
+        @ApiResponse(responseCode = "403", description = "The authenticated actor lacks the ADMIN role"),
+        @ApiResponse(
+                responseCode = "404",
+                description =
+                        "The requested resource or a referenced resource was not found for the supplied identifier"),
+        @ApiResponse(
+                responseCode = "422",
+                description =
+                        "The request was parsed, but its values or the current resource state violate domain validation rules"),
+        @ApiResponse(
+                responseCode = "500",
+                description = "An unexpected failure prevented the server from completing the operation")
+    })
+    @PreAuthorize("hasRole('ADMIN')")
+    ResponseEntity<PartnerStatusResponse> approvePartner(@PathVariable("id") String id);
+
+    @PostMapping("/{id}/reject")
+    @Operation(summary = "Reject Partner")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Partner rejected successfully"),
+        @ApiResponse(
+                responseCode = "400",
+                description =
+                        "The request body is missing or contains malformed JSON, or a request parameter has an incompatible type"),
+        @ApiResponse(responseCode = "401", description = "Missing or invalid credentials"),
+        @ApiResponse(responseCode = "403", description = "The authenticated actor lacks the ADMIN role"),
+        @ApiResponse(
+                responseCode = "404",
+                description =
+                        "The requested resource or a referenced resource was not found for the supplied identifier"),
+        @ApiResponse(
+                responseCode = "422",
+                description =
+                        "The request was parsed, but its values or the current resource state violate domain validation rules"),
+        @ApiResponse(
+                responseCode = "500",
+                description = "An unexpected failure prevented the server from completing the operation")
+    })
+    @PreAuthorize("hasRole('ADMIN')")
+    ResponseEntity<PartnerStatusResponse> rejectPartner(@PathVariable("id") String id);
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete Partner")

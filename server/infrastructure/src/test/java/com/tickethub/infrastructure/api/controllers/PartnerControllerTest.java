@@ -8,10 +8,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.tickethub.application.Either;
+import com.tickethub.application.partner.approve.ApprovePartnerOutput;
+import com.tickethub.application.partner.approve.ApprovePartnerUseCase;
 import com.tickethub.application.partner.changeaddress.*;
 import com.tickethub.application.partner.changename.*;
+import com.tickethub.application.partner.changewebhook.ChangePartnerWebhookOutput;
+import com.tickethub.application.partner.changewebhook.ChangePartnerWebhookUseCase;
 import com.tickethub.application.partner.create.*;
 import com.tickethub.application.partner.delete.DeletePartnerUseCase;
+import com.tickethub.application.partner.reject.RejectPartnerOutput;
+import com.tickethub.application.partner.reject.RejectPartnerUseCase;
 import com.tickethub.application.partner.retrieve.get.*;
 import com.tickethub.application.partner.retrieve.list.*;
 import com.tickethub.application.partner.update.*;
@@ -44,10 +50,19 @@ class PartnerControllerTest {
     ChangePartnerNameUseCase changePartnerName;
 
     @MockitoBean
+    ChangePartnerWebhookUseCase changePartnerWebhook;
+
+    @MockitoBean
     CreatePartnerUseCase createPartner;
 
     @MockitoBean
     DeletePartnerUseCase deletePartner;
+
+    @MockitoBean
+    ApprovePartnerUseCase approvePartner;
+
+    @MockitoBean
+    RejectPartnerUseCase rejectPartner;
 
     @MockitoBean
     GetPartnerUseCase getPartner;
@@ -69,8 +84,8 @@ class PartnerControllerTest {
     }
 
     @Test
-    @DisplayName("Given a valid command, when calls create partner, should return partner id")
-    void givenAValidCommand_whenCallsCreatePartner_shouldReturnPartnerId() throws Exception {
+    @DisplayName("Given a registration request, when calls create partner, should return pending partner id")
+    void givenRegistrationRequest_whenCallsCreatePartner_shouldReturnPendingPartnerId() throws Exception {
         when(createPartner.execute(any())).thenReturn(Either.right(new CreatePartnerOutput("partner-1")));
 
         mvc.perform(post("/partners").contentType(MediaType.APPLICATION_JSON).content("""
@@ -79,6 +94,72 @@ class PartnerControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/partners/partner-1"))
                 .andExpect(jsonPath("$.id").value("partner-1"));
+    }
+
+    @Test
+    @DisplayName("Given admin, when calls approve partner, should return active status")
+    void givenAdmin_whenCallsApprovePartner_shouldReturnActiveStatus() throws Exception {
+        when(approvePartner.execute("partner-1"))
+                .thenReturn(Either.right(new ApprovePartnerOutput("partner-1", "ACTIVE")));
+
+        mvc.perform(post("/partners/partner-1/approve").header("Authorization", bearer(null, "ROLE_ADMIN")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("partner-1"))
+                .andExpect(jsonPath("$.status").value("ACTIVE"));
+    }
+
+    @Test
+    @DisplayName("Given admin, when calls reject partner, should return rejected status")
+    void givenAdmin_whenCallsRejectPartner_shouldReturnRejectedStatus() throws Exception {
+        when(rejectPartner.execute("partner-1"))
+                .thenReturn(Either.right(new RejectPartnerOutput("partner-1", "REJECTED")));
+
+        mvc.perform(post("/partners/partner-1/reject").header("Authorization", bearer(null, "ROLE_ADMIN")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("partner-1"))
+                .andExpect(jsonPath("$.status").value("REJECTED"));
+    }
+
+    @Test
+    @DisplayName("Given anonymous, when calls approve partner, then returns unauthorized")
+    void givenAnonymous_whenCallsApprovePartner_thenReturnsUnauthorized() throws Exception {
+        mvc.perform(post("/partners/partner-1/approve")).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("Given non admin, when calls approve partner, then returns forbidden")
+    void givenNonAdmin_whenCallsApprovePartner_thenReturnsForbidden() throws Exception {
+        mvc.perform(post("/partners/partner-1/approve")
+                        .header("Authorization", bearer("partner-1", "ROLE_PARTNER", "show:create")))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("Given owner, when calls change webhook, then succeeds")
+    void givenOwner_whenCallsChangeWebhook_thenSucceeds() throws Exception {
+        when(changePartnerWebhook.execute(any())).thenReturn(Either.right(new ChangePartnerWebhookOutput("partner-1")));
+        when(ownerAccess.isSelfOrAdmin("partner-1")).thenReturn(true);
+
+        mvc.perform(put("/partners/partner-1/webhook")
+                        .header("Authorization", bearer("partner-1", "partner:write"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"webhookUrl":"https://partner.domain.com/hook","webhookSecret":"s3cr3t"}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("partner-1"));
+    }
+
+    @Test
+    @DisplayName("Given another account, when calls change webhook, then returns forbidden")
+    void givenAnotherAccount_whenCallsChangeWebhook_thenReturnsForbidden() throws Exception {
+        mvc.perform(put("/partners/partner-1/webhook")
+                        .header("Authorization", bearer("partner-9", "partner:write"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"webhookUrl":"https://partner.domain.com/hook","webhookSecret":"s3cr3t"}
+                                """))
+                .andExpect(status().isForbidden());
     }
 
     @Test

@@ -1,10 +1,11 @@
 @baseUrl = http://localhost:8080
-# Login via auth.http first, then paste the token below.
-# The token must carry the ownerId claim matching the resource being managed.
-@token = PASTE_JWT_HERE
+# Registration is public but creates a PENDING partner (ADR-024): login only
+# works after master approval. Login as master (admin@tickethub.local) via
+# auth.http for the approve/reject calls below.
+@token = PASTE_ADMIN_JWT_HERE
 @partnerId = REPLACE_WITH_PARTNER_ID
 
-### Create partner
+### Request partner registration (public, PENDING)
 # @name createPartner
 POST {{baseUrl}}/partners
 Content-Type: application/json
@@ -25,6 +26,29 @@ X-Correlation-ID: partner-create-1
   },
   "email": "cinema@domain.com",
   "password": "secret-123"
+}
+
+### Approve partner (ADMIN only)
+# @name approvePartner
+POST {{baseUrl}}/partners/{{partnerId}}/approve
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Reject partner (ADMIN only)
+# @name rejectPartner
+POST {{baseUrl}}/partners/{{partnerId}}/reject
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Change partner webhook (owner or ADMIN)
+# @name changePartnerWebhook
+PUT {{baseUrl}}/partners/{{partnerId}}/webhook
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "webhookUrl": "https://partner.domain.com/hook",
+  "webhookSecret": "s3cr3t"
 }
 
 ### Get partner by id

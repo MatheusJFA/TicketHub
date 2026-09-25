@@ -94,6 +94,56 @@ class PartnerTest {
         assertEquals(expectedCnpj, actualPartner.getCnpj().getValue());
         assertEquals(VALID_EMAIL, actualPartner.getEmail().getValue());
         assertEquals(VALID_HASH, actualPartner.getPasswordHash().getValue());
+        assertEquals(PartnerStatus.PENDING, actualPartner.getStatus());
+    }
+
+    @Test
+    @DisplayName("Given pending partner, when approve, then status is active")
+    void givenPendingPartner_whenApprove_thenStatusIsActive() {
+        final var partner = Partner.create(
+                "Cinema Nova",
+                "11222333000181",
+                Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"),
+                VALID_EMAIL,
+                VALID_HASH);
+
+        partner.approve();
+
+        assertEquals(PartnerStatus.ACTIVE, partner.getStatus());
+    }
+
+    @Test
+    @DisplayName("Given pending partner, when reject, then status is rejected")
+    void givenPendingPartner_whenReject_thenStatusIsRejected() {
+        final var partner = Partner.create(
+                "Cinema Nova",
+                "11222333000181",
+                Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"),
+                VALID_EMAIL,
+                VALID_HASH);
+
+        partner.reject();
+
+        assertEquals(PartnerStatus.REJECTED, partner.getStatus());
+    }
+
+    @Test
+    @DisplayName("Given non pending partner, when approve or reject, then throw domain exception")
+    void givenNonPendingPartner_whenApproveOrReject_thenThrowDomainException() {
+        final var partner = Partner.create(
+                "Cinema Nova",
+                "11222333000181",
+                Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"),
+                VALID_EMAIL,
+                VALID_HASH);
+        partner.approve();
+
+        assertEquals(
+                "Only pending partners can be approved",
+                assertThrows(DomainException.class, partner::approve).getMessage());
+        assertEquals(
+                "Only pending partners can be rejected",
+                assertThrows(DomainException.class, partner::reject).getMessage());
     }
 
     @Test
@@ -130,5 +180,35 @@ class PartnerTest {
                         VALID_HASH));
 
         assertEquals("Invalid CNPJ", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Given create, when read webhook, then null")
+    void givenCreate_whenReadWebhook_thenNull() {
+        final var partner = Partner.create(
+                "Cinema Nova",
+                "11222333000181",
+                Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"),
+                VALID_EMAIL,
+                VALID_HASH);
+
+        assertEquals(null, partner.getWebhookUrl());
+        assertEquals(null, partner.getWebhookSecret());
+    }
+
+    @Test
+    @DisplayName("Given urls, when change webhook, then updates")
+    void givenUrls_whenChangeWebhook_thenUpdates() {
+        final var partner = Partner.create(
+                "Cinema Nova",
+                "11222333000181",
+                Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000"),
+                VALID_EMAIL,
+                VALID_HASH);
+
+        partner.changeWebhook("https://partner.domain.com/hook", "s3cr3t");
+
+        assertEquals("https://partner.domain.com/hook", partner.getWebhookUrl());
+        assertEquals("s3cr3t", partner.getWebhookSecret());
     }
 }

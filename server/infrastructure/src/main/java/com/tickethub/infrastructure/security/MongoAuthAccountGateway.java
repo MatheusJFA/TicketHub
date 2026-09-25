@@ -9,6 +9,7 @@ import com.tickethub.domain.authentication.AuthAccountGateway;
 import com.tickethub.domain.core.customer.CustomerGateway;
 import com.tickethub.domain.core.operator.OperatorGateway;
 import com.tickethub.domain.core.partner.PartnerGateway;
+import com.tickethub.domain.core.partner.PartnerStatus;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.shared.Email;
 import java.util.Optional;
@@ -55,6 +56,8 @@ public class MongoAuthAccountGateway implements AuthAccountGateway {
         return toEmail(identifier)
                 .flatMap(partners::findByEmail)
                 .filter(partner -> nonNull(partner.getPasswordHash()))
+                // Pending/rejected partners cannot login until approved by an admin.
+                .filter(partner -> partner.getStatus() == PartnerStatus.ACTIVE)
                 .map(partner -> new AuthAccount(
                         partner.getEmail().getValue(),
                         partner.getPasswordHash().getValue(),

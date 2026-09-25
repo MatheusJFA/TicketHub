@@ -58,10 +58,11 @@ class MongoAuthAccountGatewayTest {
     }
 
     @Test
-    @DisplayName("Given partner email, when find by identifier, then returns partner account")
-    void givenPartnerEmail_whenFindByIdentifier_thenReturnsPartnerAccount() {
+    @DisplayName("Given approved partner email, when find by identifier, then returns partner account")
+    void givenApprovedPartnerEmail_whenFindByIdentifier_thenReturnsPartnerAccount() {
         final var address = Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000");
-        final var partner = Partner.create("Cinema Nova", "11222333000181", address, "cinema@domain.com", PASSWORD_HASH);
+        final var partner = Partner.create("Cinema Nova", "11222333000181", address, "cinema@domain.com", PASSWORD_HASH)
+                .approve();
         when(customers.findByEmail(Email.create("cinema@domain.com"))).thenReturn(Optional.empty());
         when(partners.findByEmail(Email.create("cinema@domain.com"))).thenReturn(Optional.of(partner));
 
@@ -71,6 +72,34 @@ class MongoAuthAccountGatewayTest {
         assertEquals(partner.getId().getValue(), account.ownerId());
         assertTrue(account.authorities().contains("ROLE_PARTNER"));
         assertTrue(account.authorities().contains("show:create"));
+    }
+
+    @Test
+    @DisplayName("Given pending partner email, when find by identifier, then returns empty")
+    void givenPendingPartnerEmail_whenFindByIdentifier_thenReturnsEmpty() {
+        final var address = Address.create("Rua A", "10", null, "Centro", "Sao Paulo", "SP", "Brasil", "01001000");
+        final var partner =
+                Partner.create("Cinema Nova", "11222333000181", address, "pending@domain.com", PASSWORD_HASH);
+        when(customers.findByEmail(Email.create("pending@domain.com"))).thenReturn(Optional.empty());
+        when(partners.findByEmail(Email.create("pending@domain.com"))).thenReturn(Optional.of(partner));
+        when(operators.findByEmail(Email.create("pending@domain.com"))).thenReturn(Optional.empty());
+
+        assertTrue(gateway.findByIdentifier("pending@domain.com").isEmpty());
+    }
+
+    @Test
+    @DisplayName("Given operator email, when find by identifier, then returns admin account")
+    void givenOperatorEmail_whenFindByIdentifier_thenReturnsAdminAccount() {
+        final var operator = Operator.create("Admin Local", "admin@tickethub.local", PASSWORD_HASH);
+        when(customers.findByEmail(Email.create("admin@tickethub.local"))).thenReturn(Optional.empty());
+        when(partners.findByEmail(Email.create("admin@tickethub.local"))).thenReturn(Optional.empty());
+        when(operators.findByEmail(Email.create("admin@tickethub.local"))).thenReturn(Optional.of(operator));
+
+        final var account = gateway.findByIdentifier("admin@tickethub.local").orElseThrow();
+
+        assertEquals("admin@tickethub.local", account.subject());
+        assertTrue(account.authorities().contains("ROLE_ADMIN"));
+        assertEquals(null, account.ownerId());
     }
 
     @Test

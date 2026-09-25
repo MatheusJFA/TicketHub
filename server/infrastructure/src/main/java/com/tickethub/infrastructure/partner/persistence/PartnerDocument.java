@@ -2,6 +2,7 @@ package com.tickethub.infrastructure.partner.persistence;
 
 import com.tickethub.domain.core.partner.Partner;
 import com.tickethub.domain.core.partner.PartnerID;
+import com.tickethub.domain.core.partner.PartnerStatus;
 import com.tickethub.domain.shared.CNPJ;
 import com.tickethub.domain.shared.Email;
 import com.tickethub.domain.shared.Name;
@@ -21,6 +22,9 @@ public record PartnerDocument(
         AddressDocument address,
         String email,
         String passwordHash,
+        String status,
+        String webhookUrl,
+        String webhookSecret,
         Instant createdAt,
         Instant updatedAt,
         Instant deletedAt,
@@ -37,6 +41,9 @@ public record PartnerDocument(
                 address,
                 email,
                 passwordHash,
+                status,
+                webhookUrl,
+                webhookSecret,
                 createdAt,
                 updatedAt,
                 deletedAt,
@@ -54,6 +61,11 @@ public record PartnerDocument(
                 Optional.ofNullable(partner.getPasswordHash())
                         .map(PasswordHash::getValue)
                         .orElse(null),
+                Optional.ofNullable(partner.getStatus())
+                        .map(PartnerStatus::name)
+                        .orElse(null),
+                partner.getWebhookUrl(),
+                partner.getWebhookSecret(),
                 partner.getCreatedAt(),
                 partner.getUpdatedAt(),
                 partner.getDeletedAt(),
@@ -74,6 +86,9 @@ public record PartnerDocument(
         final PasswordHash passwordHash = Optional.ofNullable(this.passwordHash)
                 .map(PasswordHash::fromHash)
                 .orElse(null);
+        // Documents written before approval flow have no status: grandfather as ACTIVE.
+        final PartnerStatus status =
+                Optional.ofNullable(this.status).map(PartnerStatus::valueOf).orElse(PartnerStatus.ACTIVE);
         return Partner.reconstitute(
                 PartnerID.from(id),
                 Name.create(name),
@@ -81,6 +96,9 @@ public record PartnerDocument(
                 address.toDomain(),
                 email,
                 passwordHash,
+                status,
+                webhookUrl,
+                webhookSecret,
                 createdAt,
                 updatedAt,
                 deletedAt,

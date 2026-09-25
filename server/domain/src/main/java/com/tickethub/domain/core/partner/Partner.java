@@ -1,6 +1,7 @@
 package com.tickethub.domain.core.partner;
 
 import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 
 import com.tickethub.domain.AggregateRoot;
 import com.tickethub.domain.core.show.Show;
@@ -20,6 +21,9 @@ public class Partner extends AggregateRoot<PartnerID> {
     private Address address;
     private Email email;
     private PasswordHash passwordHash;
+    private PartnerStatus status;
+    private String webhookUrl;
+    private String webhookSecret;
 
     private Partner(
             PartnerID id,
@@ -28,6 +32,9 @@ public class Partner extends AggregateRoot<PartnerID> {
             Address address,
             Email email,
             PasswordHash passwordHash,
+            PartnerStatus status,
+            String webhookUrl,
+            String webhookSecret,
             Instant createdAt,
             Instant updatedAt,
             Instant deletedAt,
@@ -39,6 +46,9 @@ public class Partner extends AggregateRoot<PartnerID> {
         this.address = requireAddress(address);
         this.email = email;
         this.passwordHash = passwordHash;
+        this.status = status;
+        this.webhookUrl = webhookUrl;
+        this.webhookSecret = webhookSecret;
     }
 
     public static Partner create(String name, String cnpj, Address address, String email, String passwordHash) {
@@ -51,6 +61,9 @@ public class Partner extends AggregateRoot<PartnerID> {
                 address,
                 Email.create(email),
                 PasswordHash.fromHash(passwordHash),
+                PartnerStatus.PENDING,
+                null,
+                null,
                 now,
                 now,
                 null,
@@ -65,6 +78,9 @@ public class Partner extends AggregateRoot<PartnerID> {
             Address address,
             Email email,
             PasswordHash passwordHash,
+            PartnerStatus status,
+            String webhookUrl,
+            String webhookSecret,
             Instant createdAt,
             Instant updatedAt,
             Instant deletedAt,
@@ -77,6 +93,9 @@ public class Partner extends AggregateRoot<PartnerID> {
                 address,
                 email,
                 passwordHash,
+                status,
+                webhookUrl,
+                webhookSecret,
                 createdAt,
                 updatedAt,
                 deletedAt,
@@ -112,6 +131,31 @@ public class Partner extends AggregateRoot<PartnerID> {
         return this;
     }
 
+    public Partner approve() {
+        if (status != PartnerStatus.PENDING) {
+            throw new DomainException("Only pending partners can be approved");
+        }
+        this.status = PartnerStatus.ACTIVE;
+        markAsUpdated();
+        return this;
+    }
+
+    public Partner reject() {
+        if (status != PartnerStatus.PENDING) {
+            throw new DomainException("Only pending partners can be rejected");
+        }
+        this.status = PartnerStatus.REJECTED;
+        markAsUpdated();
+        return this;
+    }
+
+    public Partner changeWebhook(final String webhookUrl, final String webhookSecret) {
+        this.webhookUrl = defaultIfBlank(webhookUrl, null);
+        this.webhookSecret = defaultIfBlank(webhookSecret, null);
+        markAsUpdated();
+        return this;
+    }
+
     private static Address requireAddress(final Address address) {
         if (isNull(address)) {
             throw new DomainException("'address' should not be null");
@@ -137,6 +181,18 @@ public class Partner extends AggregateRoot<PartnerID> {
 
     public PasswordHash getPasswordHash() {
         return passwordHash;
+    }
+
+    public PartnerStatus getStatus() {
+        return status;
+    }
+
+    public String getWebhookUrl() {
+        return webhookUrl;
+    }
+
+    public String getWebhookSecret() {
+        return webhookSecret;
     }
 
     @Override

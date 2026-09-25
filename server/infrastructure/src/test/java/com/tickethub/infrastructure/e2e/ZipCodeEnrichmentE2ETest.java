@@ -73,6 +73,12 @@ class ZipCodeEnrichmentE2ETest extends ContainerSupport {
                 .getContentAsString();
         final var id = objectMapper.readTree(created).get("id").asText();
 
+        // Pending partners cannot login until approved by an admin.
+        mvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"identifier\":\"cep-failopen@domain.com\",\"password\":\"secret-123\"}"))
+                .andExpect(status().isUnauthorized());
+
         final var login = mvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"identifier\":\"admin@tickethub.local\",\"password\":\"admin-local\"}"))
@@ -81,6 +87,15 @@ class ZipCodeEnrichmentE2ETest extends ContainerSupport {
                 .getResponse()
                 .getContentAsString();
         final var adminToken = objectMapper.readTree(login).get("accessToken").asText();
+
+        mvc.perform(post("/partners/" + id + "/approve").header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("ACTIVE"));
+
+        mvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"identifier\":\"cep-failopen@domain.com\",\"password\":\"secret-123\"}"))
+                .andExpect(status().isOk());
 
         mvc.perform(get("/partners/" + id).header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isOk())

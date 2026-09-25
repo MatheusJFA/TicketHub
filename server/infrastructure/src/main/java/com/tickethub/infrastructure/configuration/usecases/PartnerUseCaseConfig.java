@@ -1,13 +1,19 @@
 package com.tickethub.infrastructure.configuration.usecases;
 
+import com.tickethub.application.partner.approve.ApprovePartnerUseCase;
+import com.tickethub.application.partner.approve.DefaultApprovePartnerUseCase;
 import com.tickethub.application.partner.changeaddress.ChangePartnerAddressUseCase;
 import com.tickethub.application.partner.changeaddress.DefaultChangePartnerAddressUseCase;
 import com.tickethub.application.partner.changename.ChangePartnerNameUseCase;
 import com.tickethub.application.partner.changename.DefaultChangePartnerNameUseCase;
+import com.tickethub.application.partner.changewebhook.ChangePartnerWebhookUseCase;
+import com.tickethub.application.partner.changewebhook.DefaultChangePartnerWebhookUseCase;
 import com.tickethub.application.partner.create.CreatePartnerUseCase;
 import com.tickethub.application.partner.create.DefaultCreatePartnerUseCase;
 import com.tickethub.application.partner.delete.DefaultDeletePartnerUseCase;
 import com.tickethub.application.partner.delete.DeletePartnerUseCase;
+import com.tickethub.application.partner.reject.DefaultRejectPartnerUseCase;
+import com.tickethub.application.partner.reject.RejectPartnerUseCase;
 import com.tickethub.application.partner.retrieve.get.DefaultGetPartnerUseCase;
 import com.tickethub.application.partner.retrieve.get.GetPartnerUseCase;
 import com.tickethub.application.partner.retrieve.list.DefaultListPartnersUseCase;
@@ -32,6 +38,16 @@ public class PartnerUseCaseConfig {
     }
 
     @Bean
+    public ApprovePartnerUseCase approvePartnerUseCase() {
+        return new DefaultApprovePartnerUseCase(partnerGateway);
+    }
+
+    @Bean
+    public RejectPartnerUseCase rejectPartnerUseCase() {
+        return new DefaultRejectPartnerUseCase(partnerGateway);
+    }
+
+    @Bean
     public ChangePartnerAddressUseCase changePartnerAddressUseCase() {
         return new DefaultChangePartnerAddressUseCase(partnerGateway);
     }
@@ -39,6 +55,11 @@ public class PartnerUseCaseConfig {
     @Bean
     public ChangePartnerNameUseCase changePartnerNameUseCase() {
         return new DefaultChangePartnerNameUseCase(partnerGateway);
+    }
+
+    @Bean
+    public ChangePartnerWebhookUseCase changePartnerWebhookUseCase() {
+        return new DefaultChangePartnerWebhookUseCase(partnerGateway);
     }
 
     @Bean

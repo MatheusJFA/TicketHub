@@ -83,6 +83,8 @@ ensureAccount(
   {
     name: "Cinema Nova",
     cnpj: "04252011000110",
+    // Solicitações via POST /partners nascem PENDING; o seed grava direto como ACTIVE.
+    status: "ACTIVE",
     address: {
       street: "Rua Augusta",
       number: "100",
@@ -99,4 +101,10 @@ ensureAccount(
     // senha: partner-local
     passwordHash: "$2a$10$yd53Z0ydlKB9/DaDw/jHFO8eWLtgbWsNjjYH9eSY1dvKPRBkC2B3a",
   }
+);
+
+// Garante o seed como ACTIVE mesmo em volume pré-existente (o update acima só toca credenciais).
+db.partners.updateOne(
+  { email: "partner@tickethub.local" },
+  { $set: { status: "ACTIVE", updatedAt: now, lastModifiedBy: "seed-dev" } }
 );
