@@ -1,6 +1,7 @@
 package com.tickethub.infrastructure.security;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
@@ -43,6 +44,7 @@ class JwtTokenIssuerTest {
         assertEquals("maria@domain.com", jwt.getSubject());
         assertEquals("tickethub", jwt.getClaimAsString("iss"));
         assertEquals("customer-1", jwt.getClaimAsString("ownerId"));
+        assertNotNull(jwt.getClaimAsString("jti"));
         final List<String> authorities = jwt.getClaimAsStringList("authorities");
         assertTrue(authorities.contains("ROLE_CUSTOMER"));
         assertTrue(authorities.contains("customer:write"));

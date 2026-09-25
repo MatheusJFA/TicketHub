@@ -40,8 +40,7 @@ class MercadoPagoConfigurationTest {
                 .run(context -> {
                     assertThat(context).hasNotFailed();
                     assertThat(context).doesNotHaveBean(MercadoPagoClient.class);
-                    assertThat(context).getBean(PaymentGateway.class)
-                            .isInstanceOf(DisabledPaymentGateway.class);
+                    assertThat(context).getBean(PaymentGateway.class).isInstanceOf(DisabledPaymentGateway.class);
                 });
     }
 
@@ -67,8 +66,7 @@ class MercadoPagoConfigurationTest {
                 .run(context -> {
                     assertThat(context).hasNotFailed();
                     assertThat(context).doesNotHaveBean(MercadoPagoClient.class);
-                    assertThat(context).getBean(PaymentGateway.class)
-                            .isInstanceOf(DisabledPaymentGateway.class);
+                    assertThat(context).getBean(PaymentGateway.class).isInstanceOf(DisabledPaymentGateway.class);
                 });
     }
 }

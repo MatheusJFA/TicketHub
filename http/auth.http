@@ -56,14 +56,16 @@ POST {{baseUrl}}/auth/refresh
 Content-Type: application/json
 
 {
-  "refreshToken": "PASTE_REFRESH_TOKEN_HERE"
+  "refreshToken": "PASTE_REFRESH_TOKEN_HERE",
+  "accessToken": "PASTE_ACCESS_TOKEN_HERE"
 }
 
-### Logout (revokes the refresh token)
+### Logout (revokes the refresh token and, if sent, the access token)
 # @name logout
 POST {{baseUrl}}/auth/logout
 Content-Type: application/json
 
 {
-  "refreshToken": "PASTE_REFRESH_TOKEN_HERE"
+  "refreshToken": "PASTE_REFRESH_TOKEN_HERE",
+  "accessToken": "PASTE_ACCESS_TOKEN_HERE"
 }

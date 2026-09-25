@@ -3,13 +3,17 @@ package com.tickethub.infrastructure.configuration;
 import static java.util.Objects.isNull;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import com.tickethub.domain.authentication.RevokedAccessTokenGateway;
 import com.tickethub.infrastructure.authentication.AuthSessionProperties;
+import com.tickethub.infrastructure.security.RevokedAccessTokenFilter;
 import com.tickethub.infrastructure.security.SecurityProperties;
 import com.tickethub.infrastructure.web.CheckoutProperties;
 import com.tickethub.infrastructure.web.CorsProperties;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,7 +53,8 @@ public class SecurityConfiguration {
             final HttpSecurity http,
             final JwtDecoder jwtDecoder,
             final JwtAuthenticationConverter jwtAuthenticationConverter,
-            final CorsConfigurationSource corsConfigurationSource)
+            final CorsConfigurationSource corsConfigurationSource,
+            final RevokedAccessTokenFilter revokedAccessTokenFilter)
             throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
@@ -67,13 +72,33 @@ public class SecurityConfiguration {
                         .permitAll()
                         .requestMatchers(HttpMethod.GET, "/shows/**", "/sections/**", "/spots/**", "/zipcode/**")
                         .permitAll()
-                        .requestMatchers(HttpMethod.POST, "/customers/**", "/partners/**")
+                        .requestMatchers(HttpMethod.POST, "/customers/**", "/partners")
                         .permitAll()
                         .anyRequest()
                         .authenticated())
                 .oauth2ResourceServer(oauth -> oauth.jwt(
-                        jwt -> jwt.decoder(jwtDecoder).jwtAuthenticationConverter(jwtAuthenticationConverter)));
+                        jwt -> jwt.decoder(jwtDecoder).jwtAuthenticationConverter(jwtAuthenticationConverter)))
+                .addFilterAfter(
+                        revokedAccessTokenFilter,
+                        org.springframework.security.oauth2.server.resource.web.authentication
+                                .BearerTokenAuthenticationFilter.class);
         return http.build();
+    }
+
+    @Bean
+    public RevokedAccessTokenFilter revokedAccessTokenFilter(final ObjectProvider<RevokedAccessTokenGateway> gateways) {
+        // Slice tests (WebMvcTest) have no Redis adapter: fall back to no-op.
+        return new RevokedAccessTokenFilter(gateways.getIfAvailable(NoOpRevokedAccessTokenGateway::new));
+    }
+
+    static final class NoOpRevokedAccessTokenGateway implements RevokedAccessTokenGateway {
+        @Override
+        public void revoke(final String tokenId, final Instant expiresAt) {}
+
+        @Override
+        public boolean isRevoked(final String tokenId) {
+            return false;
+        }
     }
 
     @Bean

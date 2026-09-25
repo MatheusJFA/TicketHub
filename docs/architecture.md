@@ -150,8 +150,9 @@ rejeição em `POST /partners/{id}/reject`). `POST /operators` exige `ADMIN`.
 O cadastro cria a credencial (email + senha com hash BCrypt); o login
 (`POST /auth/login` com `identifier` = email) devolve access JWT curto +
 refresh opaco rotativo (`POST /auth/refresh`, `POST /auth/logout`; coleção
-`refresh_sessions`). Reuso de refresh rotacionado revoga a família. Detalhes em
-[`ADR-010`](./adr/0010-login-email-refresh-logout.md).
+`refresh_sessions`). `POST /auth/logout` com `accessToken` também nega o
+access (denylist do `jti` no Redis, `ADR-025`). Reuso de refresh rotacionado
+revoga a família. Detalhes em [`ADR-010`](./adr/0010-login-email-refresh-logout.md).
 
 ## 5. Testes
 

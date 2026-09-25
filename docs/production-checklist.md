@@ -46,6 +46,8 @@ têm default de desenvolvimento no `application.yml` / `docker-compose.yml`.
 - MongoDB: backup do volume `mongo_data`; `LIQUIBASE_ENABLED=true` mantém
   migrações (nunca editar changeset aplicado — só adicionar).
 - Redis: cache puro (perda = miss, sem drama); `redis_data` opcional.
+  Exceção: a denylist de access (`tickethub:auth:denylist:*`, ADR-025) mora
+  no Redis — com Redis fora, revogação não pega (fail-open com warn).
 - Kafka: tópico `tickethub.events` (3 partições/1 réplica no compose);
   ajustar partições/réplicas e `KAFKA_CONSUMER_GROUP` por ambiente.
 - Confirmar rotação do webhook secret sem downtime: atualizar MP e env

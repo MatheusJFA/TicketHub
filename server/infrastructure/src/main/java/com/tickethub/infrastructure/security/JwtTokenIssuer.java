@@ -9,6 +9,7 @@ import com.tickethub.domain.authentication.TokenIssuer;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -36,6 +37,7 @@ public class JwtTokenIssuer implements TokenIssuer {
                 .issuedAt(now)
                 .expiresAt(now.plus(expirationMinutes, ChronoUnit.MINUTES))
                 .subject(subject)
+                .id(UUID.randomUUID().toString())
                 .claim("authorities", List.copyOf(emptyIfNull(authorities)));
         if (nonNull(ownerId)) {
             claims.claim("ownerId", ownerId);
