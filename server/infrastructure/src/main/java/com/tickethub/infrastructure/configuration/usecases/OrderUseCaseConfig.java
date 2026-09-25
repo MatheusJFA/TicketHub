@@ -8,11 +8,14 @@ import com.tickethub.application.order.expire.DefaultExpireOrdersUseCase;
 import com.tickethub.application.order.expire.ExpireOrdersUseCase;
 import com.tickethub.application.order.retrieve.get.DefaultGetOrderUseCase;
 import com.tickethub.application.order.retrieve.get.GetOrderUseCase;
+import com.tickethub.domain.core.coupon.CouponGateway;
 import com.tickethub.domain.core.customer.CustomerGateway;
 import com.tickethub.domain.core.order.OrderGateway;
 import com.tickethub.domain.core.section.SectionGateway;
 import com.tickethub.domain.core.spot.SpotGateway;
+import java.time.Clock;
 import java.time.Duration;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
@@ -26,24 +29,33 @@ public class OrderUseCaseConfig {
     private final SectionGateway sectionGateway;
     private final OrderGateway orderGateway;
     private final Duration reservationTtl;
+    private final CouponGateway couponGateway;
 
     public OrderUseCaseConfig(
             final CustomerGateway customerGateway,
             final SpotGateway spotGateway,
             final SectionGateway sectionGateway,
             final OrderGateway orderGateway,
-            @Value("${tickethub.orders.reservation-ttl:15m}") final Duration reservationTtl) {
+            @Value("${tickethub.orders.reservation-ttl:15m}") final Duration reservationTtl,
+            final ObjectProvider<CouponGateway> coupons) {
         this.customerGateway = customerGateway;
         this.spotGateway = spotGateway;
         this.sectionGateway = sectionGateway;
         this.orderGateway = orderGateway;
         this.reservationTtl = reservationTtl;
+        this.couponGateway = coupons.getIfAvailable();
     }
 
     @Bean
     public CreateOrderUseCase createOrderUseCase() {
         return new DefaultCreateOrderUseCase(
-                customerGateway, spotGateway, sectionGateway, orderGateway, reservationTtl);
+                customerGateway,
+                spotGateway,
+                sectionGateway,
+                orderGateway,
+                couponGateway,
+                reservationTtl,
+                Clock.systemUTC());
     }
 
     @Bean

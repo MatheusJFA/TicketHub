@@ -2,13 +2,18 @@ package com.tickethub.application.order.create;
 
 import java.util.List;
 
-public record CreateOrderCommand(String customerId, List<String> spotIds, String idempotencyKey) {
+public record CreateOrderCommand(String customerId, List<String> spotIds, String idempotencyKey, String couponCode) {
     public static CreateOrderCommand with(final String customerId, final List<String> spotIds) {
-        return new CreateOrderCommand(customerId, spotIds, null);
+        return new CreateOrderCommand(customerId, spotIds, null, null);
     }
 
     public static CreateOrderCommand with(
             final String customerId, final List<String> spotIds, final String idempotencyKey) {
-        return new CreateOrderCommand(customerId, spotIds, idempotencyKey);
+        return new CreateOrderCommand(customerId, spotIds, idempotencyKey, null);
+    }
+
+    public static CreateOrderCommand with(
+            final String customerId, final List<String> spotIds, final String idempotencyKey, final String couponCode) {
+        return new CreateOrderCommand(customerId, spotIds, idempotencyKey, couponCode);
     }
 }

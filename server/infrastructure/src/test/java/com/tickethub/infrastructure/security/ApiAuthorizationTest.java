@@ -3,6 +3,7 @@ package com.tickethub.infrastructure.security;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.tickethub.infrastructure.api.AuditAPI;
+import com.tickethub.infrastructure.api.CouponAPI;
 import com.tickethub.infrastructure.api.CustomerAPI;
 import com.tickethub.infrastructure.api.OperatorAPI;
 import com.tickethub.infrastructure.api.PartnerAPI;
@@ -55,6 +56,7 @@ class ApiAuthorizationTest {
         var expressions = 0;
         for (final Class<?> api : Set.of(
                 AuditAPI.class,
+                CouponAPI.class,
                 CustomerAPI.class,
                 OperatorAPI.class,
                 PartnerAPI.class,

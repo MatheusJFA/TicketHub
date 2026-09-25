@@ -55,6 +55,24 @@ public final class Money extends ValueObject {
         return Money.create(value.add(other.value), currency);
     }
 
+    public Money subtract(final Money other) {
+        if (isNull(other)) {
+            throw new DomainException("'other' should not be null");
+        }
+        if (!currency.equals(other.currency)) {
+            throw new DomainException("Cannot subtract money with different currencies");
+        }
+        return Money.create(value.subtract(other.value), currency);
+    }
+
+    public Money multiply(final BigDecimal factor) {
+        if (isNull(factor) || factor.signum() < 0) {
+            throw new DomainException("'factor' should not be null or negative");
+        }
+        return Money.create(
+                value.multiply(factor).setScale(currency.getDefaultFractionDigits(), RoundingMode.HALF_UP), currency);
+    }
+
     public BigDecimal getValue() {
         return value;
     }

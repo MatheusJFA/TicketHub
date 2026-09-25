@@ -11,6 +11,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.tickethub.application.UseCaseTest;
+import com.tickethub.domain.core.coupon.Coupon;
+import com.tickethub.domain.core.coupon.CouponGateway;
+import com.tickethub.domain.core.coupon.CouponKind;
 import com.tickethub.domain.core.customer.Customer;
 import com.tickethub.domain.core.customer.CustomerGateway;
 import com.tickethub.domain.core.customer.CustomerID;
@@ -49,12 +52,15 @@ class CreateOrderUseCaseTest extends UseCaseTest {
     private final SpotGateway spotGateway = mock(SpotGateway.class);
     private final SectionGateway sectionGateway = mock(SectionGateway.class);
     private final OrderGateway orderGateway = mock(OrderGateway.class);
+    private final CouponGateway couponGateway = mock(CouponGateway.class);
     private final DefaultCreateOrderUseCase useCase =
             new DefaultCreateOrderUseCase(customerGateway, spotGateway, sectionGateway, orderGateway, TTL, CLOCK);
+    private final DefaultCreateOrderUseCase couponUseCase = new DefaultCreateOrderUseCase(
+            customerGateway, spotGateway, sectionGateway, orderGateway, couponGateway, TTL, CLOCK);
 
     @Override
     protected List<Object> getMocks() {
-        return List.of(customerGateway, spotGateway, sectionGateway, orderGateway);
+        return List.of(customerGateway, spotGateway, sectionGateway, orderGateway, couponGateway);
     }
 
     private Customer givenCustomer() {
@@ -242,5 +248,161 @@ class CreateOrderUseCaseTest extends UseCaseTest {
         verify(spotGateway, times(1)).findPlacement(spot.getId());
         verify(spotGateway, times(1)).reserveIfAvailable(spot.getId());
         verify(sectionGateway, times(1)).findById(section.getId());
+    }
+
+    private Coupon givenCoupon(final Section section) {
+        final var coupon = Coupon.create(
+                "PISTA10", null, section.getId().getValue(), CouponKind.PERCENT, 10, null, null, null, null);
+        when(couponGateway.findByCode("PISTA10")).thenReturn(Optional.of(coupon));
+        when(couponGateway.claimUse("PISTA10", CLOCK.instant())).thenReturn(Optional.of(coupon));
+        return coupon;
+    }
+
+    @Test
+    @DisplayName("Given percent coupon, when execute, then discounts eligible items")
+    void givenPercentCoupon_whenExecute_thenDiscountsEligibleItems() {
+        final var customer = givenCustomer();
+        final var section = givenSection(Money.create(new BigDecimal("50.00"), BRL));
+        final var first = givenFreeSpot(section, "A1");
+        final var second = givenFreeSpot(section, "A2");
+        givenCoupon(section);
+        when(orderGateway.create(any())).thenAnswer(returnsFirstArg());
+
+        final var output = couponUseCase
+                .execute(CreateOrderCommand.with(
+                        customer.getId().getValue(),
+                        List.of(first.getId().getValue(), second.getId().getValue()),
+                        null,
+                        "pista10"))
+                .getRight();
+
+        assertEquals(new BigDecimal("90.00"), output.totalValue());
+        verify(customerGateway, times(1)).findById(customer.getId());
+        verify(spotGateway, times(2)).findPlacement(any());
+        verify(spotGateway, times(2)).reserveIfAvailable(any());
+        verify(sectionGateway, times(2)).findById(any());
+        verify(couponGateway, times(1)).findByCode("PISTA10");
+        verify(couponGateway, times(1)).claimUse("PISTA10", CLOCK.instant());
+        verify(orderGateway, times(1)).create(any());
+    }
+
+    @Test
+    @DisplayName("Given fixed coupon, when execute, then discounts subtotal")
+    void givenFixedCoupon_whenExecute_thenDiscountsSubtotal() {
+        final var customer = givenCustomer();
+        final var section = givenSection(Money.create(new BigDecimal("50.00"), BRL));
+        final var first = givenFreeSpot(section, "A1");
+        final var second = givenFreeSpot(section, "A2");
+        final var coupon = Coupon.create(
+                "FIX30",
+                null,
+                section.getId().getValue(),
+                CouponKind.FIXED,
+                null,
+                Money.create(new BigDecimal("30.00"), BRL),
+                null,
+                null,
+                null);
+        when(couponGateway.findByCode("FIX30")).thenReturn(Optional.of(coupon));
+        when(couponGateway.claimUse("FIX30", CLOCK.instant())).thenReturn(Optional.of(coupon));
+        when(orderGateway.create(any())).thenAnswer(returnsFirstArg());
+
+        final var output = couponUseCase
+                .execute(CreateOrderCommand.with(
+                        customer.getId().getValue(),
+                        List.of(first.getId().getValue(), second.getId().getValue()),
+                        null,
+                        "FIX30"))
+                .getRight();
+
+        assertEquals(new BigDecimal("70.00"), output.totalValue());
+        verify(customerGateway, times(1)).findById(customer.getId());
+        verify(spotGateway, times(2)).findPlacement(any());
+        verify(spotGateway, times(2)).reserveIfAvailable(any());
+        verify(sectionGateway, times(2)).findById(any());
+        verify(couponGateway, times(1)).findByCode("FIX30");
+        verify(couponGateway, times(1)).claimUse("FIX30", CLOCK.instant());
+        verify(orderGateway, times(1)).create(any());
+    }
+
+    @Test
+    @DisplayName("Given unknown coupon, when execute, then returns error without order")
+    void givenUnknownCoupon_whenExecute_thenReturnsErrorWithoutOrder() {
+        final var customer = givenCustomer();
+        final var section = givenSection(Money.create(new BigDecimal("50.00"), BRL));
+        final var spot = givenFreeSpot(section, "A1");
+        when(couponGateway.findByCode("NOPE")).thenReturn(Optional.empty());
+
+        final var notification = couponUseCase
+                .execute(CreateOrderCommand.with(
+                        customer.getId().getValue(), List.of(spot.getId().getValue()), null, "NOPE"))
+                .getLeft();
+
+        assertEquals(
+                "Coupon is unknown, expired or exhausted: NOPE",
+                notification.firstError().message());
+        verify(customerGateway, times(1)).findById(customer.getId());
+        verify(spotGateway, times(1)).findPlacement(spot.getId());
+        verify(spotGateway, times(1)).reserveIfAvailable(spot.getId());
+        verify(sectionGateway, times(1)).findById(section.getId());
+        verify(couponGateway, times(1)).findByCode("NOPE");
+        verify(spotGateway, times(1)).update(spot);
+        verify(orderGateway, times(0)).create(any());
+    }
+
+    @Test
+    @DisplayName("Given exhausted coupon, when execute, then returns error without order")
+    void givenExhaustedCoupon_whenExecute_thenReturnsErrorWithoutOrder() {
+        final var customer = givenCustomer();
+        final var section = givenSection(Money.create(new BigDecimal("50.00"), BRL));
+        final var spot = givenFreeSpot(section, "A1");
+        final var coupon =
+                Coupon.create("ONEUSE", null, section.getId().getValue(), CouponKind.PERCENT, 10, null, null, null, 1);
+        when(couponGateway.findByCode("ONEUSE")).thenReturn(Optional.of(coupon));
+        when(couponGateway.claimUse("ONEUSE", CLOCK.instant())).thenReturn(Optional.empty());
+
+        final var notification = couponUseCase
+                .execute(CreateOrderCommand.with(
+                        customer.getId().getValue(), List.of(spot.getId().getValue()), null, "ONEUSE"))
+                .getLeft();
+
+        assertEquals(
+                "Coupon is exhausted or expired: ONEUSE",
+                notification.firstError().message());
+        verify(customerGateway, times(1)).findById(customer.getId());
+        verify(spotGateway, times(1)).findPlacement(spot.getId());
+        verify(spotGateway, times(1)).reserveIfAvailable(spot.getId());
+        verify(sectionGateway, times(1)).findById(section.getId());
+        verify(couponGateway, times(1)).findByCode("ONEUSE");
+        verify(couponGateway, times(1)).claimUse("ONEUSE", CLOCK.instant());
+        verify(spotGateway, times(1)).update(spot);
+        verify(orderGateway, times(0)).create(any());
+    }
+
+    @Test
+    @DisplayName("Given coupon for other section, when execute, then returns error without order")
+    void givenCouponForOtherSection_whenExecute_thenReturnsErrorWithoutOrder() {
+        final var customer = givenCustomer();
+        final var section = givenSection(Money.create(new BigDecimal("50.00"), BRL));
+        final var spot = givenFreeSpot(section, "A1");
+        final var coupon =
+                Coupon.create("OTHER", null, "other-section", CouponKind.PERCENT, 10, null, null, null, null);
+        when(couponGateway.findByCode("OTHER")).thenReturn(Optional.of(coupon));
+
+        final var notification = couponUseCase
+                .execute(CreateOrderCommand.with(
+                        customer.getId().getValue(), List.of(spot.getId().getValue()), null, "OTHER"))
+                .getLeft();
+
+        assertEquals(
+                "Coupon does not apply to these spots: OTHER",
+                notification.firstError().message());
+        verify(customerGateway, times(1)).findById(customer.getId());
+        verify(spotGateway, times(1)).findPlacement(spot.getId());
+        verify(spotGateway, times(1)).reserveIfAvailable(spot.getId());
+        verify(sectionGateway, times(1)).findById(section.getId());
+        verify(couponGateway, times(1)).findByCode("OTHER");
+        verify(spotGateway, times(1)).update(spot);
+        verify(orderGateway, times(0)).create(any());
     }
 }

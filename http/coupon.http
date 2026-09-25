@@ -1,0 +1,33 @@
+@baseUrl = http://localhost:8080
+# Login as master (admin@tickethub.local) via auth.http first, then paste the ADMIN token below.
+@token = PASTE_ADMIN_JWT_HERE
+
+### Create percent coupon for a section (ADMIN only)
+# @name createPercentCoupon
+POST {{baseUrl}}/coupons
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "code": "PISTA10",
+  "sectionId": "REPLACE_WITH_SECTION_ID",
+  "kind": "PERCENT",
+  "percent": 10,
+  "maxUses": 100
+}
+
+### Create fixed coupon for a show (ADMIN only)
+# @name createFixedCoupon
+POST {{baseUrl}}/coupons
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "code": "FEST30",
+  "showId": "REPLACE_WITH_SHOW_ID",
+  "kind": "FIXED",
+  "fixedValue": 30.00,
+  "fixedCurrency": "BRL",
+  "validFrom": "2026-01-01T00:00:00Z",
+  "validUntil": "2027-01-01T00:00:00Z"
+}

@@ -35,10 +35,18 @@ class LiquibaseMigrationIT extends ContainerSupport {
         final var collections = database.listCollectionNames().into(new ArrayList<>());
         assertTrue(
                 collections.containsAll(List.of(
-                        "customers", "partners", "shows", "sections", "spots", "orders", "tickets", "operators")),
+                        "customers",
+                        "partners",
+                        "shows",
+                        "sections",
+                        "spots",
+                        "orders",
+                        "tickets",
+                        "operators",
+                        "coupons")),
                 () -> "Database should contain all expected collections after migration");
         final var history = database.getCollection("DATABASECHANGELOG");
-        assertEquals(18, history.countDocuments(), () -> "Changelog history should contain 18 applied changesets");
+        assertEquals(20, history.countDocuments(), () -> "Changelog history should contain 20 applied changesets");
         final var appliedIds = history.find().into(new ArrayList<>()).stream()
                 .map(document -> document.getString("id"))
                 .toList();
@@ -57,11 +65,13 @@ class LiquibaseMigrationIT extends ContainerSupport {
                         "007-3-orders-tickets-indexes",
                         "008-1-create-operators",
                         "008-2-operators-email-index",
+                        "009-1-create-coupons",
+                        "009-2-coupons-code-index",
                         "002-2-orders-idempotency-index")),
                 () -> "Changelog history should contain all expected changeset ids");
         database.getCollection("customers").insertOne(new Document("_id", "preserved"));
         LiquibaseConfiguration.migrate(client, factory, CHANGELOG);
-        assertEquals(18, history.countDocuments(), () -> "Re-running migration should not reapply changesets");
+        assertEquals(20, history.countDocuments(), () -> "Re-running migration should not reapply changesets");
         assertNotNull(
                 database.getCollection("customers")
                         .find(new Document("_id", "preserved"))
