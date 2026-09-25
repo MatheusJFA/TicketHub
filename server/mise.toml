@@ -21,6 +21,14 @@ run = "mise watch compile"
 description = "Run tests in every module, including architecture tests"
 run = "mvn -B -ntp test"
 
+[tasks.lint-spotless]
+description = "Format the whole project to palantir"
+run = "mvn -B -ntp spotless:apply"
+
+[tasks.lint-verify]
+description = "Check if the format in the whole project is ok"
+run = "mvn -B -ntp spotless:verify"
+
 [tasks.test-only]
 description = "Run specific unit tests: mise run test-only 'CustomerTest,SpotTest'"
 usage = 'arg "<filter>" help="Test filter for Maven -Dtest (ex: CustomerTest or CustomerTest#myMethod)"'
