@@ -35,11 +35,12 @@ class AuditSanitizerTest {
     @DisplayName("Given json notation, when sanitize, then masks password and tokens")
     void givenJsonNotation_whenSanitize_thenMasksPasswordAndTokens() {
         final var sanitized = AuditSanitizer.sanitize(
-                        "{\"identifier\":\"admin\",\"password\":\"admin-local\",\"refreshToken\":\"abc.def.ghi\"}")
+                        "{\"identifier\":\"admin\",\"password\":\"admin-local\",\"refreshToken\":\"abc.def.ghi\",\"accessToken\":\"eyJhbGciOiJIUzI1NiJ9\"}")
                 .orElseThrow();
 
         assertTrue(sanitized.contains("\"password\":\"***\""), sanitized);
         assertTrue(sanitized.contains("\"refreshToken\":\"***\""), sanitized);
+        assertTrue(sanitized.contains("\"accessToken\":\"***\""), sanitized);
         assertTrue(sanitized.contains("\"identifier\":\"admin\""), sanitized);
         assertFalse(sanitized.contains("admin-local"), sanitized);
     }

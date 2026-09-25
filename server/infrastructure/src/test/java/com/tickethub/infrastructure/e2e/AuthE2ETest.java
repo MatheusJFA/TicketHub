@@ -177,6 +177,35 @@ class AuthE2ETest extends ContainerSupport {
     }
 
     @Test
+    @DisplayName("Given access token, when logout, then access token is revoked")
+    void givenAccessToken_whenLogout_thenAccessTokenIsRevoked() throws Exception {
+        final var customerId = registerCustomer("52998224725", "auth-logout-access@domain.com")
+                .get("id")
+                .asText();
+        final var session = login("auth-logout-access@domain.com", "secret-123");
+        final var accessToken = session.get("accessToken").asText();
+        final var refreshToken = session.get("refreshToken").asText();
+
+        mvc.perform(patch("/customers/" + customerId + "/name")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Maria Souza\"}"))
+                .andExpect(status().isOk());
+
+        mvc.perform(post("/auth/logout")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"refreshToken\":\"%s\",\"accessToken\":\"%s\"}"
+                                .formatted(refreshToken, accessToken)))
+                .andExpect(status().isNoContent());
+
+        mvc.perform(patch("/customers/" + customerId + "/name")
+                        .header("Authorization", "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Maria Souza\"}"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     @DisplayName("Given operator account, when login, then returns admin session")
     void givenOperatorAccount_whenLogin_thenReturnsAdminSession() throws Exception {
         seedOperator("admin@tickethub.local", "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");

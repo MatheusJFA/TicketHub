@@ -11,6 +11,7 @@ import com.tickethub.application.authentication.refresh.RefreshTokenUseCase;
 import com.tickethub.infrastructure.api.AuthAPI;
 import com.tickethub.infrastructure.api.HttpResults;
 import com.tickethub.infrastructure.authentication.models.LoginRequest;
+import com.tickethub.infrastructure.authentication.models.LogoutRequest;
 import com.tickethub.infrastructure.authentication.models.RefreshRequest;
 import com.tickethub.infrastructure.authentication.models.SessionResponse;
 import org.springframework.http.ResponseEntity;
@@ -47,8 +48,8 @@ public class AuthController implements AuthAPI {
     }
 
     @Override
-    public ResponseEntity<Void> logout(final RefreshRequest input) {
-        HttpResults.requireEmpty(logoutUseCase.execute(new LogoutCommand(input.refreshToken())));
+    public ResponseEntity<Void> logout(final LogoutRequest input) {
+        HttpResults.requireEmpty(logoutUseCase.execute(LogoutCommand.with(input.refreshToken(), input.accessToken())));
         return ResponseEntity.noContent().build();
     }
 }

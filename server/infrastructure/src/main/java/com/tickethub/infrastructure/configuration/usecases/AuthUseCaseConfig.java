@@ -6,9 +6,11 @@ import com.tickethub.application.authentication.logout.DefaultLogoutUseCase;
 import com.tickethub.application.authentication.logout.LogoutUseCase;
 import com.tickethub.application.authentication.refresh.DefaultRefreshTokenUseCase;
 import com.tickethub.application.authentication.refresh.RefreshTokenUseCase;
+import com.tickethub.domain.authentication.AccessTokenInspector;
 import com.tickethub.domain.authentication.AuthAccountGateway;
 import com.tickethub.domain.authentication.PasswordHasher;
 import com.tickethub.domain.authentication.RefreshSessionGateway;
+import com.tickethub.domain.authentication.RevokedAccessTokenGateway;
 import com.tickethub.domain.authentication.TokenIssuer;
 import com.tickethub.infrastructure.authentication.AuthSessionProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -39,7 +41,10 @@ public class AuthUseCaseConfig {
     }
 
     @Bean
-    public LogoutUseCase logoutUseCase(final RefreshSessionGateway refreshSessions) {
-        return new DefaultLogoutUseCase(refreshSessions);
+    public LogoutUseCase logoutUseCase(
+            final RefreshSessionGateway refreshSessions,
+            final RevokedAccessTokenGateway revokedAccessTokens,
+            final AccessTokenInspector accessTokenInspector) {
+        return new DefaultLogoutUseCase(refreshSessions, revokedAccessTokens, accessTokenInspector);
     }
 }
