@@ -1,11 +1,15 @@
 package com.tickethub.infrastructure.web;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import jakarta.servlet.FilterChain;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
@@ -18,10 +22,13 @@ class CheckoutRateLimitFilterTest {
         return request;
     }
 
+    @SuppressWarnings("unchecked")
     private CheckoutRateLimitFilter filter(final int permits) {
         final var properties = new CheckoutProperties();
         properties.setOrderRateLimitPerMinute(permits);
-        return new CheckoutRateLimitFilter(properties);
+        final var budgets = mock(ObjectProvider.class);
+        when(budgets.getIfAvailable(any())).thenReturn(new FakeRateLimitBudget());
+        return new CheckoutRateLimitFilter(properties, budgets);
     }
 
     @Test

@@ -1,17 +1,30 @@
 package com.tickethub.infrastructure.web;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.tickethub.infrastructure.authentication.AuthSessionProperties;
 import jakarta.servlet.FilterChain;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 @DisplayName("Auth rate limit filter")
 class AuthRateLimitFilterTest {
+
+    @SuppressWarnings("unchecked")
+    private static AuthRateLimitFilter filter(final int permits) {
+        final var properties = new AuthSessionProperties();
+        properties.setLoginRateLimitPerMinute(permits);
+        final var budgets = mock(ObjectProvider.class);
+        when(budgets.getIfAvailable(any())).thenReturn(new FakeRateLimitBudget());
+        return new AuthRateLimitFilter(properties, budgets);
+    }
 
     private MockHttpServletRequest request(final String uri) {
         final var request = new MockHttpServletRequest("POST", uri);
@@ -22,9 +35,7 @@ class AuthRateLimitFilterTest {
     @Test
     @DisplayName("Given requests within limit, when filter, then forwards downstream")
     void givenRequestsWithinLimit_whenFilter_thenForwardsDownstream() throws Exception {
-        final var properties = new AuthSessionProperties();
-        properties.setLoginRateLimitPerMinute(2);
-        final var filter = new AuthRateLimitFilter(properties);
+        final var filter = filter(2);
         final var forwarded = new AtomicInteger();
         final FilterChain chain = (req, res) -> forwarded.incrementAndGet();
 
@@ -36,9 +47,7 @@ class AuthRateLimitFilterTest {
     @Test
     @DisplayName("Given requests beyond limit, when filter, then returns429")
     void givenRequestsBeyondLimit_whenFilter_thenReturns429() throws Exception {
-        final var properties = new AuthSessionProperties();
-        properties.setLoginRateLimitPerMinute(1);
-        final var filter = new AuthRateLimitFilter(properties);
+        final var filter = filter(1);
         final FilterChain chain = (req, res) -> {};
 
         filter.doFilter(request("/auth/login"), new MockHttpServletResponse(), chain);
@@ -51,9 +60,7 @@ class AuthRateLimitFilterTest {
     @Test
     @DisplayName("Given non auth path, when filter, then skips rate limit")
     void givenNonAuthPath_whenFilter_thenSkipsRateLimit() throws Exception {
-        final var properties = new AuthSessionProperties();
-        properties.setLoginRateLimitPerMinute(1);
-        final var filter = new AuthRateLimitFilter(properties);
+        final var filter = filter(1);
         final var forwarded = new AtomicInteger();
         final FilterChain chain = (req, res) -> forwarded.incrementAndGet();
 

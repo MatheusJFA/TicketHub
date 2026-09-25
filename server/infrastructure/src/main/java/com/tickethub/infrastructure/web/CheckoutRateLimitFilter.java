@@ -3,6 +3,7 @@ package com.tickethub.infrastructure.web;
 import static java.util.Objects.requireNonNull;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
@@ -17,10 +18,11 @@ import org.springframework.stereotype.Component;
 @Order(Ordered.HIGHEST_PRECEDENCE + 11)
 public class CheckoutRateLimitFilter extends AbstractRateLimitFilter {
 
-    public CheckoutRateLimitFilter(final CheckoutProperties properties) {
+    public CheckoutRateLimitFilter(final CheckoutProperties properties, final ObjectProvider<RateLimitBudget> budgets) {
         super(
                 "checkout",
-                requireNonNull(properties, "'properties' should not be null").getOrderRateLimitPerMinute());
+                requireNonNull(properties, "'properties' should not be null").getOrderRateLimitPerMinute(),
+                budgets.getIfAvailable(InMemoryRateLimitBudget::new));
     }
 
     @Override
