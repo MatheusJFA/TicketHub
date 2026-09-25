@@ -134,6 +134,15 @@ flowchart LR
 
 Entidades carregam auditoria de domínio (`createdAt`, `updatedAt`, `deletedAt`, `createdBy`, `lastModifiedBy`).
 
+Eventos de domínio (`OrderPaid`, `OrderRefunded`, `SpotsGenerationRequested`)
+saem pelo `DomainEventPublisher` (Kafka, tópico `tickethub.events`): geração
+de spots e webhooks de parceiro (`order.paid`/`order.refunded` assinados,
+`ADR-028`) consomem em grupos próprios.
+
+Descontos via `Coupon` (escopo show ou seção, `PERCENT`/`FIXED`, consumo
+atômico em `POST /orders` com `couponCode`, `ADR-029`); o preço com desconto
+vira snapshot do `OrderItem`.
+
 ## 4. Autorização
 
 | Recurso | Conta própria | Outro dono | Listagem |

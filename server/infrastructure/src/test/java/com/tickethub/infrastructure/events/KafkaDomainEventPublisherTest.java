@@ -11,6 +11,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.tickethub.domain.core.order.OrderPaid;
+import com.tickethub.domain.core.order.OrderRefunded;
 import com.tickethub.domain.core.section.SpotsGenerationRequested;
 import com.tickethub.domain.event.DomainEvent;
 import com.tickethub.infrastructure.exception.EventPublishException;
@@ -52,6 +54,34 @@ class KafkaDomainEventPublisherTest {
         publisher.publish(event);
 
         verify(kafkaTemplate, never()).sendDefault(any(), any());
+    }
+
+    @Test
+    @DisplayName("Given order paid, when publish, then sends keyed message")
+    void givenOrderPaid_whenPublish_thenSendsKeyedMessage() {
+        final var event = new OrderPaid("order-1", Instant.parse("2026-09-24T10:00:00Z"));
+
+        publisher.publish(event);
+
+        verify(kafkaTemplate)
+                .sendDefault(
+                        eq("order-1"),
+                        argThat(payload -> payload.contains("\"type\":\"OrderPaid\"")
+                                && payload.contains("\"orderId\":\"order-1\"")));
+    }
+
+    @Test
+    @DisplayName("Given order refunded, when publish, then sends keyed message")
+    void givenOrderRefunded_whenPublish_thenSendsKeyedMessage() {
+        final var event = new OrderRefunded("order-1", Instant.parse("2026-09-24T10:00:00Z"));
+
+        publisher.publish(event);
+
+        verify(kafkaTemplate)
+                .sendDefault(
+                        eq("order-1"),
+                        argThat(payload -> payload.contains("\"type\":\"OrderRefunded\"")
+                                && payload.contains("\"orderId\":\"order-1\"")));
     }
 
     @Test

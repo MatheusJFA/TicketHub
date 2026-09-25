@@ -2,6 +2,8 @@ package com.tickethub.infrastructure.events;
 
 import static java.util.Objects.requireNonNull;
 
+import com.tickethub.domain.core.order.OrderPaid;
+import com.tickethub.domain.core.order.OrderRefunded;
 import com.tickethub.domain.core.section.SpotsGenerationRequested;
 import com.tickethub.domain.event.DomainEvent;
 import com.tickethub.domain.event.DomainEventPublisher;
@@ -41,6 +43,28 @@ public final class KafkaDomainEventPublisher implements DomainEventPublisher {
             }
             return;
         }
+        if (event instanceof OrderPaid paid) {
+            sendOrderEvent(new OrderEventMessage(
+                    OrderEventMessage.PAID_TYPE,
+                    paid.orderId(),
+                    paid.occurredOn().toString()));
+            return;
+        }
+        if (event instanceof OrderRefunded refunded) {
+            sendOrderEvent(new OrderEventMessage(
+                    OrderEventMessage.REFUNDED_TYPE,
+                    refunded.orderId(),
+                    refunded.occurredOn().toString()));
+            return;
+        }
         LOG.warn("Ignoring unsupported domain event {}", event.getClass().getSimpleName());
+    }
+
+    private void sendOrderEvent(final OrderEventMessage message) {
+        try {
+            kafkaTemplate.sendDefault(message.orderId(), objectMapper.writeValueAsString(message));
+        } catch (final RuntimeException e) {
+            throw new EventPublishException("Failed to publish order event", e);
+        }
     }
 }

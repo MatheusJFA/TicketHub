@@ -11,6 +11,8 @@ import com.tickethub.domain.core.show.ShowGateway;
 import com.tickethub.domain.core.spot.SpotGateway;
 import com.tickethub.domain.core.ticket.TicketGateway;
 import com.tickethub.domain.core.ticket.TicketSigner;
+import com.tickethub.domain.event.DomainEventPublisher;
+import com.tickethub.infrastructure.sales.PublishingSaleRecorder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,13 +42,15 @@ public class ReconcileUseCaseConfig {
             final PaymentGateway paymentGateway,
             final SpotGateway spotGateway,
             final SectionGateway sectionGateway,
-            final ShowGateway showGateway) {
+            final ShowGateway showGateway,
+            final DomainEventPublisher publisher) {
         this.orderGateway = orderGateway;
         this.ticketGateway = ticketGateway;
         this.ticketSigner = ticketSigner;
         this.paymentGateway = paymentGateway;
         this.spotGateway = spotGateway;
-        this.sales = new DefaultSaleRecorder(spotGateway, sectionGateway, showGateway);
+        this.sales = new PublishingSaleRecorder(
+                new DefaultSaleRecorder(spotGateway, sectionGateway, showGateway), publisher);
     }
 
     @Bean
