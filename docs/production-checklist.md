@@ -7,8 +7,8 @@ têm default de desenvolvimento no `application.yml` / `docker-compose.yml`.
 
 | Variável | Default dev | Notas |
 |---|---|---|
-| `TICKETHUB_JWT_SECRET` | `dev-only-change-me…` | ≥ 32 bytes; invalida todas as sessões ao trocar |
-| `TICKETHUB_TICKETS_SIGNATURE_SECRET` | `dev-only…` | Invalida QRs já emitidos ao trocar |
+| `TICKETHUB_JWT_SECRET` | gerado no 1º boot (`app_secrets`) | ≥ 32 bytes; invalida todas as sessões ao trocar |
+| `TICKETHUB_TICKETS_SIGNATURE_SECRET` | gerado no 1º boot (`app_secrets`) | Invalida QRs já emitidos ao trocar |
 | `MERCADOPAGO_ACCESS_TOKEN` | vazio (boot saudável; pay/webhook MP respondem 503) | Token de produção da conta MP |
 | `MERCADOPAGO_WEBHOOK_SECRET` | vazio (webhook responde 401) | Painel MP → Sua integração → Webhooks |
 | `MERCADOPAGO_NOTIFICATION_URL` | vazio (sem callback dirigido) | URL pública `https://…/payments/mercadopago` |

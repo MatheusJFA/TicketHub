@@ -5,6 +5,7 @@ import static java.util.Objects.isNull;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.tickethub.domain.authentication.RevokedAccessTokenGateway;
 import com.tickethub.infrastructure.authentication.AuthSessionProperties;
+import com.tickethub.infrastructure.security.GeneratedSecrets;
 import com.tickethub.infrastructure.security.RevokedAccessTokenFilter;
 import com.tickethub.infrastructure.security.SecurityProperties;
 import com.tickethub.infrastructure.web.CheckoutProperties;
@@ -14,9 +15,11 @@ import java.time.Instant;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -86,6 +89,14 @@ public class SecurityConfiguration {
     }
 
     @Bean
+    public GeneratedSecrets generatedSecrets(
+            @Value("${tickethub.security.jwt.secret:}") final String jwtSecret,
+            @Value("${tickethub.tickets.signature-secret:}") final String ticketSecret,
+            final ObjectProvider<MongoTemplate> mongo) {
+        return new GeneratedSecrets(jwtSecret, ticketSecret, mongo.getIfAvailable());
+    }
+
+    @Bean
     public RevokedAccessTokenFilter revokedAccessTokenFilter(final ObjectProvider<RevokedAccessTokenGateway> gateways) {
         // Slice tests (WebMvcTest) have no Redis adapter: fall back to no-op.
         return new RevokedAccessTokenFilter(gateways.getIfAvailable(NoOpRevokedAccessTokenGateway::new));
@@ -102,13 +113,13 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public JwtDecoder jwtDecoder(final SecurityProperties properties) {
-        return NimbusJwtDecoder.withSecretKey(secretKey(properties)).build();
+    public JwtDecoder jwtDecoder(final GeneratedSecrets secrets) {
+        return NimbusJwtDecoder.withSecretKey(secretKey(secrets)).build();
     }
 
     @Bean
-    public JwtEncoder jwtEncoder(final SecurityProperties properties) {
-        return new NimbusJwtEncoder(new ImmutableSecret<>(secretKey(properties)));
+    public JwtEncoder jwtEncoder(final GeneratedSecrets secrets) {
+        return new NimbusJwtEncoder(new ImmutableSecret<>(secretKey(secrets)));
     }
 
     @Bean
@@ -138,8 +149,8 @@ public class SecurityConfiguration {
         return source;
     }
 
-    private static SecretKey secretKey(final SecurityProperties properties) {
-        final String secret = properties.getJwt().getSecret();
+    private static SecretKey secretKey(final GeneratedSecrets secrets) {
+        final String secret = secrets.jwtSecret();
         if (isNull(secret) || secret.getBytes(StandardCharsets.UTF_8).length < 32) {
             throw new IllegalStateException("tickethub.security.jwt.secret must be at least 32 bytes long");
         }

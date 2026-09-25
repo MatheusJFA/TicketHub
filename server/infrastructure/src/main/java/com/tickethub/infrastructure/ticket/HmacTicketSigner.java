@@ -4,27 +4,29 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import com.tickethub.domain.core.ticket.TicketSigner;
+import com.tickethub.infrastructure.security.GeneratedSecrets;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
  * HMAC-SHA256 ticket signer. Door scanners accept only QR codes carrying a
  * signature produced with this secret; configure
- * {@code tickethub.tickets.signature-secret} per environment and never reuse
- * the JWT secret here.
+ * {@code tickethub.tickets.signature-secret} per environment (generated once
+ * and persisted on first boot when absent) and never reuse the JWT secret here.
  */
 @Component
 public class HmacTicketSigner implements TicketSigner {
 
     private final String secret;
 
-    public HmacTicketSigner(@Value("${tickethub.tickets.signature-secret}") final String secret) {
+    public HmacTicketSigner(final GeneratedSecrets secrets) {
+        final String secret =
+                requireNonNull(secrets, "'secrets' should not be null").ticketSignatureSecret();
         if (isBlank(secret)) {
             throw new IllegalStateException("tickethub.tickets.signature-secret must not be blank");
         }
