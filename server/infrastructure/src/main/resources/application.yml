@@ -115,6 +115,12 @@ tickethub:
       name: ${KAFKA_TOPIC:tickethub.events}
       partitions: ${KAFKA_TOPIC_PARTITIONS:3}
       replicas: ${KAFKA_TOPIC_REPLICAS:1}
+  webhooks:
+    enabled: ${TICKETHUB_WEBHOOKS_ENABLED:true}
+    connect-timeout: ${TICKETHUB_WEBHOOKS_CONNECT_TIMEOUT:5s}
+    read-timeout: ${TICKETHUB_WEBHOOKS_READ_TIMEOUT:5s}
+    max-attempts: ${TICKETHUB_WEBHOOKS_MAX_ATTEMPTS:3}
+    retry-wait: ${TICKETHUB_WEBHOOKS_RETRY_WAIT:500ms}
   resilience:
     retry:
       max-attempts: ${RESILIENCE_RETRY_MAX_ATTEMPTS:3}
