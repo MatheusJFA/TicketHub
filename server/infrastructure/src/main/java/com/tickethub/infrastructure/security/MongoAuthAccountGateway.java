@@ -7,6 +7,7 @@ import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 import com.tickethub.domain.authentication.AuthAccount;
 import com.tickethub.domain.authentication.AuthAccountGateway;
 import com.tickethub.domain.core.customer.CustomerGateway;
+import com.tickethub.domain.core.operator.OperatorGateway;
 import com.tickethub.domain.core.partner.PartnerGateway;
 import com.tickethub.domain.exception.DomainException;
 import com.tickethub.domain.shared.Email;
@@ -19,23 +20,19 @@ public class MongoAuthAccountGateway implements AuthAccountGateway {
 
     private final CustomerGateway customers;
     private final PartnerGateway partners;
-    private final SecurityProperties properties;
+    private final OperatorGateway operators;
 
     public MongoAuthAccountGateway(
-            final CustomerGateway customers, final PartnerGateway partners, final SecurityProperties properties) {
+            final CustomerGateway customers, final PartnerGateway partners, final OperatorGateway operators) {
         this.customers = requireNonNull(customers, "'customers' should not be null");
         this.partners = requireNonNull(partners, "'partners' should not be null");
-        this.properties = requireNonNull(properties, "'properties' should not be null");
+        this.operators = requireNonNull(operators, "'operators' should not be null");
     }
 
     @Override
     public Optional<AuthAccount> findByIdentifier(final String identifier) {
         final String normalized = trimToEmpty(identifier);
-        return findCustomer(normalized)
-                .or(() -> findPartner(normalized))
-                // Bootstrap users keep working for operator access (e.g. ADMIN)
-                // until an admin aggregate exists; matched by username.
-                .or(() -> properties.findByUsername(normalized).map(this::fromBootstrap));
+        return findCustomer(normalized).or(() -> findPartner(normalized)).or(() -> findOperator(normalized));
     }
 
     private Optional<AuthAccount> findCustomer(final String identifier) {
@@ -70,8 +67,20 @@ public class MongoAuthAccountGateway implements AuthAccountGateway {
                         partner.getId().getValue()));
     }
 
-    private AuthAccount fromBootstrap(final SecurityUser user) {
-        return new AuthAccount(user.username(), user.passwordHash(), user.authorities(), user.ownerId());
+    private Optional<AuthAccount> findOperator(final String identifier) {
+        return toEmail(identifier)
+                .flatMap(operators::findByEmail)
+                .filter(operator -> nonNull(operator.getPasswordHash()))
+                .map(operator -> new AuthAccount(
+                        operator.getEmail().getValue(),
+                        operator.getPasswordHash().getValue(),
+                        new SecurityUser(
+                                        operator.getEmail().getValue(),
+                                        operator.getPasswordHash().getValue(),
+                                        Set.of(Role.ADMIN),
+                                        null)
+                                .authorities(),
+                        null));
     }
 
     private static Optional<Email> toEmail(final String identifier) {

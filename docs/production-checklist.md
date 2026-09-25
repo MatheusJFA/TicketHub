@@ -14,8 +14,8 @@ têm default de desenvolvimento no `application.yml` / `docker-compose.yml`.
 | `MERCADOPAGO_NOTIFICATION_URL` | vazio (sem callback dirigido) | URL pública `https://…/payments/mercadopago` |
 | `MONGO_USERNAME`/`MONGO_PASSWORD` | `tickethub`/`tickethub-local` | Só valem com volume vazio |
 | `GRAFANA_ADMIN_USER`/`GRAFANA_ADMIN_PASSWORD` | `admin`/`admin-local` | |
-| Senhas seed (`*_PASSWORD_HASH`) | bcrypt de `admin-local` etc. | Trocar ou remover usuários bootstrap |
-| Carga dev (`scripts/seed-dev.js`) | só local | Nunca rodar em produção: cria `customer`/`partner` de dev |
+| Senhas seed (coleções `operators`/`customers`/`partners` via `scripts/seed-dev.js`) | bcrypt de `admin-local` etc. | Trocar; nunca rodar seed em produção |
+| Carga dev (`scripts/seed-dev.js`) | só local | Nunca rodar em produção: cria `operator`/`customer`/`partner` de dev |
 
 ## Endpoints e integrações
 

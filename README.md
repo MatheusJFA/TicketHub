@@ -51,7 +51,7 @@ Para carga inicial de dev (customer + partner com login conhecido, idempotente):
 docker compose exec -T mongo mongosh -u tickethub -p tickethub-local --authenticationDatabase admin tickethub < scripts/seed-dev.js
 ```
 
-Isso cria `customer@tickethub.local` / `customer-local` e `partner@tickethub.local` / `partner-local` (veja `http/auth.http`). Nunca rode em produção.
+Isso cria `admin@tickethub.local` / `admin-local`, `customer@tickethub.local` / `customer-local` e `partner@tickethub.local` / `partner-local` (veja `http/auth.http`). Nunca rode em produção.
 
 Para iniciar apenas o banco e executar o backend localmente com mise:
 

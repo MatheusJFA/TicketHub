@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.tickethub.infrastructure.api.AuditAPI;
 import com.tickethub.infrastructure.api.CustomerAPI;
+import com.tickethub.infrastructure.api.OperatorAPI;
 import com.tickethub.infrastructure.api.PartnerAPI;
 import com.tickethub.infrastructure.api.SectionAPI;
 import com.tickethub.infrastructure.api.ShowAPI;
@@ -53,7 +54,13 @@ class ApiAuthorizationTest {
         final var unknown = new HashSet<String>();
         var expressions = 0;
         for (final Class<?> api : Set.of(
-                AuditAPI.class, CustomerAPI.class, PartnerAPI.class, ShowAPI.class, SectionAPI.class, SpotAPI.class)) {
+                AuditAPI.class,
+                CustomerAPI.class,
+                OperatorAPI.class,
+                PartnerAPI.class,
+                ShowAPI.class,
+                SectionAPI.class,
+                SpotAPI.class)) {
             for (final Method method : api.getDeclaredMethods()) {
                 final PreAuthorize authorize = method.getAnnotation(PreAuthorize.class);
                 if (authorize == null) {

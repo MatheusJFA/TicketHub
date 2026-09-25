@@ -1,6 +1,8 @@
-// Carga inicial de desenvolvimento: garante um customer e um partner com
+// Carga inicial de desenvolvimento: garante operator, customer e partner com
 // credenciais conhecidas para login em POST /auth/login. Idempotente —
 // pode rodar quantas vezes quiser.
+// O login é 100% via Mongo (operators/customers/partners); não há mais
+// usuários bootstrap no application.yml (tickethub.security.users removido).
 //
 // Se o volume já tiver um documento com o mesmo CPF/CNPJ sob outro email
 // (ex.: dados de smoke test), o script adota esse documento e atualiza
@@ -16,11 +18,14 @@
 //     -u tickethub -p tickethub-local --authenticationDatabase admin \
 //     tickethub < scripts/seed-dev.js
 //
-// Logins garantidos:
-//   customer@tickethub.local / customer-local  (role CUSTOMER)
-//   partner@tickethub.local  / partner-local   (role PARTNER)
-// Os hashes abaixo são os mesmos defaults de dev do application.yml
-// (bcrypt de "customer-local" e "partner-local"). Nunca rode em produção.
+// Logins garantidos (todos via Mongo, sem bootstrap no application.yml):
+//   admin@tickethub.local    / admin-local     (role ADMIN, collection operators)
+//   customer@tickethub.local / customer-local  (role CUSTOMER, collection customers)
+//   partner@tickethub.local  / partner-local   (role PARTNER, collection partners)
+// Hashes bcrypt de dev (nunca use em produção):
+//   admin-local    -> $2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS
+//   customer-local -> $2a$10$8oOcWuB1hV9DFQk73vuOr.4NE22eOqPObY/YeQBli2zYPuo4he2d2
+//   partner-local  -> $2a$10$yd53Z0ydlKB9/DaDw/jHFO8eWLtgbWsNjjYH9eSY1dvKPRBkC2B3a
 
 db = db.getSiblingDB("tickethub");
 
@@ -51,11 +56,23 @@ function ensureAccount(collection, identityFilter, fixedFields, credentialFields
 }
 
 ensureAccount(
+  db.operators,
+  [{ email: "admin@tickethub.local" }],
+  { name: "Admin Local" },
+  {
+    email: "admin@tickethub.local",
+    // senha: admin-local
+    passwordHash: "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS",
+  }
+);
+
+ensureAccount(
   db.customers,
   [{ email: "customer@tickethub.local" }, { cpf: "52998224725" }],
   { cpf: "52998224725", name: "Maria Silva" },
   {
     email: "customer@tickethub.local",
+    // senha: customer-local
     passwordHash: "$2a$10$8oOcWuB1hV9DFQk73vuOr.4NE22eOqPObY/YeQBli2zYPuo4he2d2",
   }
 );
@@ -79,6 +96,7 @@ ensureAccount(
   },
   {
     email: "partner@tickethub.local",
+    // senha: partner-local
     passwordHash: "$2a$10$yd53Z0ydlKB9/DaDw/jHFO8eWLtgbWsNjjYH9eSY1dvKPRBkC2B3a",
   }
 );

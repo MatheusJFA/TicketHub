@@ -9,7 +9,9 @@ import com.tickethub.infrastructure.ContainerSupport;
 import com.tickethub.infrastructure.E2ETest;
 import com.tickethub.infrastructure.MongoCleanUpExtension;
 import com.tickethub.infrastructure.customer.persistence.CustomerDocument;
+import com.tickethub.infrastructure.operator.persistence.OperatorDocument;
 import com.tickethub.infrastructure.partner.persistence.PartnerDocument;
+import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,7 +38,21 @@ class ZipCodeEnrichmentE2ETest extends ContainerSupport {
 
     @BeforeEach
     void cleanUp() {
-        MongoCleanUpExtension.cleanCollections(mongoTemplate, PartnerDocument.COLLECTION, CustomerDocument.COLLECTION);
+        MongoCleanUpExtension.cleanCollections(
+                mongoTemplate, PartnerDocument.COLLECTION, CustomerDocument.COLLECTION, OperatorDocument.COLLECTION);
+        final var now = Instant.now();
+        mongoTemplate.save(
+                new OperatorDocument(
+                        java.util.UUID.randomUUID().toString(),
+                        "Admin Local",
+                        "admin@tickethub.local",
+                        "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS",
+                        now,
+                        now,
+                        null,
+                        "test",
+                        "test"),
+                OperatorDocument.COLLECTION);
     }
 
     @Test
@@ -56,9 +72,10 @@ class ZipCodeEnrichmentE2ETest extends ContainerSupport {
                 .getResponse()
                 .getContentAsString();
         final var id = objectMapper.readTree(created).get("id").asText();
+
         final var login = mvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"identifier\":\"admin\",\"password\":\"admin-local\"}"))
+                        .content("{\"identifier\":\"admin@tickethub.local\",\"password\":\"admin-local\"}"))
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()

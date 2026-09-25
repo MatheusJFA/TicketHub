@@ -104,20 +104,6 @@ tickethub:
     jwt:
       secret: ${TICKETHUB_JWT_SECRET:dev-only-change-me-in-production-0123456789abcdef}
       expiration-minutes: ${TICKETHUB_JWT_EXPIRATION_MINUTES:60}
-    users:
-      - username: ${TICKETHUB_ADMIN_USERNAME:admin}
-        password: "${TICKETHUB_ADMIN_PASSWORD_HASH:$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS}"
-        roles: [ADMIN]
-      - username: ${TICKETHUB_PARTNER_USERNAME:partner}
-        password: "${TICKETHUB_PARTNER_PASSWORD_HASH:$2a$10$yd53Z0ydlKB9/DaDw/jHFO8eWLtgbWsNjjYH9eSY1dvKPRBkC2B3a}"
-        roles: [PARTNER]
-        # Must match the partner resource id to scope shows/accounts; empty disables ownership checks for this user.
-        owner-id: ${TICKETHUB_PARTNER_OWNER_ID:}
-      - username: ${TICKETHUB_CUSTOMER_USERNAME:customer}
-        password: "${TICKETHUB_CUSTOMER_PASSWORD_HASH:$2a$10$8oOcWuB1hV9DFQk73vuOr.4NE22eOqPObY/YeQBli2zYPuo4he2d2}"
-        roles: [CUSTOMER]
-        # Must match the customer resource id for self-service; empty disables ownership checks for this user.
-        owner-id: ${TICKETHUB_CUSTOMER_OWNER_ID:}
   mongo:
     connect-timeout: ${MONGO_CONNECT_TIMEOUT:5s}
     read-timeout: ${MONGO_READ_TIMEOUT:5s}

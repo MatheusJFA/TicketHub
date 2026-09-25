@@ -34,11 +34,11 @@ class LiquibaseMigrationIT extends ContainerSupport {
         final var database = factory.getMongoDatabase();
         final var collections = database.listCollectionNames().into(new ArrayList<>());
         assertTrue(
-                collections.containsAll(
-                        List.of("customers", "partners", "shows", "sections", "spots", "orders", "tickets")),
+                collections.containsAll(List.of(
+                        "customers", "partners", "shows", "sections", "spots", "orders", "tickets", "operators")),
                 () -> "Database should contain all expected collections after migration");
         final var history = database.getCollection("DATABASECHANGELOG");
-        assertEquals(16, history.countDocuments(), () -> "Changelog history should contain 16 applied changesets");
+        assertEquals(18, history.countDocuments(), () -> "Changelog history should contain 18 applied changesets");
         final var appliedIds = history.find().into(new ArrayList<>()).stream()
                 .map(document -> document.getString("id"))
                 .toList();
@@ -55,11 +55,13 @@ class LiquibaseMigrationIT extends ContainerSupport {
                         "007-1-create-orders",
                         "007-2-create-tickets",
                         "007-3-orders-tickets-indexes",
+                        "008-1-create-operators",
+                        "008-2-operators-email-index",
                         "002-2-orders-idempotency-index")),
                 () -> "Changelog history should contain all expected changeset ids");
         database.getCollection("customers").insertOne(new Document("_id", "preserved"));
         LiquibaseConfiguration.migrate(client, factory, CHANGELOG);
-        assertEquals(16, history.countDocuments(), () -> "Re-running migration should not reapply changesets");
+        assertEquals(18, history.countDocuments(), () -> "Re-running migration should not reapply changesets");
         assertNotNull(
                 database.getCollection("customers")
                         .find(new Document("_id", "preserved"))

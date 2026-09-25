@@ -9,4 +9,5 @@
     <include file="changes/005-auth-credentials.xml" relativeToChangelogFile="true"/>
     <include file="changes/006-refresh-sessions.xml" relativeToChangelogFile="true"/>
     <include file="changes/007-orders-tickets.xml" relativeToChangelogFile="true"/>
+    <include file="changes/008-operators.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

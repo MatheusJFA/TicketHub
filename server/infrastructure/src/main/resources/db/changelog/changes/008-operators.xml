@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.31.xsd
+                   http://www.liquibase.org/xml/ns/dbchangelog-ext https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <changeSet id="008-1-create-operators" author="tickethub">
+        <ext:createCollection collectionName="operators"/>
+    </changeSet>
+    <changeSet id="008-2-operators-email-index" author="tickethub">
+        <ext:createIndex collectionName="operators">
+            <ext:keys>{ "email": 1 }</ext:keys>
+            <ext:options>{ "unique": true, "name": "uq_operators_email", "partialFilterExpression": { "email": { "$type": "string" } } }</ext:options>
+        </ext:createIndex>
+    </changeSet>
+</databaseChangeLog>

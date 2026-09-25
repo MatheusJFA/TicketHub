@@ -9,7 +9,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.tickethub.infrastructure.ContainerSupport;
 import com.tickethub.infrastructure.E2ETest;
 import com.tickethub.infrastructure.audit.MongoAuditTrail;
+import com.tickethub.infrastructure.operator.persistence.OperatorDocument;
 import com.tickethub.infrastructure.section.persistence.SectionDocument;
+import java.time.Instant;
 import java.util.List;
 import org.bson.Document;
 import org.junit.jupiter.api.DisplayName;
@@ -34,9 +36,10 @@ class SpotE2ETest extends ContainerSupport {
     private ObjectMapper objectMapper;
 
     private String adminToken() throws Exception {
+        ensureOperator();
         final var response = mvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"identifier\":\"admin\",\"password\":\"admin-local\"}"))
+                        .content("{\"identifier\":\"admin@tickethub.local\",\"password\":\"admin-local\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.tokenType").value("Bearer"))
                 .andReturn()
@@ -80,7 +83,30 @@ class SpotE2ETest extends ContainerSupport {
                 .findFirst()
                 .orElseThrow();
         assertEquals("SUCCESS", entry.getString("outcome"));
-        assertEquals("admin", entry.getString("actor"));
+        assertEquals("admin@tickethub.local", entry.getString("actor"));
+    }
+
+    private void ensureOperator() {
+        // O container Mongo é compartilhado entre classes de teste: garante o
+        // operador por email (upsert), sem depender do estado deixado por outros testes.
+        mongoTemplate.remove(
+                new org.springframework.data.mongodb.core.query.Query(
+                        org.springframework.data.mongodb.core.query.Criteria.where("email")
+                                .is("admin@tickethub.local")),
+                OperatorDocument.COLLECTION);
+        final var now = Instant.now();
+        mongoTemplate.save(
+                new OperatorDocument(
+                        java.util.UUID.randomUUID().toString(),
+                        "Admin Local",
+                        "admin@tickethub.local",
+                        "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS",
+                        now,
+                        now,
+                        null,
+                        "test",
+                        "test"),
+                OperatorDocument.COLLECTION);
     }
 
     private List<Document> awaitAuditEntries(final int expected) throws InterruptedException {

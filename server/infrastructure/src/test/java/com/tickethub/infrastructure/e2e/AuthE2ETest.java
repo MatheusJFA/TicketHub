@@ -11,6 +11,8 @@ import com.tickethub.infrastructure.E2ETest;
 import com.tickethub.infrastructure.MongoCleanUpExtension;
 import com.tickethub.infrastructure.authentication.persistence.RefreshSessionDocument;
 import com.tickethub.infrastructure.customer.persistence.CustomerDocument;
+import com.tickethub.infrastructure.operator.persistence.OperatorDocument;
+import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,7 +40,26 @@ class AuthE2ETest extends ContainerSupport {
     @BeforeEach
     void cleanUp() {
         MongoCleanUpExtension.cleanCollections(
-                mongoTemplate, CustomerDocument.COLLECTION, RefreshSessionDocument.COLLECTION);
+                mongoTemplate,
+                CustomerDocument.COLLECTION,
+                RefreshSessionDocument.COLLECTION,
+                OperatorDocument.COLLECTION);
+    }
+
+    private void seedOperator(final String email, final String passwordHash) {
+        final var now = Instant.now();
+        mongoTemplate.save(
+                new OperatorDocument(
+                        java.util.UUID.randomUUID().toString(),
+                        "Admin Local",
+                        email,
+                        passwordHash,
+                        now,
+                        now,
+                        null,
+                        "test",
+                        "test"),
+                OperatorDocument.COLLECTION);
     }
 
     private JsonNode registerCustomer(final String cpf, final String email) throws Exception {
@@ -156,11 +177,12 @@ class AuthE2ETest extends ContainerSupport {
     }
 
     @Test
-    @DisplayName("Given bootstrap admin, when login, then returns admin session")
-    void givenBootstrapAdmin_whenLogin_thenReturnsAdminSession() throws Exception {
+    @DisplayName("Given operator account, when login, then returns admin session")
+    void givenOperatorAccount_whenLogin_thenReturnsAdminSession() throws Exception {
+        seedOperator("admin@tickethub.local", "$2a$10$yK7PogeVNyS8.guDq1yKneeynLO7jVthcXy5ZQonI6gid0M4kGhKS");
         final MvcResult login = mvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"identifier\":\"admin\",\"password\":\"admin-local\"}"))
+                        .content("{\"identifier\":\"admin@tickethub.local\",\"password\":\"admin-local\"}"))
                 .andExpect(status().isOk())
                 .andReturn();
 

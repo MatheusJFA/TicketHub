@@ -1,0 +1,15 @@
+@baseUrl = http://localhost:8080
+# Login as master via auth.http first, then paste the ADMIN token below.
+@token = PASTE_ADMIN_JWT_HERE
+
+### Create operator (ADMIN only)
+# @name createOperator
+POST {{baseUrl}}/operators
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Backoffice",
+  "email": "backoffice@tickethub.local",
+  "password": "secret-123"
+}

@@ -1,12 +1,12 @@
 @baseUrl = http://localhost:8080
 
-### Login as admin (bootstrap username)
+### Login as admin (seeded operator via scripts/seed-dev.js)
 # @name loginAdmin
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-  "identifier": "admin",
+  "identifier": "admin@tickethub.local",
   "password": "admin-local"
 }
 
