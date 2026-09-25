@@ -29,5 +29,7 @@ public abstract class ContainerSupport {
         registry.add("spring.data.redis.host", REDIS::getHost);
         registry.add("spring.data.redis.port", () -> String.valueOf(REDIS.getMappedPort(6379)));
         registry.add("tickethub.payment.mercadopago.access-token", () -> "test-access-token");
+        registry.add("tickethub.security.jwt.secret", () -> "test-secret-key-with-at-least-32-bytes!!");
+        registry.add("tickethub.tickets.signature-secret", () -> "test-ticket-signing-secret-0123456789");
     }
 }

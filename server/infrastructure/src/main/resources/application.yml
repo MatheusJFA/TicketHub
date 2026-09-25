@@ -72,7 +72,8 @@ tickethub:
     reservation-ttl: ${TICKETHUB_ORDERS_RESERVATION_TTL:15m}
     expire-interval: ${TICKETHUB_ORDERS_EXPIRE_INTERVAL:1m}
   tickets:
-    signature-secret: ${TICKETHUB_TICKETS_SIGNATURE_SECRET:dev-only-change-me-ticket-signing-secret-0123456789}
+    # Blank generates a random secret on first boot, persisted in app_secrets.
+    signature-secret: ${TICKETHUB_TICKETS_SIGNATURE_SECRET:}
   audit:
     enabled: ${AUDIT_ENABLED:true}
   auth:
@@ -102,7 +103,8 @@ tickethub:
       read-timeout: ${MERCADOPAGO_READ_TIMEOUT:5s}
   security:
     jwt:
-      secret: ${TICKETHUB_JWT_SECRET:dev-only-change-me-in-production-0123456789abcdef}
+      # Blank generates a random secret on first boot, persisted in app_secrets.
+      secret: ${TICKETHUB_JWT_SECRET:}
       expiration-minutes: ${TICKETHUB_JWT_EXPIRATION_MINUTES:60}
   mongo:
     connect-timeout: ${MONGO_CONNECT_TIMEOUT:5s}
