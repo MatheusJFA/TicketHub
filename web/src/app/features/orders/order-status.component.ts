@@ -1,20 +1,30 @@
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { I18nService } from '../../core/i18n/i18n.service';
+import { ListErrorComponent } from '../../core/list-error.component';
 import { OrdersService } from '../../core/orders.service';
+import { shareLink } from '../../core/share';
+import { ToastService } from '../../core/toast.service';
+import { parseApiError } from '../../core/api-error';
 import { OrderResponse } from '../../core/models';
 
 @Component({
   selector: 'app-order-status',
   standalone: true,
-  imports: [FormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [FormsModule, DatePipe, ListErrorComponent],
   templateUrl: './order-status.component.html',
 })
 export class OrderStatusComponent {
   private readonly orders = inject(OrdersService);
-  private readonly route = inject(ActivatedRoute);
+  private readonly toast = inject(ToastService);
+  readonly i18n = inject(I18nService);
 
-  orderId = this.route.snapshot.paramMap.get('id') ?? '';
+  /** Rota /orders/:id via withComponentInputBinding; /orders usa '' + lookup manual. */
+  readonly id = input<string>('');
+
+  orderId = '';
   readonly order = signal<OrderResponse | null>(null);
   readonly error = signal<string | null>(null);
   readonly loading = signal(false);
@@ -22,9 +32,13 @@ export class OrderStatusComponent {
   readonly cancelError = signal<string | null>(null);
 
   constructor() {
-    if (this.orderId) {
-      this.lookup();
-    }
+    effect(() => {
+      const id = this.id();
+      if (id) {
+        this.orderId = id;
+        this.lookup();
+      }
+    });
   }
 
   lookup(): void {
@@ -39,14 +53,20 @@ export class OrderStatusComponent {
         this.loading.set(false);
       },
       error: () => {
-        this.error.set('Pedido não encontrado.');
+        this.error.set(this.i18n.t('errors.orderNotFound'));
         this.loading.set(false);
       },
     });
   }
 
-  cancel(): void {
+  share(): void {
     const order = this.order();
+    if (!order) return;
+    const url = `${location.origin}/orders/${order.orderId}`;
+    void shareLink(url, this.i18n.t('orders.title'), this.i18n.t('checkout.copied'), this.toast);
+  }
+
+  cancel(): void {    const order = this.order();
     if (!order || order.status !== 'PENDING') {
       return;
     }
@@ -59,9 +79,7 @@ export class OrderStatusComponent {
       },
       error: (err) => {
         this.cancelling.set(false);
-        this.cancelError.set(
-          err?.error?.errors?.[0]?.message ?? 'Não foi possível cancelar.',
-        );
+        this.cancelError.set(parseApiError(err, this.i18n.t('errors.cancelFailed')));
       },
     });
   }

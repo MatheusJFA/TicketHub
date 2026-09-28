@@ -1,11 +1,11 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, computed, signal } from '@angular/core';
 import { SpotItem } from './models';
 
 @Injectable({ providedIn: 'root' })
 export class CartService {
   readonly spots = signal<SpotItem[]>([]);
 
-  readonly ids = () => this.spots().map((spot) => spot.id);
+  readonly ids = computed(() => this.spots().map((spot) => spot.id));
 
   toggle(spot: SpotItem): void {
     if (!spot.available || !spot.published) {

@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable, catchError, finalize, map, share, tap, throwError } from 'rxjs';
+import { Observable, catchError, finalize, map, shareReplay, tap, throwError } from 'rxjs';
 import { ConfigService } from './config.service';
 import { SessionResponse } from './models';
 
@@ -21,11 +21,16 @@ export class AuthService {
   private readonly router = inject(Router);
   private readonly config = inject(ConfigService);
 
-  private readonly accessToken = signal<string | null>(localStorage.getItem(ACCESS_KEY));
-  private readonly refreshToken = signal<string | null>(localStorage.getItem(REFRESH_KEY));
+  private readonly accessToken = signal<string | null>(readStorage(ACCESS_KEY));
+  private readonly refreshToken = signal<string | null>(readStorage(REFRESH_KEY));
   private refreshInFlight: Observable<string> | null = null;
 
-  readonly isLoggedIn = computed(() => this.accessToken() !== null);
+  readonly isLoggedIn = computed(() => {
+    const claims = decode(this.accessToken());
+    if (!claims) return false;
+    if (claims.exp && claims.exp * 1000 < Date.now()) return false;
+    return true;
+  });
   readonly claims = computed<JwtClaims | null>(() => decode(this.accessToken()));
   readonly customerId = computed(() => this.claims()?.ownerId ?? null);
 
@@ -36,6 +41,18 @@ export class AuthService {
   get canManageCatalog(): boolean {
     return this.hasAuthority('show:create') || this.hasAuthority('show:write');
   }
+
+  readonly canManageCatalog$ = computed(() => this.canManageCatalog);
+
+  get isAdmin(): boolean {
+    return this.hasAuthority('ROLE_ADMIN');
+  }
+
+  get canValidateTickets(): boolean {
+    return this.hasAuthority('ticket:validate');
+  }
+
+  readonly canValidateTickets$ = computed(() => this.canValidateTickets);
 
   token(): string | null {
     return this.accessToken();
@@ -85,7 +102,7 @@ export class AuthService {
           finalize(() => {
             this.refreshInFlight = null;
           }),
-          share(),
+          shareReplay(1),
         );
     }
     return this.refreshInFlight;
@@ -112,7 +129,19 @@ function decode(token: string | null): JwtClaims | null {
   }
   try {
     const payload = token.split('.')[1];
-    return JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+    if (!payload) return null;
+    const json = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+    if (typeof json !== 'object' || json === null) return null;
+    return json as JwtClaims;
+  } catch {
+    return null;
+  }
+}
+
+function readStorage(key: string): string | null {
+  try {
+    if (typeof localStorage === 'undefined') return null;
+    return localStorage.getItem(key);
   } catch {
     return null;
   }

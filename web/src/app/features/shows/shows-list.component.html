@@ -1,22 +1,128 @@
-<section>
-  <h1 class="mb-4 text-2xl font-bold">Shows</h1>
+<section class="th-ticket overflow-hidden">
+  <div class="grid sm:grid-cols-[1fr_230px]">
+    <div class="relative bg-[#2a241a] p-8 text-[#fff8ee] sm:p-10">
+      <div
+        class="pointer-events-none absolute -right-10 -top-10 h-44 w-44 rounded-full border-[3px] border-dashed border-[#fff8ee]/30"></div>
+      <div
+        class="pointer-events-none absolute -bottom-14 -left-14 h-52 w-52 rounded-full border-[3px] border-dashed border-[#fff8ee]/30"></div>
+      <p class="th-badge border border-[#fff8ee]/50 bg-white/10 text-[#fff8ee]">{{ i18n.t('hero.badge') }}</p>
+      <h1 class="th-display mt-3 max-w-xl text-4xl leading-[0.95] sm:text-6xl">{{ i18n.t('hero.title') }}</h1>
+      <p class="mt-3 max-w-xl text-sm font-medium text-[#ffe9d6]">
+        {{ i18n.t('hero.subtitle') }}
+      </p>
+      <form (ngSubmit)="$event.preventDefault(); catalogSection.scrollIntoView({ behavior: 'smooth', block: 'start' })" class="mt-6 flex max-w-xl gap-2">
+        <label class="sr-only" for="shows-search">{{ i18n.t('hero.searchPh') }}</label>
+        <input
+          id="shows-search"
+          name="search"
+          [ngModel]="q()"
+          (ngModelChange)="setQuery($event)"
+          [placeholder]="i18n.t('hero.searchPh')"
+          class="th-input !border-[#2a241a] !py-3" />
+        <button
+          type="submit"
+          class="shrink-0 rounded-full border-[1.5px] border-[#fdf8ec] bg-[#fdf8ec] px-6 font-bold text-[#2a241a] shadow-[3px_3px_0_rgb(0_0_0/0.35)] transition hover:-translate-y-0.5">
+          {{ i18n.t('hero.searchBtn') }}
+        </button>
+      </form>
+    </div>
+    <div class="th-perfo-y flex flex-row items-center justify-between gap-4 bg-[#fffdf6] p-6 sm:flex-col sm:justify-center sm:gap-5">
+      <p class="th-display text-2xl tracking-widest text-[#2a241a] sm:[writing-mode:vertical-rl] sm:rotate-180">
+        ★ {{ i18n.t('ticket.admit') }} ★
+      </p>
+      <div class="th-barcode w-32 sm:w-full"></div>
+      <p class="text-[0.7rem] font-bold uppercase tracking-widest text-[#6f6353]">{{ i18n.t('ticket.stubRow') }}</p>
+    </div>
+  </div>
+</section>
+
+<div class="th-marquee mt-6 rounded-xl" aria-hidden="true">
+  <div class="th-marquee-track">
+    @for (i of [1, 2]; track i) {
+      <span>TicketHub ★ {{ i18n.t('hero.title') }} ★ PIX ★ {{ i18n.t('catalog.onSale') }} ★&nbsp;</span>
+      <span>TicketHub ★ {{ i18n.t('hero.title') }} ★ PIX ★ {{ i18n.t('catalog.onSale') }} ★&nbsp;</span>
+    }
+  </div>
+</div>
+
+<section class="mt-10" #catalogSection>
   @if (loading()) {
-    <p class="text-slate-400">Carregando…</p>
+    <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+        <div class="th-ticket p-5"><div class="th-skeleton h-28"></div></div>
+      }
+    </div>
   } @else if (error()) {
-    <p class="text-sm text-red-400">{{ error() }}</p>
+    <app-list-error [message]="error()!" (retry)="reload()" />
   } @else if (shows().length === 0) {
-    <p class="text-slate-400">Nenhum show publicado no momento.</p>
+    <div class="th-ticket grid place-items-center gap-2 p-12 text-center">
+      <p class="text-4xl">🎭</p>
+      <p class="th-display text-xl">{{ i18n.t('catalog.emptyTitle') }}</p>
+      <p class="max-w-sm text-sm text-[#6f6353]">{{ i18n.t('catalog.emptyHint') }}</p>
+    </div>
   } @else {
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       @for (show of shows(); track show.id) {
-        <article class="rounded-lg border border-slate-800 bg-[#171b22] p-4">
-          <h2 class="mb-1 text-lg font-semibold">{{ show.name }}</h2>
-          <p class="text-sm text-slate-400">{{ show.date | date: 'dd/MM/yyyy HH:mm' }}</p>
-          <p class="mt-2 text-sm">{{ show.description }}</p>
-          <p class="mt-2 text-sm text-slate-400">{{ show.totalSpotsSold }} / {{ show.totalSpots }} vendidos</p>
-          <a [routerLink]="['/shows', show.id]" class="mt-2 inline-block text-sky-400">Ver detalhes</a>
+        <article class="th-ticket flex flex-col transition hover:-translate-y-1">
+          <div class="flex flex-1 flex-col p-5">
+            <div class="flex items-start justify-between gap-3">
+              <div class="th-dateblock">
+                <span class="th-display text-2xl">{{ show.date | date: 'dd' : undefined : i18n.dateLocale() }}</span>
+                <span class="text-[0.7rem] font-extrabold uppercase tracking-widest text-[#2a241a]">{{
+                  show.date | date: 'MMM yyyy' : undefined : i18n.dateLocale()
+                }}</span>
+                <span class="text-[0.7rem] font-semibold text-[#6f6353]">{{
+                  show.date | date: 'HH:mm' : undefined : i18n.dateLocale()
+                }}</span>
+              </div>
+              <span class="th-badge th-badge-live mt-1">{{ i18n.t('catalog.onSale') }}</span>
+            </div>
+            <h3 class="th-display mt-4 text-xl leading-tight">{{ show.name }}</h3>
+            <p class="mt-1 line-clamp-2 text-sm text-[#6f6353]">{{ show.description }}</p>
+            <p class="mt-2 text-xs font-bold uppercase tracking-wide text-[#6f6353]">
+              📍 {{ show.address.city }}/{{ show.address.state }} · {{ show.address.street }}, {{ show.address.number }}
+            </p>
+            <div class="mt-4">
+              <div class="flex justify-between text-xs font-bold text-[#6f6353]">
+                <span>{{ i18n.t('catalog.sold', { sold: show.totalSpotsSold, total: show.totalSpots }) }}</span>
+                <span>{{ occupancy(show) }}%</span>
+              </div>
+              <div class="mt-1 h-2 overflow-hidden rounded-full border border-[#2a241a] bg-[#eee4cc]">
+                <div class="h-full bg-[#2a241a]" [style.width.%]="occupancy(show)"></div>
+              </div>
+            </div>
+          </div>
+          <div class="th-perfo-x mx-5"></div>
+          <div class="flex items-center justify-between gap-2 p-5 pt-4">
+            <div class="th-barcode w-20 shrink-0"></div>
+            <div class="flex gap-2">
+              <a [routerLink]="['/shows', show.id]" [attr.aria-label]="i18n.t('catalog.details') + ': ' + show.name"
+                class="th-btn-primary !px-3.5 !py-2 !text-xs">👁 {{ i18n.t('catalog.details') }}</a>
+              <a [routerLink]="['/shows', show.id, 'seats']" [attr.aria-label]="i18n.t('catalog.seatsBtn') + ': ' + show.name"
+                class="th-btn-ghost !px-3.5 !py-2 !text-xs">🎟 {{ i18n.t('catalog.seatsBtn') }}</a>
+            </div>
+          </div>
         </article>
       }
     </div>
+    <app-pagination [page]="page()" [total]="total()" [perPage]="perPage" (pageChange)="goTo($event)" />
   }
+</section>
+
+<section class="mt-12">
+  <h2 class="th-display text-center text-2xl">{{ i18n.t('ticket.howTitle') }}</h2>
+  <div class="mt-5 grid gap-5 sm:grid-cols-3">
+    <div class="th-card p-5 text-center">
+      <p class="th-display text-4xl text-[#2a241a]">01</p>
+      <p class="mt-2 font-bold">{{ i18n.t('ticket.how1') }}</p>
+    </div>
+    <div class="th-card p-5 text-center">
+      <p class="th-display text-4xl text-[#2a241a]">02</p>
+      <p class="mt-2 font-bold">{{ i18n.t('ticket.how2') }}</p>
+    </div>
+    <div class="th-card p-5 text-center">
+      <p class="th-display text-4xl text-[#2a241a]">03</p>
+      <p class="mt-2 font-bold">{{ i18n.t('ticket.how3') }}</p>
+    </div>
+  </div>
 </section>

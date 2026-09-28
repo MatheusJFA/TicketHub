@@ -1,64 +1,83 @@
 <section>
-  <h1 class="mb-4 text-2xl font-bold">Administração · Shows</h1>
-
-  <form (ngSubmit)="create()" class="mb-8 grid max-w-xl gap-3 rounded-lg border border-slate-800 bg-[#171b22] p-4">
-    <h2 class="font-semibold">Novo show</h2>
-    <label class="grid gap-1 text-sm">
-      Partner ID
-      <input name="partnerId" [(ngModel)]="partnerId" required
-        class="rounded-md border border-slate-700 bg-[#0f1115] px-3 py-2 text-slate-100" />
-    </label>
-    <label class="grid gap-1 text-sm">
-      Nome
-      <input name="name" [(ngModel)]="name" required
-        class="rounded-md border border-slate-700 bg-[#0f1115] px-3 py-2 text-slate-100" />
-    </label>
-    <label class="grid gap-1 text-sm">
-      Descrição
-      <input name="description" [(ngModel)]="description" required
-        class="rounded-md border border-slate-700 bg-[#0f1115] px-3 py-2 text-slate-100" />
-    </label>
-    <div class="grid grid-cols-3 gap-3">
-      <label class="grid gap-1 text-sm">
-        Data/hora
-        <input name="date" [(ngModel)]="date" type="datetime-local" required
-          class="rounded-md border border-slate-700 bg-[#0f1115] px-3 py-2 text-slate-100" />
-      </label>
-      <label class="grid gap-1 text-sm">
-        Cidade
-        <input name="city" [(ngModel)]="city" required
-          class="rounded-md border border-slate-700 bg-[#0f1115] px-3 py-2 text-slate-100" />
-      </label>
-      <label class="grid gap-1 text-sm">
-        UF
-        <input name="state" [(ngModel)]="state" required maxlength="2"
-          class="rounded-md border border-slate-700 bg-[#0f1115] px-3 py-2 text-slate-100" />
-      </label>
+  <div class="flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <p class="th-stamp">{{ i18n.t('admin.badge') }}</p>
+      <h1 class="th-display mt-2 text-3xl">{{ i18n.t('ticket.boxOffice') }} · {{ i18n.t('admin.title') }}</h1>
+      <p class="text-sm font-medium text-[#6f6353]">{{ i18n.t('admin.subtitle') }}</p>
     </div>
-    <button type="submit" [disabled]="creating()"
-      class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white disabled:opacity-50">
-      {{ creating() ? 'Criando…' : 'Criar show' }}
+    @if (isMaster()) {
+      <div class="flex flex-wrap gap-2">
+        <a routerLink="/admin/coupons" class="th-btn-ghost">🎟 {{ i18n.t('coupons.title') }}</a>
+        <a routerLink="/admin/partners" class="th-btn-ghost">🤝 {{ i18n.t('partners.title') }}</a>
+        <a routerLink="/admin/operators" class="th-btn-ghost">🛠 {{ i18n.t('operators.title') }}</a>
+        <a routerLink="/admin/audit" class="th-btn-ghost">🔍 {{ i18n.t('audit.title') }}</a>
+      </div>
+    }
+  </div>
+
+  <form (ngSubmit)="create()" class="th-ticket mt-5 grid gap-4 p-6">
+    <h2 class="th-display text-lg">{{ i18n.t('admin.newShow') }}</h2>
+    <div class="grid gap-4 sm:grid-cols-2">
+      <label class="th-label sm:col-span-2">
+        {{ i18n.t('admin.partnerId') }}
+        <input name="partnerId" [(ngModel)]="partnerId" required [placeholder]="i18n.t('admin.partnerPh')" class="th-input font-mono !text-xs" />
+      </label>
+      <label class="th-label">
+        {{ i18n.t('admin.name') }}
+        <input name="name" [(ngModel)]="name" required [placeholder]="i18n.t('admin.namePh')" class="th-input" />
+      </label>
+      <label class="th-label">
+        {{ i18n.t('admin.desc') }}
+        <input name="description" [(ngModel)]="description" required [placeholder]="i18n.t('admin.descPh')" class="th-input" />
+      </label>
+      <label class="th-label">
+        {{ i18n.t('admin.datetime') }}
+        <input name="date" [(ngModel)]="date" type="datetime-local" required class="th-input" />
+      </label>
+      <div class="grid grid-cols-2 gap-4">
+        <label class="th-label">
+          {{ i18n.t('admin.city') }}
+          <input name="city" [(ngModel)]="city" required [placeholder]="i18n.t('admin.cityPh')" class="th-input" />
+        </label>
+        <label class="th-label">
+          {{ i18n.t('admin.state') }}
+          <input name="state" [(ngModel)]="state" required maxlength="2" placeholder="SP" class="th-input" />
+        </label>
+      </div>
+    </div>
+    <button type="submit" [disabled]="creating()" class="th-btn-stamp w-fit">
+      {{ creating() ? i18n.t('admin.creating') : i18n.t('admin.create') }}
     </button>
   </form>
 
   @if (error()) {
-    <p class="mb-4 text-sm text-red-400">{{ error() }}</p>
+    <div class="th-alert-error mt-4">{{ error() }}</div>
   }
   @if (loading()) {
-    <p class="text-slate-400">Carregando…</p>
+    <div class="th-skeleton mt-4 h-40"></div>
   } @else {
-    <div class="grid gap-4 sm:grid-cols-2">
+    <div class="mt-5 grid gap-4 sm:grid-cols-2">
       @for (show of shows(); track show.id) {
-        <article class="rounded-lg border border-slate-800 bg-[#171b22] p-4">
-          <h2 class="font-semibold">{{ show.name }}</h2>
-          <p class="text-sm text-slate-400">
-            {{ show.published ? 'Publicado' : 'Rascunho' }} · {{ show.totalSpotsSold }}/{{ show.totalSpots }}
-          </p>
-          <div class="mt-2 flex gap-3 text-sm">
-            <a [routerLink]="['/admin/shows', show.id]" class="text-sky-400">Gerenciar</a>
+        <article class="th-card flex items-center justify-between gap-3 p-5">
+          <div>
+            <h2 class="th-display">{{ show.name }}</h2>
+            <p class="mt-1.5 text-sm font-semibold text-[#6f6353]">
+              @if (show.published) {
+                <span class="th-badge th-badge-live">{{ i18n.t('admin.published') }}</span>
+              } @else {
+                <span class="th-badge th-badge-draft">{{ i18n.t('admin.draft') }}</span>
+              }
+              <span class="ml-2">{{ i18n.t('catalog.sold', { sold: show.totalSpotsSold, total: show.totalSpots }) }}</span>
+            </p>
+          </div>
+          <div class="flex shrink-0 items-center gap-2 text-sm">
+            <a [routerLink]="['/admin/shows', show.id]" class="th-btn-ghost">{{ i18n.t('admin.manage') }}</a>
             @if (!show.published) {
-              <button type="button" (click)="publish(show.id)" class="text-emerald-400">Publicar</button>
+              <button type="button" (click)="publish(show.id)" class="th-btn-stamp !px-4 !py-2 !text-xs">{{ i18n.t('admin.publish') }}</button>
+            } @else {
+              <button type="button" (click)="unpublish(show.id)" class="th-btn-ghost !px-4 !py-2 !text-xs">{{ i18n.t('admin.unpublish') }}</button>
             }
+            <button type="button" (click)="remove(show.id)" class="rounded-full border-[1.5px] border-[#c93a2e] px-3 py-2 text-xs font-bold text-[#c93a2e] transition hover:bg-[#fdeeea]" title="{{ i18n.t('admin.remove') }}">🗑</button>
           </div>
         </article>
       }
