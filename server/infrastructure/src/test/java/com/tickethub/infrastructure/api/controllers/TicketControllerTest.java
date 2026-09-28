@@ -2,11 +2,15 @@ package com.tickethub.infrastructure.api.controllers;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.tickethub.application.Either;
+import com.tickethub.application.ticket.retrieve.bycustomer.ListCustomerTicketsUseCase;
+import com.tickethub.application.ticket.retrieve.byshow.ListShowTicketsOutput;
+import com.tickethub.application.ticket.retrieve.byshow.ListShowTicketsUseCase;
 import com.tickethub.application.ticket.validate.ValidateTicketOutput;
 import com.tickethub.application.ticket.validate.ValidateTicketUseCase;
 import com.tickethub.domain.validation.Error;
@@ -16,6 +20,7 @@ import com.tickethub.infrastructure.security.ShowAccess;
 import com.tickethub.infrastructure.security.TestTokens;
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +50,12 @@ class TicketControllerTest {
 
     @MockitoBean
     ValidateTicketUseCase validateTicket;
+
+    @MockitoBean
+    ListCustomerTicketsUseCase listCustomerTickets;
+
+    @MockitoBean
+    ListShowTicketsUseCase listShowTickets;
 
     @MockitoBean(name = "showAccess")
     ShowAccess showAccess;
@@ -133,5 +144,31 @@ class TicketControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"ticketId\":\"ticket-1\",\"code\":\"ABCDEFGH\",\"signature\":\"sig\"}"))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("Given owner, when lists show tickets, then returns gate preload")
+    void givenOwner_whenListsShowTickets_thenReturnsGatePreload() throws Exception {
+        final var output = new ListShowTicketsOutput(
+                "ticket-1", "ABCDEFGH", "sig", "ISSUED", "spot-1", "A1");
+        when(showAccess.canWrite("show-1")).thenReturn(true);
+        when(listShowTickets.execute(any())).thenReturn(Either.right(List.of(output)));
+
+        mvc.perform(get("/shows/show-1/tickets")
+                        .header("Authorization", bearerAsOwner("partner-1", "ticket:validate")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].ticketId").value("ticket-1"))
+                .andExpect(jsonPath("$[0].code").value("ABCDEFGH"))
+                .andExpect(jsonPath("$[0].status").value("ISSUED"));
+    }
+
+    @Test
+    @DisplayName("Given non owner, when lists show tickets, then returns forbidden")
+    void givenNonOwner_whenListsShowTickets_thenReturnsForbidden() throws Exception {
+        when(showAccess.canWrite("show-1")).thenReturn(false);
+
+        mvc.perform(get("/shows/show-1/tickets")
+                        .header("Authorization", bearerAsOwner("partner-9", "ticket:validate")))
+                .andExpect(status().isForbidden());
     }
 }

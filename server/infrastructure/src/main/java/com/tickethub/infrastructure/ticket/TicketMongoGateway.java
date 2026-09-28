@@ -2,7 +2,9 @@ package com.tickethub.infrastructure.ticket;
 
 import static java.util.Objects.requireNonNull;
 
+import com.tickethub.domain.core.customer.CustomerID;
 import com.tickethub.domain.core.order.OrderID;
+import com.tickethub.domain.core.spot.SpotID;
 import com.tickethub.domain.core.ticket.Ticket;
 import com.tickethub.domain.core.ticket.TicketGateway;
 import com.tickethub.domain.core.ticket.TicketID;
@@ -45,6 +47,36 @@ public class TicketMongoGateway implements TicketGateway {
         return mongoTemplate
                 .find(
                         Query.query(Criteria.where("orderId").is(orderId.getValue())),
+                        TicketDocument.class,
+                        TicketDocument.COLLECTION)
+                .stream()
+                .map(TicketDocument::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<Ticket> findByCustomerId(final CustomerID customerId) {
+        requireNonNull(customerId, "'customerId' should not be null");
+        return mongoTemplate
+                .find(
+                        Query.query(Criteria.where("customerId").is(customerId.getValue())),
+                        TicketDocument.class,
+                        TicketDocument.COLLECTION)
+                .stream()
+                .map(TicketDocument::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<Ticket> findBySpotIds(final List<SpotID> spotIds) {
+        requireNonNull(spotIds, "'spotIds' should not be null");
+        if (spotIds.isEmpty()) {
+            return List.of();
+        }
+        return mongoTemplate
+                .find(
+                        Query.query(Criteria.where("spotId")
+                                .in(spotIds.stream().map(SpotID::getValue).toList())),
                         TicketDocument.class,
                         TicketDocument.COLLECTION)
                 .stream()

@@ -1,5 +1,9 @@
 package com.tickethub.infrastructure.configuration.usecases;
 
+import com.tickethub.application.ticket.retrieve.bycustomer.DefaultListCustomerTicketsUseCase;
+import com.tickethub.application.ticket.retrieve.bycustomer.ListCustomerTicketsUseCase;
+import com.tickethub.application.ticket.retrieve.byshow.DefaultListShowTicketsUseCase;
+import com.tickethub.application.ticket.retrieve.byshow.ListShowTicketsUseCase;
 import com.tickethub.application.ticket.validate.DefaultValidateTicketUseCase;
 import com.tickethub.application.ticket.validate.ValidateTicketUseCase;
 import com.tickethub.domain.core.show.ShowGateway;
@@ -32,5 +36,15 @@ public class TicketUseCaseConfig {
     @Bean
     public ValidateTicketUseCase validateTicketUseCase() {
         return new DefaultValidateTicketUseCase(ticketGateway, ticketSigner, spotGateway, showGateway);
+    }
+
+    @Bean
+    public ListCustomerTicketsUseCase listCustomerTicketsUseCase() {
+        return new DefaultListCustomerTicketsUseCase(ticketGateway, spotGateway, showGateway);
+    }
+
+    @Bean
+    public ListShowTicketsUseCase listShowTicketsUseCase() {
+        return new DefaultListShowTicketsUseCase(ticketGateway, spotGateway);
     }
 }

@@ -19,3 +19,11 @@ X-Correlation-ID: ticket-validate-1
   "sectionId": "{{sectionId}}",
   "spotId": "{{spotId}}"
 }
+
+### List show tickets (door preload for offline validation)
+# Downloads every ticket of a show so the gate keeps matching
+# ticketId:code while offline. Requires ticket:validate + show access.
+# @name listShowTickets
+GET {{baseUrl}}/shows/{{showId}}/tickets
+Accept: application/json
+Authorization: Bearer {{token}}

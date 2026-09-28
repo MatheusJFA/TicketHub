@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
 import com.tickethub.domain.core.section.SectionID;
+import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.domain.core.spot.Spot;
 import com.tickethub.domain.core.spot.SpotGateway;
 import com.tickethub.domain.core.spot.SpotID;
@@ -132,6 +133,14 @@ public class SpotMongoGateway implements SpotGateway {
                 query,
                 SORTABLE_FIELDS,
                 SpotDocument::toDomain);
+    }
+
+    @Override
+    public List<Spot> findByShowId(final ShowID showId) {
+        requireNonNull(showId, "'showId' should not be null");
+        return repository.findByShowId(showId.getValue()).stream()
+                .map(SpotDocument::toDomain)
+                .toList();
     }
 
     @Override
