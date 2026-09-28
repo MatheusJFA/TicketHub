@@ -1,0 +1,144 @@
+@if (!auth.isLoggedIn() || !isPartner) {
+  <section class="mx-auto max-w-2xl">
+    <div class="th-ticket overflow-hidden">
+      <div class="border-b-2 border-[#2a241a] bg-[#2a241a] p-6 text-[#fdf8ec]">
+        <p class="th-display text-xl">{{ i18n.t('ticket.boxOffice') }}</p>
+        <h1 class="th-display mt-1 text-3xl">{{ i18n.t('partner.signupTitle') }}</h1>
+        <p class="mt-1 text-sm text-[#c9bfa9]">{{ i18n.t('partner.signupSub') }}</p>
+      </div>
+      @if (signupDone()) {
+        <div class="p-6">
+          <div class="rounded-xl border-[1.5px] border-[#0f766e] bg-[#d9efe8] p-4 text-sm font-bold text-[#0b4f49]">
+            ✅ {{ i18n.t('partner.pending') }}
+          </div>
+        </div>
+      } @else {
+        <form (ngSubmit)="signup()" class="grid gap-4 p-6">
+          <div class="grid gap-4 sm:grid-cols-2">
+            <label class="th-label">
+              {{ i18n.t('partner.name') }}
+              <input name="name" [(ngModel)]="name" required class="th-input" />
+            </label>
+            <label class="th-label">
+              {{ i18n.t('partner.cnpj') }}
+              <input name="cnpj" [(ngModel)]="cnpj" required inputmode="numeric" class="th-input" />
+            </label>
+            <label class="th-label">
+              {{ i18n.t('partner.email') }}
+              <input name="email" [(ngModel)]="email" type="email" required autocomplete="email" class="th-input" />
+            </label>
+            <label class="th-label">
+              {{ i18n.t('partner.password') }}
+              <input name="password" [(ngModel)]="password" type="password" required autocomplete="new-password" class="th-input" />
+            </label>
+            <label class="th-label">
+              {{ i18n.t('partner.street') }}
+              <input name="street" [(ngModel)]="address.street" required class="th-input" />
+            </label>
+            <div class="grid grid-cols-2 gap-4">
+              <label class="th-label">
+                {{ i18n.t('partner.number') }}
+                <input name="number" [(ngModel)]="address.number" required class="th-input" />
+              </label>
+              <label class="th-label">
+                {{ i18n.t('partner.complement') }}
+                <input name="complement" [(ngModel)]="address.complement" class="th-input" />
+              </label>
+            </div>
+            <label class="th-label">
+              {{ i18n.t('partner.neighborhood') }}
+              <input name="neighborhood" [(ngModel)]="address.neighborhood" required class="th-input" />
+            </label>
+            <div class="grid grid-cols-2 gap-4">
+              <label class="th-label">
+                {{ i18n.t('partner.city') }}
+                <input name="city" [(ngModel)]="address.city" required class="th-input" />
+              </label>
+              <label class="th-label">
+                {{ i18n.t('partner.state') }}
+                <input name="state" [(ngModel)]="address.state" required maxlength="2" class="th-input" />
+              </label>
+            </div>
+            <label class="th-label">
+              {{ i18n.t('partner.country') }}
+              <input name="country" [(ngModel)]="address.country" required class="th-input" />
+            </label>
+            <label class="th-label">
+              {{ i18n.t('partner.zip') }}
+              <input name="zip" [(ngModel)]="address.zipCode" required (blur)="lookupZip()" inputmode="numeric" class="th-input" />
+            </label>
+          </div>
+          @if (error()) {
+            <div class="th-alert-error">{{ error() }}</div>
+          }
+          <button type="submit" [disabled]="signingUp()" class="th-btn-stamp w-fit">
+            {{ signingUp() ? i18n.t('partner.submitting') : i18n.t('partner.submit') }}
+          </button>
+        </form>
+      }
+    </div>
+  </section>
+} @else {
+  <section class="mx-auto max-w-2xl">
+    <p class="th-stamp">{{ i18n.t('partner.title') }}</p>
+    <h1 class="th-display mt-2 text-3xl">{{ i18n.t('partner.profileTitle') }}</h1>
+    @if (loading()) {
+      <div class="th-skeleton mt-4 h-48"></div>
+    } @else if (profile()) {
+      <div class="th-ticket mt-4 grid gap-4 p-6">
+        <div class="grid gap-4 sm:grid-cols-2">
+          <label class="th-label">
+            {{ i18n.t('partner.name') }}
+            <input name="pname" [(ngModel)]="name" required class="th-input" />
+          </label>
+          <p class="th-label">CNPJ<br /><span class="th-input font-mono !bg-[#f3ecdd]">{{ profile()!.cnpj }}</span></p>
+          <label class="th-label">
+            {{ i18n.t('partner.street') }}
+            <input name="pstreet" [(ngModel)]="address.street" required class="th-input" />
+          </label>
+          <div class="grid grid-cols-2 gap-4">
+            <label class="th-label">
+              {{ i18n.t('partner.number') }}
+              <input name="pnumber" [(ngModel)]="address.number" required class="th-input" />
+            </label>
+            <label class="th-label">
+              {{ i18n.t('partner.zip') }}
+              <input name="pzip" [(ngModel)]="address.zipCode" required class="th-input" />
+            </label>
+          </div>
+          <label class="th-label">
+            {{ i18n.t('partner.city') }}
+            <input name="pcity" [(ngModel)]="address.city" required class="th-input" />
+          </label>
+          <label class="th-label">
+            {{ i18n.t('partner.state') }}
+            <input name="pstate" [(ngModel)]="address.state" required maxlength="2" class="th-input" />
+          </label>
+        </div>
+        <div class="th-perfo-x"></div>
+        <h2 class="th-display text-lg">🔔 {{ i18n.t('partner.webhookTitle') }}</h2>
+        <div class="grid gap-4 sm:grid-cols-2">
+          <label class="th-label">
+            {{ i18n.t('partner.webhookUrl') }}
+            <input name="wurl" [(ngModel)]="webhookUrl" placeholder="https://…" class="th-input font-mono !text-xs" />
+          </label>
+          <label class="th-label">
+            {{ i18n.t('partner.webhookSecret') }}
+            <input name="wsecret" [(ngModel)]="webhookSecret" placeholder="••••••" class="th-input font-mono !text-xs" />
+          </label>
+        </div>
+        @if (error()) {
+          <div class="th-alert-error">{{ error() }}</div>
+        }
+        @if (saved()) {
+          <div class="rounded-xl border-[1.5px] border-[#0f766e] bg-[#d9efe8] p-3 text-sm font-bold text-[#0b4f49]">
+            ✅ {{ i18n.t('partner.saved') }}
+          </div>
+        }
+        <button type="button" (click)="save()" [disabled]="saving()" class="th-btn-primary w-fit">
+          {{ saving() ? i18n.t('partner.saving') : i18n.t('partner.save') }}
+        </button>
+      </div>
+    }
+  </section>
+}

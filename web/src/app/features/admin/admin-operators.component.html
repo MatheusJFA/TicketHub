@@ -1,0 +1,32 @@
+<section class="mx-auto max-w-xl">
+  <p class="text-sm font-semibold"><a routerLink="/admin" class="th-link">← Admin</a></p>
+  <p class="th-stamp mt-2">{{ i18n.t('admin.badge') }}</p>
+  <h1 class="th-display mt-2 text-3xl">{{ i18n.t('operators.title') }}</h1>
+  <p class="mt-1 text-sm font-medium text-[#6f6353]">{{ i18n.t('operators.subtitle') }}</p>
+
+  <form (ngSubmit)="submit()" class="th-ticket mt-5 grid gap-4 p-6">
+    <label class="th-label">
+      {{ i18n.t('operators.name') }}
+      <input name="name" [(ngModel)]="name" required autocomplete="off" class="th-input" />
+    </label>
+    <label class="th-label">
+      {{ i18n.t('operators.email') }}
+      <input name="email" [(ngModel)]="email" type="email" required autocomplete="off" class="th-input" />
+    </label>
+    <label class="th-label">
+      {{ i18n.t('operators.password') }}
+      <input name="password" [(ngModel)]="password" type="password" required autocomplete="new-password" class="th-input" />
+    </label>
+    @if (error()) {
+      <div class="th-alert-error">{{ error() }}</div>
+    }
+    @if (createdId()) {
+      <div class="rounded-xl border-[1.5px] border-[#0f766e] bg-[#d9efe8] p-3 text-sm font-bold text-[#0b4f49]">
+        ✅ {{ i18n.t('operators.created') }} <span class="font-mono text-xs">{{ createdId() }}</span>
+      </div>
+    }
+    <button type="submit" [disabled]="creating()" class="th-btn-stamp w-fit">
+      {{ creating() ? i18n.t('operators.creating') : i18n.t('operators.create') }}
+    </button>
+  </form>
+</section>
