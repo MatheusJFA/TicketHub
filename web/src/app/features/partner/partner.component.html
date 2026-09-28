@@ -9,7 +9,7 @@
       @if (signupDone()) {
         <div class="p-6">
           <div class="rounded-xl border-[1.5px] border-[#0f766e] bg-[#d9efe8] p-4 text-sm font-bold text-[#0b4f49]">
-            ✅ {{ i18n.t('partner.pending') }}
+            <app-icon name="check" class="h-4 w-4 text-[#0b4f49]" /> {{ i18n.t('partner.pending') }}
           </div>
         </div>
       } @else {
@@ -116,7 +116,7 @@
           </label>
         </div>
         <div class="th-perfo-x"></div>
-        <h2 class="th-display text-lg">🔔 {{ i18n.t('partner.webhookTitle') }}</h2>
+        <h2 class="th-display text-lg"><app-icon name="bell" class="th-icon--emboss h-5 w-5" /> {{ i18n.t('partner.webhookTitle') }}</h2>
         <div class="grid gap-4 sm:grid-cols-2">
           <label class="th-label">
             {{ i18n.t('partner.webhookUrl') }}
@@ -132,7 +132,7 @@
         }
         @if (saved()) {
           <div class="rounded-xl border-[1.5px] border-[#0f766e] bg-[#d9efe8] p-3 text-sm font-bold text-[#0b4f49]">
-            ✅ {{ i18n.t('partner.saved') }}
+            <app-icon name="check" class="h-4 w-4 text-[#0b4f49]" /> {{ i18n.t('partner.saved') }}
           </div>
         }
         <button type="button" (click)="save()" [disabled]="saving()" class="th-btn-primary w-fit">

@@ -5,12 +5,13 @@ import { I18nService } from '../../core/i18n/i18n.service';
 import { ConfirmService } from '../../core/confirm.service';
 import { PartnersService, PartnerProfile } from '../../core/partners.service';
 import { parseApiError } from '../../core/api-error';
+import { IconComponent } from '../../core/icon.component';
 
 @Component({
   selector: 'app-admin-partners',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe, RouterLink, IconComponent],
   templateUrl: './admin-partners.component.html',
 })
 export class AdminPartnersComponent {

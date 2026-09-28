@@ -15,6 +15,7 @@ import {
   ValidatedCacheService,
 } from '../../core/validated-cache.service';
 import { parseApiError } from '../../core/api-error';
+import { IconComponent } from '../../core/icon.component';
 import { ShowSummary } from '../../core/models';
 
 type GateState = 'idle' | 'checking' | 'granted' | 'denied';
@@ -23,7 +24,7 @@ type GateState = 'idle' | 'checking' | 'granted' | 'denied';
   selector: 'app-gate',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, DatePipe, ListErrorComponent],
+  imports: [FormsModule, DatePipe, ListErrorComponent, IconComponent],
   templateUrl: './gate.component.html',
 })
 export class GateComponent {

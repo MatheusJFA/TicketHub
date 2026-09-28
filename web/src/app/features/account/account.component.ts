@@ -6,12 +6,13 @@ import { AuthService } from '../../core/auth.service';
 import { ConfirmService } from '../../core/confirm.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { parseApiError } from '../../core/api-error';
+import { IconComponent } from '../../core/icon.component';
 
 @Component({
   selector: 'app-account',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule],
+  imports: [FormsModule, IconComponent],
   templateUrl: './account.component.html',
 })
 export class AccountComponent {

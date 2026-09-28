@@ -6,6 +6,7 @@ import { PartnersService, PartnerProfile } from '../../core/partners.service';
 import { ZipcodeService } from '../../core/zipcode.service';
 import { Address } from '../../core/models';
 import { parseApiError } from '../../core/api-error';
+import { IconComponent } from '../../core/icon.component';
 
 const EMPTY_ADDRESS: Address = {
   street: '',
@@ -22,7 +23,7 @@ const EMPTY_ADDRESS: Address = {
   selector: 'app-partner',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule],
+  imports: [FormsModule, IconComponent],
   templateUrl: './partner.component.html',
 })
 export class PartnerComponent {

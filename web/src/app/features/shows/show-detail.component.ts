@@ -4,13 +4,14 @@ import { RouterLink } from '@angular/router';
 import { CatalogService } from '../../core/catalog.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { ListErrorComponent } from '../../core/list-error.component';
+import { IconComponent } from '../../core/icon.component';
 import { ShowDetail } from '../../core/models';
 
 @Component({
   selector: 'app-show-detail',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, DatePipe, ListErrorComponent],
+  imports: [RouterLink, DatePipe, ListErrorComponent, IconComponent],
   templateUrl: './show-detail.component.html',
 })
 export class ShowDetailComponent {

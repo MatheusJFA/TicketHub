@@ -9,12 +9,13 @@ import { I18nService } from '../../core/i18n/i18n.service';
 import { ListErrorComponent } from '../../core/list-error.component';
 import { PaginationComponent } from '../../core/pagination.component';
 import { parseApiError } from '../../core/api-error';
+import { IconComponent } from '../../core/icon.component';
 
 @Component({
   selector: 'app-admin-audit',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, DatePipe, RouterLink, ListErrorComponent, PaginationComponent],
+  imports: [FormsModule, DatePipe, RouterLink, ListErrorComponent, PaginationComponent, IconComponent],
   templateUrl: './admin-audit.component.html',
 })
 export class AdminAuditComponent {

@@ -34,7 +34,11 @@
         {{ i18n.t('auth.password') }}
         <div class="relative">
           <input formControlName="password" [type]="showPassword() ? 'text' : 'password'" required minlength="8" autocomplete="new-password" [placeholder]="i18n.t('auth.passwordMin')" class="th-input pr-12" [attr.aria-invalid]="form.controls.password.invalid && form.controls.password.touched" />
-          <button type="button" (click)="showPassword.set(!showPassword())" class="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-bold text-[#6f6353] underline" [attr.aria-pressed]="showPassword()">👁</button>
+          <button type="button" (click)="showPassword.set(!showPassword())" class="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-bold text-[#6f6353] underline" [attr.aria-pressed]="showPassword()">@if (showPassword()) {
+            <app-icon name="eye-off" class="th-icon--emboss h-4 w-4" />
+          } @else {
+            <app-icon name="eye" class="th-icon--emboss h-4 w-4" />
+          }</button>
         </div>
         @if (form.controls.password.touched && form.controls.password.invalid) {
           <span class="text-xs font-bold text-[#c93a2e]">{{ i18n.t('errors.minLength', { min: 8 }) }}</span>
