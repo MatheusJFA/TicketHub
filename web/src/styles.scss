@@ -264,7 +264,7 @@ body {
   border-top: 2px dashed #c4b795;
 }
 .th-perfo-x::after {
-  content: '✂';
+  content: '✂︎';
   position: absolute;
   top: -14px;
   left: 1.25rem;
@@ -293,6 +293,18 @@ body {
 .th-stamp-teal {
   border-color: var(--color-teal);
   color: var(--color-teal);
+}
+
+/* Monochrome icons with letterpress relief (tone-on-tone emboss).
+   Use .th-icon--emboss on light surfaces and .th-icon--emboss-dark
+   on dark (#2a241a) surfaces. The TicketHub logo is excluded. */
+.th-icon--emboss {
+  color: #cfc2a4;
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.9));
+}
+.th-icon--emboss-dark {
+  color: #6b5d45;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.55));
 }
 
 /* Fake barcode stub. */

@@ -18,7 +18,7 @@
           </div>
           <h1 class="th-display mt-3 text-3xl leading-none sm:text-5xl">{{ show()!.name }}</h1>
           <p class="mt-2 font-semibold text-[#e5d9bd]">
-            📅 {{ show()!.date | date: 'medium' : undefined : i18n.dateLocale() }}
+            <app-icon name="calendar" class="th-icon--emboss-dark h-4 w-4" /> {{ show()!.date | date: 'medium' : undefined : i18n.dateLocale() }}
           </p>
         </div>
         <div class="th-perfo-y flex flex-row items-center justify-around bg-[#fffdf6] p-6 sm:flex-col sm:justify-center sm:gap-4">
@@ -36,7 +36,7 @@
           <h2 class="th-display text-lg">{{ i18n.t('detail.about') }}</h2>
           <p class="mt-1 text-sm leading-relaxed text-[#4a4132]">{{ show()!.description }}</p>
           <div class="mt-4 grid gap-2 rounded-xl border-[1.5px] border-dashed border-[#c4b795] bg-[#f8f2e2] p-4 text-sm font-medium text-[#4a4132]">
-            <p>📍 {{ show()!.address.street }}, {{ show()!.address.number }} — {{ show()!.address.neighborhood }}</p>
+            <p><app-icon name="pin" class="th-icon--emboss h-4 w-4" /> {{ show()!.address.street }}, {{ show()!.address.number }} — {{ show()!.address.neighborhood }}</p>
             <p>{{ show()!.address.city }}/{{ show()!.address.state }} · {{ show()!.address.country }} · CEP {{ show()!.address.zipCode }}</p>
           </div>
         </div>

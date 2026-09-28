@@ -56,7 +56,7 @@
     <app-list-error [message]="error()!" (retry)="reload()" />
   } @else if (shows().length === 0) {
     <div class="th-ticket grid place-items-center gap-2 p-12 text-center">
-      <p class="text-4xl">🎭</p>
+      <p class="text-4xl"><app-icon name="ticket" class="th-icon--emboss h-10 w-10" /></p>
       <p class="th-display text-xl">{{ i18n.t('catalog.emptyTitle') }}</p>
       <p class="max-w-sm text-sm text-[#6f6353]">{{ i18n.t('catalog.emptyHint') }}</p>
     </div>
@@ -80,7 +80,7 @@
             <h3 class="th-display mt-4 text-xl leading-tight">{{ show.name }}</h3>
             <p class="mt-1 line-clamp-2 text-sm text-[#6f6353]">{{ show.description }}</p>
             <p class="mt-2 text-xs font-bold uppercase tracking-wide text-[#6f6353]">
-              📍 {{ show.address.city }}/{{ show.address.state }} · {{ show.address.street }}, {{ show.address.number }}
+              <app-icon name="pin" class="th-icon--emboss h-3.5 w-3.5" /> {{ show.address.city }}/{{ show.address.state }} · {{ show.address.street }}, {{ show.address.number }}
             </p>
             <div class="mt-4">
               <div class="flex justify-between text-xs font-bold text-[#6f6353]">
@@ -97,9 +97,9 @@
             <div class="th-barcode w-20 shrink-0"></div>
             <div class="flex gap-2">
               <a [routerLink]="['/shows', show.id]" [attr.aria-label]="i18n.t('catalog.details') + ': ' + show.name"
-                class="th-btn-primary !px-3.5 !py-2 !text-xs">👁 {{ i18n.t('catalog.details') }}</a>
+                class="th-btn-primary !px-3.5 !py-2 !text-xs"><app-icon name="eye" class="th-icon--emboss-dark h-3.5 w-3.5" /> {{ i18n.t('catalog.details') }}</a>
               <a [routerLink]="['/shows', show.id, 'seats']" [attr.aria-label]="i18n.t('catalog.seatsBtn') + ': ' + show.name"
-                class="th-btn-ghost !px-3.5 !py-2 !text-xs">🎟 {{ i18n.t('catalog.seatsBtn') }}</a>
+                class="th-btn-ghost !px-3.5 !py-2 !text-xs"><app-icon name="ticket" class="th-icon--emboss h-3.5 w-3.5" /> {{ i18n.t('catalog.seatsBtn') }}</a>
             </div>
           </div>
         </article>

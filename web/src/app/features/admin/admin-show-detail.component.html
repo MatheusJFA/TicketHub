@@ -6,7 +6,7 @@
   <section>
     <p class="text-sm font-semibold"><a routerLink="/admin" class="th-link">{{ i18n.t('admin.back') }}</a></p>
     <div class="mt-2 flex flex-wrap items-center justify-between gap-3">
-      <h1 class="th-display text-3xl">🎪 {{ show()?.name }}</h1>
+      <h1 class="th-display text-3xl"><app-icon name="tent" class="th-icon--emboss h-7 w-7" /> {{ show()?.name }}</h1>
       @if (show()?.published) {
         <span class="th-badge th-badge-live">{{ i18n.t('admin.published') }}</span>
       } @else {
@@ -15,7 +15,7 @@
     </div>
 
     <form (ngSubmit)="buildSection()" class="th-ticket mb-6 mt-4 grid gap-5 p-6">
-      <h2 class="th-display text-lg">🗺 {{ i18n.t('admin.mapTitle') }}</h2>
+      <h2 class="th-display text-lg"><app-icon name="map" class="th-icon--emboss h-5 w-5" /> {{ i18n.t('admin.mapTitle') }}</h2>
       <div class="grid gap-4 sm:grid-cols-2">
         <label class="th-label">
           {{ i18n.t('admin.sectionName') }}
@@ -47,7 +47,7 @@
 
       @if (previewRows().length > 0) {
         <div class="rounded-xl border-[1.5px] border-[#2a241a] bg-[#2a241a] p-4">
-          <p class="mb-1 text-center text-xs font-black tracking-[0.3em] text-[#e8b93e]">★ {{ previewTotal() }} ★</p>
+          <p class="mb-1 flex items-center justify-center gap-2 text-center text-xs font-black tracking-[0.3em] text-[#f6ecd4]"><app-icon name="star" class="th-icon--emboss-dark h-3.5 w-3.5" /> {{ previewTotal() }} <app-icon name="star" class="th-icon--emboss-dark h-3.5 w-3.5" /></p>
           <div class="grid max-h-56 gap-3 overflow-auto rounded-lg bg-[#f8f2e2] p-4">
             @for (r of previewRows(); track r.row) {
               <div class="flex items-center gap-2">
@@ -110,7 +110,7 @@
               <span class="ml-1 font-sans text-sm font-semibold text-[#6f6353]">
                 {{ entry.section.totalSpotsSold }}/{{ entry.section.totalSpots }} · {{ entry.section.price.currency }} {{ entry.section.price.value }}
               </span>
-              <button type="button" (click)="startEditSection(entry.section)" class="ml-1 align-middle text-xs font-bold text-[#6f6353] underline">✏️</button>
+              <button type="button" (click)="startEditSection(entry.section)" class="ml-1 align-middle text-xs font-bold text-[#6f6353] underline"><app-icon name="pencil" class="th-icon--emboss h-3.5 w-3.5" /></button>
             </h2>
           }
           <div class="flex shrink-0 flex-wrap items-center gap-2">
@@ -125,7 +125,7 @@
               </button>
             }
             <button type="button" (click)="deleteSection(entry.section.id)" class="rounded-full border-[1.5px] border-[#c93a2e] px-3 py-1.5 text-xs font-bold text-[#c93a2e] transition hover:bg-[#fdeeea]">
-              🗑
+              <app-icon name="trash" class="th-icon--emboss h-4 w-4" />
             </button>
           </div>
         </div>

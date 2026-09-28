@@ -1,5 +1,5 @@
 <section class="mx-auto max-w-xl">
-  <h1 class="th-display text-center text-3xl">🎟 {{ i18n.t('orders.title') }}</h1>
+  <h1 class="th-display text-center text-3xl"><app-icon name="ticket" class="th-icon--emboss h-7 w-7" /> {{ i18n.t('orders.title') }}</h1>
   <p class="text-center text-sm font-medium text-[#6f6353]">{{ i18n.t('orders.subtitle') }}</p>
   <form class="th-card mt-4 flex gap-2 p-3" (ngSubmit)="lookup()">
     <input
@@ -19,6 +19,7 @@
         <p class="font-mono text-xs text-[#6f6353]">{{ order()!.orderId }}</p>
         <div class="flex items-center gap-2">
           <button type="button" (click)="share()" class="th-btn-ghost !px-3 !py-1.5 !text-xs">
+            <app-icon name="share" class="th-icon--emboss h-3.5 w-3.5" />
             {{ i18n.t('orders.share') }}
           </button>
           <span
@@ -59,6 +60,6 @@
       }
     </div>
   } @else {
-    <div class="th-ticket mt-4 p-10 text-center text-sm font-medium text-[#6f6353]">{{ i18n.t('orders.hint') }}</div>
+    <div class="th-ticket mt-4 p-10 text-center text-sm font-medium text-[#6f6353]"><app-icon name="search" class="th-icon--emboss h-5 w-5" /><br />{{ i18n.t('orders.hint') }}</div>
   }
 </section>

@@ -6,6 +6,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { CatalogService } from '../../core/catalog.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { ListErrorComponent } from '../../core/list-error.component';
+import { IconComponent } from '../../core/icon.component';
 import { PaginationComponent } from '../../core/pagination.component';
 import { parseApiError } from '../../core/api-error';
 import { ShowSummary } from '../../core/models';
@@ -17,7 +18,7 @@ export type CatalogScope = 'all' | 'name' | 'city' | 'state';
   selector: 'app-shows-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, DatePipe, FormsModule, ListErrorComponent, PaginationComponent],
+  imports: [RouterLink, DatePipe, FormsModule, ListErrorComponent, PaginationComponent, IconComponent],
   templateUrl: './shows-list.component.html',
 })
 export class ShowsListComponent {

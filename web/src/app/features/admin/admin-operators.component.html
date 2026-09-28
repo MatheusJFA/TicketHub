@@ -22,7 +22,7 @@
     }
     @if (createdId()) {
       <div class="rounded-xl border-[1.5px] border-[#0f766e] bg-[#d9efe8] p-3 text-sm font-bold text-[#0b4f49]">
-        ✅ {{ i18n.t('operators.created') }} <span class="font-mono text-xs">{{ createdId() }}</span>
+        <app-icon name="check" class="h-4 w-4 text-[#0b4f49]" /> {{ i18n.t('operators.created') }} <span class="font-mono text-xs">{{ createdId() }}</span>
       </div>
     }
     <button type="submit" [disabled]="creating()" class="th-btn-stamp w-fit">

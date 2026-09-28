@@ -1,5 +1,5 @@
 <section class="mx-auto max-w-md">
-  <h1 class="th-display text-center text-3xl">👤 {{ i18n.t('account.title') }}</h1>
+  <h1 class="th-display text-center text-3xl"><app-icon name="user" class="th-icon--emboss h-7 w-7" /> {{ i18n.t('account.title') }}</h1>
   <p class="text-center text-sm font-medium text-[#6f6353]">{{ i18n.t('account.subtitle') }}</p>
 
   @if (loading()) {
@@ -16,7 +16,7 @@
       }
       @if (saved()) {
         <div class="rounded-xl border-[1.5px] border-[#0f766e] bg-[#d9efe8] p-3 text-sm font-bold text-[#0b4f49]">
-          ✅ {{ i18n.t('account.saved') }}
+          <app-icon name="check" class="h-4 w-4 text-[#0b4f49]" /> {{ i18n.t('account.saved') }}
         </div>
       }
       <button type="button" (click)="save()" [disabled]="saving()" class="th-btn-primary w-full">

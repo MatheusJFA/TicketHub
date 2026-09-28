@@ -1,7 +1,7 @@
 <section>
   <p class="text-sm font-semibold"><a routerLink="/admin" class="th-link">← Admin</a></p>
   <p class="th-stamp mt-2">{{ i18n.t('admin.badge') }}</p>
-  <h1 class="th-display mt-2 text-3xl">🔍 {{ i18n.t('audit.title') }}</h1>
+  <h1 class="th-display mt-2 text-3xl"><app-icon name="search" class="th-icon--emboss h-7 w-7" /> {{ i18n.t('audit.title') }}</h1>
   <p class="mt-1 text-sm font-medium text-[#6f6353]">{{ i18n.t('audit.subtitle') }} ({{ total() }})</p>
 
   <form (ngSubmit)="load()" class="th-card mt-4 grid gap-3 p-4 sm:grid-cols-[1fr_1fr_1fr_auto]">

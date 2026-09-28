@@ -7,10 +7,10 @@
     </div>
     @if (isMaster()) {
       <div class="flex flex-wrap gap-2">
-        <a routerLink="/admin/coupons" class="th-btn-ghost">🎟 {{ i18n.t('coupons.title') }}</a>
-        <a routerLink="/admin/partners" class="th-btn-ghost">🤝 {{ i18n.t('partners.title') }}</a>
-        <a routerLink="/admin/operators" class="th-btn-ghost">🛠 {{ i18n.t('operators.title') }}</a>
-        <a routerLink="/admin/audit" class="th-btn-ghost">🔍 {{ i18n.t('audit.title') }}</a>
+        <a routerLink="/admin/coupons" class="th-btn-ghost"><app-icon name="ticket" class="th-icon--emboss h-4 w-4" /> {{ i18n.t('coupons.title') }}</a>
+        <a routerLink="/admin/partners" class="th-btn-ghost"><app-icon name="users" class="th-icon--emboss h-4 w-4" /> {{ i18n.t('partners.title') }}</a>
+        <a routerLink="/admin/operators" class="th-btn-ghost"><app-icon name="wrench" class="th-icon--emboss h-4 w-4" /> {{ i18n.t('operators.title') }}</a>
+        <a routerLink="/admin/audit" class="th-btn-ghost"><app-icon name="search" class="th-icon--emboss h-4 w-4" /> {{ i18n.t('audit.title') }}</a>
       </div>
     }
   </div>
@@ -77,7 +77,7 @@
             } @else {
               <button type="button" (click)="unpublish(show.id)" class="th-btn-ghost !px-4 !py-2 !text-xs">{{ i18n.t('admin.unpublish') }}</button>
             }
-            <button type="button" (click)="remove(show.id)" class="rounded-full border-[1.5px] border-[#c93a2e] px-3 py-2 text-xs font-bold text-[#c93a2e] transition hover:bg-[#fdeeea]" title="{{ i18n.t('admin.remove') }}">🗑</button>
+            <button type="button" (click)="remove(show.id)" class="rounded-full border-[1.5px] border-[#c93a2e] px-3 py-2 text-xs font-bold text-[#c93a2e] transition hover:bg-[#fdeeea]" title="{{ i18n.t('admin.remove') }}"><app-icon name="trash" class="th-icon--emboss h-4 w-4" /></button>
           </div>
         </article>
       }

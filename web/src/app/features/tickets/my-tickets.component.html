@@ -1,6 +1,6 @@
 <section>
   <div class="text-center">
-    <h1 class="th-display text-3xl">🎟 {{ i18n.t('tickets.title') }}</h1>
+    <h1 class="th-display text-3xl"><app-icon name="ticket" class="th-icon--emboss h-7 w-7" /> {{ i18n.t('tickets.title') }}</h1>
     <p class="mt-1 text-sm font-medium text-[#6f6353]">{{ i18n.t('tickets.subtitle') }}</p>
   </div>
 
@@ -13,7 +13,7 @@
     <app-list-error [message]="error()!" (retry)="load()" class="mt-6 block" />
   } @else if (items().length === 0) {
     <div class="th-ticket mx-auto mt-6 grid max-w-md place-items-center gap-2 p-12 text-center">
-      <p class="text-4xl">🎫</p>
+      <p class="text-4xl"><app-icon name="ticket" class="th-icon--emboss h-10 w-10" /></p>
       <p class="font-bold">{{ i18n.t('tickets.empty') }}</p>
       <a routerLink="/" class="th-btn-stamp mt-2">{{ i18n.t('tickets.browse') }}</a>
     </div>
@@ -25,8 +25,8 @@
             <p class="text-[0.7rem] font-extrabold uppercase tracking-[0.2em] text-[#c9bfa9]">{{ i18n.t('ticket.admit') }}</p>
             <h2 class="th-display mt-1 text-xl leading-tight">{{ ticket.showName }}</h2>
             <p class="mt-1 text-sm font-semibold text-[#e5d9bd]">
-              📅 {{ ticket.showDate | date: 'medium' : undefined : i18n.dateLocale() }}
-              · 🎪 {{ ticket.location }}
+              <app-icon name="calendar" class="th-icon--emboss-dark h-3.5 w-3.5" /> {{ ticket.showDate | date: 'medium' : undefined : i18n.dateLocale() }}
+              · <app-icon name="tent" class="th-icon--emboss-dark h-3.5 w-3.5" /> {{ ticket.location }}
             </p>
           </div>
           <div class="p-5">
@@ -54,6 +54,7 @@
             <div class="flex items-center justify-between pt-4">
               <div class="th-barcode w-28" aria-hidden="true"></div>
               <button type="button" (click)="copy(ticket)" class="th-btn-ghost !px-4 !py-2 !text-xs" [attr.aria-live]="'polite'">
+                <app-icon name="copy" class="th-icon--emboss h-3.5 w-3.5" />
                 {{ copiedId() === ticket.ticketId ? i18n.t('checkout.copied') : i18n.t('tickets.copyQr') }}
               </button>
             </div>

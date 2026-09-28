@@ -9,6 +9,7 @@ import { OrdersService } from '../../core/orders.service';
 import { shareLink } from '../../core/share';
 import { ToastService } from '../../core/toast.service';
 import { parseApiError } from '../../core/api-error';
+import { IconComponent } from '../../core/icon.component';
 import { OrderResponse, PayOrderResponse } from '../../core/models';
 
 type Phase = 'review' | 'paying' | 'waiting' | 'done' | 'error';
@@ -17,7 +18,7 @@ type Phase = 'review' | 'paying' | 'waiting' | 'done' | 'error';
   selector: 'app-checkout',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, DatePipe],
+  imports: [RouterLink, DatePipe, IconComponent],
   templateUrl: './checkout.component.html',
 })
 export class CheckoutComponent implements OnDestroy {

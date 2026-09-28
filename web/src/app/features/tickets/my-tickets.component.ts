@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { ListErrorComponent } from '../../core/list-error.component';
+import { IconComponent } from '../../core/icon.component';
 import { ToastService } from '../../core/toast.service';
 import { TicketsService, CustomerTicket } from '../../core/tickets.service';
 
@@ -11,7 +12,7 @@ import { TicketsService, CustomerTicket } from '../../core/tickets.service';
   selector: 'app-my-tickets',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, DatePipe, ListErrorComponent],
+  imports: [RouterLink, DatePipe, ListErrorComponent, IconComponent],
   templateUrl: './my-tickets.component.html',
 })
 export class MyTicketsComponent {

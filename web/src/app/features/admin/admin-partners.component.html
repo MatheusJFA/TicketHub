@@ -26,7 +26,7 @@
               (click)="approve(p.id)"
               [disabled]="busy() === p.id"
               class="rounded-full border-[1.5px] border-[#0f766e] bg-[#d9efe8] px-4 py-2 text-xs font-extrabold text-[#0b4f49] transition hover:-translate-y-0.5 disabled:opacity-50">
-              ✅ {{ i18n.t('partners.approve') }}
+              <app-icon name="check" class="h-3.5 w-3.5 text-[#0b4f49]" /> {{ i18n.t('partners.approve') }}
             </button>
             <button
               type="button"
@@ -40,7 +40,7 @@
               (click)="remove(p.id)"
               [disabled]="busy() === p.id"
               class="rounded-full border-[1.5px] border-[#c93a2e] px-4 py-2 text-xs font-extrabold text-[#c93a2e] transition hover:bg-[#fdeeea] disabled:opacity-50">
-              🗑 {{ i18n.t('partners.remove') }}
+              <app-icon name="trash" class="th-icon--emboss h-3.5 w-3.5" /> {{ i18n.t('partners.remove') }}
             </button>
           </div>
         </article>

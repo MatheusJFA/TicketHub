@@ -6,12 +6,13 @@ import { CouponsService } from '../../core/coupons.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { ShowSummary } from '../../core/models';
 import { parseApiError } from '../../core/api-error';
+import { IconComponent } from '../../core/icon.component';
 
 @Component({
   selector: 'app-admin-coupons',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, IconComponent],
   templateUrl: './admin-coupons.component.html',
 })
 export class AdminCouponsComponent {

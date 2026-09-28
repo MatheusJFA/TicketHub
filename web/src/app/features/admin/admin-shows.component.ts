@@ -8,12 +8,13 @@ import { ConfirmService } from '../../core/confirm.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { ShowSummary } from '../../core/models';
 import { parseApiError } from '../../core/api-error';
+import { IconComponent } from '../../core/icon.component';
 
 @Component({
   selector: 'app-admin-shows',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, IconComponent],
   templateUrl: './admin-shows.component.html',
 })
 export class AdminShowsComponent {

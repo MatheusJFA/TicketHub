@@ -6,6 +6,7 @@ import { CatalogService } from '../../core/catalog.service';
 import { CartService } from '../../core/cart.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { ListErrorComponent } from '../../core/list-error.component';
+import { IconComponent } from '../../core/icon.component';
 import { SectionSummary, ShowDetail, SpotItem } from '../../core/models';
 
 interface SectionMap {
@@ -17,7 +18,7 @@ interface SectionMap {
   selector: 'app-seat-map',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, ListErrorComponent],
+  imports: [RouterLink, ListErrorComponent, IconComponent],
   templateUrl: './seat-map.component.html',
 })
 export class SeatMapComponent {

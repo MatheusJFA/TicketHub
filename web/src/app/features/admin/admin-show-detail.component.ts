@@ -10,6 +10,7 @@ import { ConfirmService } from '../../core/confirm.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { SectionSummary, ShowDetail, SpotItem } from '../../core/models';
 import { parseApiError } from '../../core/api-error';
+import { IconComponent } from '../../core/icon.component';
 
 interface SectionMap {
   section: SectionSummary;
@@ -25,7 +26,7 @@ interface BuildProgress {
   selector: 'app-admin-show-detail',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, RouterLink, DecimalPipe],
+  imports: [FormsModule, RouterLink, DecimalPipe, IconComponent],
   templateUrl: './admin-show-detail.component.html',
 })
 export class AdminShowDetailComponent {
