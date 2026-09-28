@@ -4,12 +4,20 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { parseApiError } from '../../core/api-error';
+import { IconComponent } from '../../core/icon.component';
+import { ConfigService } from '../../core/config.service';
+
+interface DemoAccount {
+  label: string;
+  email: string;
+  password: string;
+}
 
 @Component({
   selector: 'app-login',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, IconComponent],
   templateUrl: './login.component.html',
 })
 export class LoginComponent {
@@ -17,6 +25,7 @@ export class LoginComponent {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   readonly i18n = inject(I18nService);
+  readonly config = inject(ConfigService);
 
   readonly form = inject(FormBuilder).nonNullable.group({
     identifier: ['', [Validators.required, Validators.minLength(3)]],
@@ -25,6 +34,18 @@ export class LoginComponent {
   readonly showPassword = signal(false);
   readonly error = signal<string | null>(null);
   readonly loading = signal(false);
+
+  /** Seed-dev accounts (scripts/seed-dev.js). Fill-only; user still submits. */
+  readonly demoAccounts: DemoAccount[] = [
+    { label: 'Admin', email: 'admin@tickethub.local', password: 'admin-local' },
+    { label: 'Customer', email: 'customer@tickethub.local', password: 'customer-local' },
+    { label: 'Partner', email: 'partner@tickethub.local', password: 'partner-local' },
+  ];
+
+  fillDemo(account: DemoAccount): void {
+    this.error.set(null);
+    this.form.setValue({ identifier: account.email, password: account.password });
+  }
 
   submit(): void {
     if (this.form.invalid || this.loading()) {
