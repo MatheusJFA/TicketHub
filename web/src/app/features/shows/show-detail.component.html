@@ -1,21 +1,53 @@
 @if (loading()) {
-  <p class="text-slate-400">Carregando…</p>
+  <div class="th-ticket p-6"><div class="th-skeleton h-40"></div></div>
 } @else if (error() || !show()) {
-  <p class="text-sm text-red-400">{{ error() }}</p>
+  <app-list-error [message]="error() ?? i18n.t('errors.notFoundShow')" (retry)="retry()" />
 } @else {
   <section>
-    <h1 class="text-2xl font-bold">{{ show()!.name }}</h1>
-    <p class="text-sm text-slate-400">{{ show()!.date | date: 'dd/MM/yyyy HH:mm' }}</p>
-    <p class="mt-2">{{ show()!.description }}</p>
-    <p class="mt-1 text-sm text-slate-400">
-      {{ show()!.address.street }}, {{ show()!.address.number }} —
-      {{ show()!.address.city }}/{{ show()!.address.state }}
-    </p>
-    <p class="mt-1 text-sm text-slate-400">{{ show()!.totalSpotsSold }} / {{ show()!.totalSpots }} vendidos</p>
-    <a
-      class="mt-4 inline-block rounded-md bg-blue-600 px-4 py-2 font-medium text-white"
-      [routerLink]="['/shows', show()!.id, 'seats']"
-      >Escolher assentos</a
-    >
+    <p class="text-sm font-semibold"><a routerLink="/" class="th-link">{{ i18n.t('detail.back') }}</a></p>
+    <div class="th-ticket mt-3 overflow-hidden">
+      <div class="grid sm:grid-cols-[1fr_200px]">
+        <div class="bg-[#2a241a] p-7 text-[#fdf8ec] sm:p-8">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="th-badge border border-[#f6ecd4]/40 bg-white/10 text-[#f6ecd4]">Show</span>
+            @if (show()!.published) {
+              <span class="th-stamp th-stamp-teal !border-[#7fd1c0] !text-[#7fd1c0]">{{ i18n.t('detail.published') }}</span>
+            } @else {
+              <span class="th-stamp !border-[#e8b93e] !text-[#e8b93e]">{{ i18n.t('detail.draft') }}</span>
+            }
+          </div>
+          <h1 class="th-display mt-3 text-3xl leading-none sm:text-5xl">{{ show()!.name }}</h1>
+          <p class="mt-2 font-semibold text-[#e5d9bd]">
+            📅 {{ show()!.date | date: 'medium' : undefined : i18n.dateLocale() }}
+          </p>
+        </div>
+        <div class="th-perfo-y flex flex-row items-center justify-around bg-[#fffdf6] p-6 sm:flex-col sm:justify-center sm:gap-4">
+          <div class="th-dateblock">
+            <span class="th-display text-3xl">{{ show()!.date | date: 'dd' : undefined : i18n.dateLocale() }}</span>
+            <span class="text-[0.7rem] font-extrabold uppercase tracking-widest text-[#2a241a]">{{
+              show()!.date | date: 'MMM' : undefined : i18n.dateLocale()
+            }}</span>
+          </div>
+          <div class="th-barcode w-28 sm:w-full"></div>
+        </div>
+      </div>
+      <div class="grid gap-6 p-7 sm:grid-cols-[1fr_320px]">
+        <div>
+          <h2 class="th-display text-lg">{{ i18n.t('detail.about') }}</h2>
+          <p class="mt-1 text-sm leading-relaxed text-[#4a4132]">{{ show()!.description }}</p>
+          <div class="mt-4 grid gap-2 rounded-xl border-[1.5px] border-dashed border-[#c4b795] bg-[#f8f2e2] p-4 text-sm font-medium text-[#4a4132]">
+            <p>📍 {{ show()!.address.street }}, {{ show()!.address.number }} — {{ show()!.address.neighborhood }}</p>
+            <p>{{ show()!.address.city }}/{{ show()!.address.state }} · {{ show()!.address.country }} · CEP {{ show()!.address.zipCode }}</p>
+          </div>
+        </div>
+        <aside class="th-ticket h-fit p-5">
+          <p class="text-sm font-bold uppercase tracking-widest text-[#6f6353]">{{ i18n.t('detail.tickets') }}</p>
+          <p class="th-display mt-1 text-4xl">{{ show()!.totalSpotsSold }}<span class="text-xl text-[#a89a83]">/{{ show()!.totalSpots }}</span></p>
+          <p class="text-xs font-semibold text-[#6f6353]">{{ i18n.t('detail.soldLabel') }}</p>
+          <a class="th-btn-stamp mt-4 w-full" [routerLink]="['/shows', show()!.id, 'seats']">{{ i18n.t('detail.chooseSeats') }}</a>
+          <p class="mt-2 text-center text-xs font-semibold text-[#6f6353]">{{ i18n.t('detail.reserveNote') }}</p>
+        </aside>
+      </div>
+    </div>
   </section>
 }

@@ -1,11 +1,379 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-surface: #171b22;
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Archivo', 'Inter', system-ui, sans-serif;
+  --color-paper: #f3ecdd;
+  --color-cream: #fffdf6;
+  --color-ink: #2a241a;
+  --color-ink-soft: #6f6353;
+  --color-stamp: #2a241a;
+  --color-teal: #0f766e;
+  --color-gold: #d9a400;
+  --color-line: #d8cdb4;
+  --color-brand-50: #eef2ff;
+  --color-brand-100: #e0e7ff;
+  --color-brand-500: #6366f1;
+  --color-brand-600: #4f46e5;
+  --color-brand-700: #4338ca;
 }
 
 body {
-  background: #0f1115;
-  color: #e8eaf0;
-  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background-color: var(--color-paper);
+  background-image: radial-gradient(rgb(42 36 26 / 0.07) 1px, transparent 1px);
+  background-size: 22px 22px;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- route view transitions (withViewTransitions) ---- */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.22s;
+  animation-timing-function: ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+  .th-marquee-track {
+    animation: none;
+  }
+}
+
+.th-display {
+  font-family: var(--font-display);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+/* ---- shared primitives (retro ticket theme) ---- */
+.th-container {
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+.th-card {
+  background: var(--color-cream);
+  border: 1.5px solid var(--color-ink);
+  border-radius: 1rem;
+  box-shadow: 4px 4px 0 rgb(42 36 26 / 0.9);
+}
+
+.th-input {
+  width: 100%;
+  border-radius: 0.65rem;
+  border: 1.5px solid var(--color-ink);
+  background: #fff;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.9rem;
+  color: var(--color-ink);
+  outline: none;
+  transition: box-shadow 0.15s;
+}
+.th-input::placeholder {
+  color: #a89a83;
+}
+.th-input:focus {
+  box-shadow: 3px 3px 0 var(--color-ink);
+}
+
+.th-label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.th-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--color-ink);
+  background: var(--color-ink);
+  color: #fdf8ec;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 0.65rem 1.4rem;
+  box-shadow: 3px 3px 0 rgb(42 36 26 / 0.25);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.th-btn-primary:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 rgb(42 36 26 / 0.25);
+}
+.th-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.th-btn-primary:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 rgb(42 36 26 / 0.25);
+}
+
+.th-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1.5px solid var(--color-ink);
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.55rem 1.2rem;
+  transition: background 0.15s;
+}
+.th-btn-ghost:hover {
+  background: #f6ecd4;
+}
+
+.th-btn-stamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--color-ink);
+  background: var(--color-stamp);
+  color: #fff8ee;
+  font-weight: 800;
+  font-size: 0.9rem;
+  padding: 0.65rem 1.4rem;
+  box-shadow: 3px 3px 0 var(--color-ink);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.th-btn-stamp:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--color-ink);
+}
+.th-btn-stamp:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.th-link {
+  color: var(--color-stamp);
+  font-weight: 700;
+}
+.th-link:hover {
+  text-decoration: underline;
+}
+
+.th-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 0.2rem 0.7rem;
+  text-transform: uppercase;
+}
+.th-badge-live {
+  background: #d9efe8;
+  color: var(--color-teal);
+  border: 1px solid var(--color-teal);
+}
+.th-badge-draft {
+  background: #fbf0c9;
+  color: #8a5f00;
+  border: 1px solid var(--color-gold);
+}
+.th-badge-info {
+  background: var(--color-brand-50);
+  color: var(--color-brand-700);
+  border: 1px solid var(--color-brand-500);
+}
+.th-badge-muted {
+  background: #eee7d3;
+  color: var(--color-ink-soft);
+  border: 1px solid var(--color-line);
+}
+
+.th-alert-error {
+  border-radius: 0.75rem;
+  border: 1.5px solid #c93a2e;
+  background: #fdeeea;
+  color: #96281f;
+  font-size: 0.85rem;
+  padding: 0.7rem 1rem;
+}
+
+.th-skeleton {
+  border-radius: 0.75rem;
+  background: linear-gradient(90deg, #e9dfc8 25%, #ded2b6 50%, #e9dfc8 75%);
+  background-size: 200% 100%;
+  animation: th-shimmer 1.2s infinite;
+}
+@keyframes th-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* ---- retro ticket pieces ---- */
+
+/* Big ticket shell: paper, ink border, hard offset shadow. */
+.th-ticket {
+  position: relative;
+  background: var(--color-cream);
+  border: 2px solid var(--color-ink);
+  border-radius: 1.25rem;
+  box-shadow: 6px 6px 0 var(--color-ink);
+}
+
+/* Vertical perforation between main + stub, with punched notches. */
+.th-perfo-y {
+  position: relative;
+  border-left: 2px dashed #c4b795;
+}
+.th-perfo-y::before,
+.th-perfo-y::after {
+  content: '';
+  position: absolute;
+  left: -14px;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--color-paper);
+  border: 2px solid var(--color-ink);
+}
+.th-perfo-y::before {
+  top: -26px;
+  clip-path: inset(50% 0 0 0);
+}
+.th-perfo-y::after {
+  bottom: -26px;
+  clip-path: inset(0 0 50% 0);
+}
+
+/* Horizontal tear line with scissors. */
+.th-perfo-x {
+  position: relative;
+  border-top: 2px dashed #c4b795;
+}
+.th-perfo-x::after {
+  content: '✂';
+  position: absolute;
+  top: -14px;
+  left: 1.25rem;
+  background: var(--color-cream);
+  padding-inline: 0.4rem;
+  color: var(--color-ink-soft);
+  font-size: 0.85rem;
+}
+
+/* Rubber-stamp badge. */
+.th-stamp {
+  display: inline-block;
+  border: 2.5px double var(--color-stamp);
+  color: var(--color-stamp);
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.8rem;
+  font-weight: 900;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  transform: rotate(-4deg);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  mask-size: 120px;
+}
+
+.th-stamp-teal {
+  border-color: var(--color-teal);
+  color: var(--color-teal);
+}
+
+/* Fake barcode stub. */
+.th-barcode {
+  height: 46px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--color-ink) 0 2px,
+    transparent 2px 5px,
+    var(--color-ink) 5px 6px,
+    transparent 6px 9px,
+    var(--color-ink) 9px 12px,
+    transparent 12px 15px
+  );
+}
+
+/* Marquee ribbon. */
+.th-marquee {
+  overflow: hidden;
+  border-block: 2px solid var(--color-ink);
+  background: var(--color-ink);
+  color: #f6ecd4;
+}
+.th-marquee-track {
+  display: flex;
+  gap: 2.5rem;
+  width: max-content;
+  padding-block: 0.55rem;
+  font-weight: 800;
+  font-size: 0.8rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  animation: th-marquee 22s linear infinite;
+}
+@keyframes th-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Date block like a torn calendar page. */
+.th-dateblock {
+  display: grid;
+  place-items: center;
+  min-width: 4.25rem;
+  border: 1.5px solid var(--color-ink);
+  border-radius: 0.75rem;
+  background: #fff;
+  box-shadow: 2px 2px 0 var(--color-ink);
+  padding: 0.4rem 0.5rem;
+  text-align: center;
+  line-height: 1.1;
+}
+
+/* seat states */
+.th-seat {
+  border-radius: 0.65rem;
+  border: 1.5px solid var(--color-ink);
+  background: #fff;
+  padding: 0.55rem 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  transition: all 0.12s;
+}
+.th-seat:hover:not(:disabled) {
+  background: #f6ecd4;
+  transform: translateY(-1px);
+  box-shadow: 2px 2px 0 var(--color-ink);
+}
+.th-seat--selected {
+  border-color: var(--color-ink);
+  background: var(--color-stamp);
+  color: #fff8ee;
+  box-shadow: 2px 2px 0 var(--color-ink);
+}
+.th-seat:disabled {
+  border-color: var(--color-line);
+  background: #ece4cf;
+  color: #b3a586;
+  text-decoration: line-through;
+  cursor: not-allowed;
 }

@@ -1,47 +1,64 @@
-<section class="max-w-xl">
-  <h1 class="mb-4 text-2xl font-bold">Meu pedido</h1>
-  <form class="mb-4 flex gap-2" (ngSubmit)="lookup()">
+<section class="mx-auto max-w-xl">
+  <h1 class="th-display text-center text-3xl">🎟 {{ i18n.t('orders.title') }}</h1>
+  <p class="text-center text-sm font-medium text-[#6f6353]">{{ i18n.t('orders.subtitle') }}</p>
+  <form class="th-card mt-4 flex gap-2 p-3" (ngSubmit)="lookup()">
     <input
       name="orderId"
       [(ngModel)]="orderId"
-      placeholder="ID do pedido"
-      class="flex-1 rounded-md border border-slate-700 bg-[#171b22] px-3 py-2 text-slate-100" />
-    <button type="submit" class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white">Consultar</button>
+      [placeholder]="i18n.t('orders.placeholder')"
+      class="th-input font-mono !text-xs" />
+    <button type="submit" class="th-btn-primary shrink-0">{{ i18n.t('orders.lookup') }}</button>
   </form>
   @if (loading()) {
-    <p class="text-slate-400">Carregando…</p>
+    <div class="th-skeleton mt-4 h-44"></div>
   } @else if (error()) {
-    <p class="text-sm text-red-400">{{ error() }}</p>
+    <app-list-error [message]="error()!" (retry)="lookup()" class="mt-4 block" />
   } @else if (order()) {
-    <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
-      <dt class="text-slate-400">Pedido</dt>
-      <dd>{{ order()!.orderId }}</dd>
-      <dt class="text-slate-400">Status</dt>
-      <dd>
-        <strong>{{ order()!.status }}</strong>
-      </dd>
-      <dt class="text-slate-400">Total</dt>
-      <dd>{{ order()!.currency }} {{ order()!.totalValue }}</dd>
-      <dt class="text-slate-400">Expira em</dt>
-      <dd>{{ order()!.expiresAt }}</dd>
-      <dt class="text-slate-400">Assentos</dt>
-      <dd>{{ order()!.spotIds.join(', ') }}</dd>
-      @if (order()!.chargeId) {
-        <dt class="text-slate-400">Cobrança</dt>
-        <dd>{{ order()!.chargeId }}</dd>
+    <div class="th-ticket mt-4 p-6">
+      <div class="flex items-center justify-between gap-2">
+        <p class="font-mono text-xs text-[#6f6353]">{{ order()!.orderId }}</p>
+        <div class="flex items-center gap-2">
+          <button type="button" (click)="share()" class="th-btn-ghost !px-3 !py-1.5 !text-xs">
+            {{ i18n.t('orders.share') }}
+          </button>
+          <span
+            class="th-stamp"
+            [class.th-stamp-teal]="order()!.status === 'PAID'"
+            style="font-size: 0.65rem">
+            {{ order()!.status }}
+          </span>
+        </div>
+      </div>
+      <dl class="mt-4 grid grid-cols-[110px_1fr] gap-x-4 gap-y-2.5 text-sm">
+        <dt class="font-semibold text-[#6f6353]">{{ i18n.t('orders.total') }}</dt>
+        <dd class="th-display text-lg">{{ order()!.currency }} {{ order()!.totalValue }}</dd>
+        <dt class="font-semibold text-[#6f6353]">{{ i18n.t('orders.expiresAt') }}</dt>
+        <dd class="font-medium">{{ order()!.expiresAt | date: 'medium' : undefined : i18n.dateLocale() }}</dd>
+        <dt class="font-semibold text-[#6f6353]">{{ i18n.t('orders.seats') }}</dt>
+        <dd><span class="rounded-lg border border-dashed border-[#c4b795] bg-[#f8f2e2] px-2 py-1 font-mono text-xs font-bold">{{ order()!.spotIds.join(', ') }}</span></dd>
+        @if (order()!.chargeId) {
+          <dt class="font-semibold text-[#6f6353]">{{ i18n.t('orders.charge') }}</dt>
+          <dd class="font-mono text-xs">{{ order()!.chargeId }}</dd>
+        }
+      </dl>
+      <div class="th-perfo-x mt-5"></div>
+      <div class="flex items-center justify-between pt-4">
+        <div class="th-barcode w-32"></div>
+        @if (order()!.status === 'PENDING') {
+          <button
+            type="button"
+            (click)="cancel()"
+            [disabled]="cancelling()"
+            class="rounded-full border-[1.5px] border-[#c93a2e] bg-transparent px-4 py-2 text-sm font-bold text-[#c93a2e] transition hover:bg-[#fdeeea] disabled:opacity-50">
+            {{ cancelling() ? i18n.t('orders.cancelling') : i18n.t('orders.cancel') }}
+          </button>
+        }
+      </div>
+      @if (cancelError()) {
+        <div class="th-alert-error mt-3">{{ cancelError() }}</div>
       }
-    </dl>
-    @if (order()!.status === 'PENDING') {
-      <button
-        type="button"
-        (click)="cancel()"
-        [disabled]="cancelling()"
-        class="mt-4 rounded-md border border-red-400 px-4 py-2 font-medium text-red-400 disabled:opacity-50">
-        {{ cancelling() ? 'Cancelando…' : 'Cancelar pedido' }}
-      </button>
-    }
-    @if (cancelError()) {
-      <p class="mt-2 text-sm text-red-400">{{ cancelError() }}</p>
-    }
+    </div>
+  } @else {
+    <div class="th-ticket mt-4 p-10 text-center text-sm font-medium text-[#6f6353]">{{ i18n.t('orders.hint') }}</div>
   }
 </section>

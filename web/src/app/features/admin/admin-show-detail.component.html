@@ -1,71 +1,148 @@
 @if (loading()) {
-  <p class="text-slate-400">Carregando…</p>
+  <div class="th-skeleton h-48"></div>
 } @else if (error() && !show()) {
-  <p class="text-sm text-red-400">{{ error() }}</p>
+  <div class="th-alert-error">{{ error() }}</div>
 } @else {
   <section>
-    <p class="text-sm text-slate-400"><a routerLink="/admin" class="text-sky-400">← Admin</a></p>
-    <h1 class="mt-1 text-2xl font-bold">{{ show()?.name }}</h1>
+    <p class="text-sm font-semibold"><a routerLink="/admin" class="th-link">{{ i18n.t('admin.back') }}</a></p>
+    <div class="mt-2 flex flex-wrap items-center justify-between gap-3">
+      <h1 class="th-display text-3xl">🎪 {{ show()?.name }}</h1>
+      @if (show()?.published) {
+        <span class="th-badge th-badge-live">{{ i18n.t('admin.published') }}</span>
+      } @else {
+        <span class="th-badge th-badge-draft">{{ i18n.t('admin.draft') }}</span>
+      }
+    </div>
 
-    <form (ngSubmit)="addSection()" class="mb-6 mt-4 grid max-w-xl gap-3 rounded-lg border border-slate-800 bg-[#171b22] p-4">
-      <h2 class="font-semibold">Novo setor</h2>
-      <div class="grid grid-cols-2 gap-3">
-        <label class="grid gap-1 text-sm">
-          Nome
-          <input name="sectionName" [(ngModel)]="sectionName" required
-            class="rounded-md border border-slate-700 bg-[#0f1115] px-3 py-2 text-slate-100" />
+    <form (ngSubmit)="buildSection()" class="th-ticket mb-6 mt-4 grid gap-5 p-6">
+      <h2 class="th-display text-lg">🗺 {{ i18n.t('admin.mapTitle') }}</h2>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <label class="th-label">
+          {{ i18n.t('admin.sectionName') }}
+          <input name="sectionName" [(ngModel)]="sectionName" required [placeholder]="i18n.t('admin.sectionNamePh')" class="th-input" />
         </label>
-        <label class="grid gap-1 text-sm">
-          Descrição
-          <input name="sectionDescription" [(ngModel)]="sectionDescription" required
-            class="rounded-md border border-slate-700 bg-[#0f1115] px-3 py-2 text-slate-100" />
+        <label class="th-label">
+          {{ i18n.t('admin.sectionDesc') }}
+          <input name="sectionDescription" [(ngModel)]="sectionDescription" required [placeholder]="i18n.t('admin.sectionDescPh')" class="th-input" />
         </label>
-        <label class="grid gap-1 text-sm">
-          Total de assentos
-          <input name="sectionSpots" [(ngModel)]="sectionSpots" type="number" min="1" required
-            class="rounded-md border border-slate-700 bg-[#0f1115] px-3 py-2 text-slate-100" />
-        </label>
-        <label class="grid gap-1 text-sm">
-          Preço (BRL)
-          <input name="sectionPrice" [(ngModel)]="sectionPrice" type="number" min="0" step="0.01" required
-            class="rounded-md border border-slate-700 bg-[#0f1115] px-3 py-2 text-slate-100" />
+        <div class="grid grid-cols-3 gap-4">
+          <label class="th-label">
+            {{ i18n.t('admin.mapRowStart') }}
+            <input name="rowStart" [(ngModel)]="rowStart" required maxlength="1" placeholder="A" class="th-input text-center font-black uppercase" />
+          </label>
+          <label class="th-label">
+            {{ i18n.t('admin.mapRows') }}
+            <input name="rowCount" [(ngModel)]="rowCount" type="number" min="1" max="26" required class="th-input" />
+          </label>
+          <label class="th-label">
+            {{ i18n.t('admin.mapSeatsPerRow') }}
+            <input name="seatsPerRow" [(ngModel)]="seatsPerRow" type="number" min="1" max="100" required class="th-input" />
+          </label>
+        </div>
+        <label class="th-label">
+          {{ i18n.t('admin.price') }}
+          <input name="sectionPrice" [(ngModel)]="sectionPrice" type="number" min="0" step="0.01" required class="th-input" />
         </label>
       </div>
-      <button type="submit" class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white">
-        Adicionar setor
-      </button>
+
+      @if (previewRows().length > 0) {
+        <div class="rounded-xl border-[1.5px] border-[#2a241a] bg-[#2a241a] p-4">
+          <p class="mb-1 text-center text-xs font-black tracking-[0.3em] text-[#e8b93e]">★ {{ previewTotal() }} ★</p>
+          <div class="grid max-h-56 gap-3 overflow-auto rounded-lg bg-[#f8f2e2] p-4">
+            @for (r of previewRows(); track r.row) {
+              <div class="flex items-center gap-2">
+                <span class="th-display w-6 shrink-0 text-center text-sm">{{ r.row }}</span>
+                <div class="flex flex-wrap gap-1.5">
+                  @for (s of r.seats; track s) {
+                    <span class="rounded-md border-[1.5px] border-[#2a241a] bg-white px-1.5 py-0.5 text-[0.7rem] font-bold">{{ s }}</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (building()) {
+        <div>
+          <div class="flex justify-between text-xs font-bold text-[#6f6353]">
+            <span>{{ i18n.t('admin.mapBuilding', { done: building()!.done, total: building()!.total }) }}</span>
+            <span>{{ (building()!.done / building()!.total) * 100 | number: '1.0-0' }}%</span>
+          </div>
+          <div class="mt-1 h-2 overflow-hidden rounded-full border border-[#2a241a] bg-[#eee4cc]">
+            <div class="h-full bg-[#2a241a]" [style.width.%]="(building()!.done / building()!.total) * 100"></div>
+          </div>
+        </div>
+      } @else {
+        <button type="submit" class="th-btn-stamp w-fit" [disabled]="!sectionName.trim() || previewRows().length === 0">
+          {{ i18n.t('admin.mapBuild', { total: previewTotal() }) }}
+        </button>
+      }
     </form>
 
     @if (error()) {
-      <p class="mb-4 text-sm text-red-400">{{ error() }}</p>
+      <div class="th-alert-error mb-4">{{ error() }}</div>
     }
 
     @for (entry of map(); track entry.section.id) {
-      <article class="mb-4 rounded-lg border border-slate-800 bg-[#171b22] p-4">
-        <h2 class="font-semibold">
-          {{ entry.section.name }}
-          <span class="text-sm font-normal text-slate-400">
-            {{ entry.section.published ? 'Publicado' : 'Rascunho' }} ·
-            {{ entry.section.totalSpotsSold }}/{{ entry.section.totalSpots }}
-          </span>
-          @if (!entry.section.published) {
-            <button type="button" (click)="publishSection(entry.section.id)" class="ml-2 text-sm text-emerald-400">
-              Publicar setor
-            </button>
+      <article class="th-card mb-4 p-5">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          @if (editingSection[entry.section.id]) {
+            <div class="flex flex-wrap items-center gap-2">
+              <input
+                [name]="'rename-' + entry.section.id"
+                [(ngModel)]="editingSection[entry.section.id].name"
+                class="th-input !w-40 !py-1.5 !text-sm" />
+              <input
+                [name]="'reprice-' + entry.section.id"
+                [(ngModel)]="editingSection[entry.section.id].price"
+                type="number"
+                min="0"
+                step="0.01"
+                class="th-input !w-28 !py-1.5 !text-sm" />
+              <button type="button" (click)="saveSection(entry.section)" class="th-btn-primary !px-3 !py-1.5 !text-xs">
+                {{ i18n.t('partner.save') }}
+              </button>
+            </div>
+          } @else {
+            <h2 class="th-display">
+              {{ entry.section.name }}
+              <span class="ml-1 font-sans text-sm font-semibold text-[#6f6353]">
+                {{ entry.section.totalSpotsSold }}/{{ entry.section.totalSpots }} · {{ entry.section.price.currency }} {{ entry.section.price.value }}
+              </span>
+              <button type="button" (click)="startEditSection(entry.section)" class="ml-1 align-middle text-xs font-bold text-[#6f6353] underline">✏️</button>
+            </h2>
           }
-        </h2>
-        <div class="mt-2 flex flex-wrap gap-2">
+          <div class="flex shrink-0 flex-wrap items-center gap-2">
+            @if (entry.section.published) {
+              <span class="th-badge th-badge-live">{{ i18n.t('admin.published') }}</span>
+              <button type="button" (click)="unpublishAllSection(entry.section.id)" class="th-btn-ghost !px-3 !py-1.5 !text-xs">
+                {{ i18n.t('admin.mapUnpublishAll') }}
+              </button>
+            } @else {
+              <button type="button" (click)="publishAllSection(entry.section.id)" class="th-btn-stamp !px-3 !py-1.5 !text-xs">
+                {{ i18n.t('admin.mapPublishAll') }}
+              </button>
+            }
+            <button type="button" (click)="deleteSection(entry.section.id)" class="rounded-full border-[1.5px] border-[#c93a2e] px-3 py-1.5 text-xs font-bold text-[#c93a2e] transition hover:bg-[#fdeeea]">
+              🗑
+            </button>
+          </div>
+        </div>
+        <div class="mt-3 flex flex-wrap gap-2 rounded-xl border-[1.5px] border-dashed border-[#c4b795] bg-[#f8f2e2] p-3">
           @for (spot of entry.spots; track spot.id) {
             <span
-              class="rounded-md border px-2 py-1 text-sm"
-              [class.border-slate-700]="spot.published"
+              class="group rounded-lg border bg-white px-2.5 py-1 text-xs font-bold"
+              [class.border-[#2a241a]]="spot.published"
               [class.border-dashed]="!spot.published"
-              [class.text-slate-500]="!spot.available"
-              [title]="spot.location + (spot.available ? '' : ' (indisponível)')">
+              [class.border-[#d9a400]]="!spot.published"
+              [class.text-[#a89a83]]="!spot.available"
+              [title]="spot.location + (spot.available ? '' : i18n.t('admin.unavailable'))">
               {{ spot.location }}
               @if (!spot.published) {
-                <button type="button" (click)="publishSpot(spot.id)" class="ml-1 text-emerald-400" [title]="'Publicar ' + spot.location">+</button>
+                <button type="button" (click)="publishSpot(spot.id)" class="ml-1 font-bold text-[#0f766e]" [title]="'Publicar ' + spot.location">{{ i18n.t('admin.publishSpot') }}</button>
               }
+              <button type="button" (click)="deleteSpot(spot.id)" class="ml-1 hidden font-bold text-[#c93a2e] group-hover:inline" title="Excluir">✕</button>
             </span>
           }
         </div>
@@ -73,11 +150,9 @@
           <input
             [name]="'spot-' + entry.section.id"
             [(ngModel)]="newSpotLocation[entry.section.id]"
-            placeholder="Novo assento (ex.: B12)"
-            class="flex-1 rounded-md border border-slate-700 bg-[#0f1115] px-3 py-1.5 text-sm text-slate-100" />
-          <button type="submit" class="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white">
-            Adicionar
-          </button>
+            [placeholder]="i18n.t('admin.spotPh')"
+            class="th-input !py-2 !text-sm" />
+          <button type="submit" class="th-btn-primary shrink-0 !py-2">{{ i18n.t('admin.add') }}</button>
         </form>
       </article>
     }

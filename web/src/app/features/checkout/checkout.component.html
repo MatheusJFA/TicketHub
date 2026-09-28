@@ -1,58 +1,96 @@
-<section>
-  <h1 class="mb-4 text-2xl font-bold">Checkout</h1>
+<section class="mx-auto max-w-2xl">
+  <ol class="mb-6 flex items-center justify-center gap-2 text-xs font-extrabold uppercase tracking-widest">
+    <li class="rounded-full border-[1.5px] border-[#2a241a] bg-[#2a241a] px-3 py-1.5 text-[#fdf8ec]">{{ i18n.t('checkout.stepSeats') }}</li>
+    <li class="text-[#a89a83]">✂</li>
+    <li class="rounded-full border-[1.5px] border-[#2a241a] bg-[#2a241a] px-3 py-1.5 text-[#fdf8ec]">{{ i18n.t('checkout.stepCheckout') }}</li>
+    <li class="text-[#a89a83]">✂</li>
+    <li class="rounded-full border-[1.5px] border-[#2a241a] px-3 py-1.5"
+      [class.bg-[#d9efe8]]="phase() === 'done'"
+      [class.text-[#0f766e]]="phase() === 'done'"
+      [class.bg-[#fffdf6]]="phase() !== 'done'"
+      [class.text-[#6f6353]]="phase() !== 'done'">{{ i18n.t('checkout.stepPayment') }}</li>
+  </ol>
+
+  <h1 class="th-display text-center text-3xl">{{ i18n.t('checkout.title') }}</h1>
 
   @if (phase() === 'review') {
-    <ul class="mb-4 list-none space-y-1 p-0">
-      @for (spot of cart.spots(); track spot.id) {
-        <li class="rounded-md border border-slate-800 bg-[#171b22] px-3 py-2 text-sm">{{ spot.location }}</li>
+    <div class="th-ticket mt-4 p-6">
+      <div class="flex items-center justify-between">
+        <h2 class="th-display text-lg">{{ i18n.t('checkout.yourOrder', { count: cart.spots().length }) }}</h2>
+        <span class="th-badge th-badge-muted">{{ i18n.t('ticket.receipt') }}</span>
+      </div>
+      @if (cart.spots().length === 0) {
+        <p class="mt-2 text-sm text-[#6f6353]">{{ i18n.t('checkout.empty') }} <a routerLink="/" class="th-link">{{ i18n.t('checkout.chooseSeats') }}</a></p>
+      } @else {
+        <ul class="mt-3 grid gap-2 sm:grid-cols-2">
+          @for (spot of cart.spots(); track spot.id) {
+            <li class="flex items-center justify-between rounded-xl border-[1.5px] border-dashed border-[#c4b795] bg-[#f8f2e2] px-3 py-2.5 text-sm font-bold">
+              🎟 {{ spot.location }}
+            </li>
+          }
+        </ul>
       }
-    </ul>
-    @if (error()) {
-      <p class="text-sm text-red-400">{{ error() }}</p>
-    }
-    <button
-      type="button"
-      (click)="confirm()"
-      [disabled]="cart.spots().length === 0"
-      class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white disabled:opacity-50">
-      Confirmar e gerar PIX
-    </button>
-    <p class="mt-3 text-sm text-slate-400"><a routerLink="/seats" class="text-sky-400">Voltar aos assentos</a></p>
+      @if (error()) {
+        <div class="th-alert-error mt-3">{{ error() }}</div>
+      }
+      <div class="th-perfo-x mt-5"></div>
+      <button type="button" (click)="confirm()" [disabled]="cart.spots().length === 0" class="th-btn-stamp mt-5 w-full">
+        {{ i18n.t('checkout.confirmPix') }}
+      </button>
+      <p class="mt-3 text-center text-sm font-semibold"><a routerLink="/" class="th-link">{{ i18n.t('checkout.backToSeats') }}</a></p>
+    </div>
   }
 
   @if (phase() === 'paying') {
-    <p class="text-slate-400">Reservando assentos e gerando cobrança…</p>
+    <div class="th-ticket mt-4 grid place-items-center gap-3 p-12 text-center">
+      <div class="th-skeleton h-10 w-10 !rounded-full"></div>
+      <p class="font-bold">{{ i18n.t('checkout.reserving') }}</p>
+      <p class="text-sm text-[#6f6353]">{{ i18n.t('checkout.dontClose') }}</p>
+    </div>
   }
 
   @if ((phase() === 'waiting' || phase() === 'done') && payment()) {
-    <p>Status do pedido: <strong>{{ order()?.status }}</strong></p>
-    <p class="mt-2">Pague com o código PIX copia e cola:</p>
-    <pre class="mt-2 wrap-anywhere rounded-md border border-dashed border-sky-400 bg-[#171b22] p-4 text-sm select-all">{{
-      payment()!.paymentCode
-    }}</pre>
-    <button
-      type="button"
-      (click)="copyCode()"
-      class="mt-2 rounded-md bg-blue-600 px-4 py-2 font-medium text-white">
-      Copiar código
-    </button>
-    @if (phase() === 'waiting') {
-      <p class="mt-2 text-sm text-slate-400">Aguardando confirmação do pagamento…</p>
-    } @else if (order()?.status === 'PAID') {
-      <p class="mt-2 font-medium text-emerald-400">Pagamento confirmado! Seus ingressos foram emitidos.</p>
-      <p class="mt-1 text-sm text-slate-400">Pedido {{ order()?.orderId }} · assentos: {{ order()?.spotIds?.join(', ') }}</p>
-    } @else {
-      <p class="mt-2 text-sm text-red-400">Pedido {{ order()?.status }}. Fale com o suporte se você pagou.</p>
-    }
+    <div class="th-ticket mt-4 p-6">
+      <div class="flex items-center justify-between">
+        <h2 class="th-display text-lg">{{ i18n.t('checkout.payTitle') }}</h2>
+        <span class="th-badge" [class.th-badge-live]="order()?.status === 'PAID'" [class.th-badge-info]="order()?.status === 'PENDING'" [class.th-badge-muted]="order()?.status !== 'PAID' && order()?.status !== 'PENDING'">
+          {{ order()?.status }}
+        </span>
+      </div>
+      <p class="mt-1 text-sm text-[#6f6353]">{{ i18n.t('checkout.orderLabel') }} <span class="font-mono">{{ order()?.orderId }}</span> · {{ i18n.t('checkout.expiresAt') }} {{ order()?.expiresAt | date: 'short' : undefined : i18n.dateLocale() }}</p>
+      <p class="mt-4 text-sm font-bold">{{ i18n.t('checkout.pixLabel') }}</p>
+      <pre class="mt-2 max-h-32 overflow-auto rounded-xl border-2 border-dashed border-[#2a241a] bg-[#fdf3e3] p-4 text-xs break-all whitespace-pre-wrap select-all">{{
+        payment()!.paymentCode
+      }}</pre>
+      <button type="button" (click)="copyCode()" class="th-btn-primary mt-3 w-full">{{ copied() ? i18n.t('checkout.copied') : i18n.t('checkout.copy') }}</button>
+      @if (order()) {
+        <button type="button" (click)="shareOrder()" class="th-btn-ghost mt-2 w-full">{{ i18n.t('orders.share') }}</button>
+      }
+      @if (error()) {
+        <div class="th-alert-error mt-3">{{ error() }} <button type="button" (click)="confirm()" class="underline font-bold">{{ i18n.t('checkout.retry') }}</button></div>
+      }
+      <div class="th-perfo-x mt-5"></div>
+      <div class="flex items-center justify-between pt-4">
+        <div class="th-barcode w-36"></div>
+        <p class="text-[0.7rem] font-bold uppercase tracking-widest text-[#6f6353]">{{ i18n.t('ticket.stubRow') }}</p>
+      </div>
+      @if (phase() === 'waiting') {
+        <p class="mt-3 flex items-center gap-2 text-sm font-medium text-[#6f6353]"><span class="inline-block h-2 w-2 animate-pulse rounded-full bg-[#d9a400]"></span> {{ i18n.t('checkout.waiting') }}</p>
+      } @else if (order()?.status === 'PAID') {
+        <div class="mt-4 rounded-xl border-[1.5px] border-[#0f766e] bg-[#d9efe8] p-4 text-sm text-[#0b4f49]">
+          <p class="font-extrabold">{{ i18n.t('checkout.paidTitle') }}</p>
+          <p class="mt-1 font-semibold">{{ i18n.t('checkout.paidSeats', { seats: order()?.spotIds?.join(', ') ?? '' }) }}</p>
+        </div>
+      } @else {
+        <div class="th-alert-error mt-3">{{ i18n.t('checkout.failed', { status: order()?.status ?? '' }) }}</div>
+      }
+    </div>
   }
 
   @if (phase() === 'error') {
-    <p class="text-sm text-red-400">{{ error() }}</p>
-    <button
-      type="button"
-      (click)="confirm()"
-      class="rounded-md bg-blue-600 px-4 py-2 font-medium text-white">
-      Tentar novamente
-    </button>
+    <div class="th-ticket mt-4 p-6">
+      <div class="th-alert-error">{{ error() }}</div>
+      <button type="button" (click)="confirm()" class="th-btn-stamp mt-4 w-full">{{ i18n.t('checkout.retry') }}</button>
+    </div>
   }
 </section>
