@@ -1,0 +1,50 @@
+<section>
+  <p class="text-sm font-semibold"><a routerLink="/admin" class="th-link">← Admin</a></p>
+  <p class="th-stamp mt-2">{{ i18n.t('admin.badge') }}</p>
+  <h1 class="th-display mt-2 text-3xl">{{ i18n.t('partners.title') }}</h1>
+  <p class="mt-1 text-sm font-medium text-[#6f6353]">{{ i18n.t('partners.subtitle') }}</p>
+
+  @if (error()) {
+    <div class="th-alert-error mt-4">{{ error() }}</div>
+  }
+  @if (loading()) {
+    <div class="th-skeleton mt-4 h-40"></div>
+  } @else if (items().length === 0) {
+    <div class="th-ticket mt-4 p-10 text-center font-medium text-[#6f6353]">{{ i18n.t('partners.empty') }}</div>
+  } @else {
+    <div class="mt-5 grid gap-4">
+      @for (p of items(); track p.id) {
+        <article class="th-card flex flex-wrap items-center justify-between gap-3 p-5">
+          <div>
+            <h2 class="th-display">{{ p.name }}</h2>
+            <p class="mt-0.5 font-mono text-xs text-[#6f6353]">{{ p.cnpj }} · {{ p.address.city }}/{{ p.address.state }}</p>
+            <p class="text-xs text-[#a89a83]">{{ p.id }}</p>
+          </div>
+          <div class="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              (click)="approve(p.id)"
+              [disabled]="busy() === p.id"
+              class="rounded-full border-[1.5px] border-[#0f766e] bg-[#d9efe8] px-4 py-2 text-xs font-extrabold text-[#0b4f49] transition hover:-translate-y-0.5 disabled:opacity-50">
+              ✅ {{ i18n.t('partners.approve') }}
+            </button>
+            <button
+              type="button"
+              (click)="reject(p.id)"
+              [disabled]="busy() === p.id"
+              class="rounded-full border-[1.5px] border-[#d9a400] bg-[#fbf0c9] px-4 py-2 text-xs font-extrabold text-[#8a5f00] transition hover:-translate-y-0.5 disabled:opacity-50">
+              {{ i18n.t('partners.reject') }}
+            </button>
+            <button
+              type="button"
+              (click)="remove(p.id)"
+              [disabled]="busy() === p.id"
+              class="rounded-full border-[1.5px] border-[#c93a2e] px-4 py-2 text-xs font-extrabold text-[#c93a2e] transition hover:bg-[#fdeeea] disabled:opacity-50">
+              🗑 {{ i18n.t('partners.remove') }}
+            </button>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>

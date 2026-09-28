@@ -1,0 +1,57 @@
+<section>
+  <p class="text-sm font-semibold"><a routerLink="/admin" class="th-link">← Admin</a></p>
+  <p class="th-stamp mt-2">{{ i18n.t('admin.badge') }}</p>
+  <h1 class="th-display mt-2 text-3xl">🔍 {{ i18n.t('audit.title') }}</h1>
+  <p class="mt-1 text-sm font-medium text-[#6f6353]">{{ i18n.t('audit.subtitle') }} ({{ total() }})</p>
+
+  <form (ngSubmit)="load()" class="th-card mt-4 grid gap-3 p-4 sm:grid-cols-[1fr_1fr_1fr_auto]">
+    <input name="action" [(ngModel)]="action" (ngModelChange)="onFilterChange()" [placeholder]="i18n.t('audit.action')" [attr.aria-label]="i18n.t('audit.action')" class="th-input font-mono !text-xs" />
+    <input name="actor" [(ngModel)]="actor" (ngModelChange)="onFilterChange()" [placeholder]="i18n.t('audit.actor')" [attr.aria-label]="i18n.t('audit.actor')" class="th-input font-mono !text-xs" />
+    <input name="outcome" [(ngModel)]="outcome" (ngModelChange)="onFilterChange()" [placeholder]="i18n.t('audit.outcome')" [attr.aria-label]="i18n.t('audit.outcome')" class="th-input font-mono !text-xs" />
+    <div class="flex gap-2">
+      <button type="submit" class="th-btn-primary !px-4 !py-2 !text-xs">{{ i18n.t('audit.filter') }}</button>
+      <button type="button" (click)="clear()" class="th-btn-ghost !px-4 !py-2 !text-xs">{{ i18n.t('audit.clear') }}</button>
+    </div>
+  </form>
+
+  @if (loading()) {
+    <div class="th-skeleton mt-4 h-64"></div>
+  } @else if (error()) {
+    <app-list-error [message]="error()!" (retry)="load(false)" class="mt-4 block" />
+  } @else if (items().length === 0) {
+    <div class="th-ticket mt-4 p-10 text-center font-medium text-[#6f6353]">{{ i18n.t('audit.empty') }}</div>
+  } @else {
+    <div class="th-card mt-4 overflow-x-auto">
+      <table class="w-full text-left text-xs">
+        <thead>
+          <tr class="border-b-2 border-[#2a241a] font-black uppercase tracking-wider">
+            <th class="px-4 py-3">{{ i18n.t('audit.when') }}</th>
+            <th class="px-4 py-3">{{ i18n.t('audit.act') }}</th>
+            <th class="px-4 py-3">{{ i18n.t('audit.who') }}</th>
+            <th class="px-4 py-3">{{ i18n.t('audit.result') }}</th>
+            <th class="px-4 py-3 text-right">{{ i18n.t('audit.duration') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (e of items(); track e.id) {
+            <tr class="border-b border-dashed border-[#d8cdb4] align-top last:border-0">
+              <td class="whitespace-nowrap px-4 py-2.5 font-mono">{{ e.occurredAt | date: 'medium' : undefined : i18n.dateLocale() }}</td>
+              <td class="px-4 py-2.5 font-mono">{{ e.action }}</td>
+              <td class="max-w-44 truncate px-4 py-2.5" [title]="e.actor">{{ e.actor }}</td>
+              <td class="px-4 py-2.5">
+                <span class="th-badge" [class.th-badge-live]="e.outcome === 'SUCCESS'" [class.th-badge-draft]="e.outcome !== 'SUCCESS'">
+                  {{ e.outcome }}
+                </span>
+                @if (e.error) {
+                  <span class="mt-1 block max-w-56 truncate font-mono text-[0.65rem] text-[#96281f]" [title]="e.error">{{ e.error }}</span>
+                }
+              </td>
+              <td class="px-4 py-2.5 text-right font-mono">{{ e.durationMs }}ms</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <app-pagination [page]="page()" [total]="total()" [perPage]="perPage" (pageChange)="goTo($event)" />
+  }
+</section>

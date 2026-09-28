@@ -1,0 +1,38 @@
+<section class="mx-auto max-w-md">
+  <h1 class="th-display text-center text-3xl">👤 {{ i18n.t('account.title') }}</h1>
+  <p class="text-center text-sm font-medium text-[#6f6353]">{{ i18n.t('account.subtitle') }}</p>
+
+  @if (loading()) {
+    <div class="th-skeleton mt-4 h-48"></div>
+  } @else {
+    <div class="th-ticket mt-4 grid gap-4 p-6">
+      <label class="th-label">
+        {{ i18n.t('account.name') }}
+        <input name="name" [(ngModel)]="name" required autocomplete="name" class="th-input" />
+      </label>
+      <p class="th-label">CPF<br /><span class="th-input font-mono !bg-[#f3ecdd]">{{ cpf }}</span></p>
+      @if (error()) {
+        <div class="th-alert-error">{{ error() }}</div>
+      }
+      @if (saved()) {
+        <div class="rounded-xl border-[1.5px] border-[#0f766e] bg-[#d9efe8] p-3 text-sm font-bold text-[#0b4f49]">
+          ✅ {{ i18n.t('account.saved') }}
+        </div>
+      }
+      <button type="button" (click)="save()" [disabled]="saving()" class="th-btn-primary w-full">
+        {{ saving() ? i18n.t('account.saving') : i18n.t('account.save') }}
+      </button>
+      <div class="th-perfo-x"></div>
+      <div>
+        <p class="text-xs font-black uppercase tracking-widest text-[#c93a2e]">{{ i18n.t('account.danger') }}</p>
+        <button
+          type="button"
+          (click)="remove()"
+          [disabled]="deleting()"
+          class="mt-2 w-full rounded-full border-[1.5px] border-[#c93a2e] bg-transparent px-4 py-2.5 text-sm font-bold text-[#c93a2e] transition hover:bg-[#fdeeea] disabled:opacity-50">
+          {{ deleting() ? i18n.t('account.deleting') : i18n.t('account.delete') }}
+        </button>
+      </div>
+    </div>
+  }
+</section>

@@ -1,0 +1,58 @@
+<section class="mx-auto max-w-xl">
+  <p class="text-sm font-semibold"><a routerLink="/admin" class="th-link">← Admin</a></p>
+  <p class="th-stamp mt-2">{{ i18n.t('coupons.title') }}</p>
+  <h1 class="th-display mt-2 text-3xl">{{ i18n.t('coupons.newTitle') }}</h1>
+  <p class="mt-1 text-sm font-medium text-[#6f6353]">{{ i18n.t('coupons.subtitle') }}</p>
+
+  <form (ngSubmit)="submit()" class="th-ticket mt-5 grid gap-4 p-6">
+    <div class="grid gap-4 sm:grid-cols-2">
+      <label class="th-label">
+        {{ i18n.t('coupons.code') }}
+        <input name="code" [(ngModel)]="code" required [placeholder]="i18n.t('coupons.codePh')" class="th-input font-mono" />
+      </label>
+      <label class="th-label">
+        {{ i18n.t('coupons.kind') }}
+        <select name="kind" [(ngModel)]="kind" class="th-input">
+          <option value="PERCENT">{{ i18n.t('coupons.kindPercent') }}</option>
+          <option value="FIXED">{{ i18n.t('coupons.kindFixed') }}</option>
+        </select>
+      </label>
+      <label class="th-label">
+        {{ i18n.t('coupons.valueLabel') }}
+        <input name="value" [(ngModel)]="value" type="number" min="1" required class="th-input" />
+      </label>
+      <label class="th-label">
+        {{ i18n.t('coupons.showLabel') }}
+        <select name="showId" [(ngModel)]="showId" class="th-input">
+          <option value="">{{ i18n.t('coupons.noScope') }}</option>
+          @for (show of shows(); track show.id) {
+            <option [value]="show.id">{{ show.name }}</option>
+          }
+        </select>
+      </label>
+      <label class="th-label">
+        {{ i18n.t('coupons.validFrom') }}
+        <input name="validFrom" [(ngModel)]="validFrom" type="datetime-local" class="th-input" />
+      </label>
+      <label class="th-label">
+        {{ i18n.t('coupons.validUntil') }}
+        <input name="validUntil" [(ngModel)]="validUntil" type="datetime-local" class="th-input" />
+      </label>
+      <label class="th-label sm:col-span-2">
+        {{ i18n.t('coupons.maxUses') }}
+        <input name="maxUses" [(ngModel)]="maxUses" type="number" min="1" placeholder="∞" class="th-input" />
+      </label>
+    </div>
+    @if (error()) {
+      <div class="th-alert-error">{{ error() }}</div>
+    }
+    @if (createdId()) {
+      <div class="rounded-xl border-[1.5px] border-[#0f766e] bg-[#d9efe8] p-4 text-sm font-bold text-[#0b4f49]">
+        ✅ {{ i18n.t('coupons.created') }} <span class="font-mono text-xs">{{ createdId() }}</span>
+      </div>
+    }
+    <button type="submit" [disabled]="creating()" class="th-btn-stamp w-fit">
+      {{ creating() ? i18n.t('coupons.creating') : i18n.t('coupons.create') }}
+    </button>
+  </form>
+</section>
