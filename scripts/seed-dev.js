@@ -31,19 +31,36 @@ db = db.getSiblingDB("tickethub");
 
 const now = new Date();
 
+// UUID v4 textual (xxxxxxxx-xxxx-...). NÃO usar hex de ObjectId (24 chars):
+// o Spring Data converte ids de 24 hex em ObjectId no findById e o lookup
+// por _id falha para documentos seedados (login funciona via findByEmail,
+// mas GET /customers/{id}, create-show etc. retornam 404).
+function uuid() {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = Math.floor(Math.random() * 16);
+    return ((c === "x" ? r : (r & 0x3) | 0x8)).toString(16);
+  });
+}
+
 function ensureAccount(collection, identityFilter, fixedFields, credentialFields) {
   const existing = collection.findOne({ $or: identityFilter });
   if (existing) {
-    collection.updateOne(
-      { _id: existing._id },
-      { $set: { ...credentialFields, updatedAt: now, lastModifiedBy: "seed-dev" } }
-    );
-    print(`${collection.getName()}: kept id=${existing._id} email=${credentialFields.email}`);
-    return;
+    if (/^[0-9a-f]{24}$/i.test(existing._id)) {
+      // Id legado quebrado (hex de ObjectId): recria com UUID.
+      collection.deleteOne({ _id: existing._id });
+      print(`${collection.getName()}: removed legacy id=${existing._id} email=${credentialFields.email}`);
+    } else {
+      collection.updateOne(
+        { _id: existing._id },
+        { $set: { ...credentialFields, updatedAt: now, lastModifiedBy: "seed-dev" } }
+      );
+      print(`${collection.getName()}: kept id=${existing._id} email=${credentialFields.email}`);
+      return;
+    }
   }
-  const inserted = collection.insertOne({
-    // @Id é String: usa o hex do ObjectId como id textual.
-    _id: new ObjectId().toString(),
+  const id = uuid();
+  collection.insertOne({
+    _id: id,
     ...fixedFields,
     ...credentialFields,
     createdAt: now,
@@ -52,7 +69,7 @@ function ensureAccount(collection, identityFilter, fixedFields, credentialFields
     createdBy: "seed-dev",
     lastModifiedBy: "seed-dev",
   });
-  print(`${collection.getName()}: created id=${inserted.insertedId} email=${credentialFields.email}`);
+  print(`${collection.getName()}: created id=${id} email=${credentialFields.email}`);
 }
 
 ensureAccount(
