@@ -9,18 +9,11 @@
       </span>
     </a>
     <nav class="flex items-center gap-1 text-sm font-semibold text-[#2a241a]">
-      <a
-        routerLink="/"
-        routerLinkActive="bg-[#2a241a] text-[#fdf8ec]"
-        [routerLinkActiveOptions]="{ exact: true }"
-        class="rounded-full px-3.5 py-2 transition hover:bg-[#eee4cc]"
-        >{{ i18n.t('nav.shows') }}</a
-      >
       @if (cart.spots().length > 0) {
         <span
           class="rounded-full border-[1.5px] border-[#2a241a] bg-[#f6ecd4] px-3 py-2 text-[#2a241a]"
           title="{{ cart.spots().length }} selecionado(s)"
-          >🎟 {{ cart.spots().length }}</span
+          ><app-icon name="ticket" class="th-icon--emboss h-4 w-4" /> {{ cart.spots().length }}</span
         >
       }
       @if (auth.isLoggedIn()) {
