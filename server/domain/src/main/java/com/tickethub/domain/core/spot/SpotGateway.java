@@ -1,6 +1,7 @@
 package com.tickethub.domain.core.spot;
 
 import com.tickethub.domain.core.section.SectionID;
+import com.tickethub.domain.core.show.ShowID;
 import com.tickethub.domain.pagination.Pagination;
 import com.tickethub.domain.pagination.SearchQuery;
 import java.util.List;
@@ -29,6 +30,12 @@ public interface SpotGateway {
     Pagination<Spot> findAll(SearchQuery query);
 
     Pagination<Spot> findBySection(SectionID sectionId, SearchQuery query);
+
+    /**
+     * Loads every spot of a show (denormalized link), for door preload
+     * ({@code GET /shows/{showId}/tickets}).
+     */
+    List<Spot> findByShowId(ShowID showId);
 
     List<SpotID> existsByIds(List<SpotID> ids);
 }
