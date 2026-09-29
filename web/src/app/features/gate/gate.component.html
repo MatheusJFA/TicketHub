@@ -28,8 +28,11 @@
             · ⏳ {{ i18n.t('gate.pendingSync', { count: pending().length }) }}
           }
         </p>
-      } @else {
+      }       @else {
         <p class="font-semibold text-[#6f6353]">{{ i18n.t('gate.noPreload') }}</p>
+      }
+      @if (preload() && preloadCount() === 0) {
+        <p class="mt-1 text-xs font-semibold text-[#6f6353]">{{ i18n.t('gate.noSalesYet') }}</p>
       }
       <div class="mt-2 flex flex-wrap gap-2">
         <button
@@ -49,6 +52,43 @@
           </button>
         }
       </div>
+    </div>
+    <div class="mt-4 rounded-xl border-[1.5px] border-[#2a241a] bg-[#fffdf6] p-3 text-sm">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <p class="font-black uppercase tracking-widest text-[#2a241a]">
+          <app-icon name="users" class="th-icon--emboss h-4 w-4" />
+          {{ i18n.t('gate.buyersTitle') }}
+          @if (buyers().length > 0) {
+            <span class="ml-1 rounded-full bg-[#2a241a] px-2 py-0.5 text-[0.7rem] text-[#fdf8ec]">{{ buyers().length }}</span>
+          }
+        </p>
+        <button
+          type="button"
+          (click)="loadBuyers()"
+          [disabled]="!online() || buyersLoading() || !showId"
+          class="th-btn-ghost !px-4 !py-2 !text-xs disabled:opacity-40">
+          {{ buyersLoading() ? i18n.t('gate.preloading') : i18n.t('gate.loadBuyers') }}
+        </button>
+      </div>
+      @if (buyers().length > 0) {
+        <ul class="mt-2 grid max-h-64 gap-1.5 overflow-auto">
+          @for (buyer of buyers(); track buyer.ticketId) {
+            <li class="flex flex-wrap items-center justify-between gap-x-3 gap-y-0.5 rounded-lg border border-dashed border-[#c4b795] bg-[#f8f2e2] px-3 py-2">
+              <span class="font-bold text-[#2a241a]">{{ buyer.buyerName }}</span>
+              <span class="font-mono text-xs text-[#6f6353]">{{ buyer.buyerCpf }}</span>
+              <span class="font-mono text-xs font-bold text-[#2a241a]">{{ buyer.location }}</span>
+              <span
+                class="th-badge"
+                [class.th-badge-live]="buyer.status === 'ISSUED'"
+                [class.th-badge-muted]="buyer.status !== 'ISSUED'">
+                {{ buyer.status }}
+              </span>
+            </li>
+          }
+        </ul>
+      } @else if (!buyersLoading()) {
+        <p class="mt-1 text-xs font-semibold text-[#6f6353]">{{ i18n.t('gate.noBuyers') }}</p>
+      }
     </div>
     <label class="th-label mt-4">
       {{ i18n.t('gate.qrLabel') }}

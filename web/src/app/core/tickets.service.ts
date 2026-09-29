@@ -24,6 +24,16 @@ export interface GateTicket {
   location: string;
 }
 
+export interface BuyerTicket {
+  ticketId: string;
+  status: string;
+  spotId: string;
+  location: string;
+  buyerName: string;
+  buyerCpf: string;
+  buyerEmail: string;
+}
+
 export interface ValidateTicketResponse {
   showId: string;
   ticketId: string;
@@ -53,6 +63,11 @@ export class TicketsService {
   /** Pré-carga da portaria: todos os ingressos do show para validar offline. */
   preload(showId: string) {
     return this.http.get<GateTicket[]>(`${this.config.url()}/shows/${showId}/tickets`);
+  }
+
+  /** Lista de compradores do show (nome, CPF, e-mail por ingresso). */
+  buyers(showId: string) {
+    return this.http.get<BuyerTicket[]>(`${this.config.url()}/shows/${showId}/buyers`);
   }
 
   validate(showId: string, ticketId: string, code: string, signature: string) {

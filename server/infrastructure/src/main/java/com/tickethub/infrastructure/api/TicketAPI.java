@@ -1,5 +1,6 @@
 package com.tickethub.infrastructure.api;
 
+import com.tickethub.infrastructure.ticket.models.BuyerTicketResponse;
 import com.tickethub.infrastructure.ticket.models.CustomerTicketResponse;
 import com.tickethub.infrastructure.ticket.models.GateTicketResponse;
 import com.tickethub.infrastructure.ticket.models.ValidateTicketRequest;
@@ -89,4 +90,19 @@ public interface TicketAPI {
     })
     @PreAuthorize("hasAuthority('ticket:validate') and @showAccess.canWrite(#showId)")
     List<GateTicketResponse> listShowTickets(@PathVariable("showId") String showId);
+
+    @GetMapping(value = "/shows/{showId}/buyers")
+    @Operation(
+            summary = "List Show Buyers",
+            description =
+                    "Returns every buyer of a show (name, CPF, e-mail per ticket) for the door guest list. Buyer PII is never included in the offline preload payload")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Show buyers"),
+        @ApiResponse(responseCode = "404", description = "The show was not found"),
+        @ApiResponse(
+                responseCode = "500",
+                description = "An unexpected failure prevented the server from completing the operation")
+    })
+    @PreAuthorize("hasAuthority('ticket:validate') and @showAccess.canWrite(#showId)")
+    List<BuyerTicketResponse> listShowBuyers(@PathVariable("showId") String showId);
 }

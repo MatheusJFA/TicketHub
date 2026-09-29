@@ -27,3 +27,10 @@ X-Correlation-ID: ticket-validate-1
 GET {{baseUrl}}/shows/{{showId}}/tickets
 Accept: application/json
 Authorization: Bearer {{token}}
+
+### List show buyers (door guest list with name/CPF per ticket)
+# Buyer PII for the door; never stored offline. Requires ticket:validate + show access.
+# @name listShowBuyers
+GET {{baseUrl}}/shows/{{showId}}/buyers
+Accept: application/json
+Authorization: Bearer {{token}}

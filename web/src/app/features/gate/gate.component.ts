@@ -7,7 +7,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CatalogService } from '../../core/catalog.service';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { ListErrorComponent } from '../../core/list-error.component';
-import { TicketsService, ValidateTicketResponse } from '../../core/tickets.service';
+import { TicketsService, BuyerTicket, ValidateTicketResponse } from '../../core/tickets.service';
 import { ToastService } from '../../core/toast.service';
 import {
   PendingCheckIn,
@@ -53,6 +53,9 @@ export class GateComponent {
   readonly preloading = signal(false);
   readonly pending = signal<PendingCheckIn[]>([]);
   readonly syncing = signal(false);
+  /** Lista de compradores do show selecionado (nome, CPF, e-mail). */
+  readonly buyers = signal<BuyerTicket[]>([]);
+  readonly buyersLoading = signal(false);
 
   constructor() {
     const destroyRef = inject(DestroyRef);
@@ -85,6 +88,7 @@ export class GateComponent {
     this.showId = id;
     this.reset();
     this.refreshPreloadMeta();
+    this.buyers.set([]);
   }
 
   refreshPreloadMeta(): void {
@@ -108,6 +112,21 @@ export class GateComponent {
       },
       error: (err) => {
         this.preloading.set(false);
+        this.error.set(parseApiError(err, this.i18n.t('errors.generic')));
+      },
+    });
+  }
+
+  loadBuyers(): void {
+    if (!this.showId || !this.online() || this.buyersLoading()) return;
+    this.buyersLoading.set(true);
+    this.tickets.buyers(this.showId).subscribe({
+      next: (buyers) => {
+        this.buyers.set(buyers);
+        this.buyersLoading.set(false);
+      },
+      error: (err) => {
+        this.buyersLoading.set(false);
         this.error.set(parseApiError(err, this.i18n.t('errors.generic')));
       },
     });

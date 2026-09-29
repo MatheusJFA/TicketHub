@@ -16,7 +16,7 @@
           ><app-icon name="ticket" class="th-icon--emboss h-4 w-4" /> {{ cart.spots().length }}</span
         >
       }
-      @if (auth.isLoggedIn()) {
+      @if (auth.isLoggedIn() && auth.customerId()) {
         <a
           routerLink="/tickets"
           routerLinkActive="bg-[#2a241a] text-[#fdf8ec]"

@@ -1,5 +1,7 @@
 package com.tickethub.infrastructure.api.controllers;
 
+import com.tickethub.application.ticket.retrieve.buyers.ListShowBuyersCommand;
+import com.tickethub.application.ticket.retrieve.buyers.ListShowBuyersUseCase;
 import com.tickethub.application.ticket.retrieve.bycustomer.ListCustomerTicketsCommand;
 import com.tickethub.application.ticket.retrieve.bycustomer.ListCustomerTicketsUseCase;
 import com.tickethub.application.ticket.retrieve.byshow.ListShowTicketsCommand;
@@ -8,6 +10,7 @@ import com.tickethub.application.ticket.validate.ValidateTicketCommand;
 import com.tickethub.application.ticket.validate.ValidateTicketUseCase;
 import com.tickethub.infrastructure.api.HttpResults;
 import com.tickethub.infrastructure.api.TicketAPI;
+import com.tickethub.infrastructure.ticket.models.BuyerTicketResponse;
 import com.tickethub.infrastructure.ticket.models.CustomerTicketResponse;
 import com.tickethub.infrastructure.ticket.models.GateTicketResponse;
 import com.tickethub.infrastructure.ticket.models.ValidateTicketRequest;
@@ -20,14 +23,17 @@ public class TicketController implements TicketAPI {
     private final ValidateTicketUseCase validateTicket;
     private final ListCustomerTicketsUseCase listCustomerTickets;
     private final ListShowTicketsUseCase listShowTickets;
+    private final ListShowBuyersUseCase listShowBuyers;
 
     public TicketController(
             final ValidateTicketUseCase validateTicket,
             final ListCustomerTicketsUseCase listCustomerTickets,
-            final ListShowTicketsUseCase listShowTickets) {
+            final ListShowTicketsUseCase listShowTickets,
+            final ListShowBuyersUseCase listShowBuyers) {
         this.validateTicket = validateTicket;
         this.listCustomerTickets = listCustomerTickets;
         this.listShowTickets = listShowTickets;
+        this.listShowBuyers = listShowBuyers;
     }
 
     @Override
@@ -49,5 +55,12 @@ public class TicketController implements TicketAPI {
         final var output = HttpResults.require(
                 listShowTickets.execute(ListShowTicketsCommand.with(showId)));
         return output.stream().map(GateTicketResponse::from).toList();
+    }
+
+    @Override
+    public List<BuyerTicketResponse> listShowBuyers(final String showId) {
+        final var output =
+                HttpResults.require(listShowBuyers.execute(ListShowBuyersCommand.with(showId)));
+        return output.stream().map(BuyerTicketResponse::from).toList();
     }
 }
