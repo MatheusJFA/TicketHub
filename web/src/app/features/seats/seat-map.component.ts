@@ -2,11 +2,11 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input, si
 import { Router, RouterLink } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
-import { CatalogService } from '../../core/catalog.service';
-import { CartService } from '../../core/cart.service';
-import { I18nService } from '../../core/i18n/i18n.service';
-import { ListErrorComponent } from '../../core/list-error.component';
-import { IconComponent } from '../../core/icon.component';
+import { CatalogService } from '../../catalog/catalog.service';
+import { CartService } from '../../orders/cart.service';
+import { I18nService } from '../../shared/i18n/i18n.service';
+import { ListErrorComponent } from '../../shared/ui/list-error.component';
+import { IconComponent } from '../../shared/ui/icon.component';
 import { SectionSummary, ShowDetail, SpotItem } from '../../core/models';
 
 interface SectionMap {

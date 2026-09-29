@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { CatalogService } from '../../core/catalog.service';
-import { I18nService } from '../../core/i18n/i18n.service';
-import { ListErrorComponent } from '../../core/list-error.component';
-import { IconComponent } from '../../core/icon.component';
+import { CatalogService } from '../../catalog/catalog.service';
+import { I18nService } from '../../shared/i18n/i18n.service';
+import { ListErrorComponent } from '../../shared/ui/list-error.component';
+import { IconComponent } from '../../shared/ui/icon.component';
 import { ShowDetail } from '../../core/models';
 
 @Component({

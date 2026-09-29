@@ -3,11 +3,11 @@ import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { CatalogService } from '../../core/catalog.service';
-import { I18nService } from '../../core/i18n/i18n.service';
-import { ListErrorComponent } from '../../core/list-error.component';
-import { IconComponent } from '../../core/icon.component';
-import { PaginationComponent } from '../../core/pagination.component';
+import { CatalogService } from '../../catalog/catalog.service';
+import { I18nService } from '../../shared/i18n/i18n.service';
+import { ListErrorComponent } from '../../shared/ui/list-error.component';
+import { IconComponent } from '../../shared/ui/icon.component';
+import { PaginationComponent } from '../../shared/ui/pagination.component';
 import { parseApiError } from '../../core/api-error';
 import { ShowSummary } from '../../core/models';
 

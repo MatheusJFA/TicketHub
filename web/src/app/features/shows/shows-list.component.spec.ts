@@ -5,7 +5,7 @@ import localePt from '@angular/common/locales/pt';
 import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import { ShowsListComponent } from './shows-list.component';
-import { CatalogService } from '../../core/catalog.service';
+import { CatalogService } from '../../catalog/catalog.service';
 import { ShowSummary } from '../../core/models';
 
 registerLocaleData(localePt);

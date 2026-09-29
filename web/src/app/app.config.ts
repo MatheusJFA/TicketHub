@@ -19,10 +19,10 @@ import {
   PreloadAllModules,
 } from '@angular/router';
 import { routes } from './app.routes';
-import { authInterceptor } from './core/auth.interceptor';
+import { authInterceptor } from './auth/auth.interceptor';
 import { ConfigService } from './core/config.service';
-import { LANG_STORAGE_KEY } from './core/i18n/locales';
-import { I18nService } from './core/i18n/i18n.service';
+import { LANG_STORAGE_KEY } from './shared/i18n/locales';
+import { I18nService } from './shared/i18n/i18n.service';
 
 registerLocaleData(localePt);
 registerLocaleData(localeEs);

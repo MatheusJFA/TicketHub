@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { LoginComponent } from './login.component';
-import { AuthService } from '../../core/auth.service';
+import { AuthService } from '../../auth/auth.service';
 
 function setup(loginImpl: () => ReturnType<AuthService['login']>) {
   const login = vi.fn(loginImpl);

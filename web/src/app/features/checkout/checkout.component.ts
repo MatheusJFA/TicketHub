@@ -2,14 +2,14 @@ import { ChangeDetectionStrategy, Component, inject, OnDestroy, signal } from '@
 import { DatePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { interval, Subscription, switchMap, take, takeWhile } from 'rxjs';
-import { AuthService } from '../../core/auth.service';
-import { CartService } from '../../core/cart.service';
-import { I18nService } from '../../core/i18n/i18n.service';
-import { OrdersService } from '../../core/orders.service';
-import { shareLink } from '../../core/share';
-import { ToastService } from '../../core/toast.service';
+import { AuthService } from '../../auth/auth.service';
+import { CartService } from '../../orders/cart.service';
+import { I18nService } from '../../shared/i18n/i18n.service';
+import { OrdersService } from '../../orders/orders.service';
+import { shareLink } from '../../shared/share';
+import { ToastService } from '../../shared/ui/toast.service';
 import { parseApiError } from '../../core/api-error';
-import { IconComponent } from '../../core/icon.component';
+import { IconComponent } from '../../shared/ui/icon.component';
 import { OrderResponse, PayOrderResponse } from '../../core/models';
 
 type Phase = 'review' | 'paying' | 'waiting' | 'done' | 'error';

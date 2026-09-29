@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { AuthService } from '../../core/auth.service';
-import { I18nService } from '../../core/i18n/i18n.service';
-import { ListErrorComponent } from '../../core/list-error.component';
-import { IconComponent } from '../../core/icon.component';
-import { ToastService } from '../../core/toast.service';
-import { TicketsService, CustomerTicket } from '../../core/tickets.service';
+import { AuthService } from '../../auth/auth.service';
+import { I18nService } from '../../shared/i18n/i18n.service';
+import { ListErrorComponent } from '../../shared/ui/list-error.component';
+import { IconComponent } from '../../shared/ui/icon.component';
+import { ToastService } from '../../shared/ui/toast.service';
+import { TicketsService, CustomerTicket } from '../../tickets/tickets.service';
 
 @Component({
   selector: 'app-my-tickets',

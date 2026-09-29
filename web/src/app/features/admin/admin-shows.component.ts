@@ -1,14 +1,14 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { CatalogService } from '../../core/catalog.service';
-import { AdminService } from '../../core/admin.service';
-import { AuthService } from '../../core/auth.service';
-import { ConfirmService } from '../../core/confirm.service';
-import { I18nService } from '../../core/i18n/i18n.service';
+import { CatalogService } from '../../catalog/catalog.service';
+import { AdminService } from '../../admin/admin.service';
+import { AuthService } from '../../auth/auth.service';
+import { ConfirmService } from '../../shared/ui/confirm.service';
+import { I18nService } from '../../shared/i18n/i18n.service';
 import { ShowSummary } from '../../core/models';
 import { parseApiError } from '../../core/api-error';
-import { IconComponent } from '../../core/icon.component';
+import { IconComponent } from '../../shared/ui/icon.component';
 
 @Component({
   selector: 'app-admin-shows',

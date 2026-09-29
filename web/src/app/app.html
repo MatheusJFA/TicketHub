@@ -16,7 +16,7 @@
           ><app-icon name="ticket" class="th-icon--emboss h-4 w-4" /> {{ cart.spots().length }}</span
         >
       }
-      @if (auth.isLoggedIn() && auth.customerId()) {
+      @if (auth.isLoggedIn() && auth.customerId() && auth.canBuyTickets) {
         <a
           routerLink="/tickets"
           routerLinkActive="bg-[#2a241a] text-[#fdf8ec]"
@@ -26,7 +26,7 @@
       }
       @if (auth.canValidateTickets) {
         <a
-          routerLink="/gate"
+          routerLink="/check-in"
           routerLinkActive="bg-[#2a241a] text-[#fdf8ec]"
           class="rounded-full px-3.5 py-2 transition hover:bg-[#eee4cc]"
           >{{ i18n.t('nav.gate') }}</a

@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../core/auth.service';
-import { I18nService } from '../../core/i18n/i18n.service';
+import { AuthService } from '../../auth/auth.service';
+import { I18nService } from '../../shared/i18n/i18n.service';
 import { parseApiError } from '../../core/api-error';
-import { IconComponent } from '../../core/icon.component';
+import { IconComponent } from '../../shared/ui/icon.component';
 
 @Component({
   selector: 'app-signup',

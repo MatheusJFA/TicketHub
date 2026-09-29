@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AccountService } from '../../core/account.service';
-import { AuthService } from '../../core/auth.service';
-import { ConfirmService } from '../../core/confirm.service';
-import { I18nService } from '../../core/i18n/i18n.service';
+import { AccountService } from '../../customers/account.service';
+import { AuthService } from '../../auth/auth.service';
+import { ConfirmService } from '../../shared/ui/confirm.service';
+import { I18nService } from '../../shared/i18n/i18n.service';
 import { parseApiError } from '../../core/api-error';
-import { IconComponent } from '../../core/icon.component';
+import { IconComponent } from '../../shared/ui/icon.component';
 
 @Component({
   selector: 'app-account',

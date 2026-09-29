@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { I18nService } from '../../core/i18n/i18n.service';
-import { OperatorsService } from '../../core/operators.service';
+import { I18nService } from '../../shared/i18n/i18n.service';
+import { OperatorsService } from '../../admin/operators.service';
 import { parseApiError } from '../../core/api-error';
-import { IconComponent } from '../../core/icon.component';
+import { IconComponent } from '../../shared/ui/icon.component';
 
 @Component({
   selector: 'app-admin-operators',

@@ -4,13 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { forkJoin, of, from, mergeMap } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
-import { CatalogService } from '../../core/catalog.service';
-import { AdminService } from '../../core/admin.service';
-import { ConfirmService } from '../../core/confirm.service';
-import { I18nService } from '../../core/i18n/i18n.service';
+import { CatalogService } from '../../catalog/catalog.service';
+import { AdminService } from '../../admin/admin.service';
+import { ConfirmService } from '../../shared/ui/confirm.service';
+import { I18nService } from '../../shared/i18n/i18n.service';
 import { SectionSummary, ShowDetail, SpotItem } from '../../core/models';
 import { parseApiError } from '../../core/api-error';
-import { IconComponent } from '../../core/icon.component';
+import { IconComponent } from '../../shared/ui/icon.component';
 
 interface SectionMap {
   section: SectionSummary;
@@ -99,8 +99,8 @@ export class AdminShowDetailComponent {
               }
               return forkJoin(
                 page.items.map((section) =>
-                  this.catalog.listSectionSpots(section.id, 0, 500).pipe(
-                    map((spots) => ({ section, spots: spots.items })),
+                  this.catalog.listAllSectionSpots(section.id).pipe(
+                    map((spots) => ({ section, spots })),
                     catchError(() => of({ section, spots: [] })),
                   ),
                 ),
@@ -145,8 +145,8 @@ export class AdminShowDetailComponent {
           if (!created) throw new Error('section not found after create');
           return created;
         }),
-        switchMap((section) => this.catalog.listSectionSpots(section.id, 0, labels.length + 10).pipe(
-          map((spots) => ({ section, spots: spots.items })),
+        switchMap((section) => this.catalog.listAllSectionSpots(section.id).pipe(
+          map((spots) => ({ section, spots })),
         )),
         switchMap(({ section, spots }) => {
           const ordered = [...spots].sort((a, b) => a.createdAt.localeCompare(b.createdAt));

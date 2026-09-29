@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/auth.guard';
-import { adminGuard, gateGuard, masterGuard } from './core/admin.guard';
+import { authGuard, customerGuard } from './auth/auth.guard';
+import { adminGuard, gateGuard, masterGuard } from './auth/admin.guard';
 
 export const routes: Routes = [
   {
@@ -46,15 +46,16 @@ export const routes: Routes = [
     path: 'tickets',
     loadComponent: () =>
       import('./features/tickets/my-tickets.component').then((m) => m.MyTicketsComponent),
-    canActivate: [authGuard],
+    canActivate: [customerGuard],
     title: 'TicketHub · Ingressos',
   },
   {
-    path: 'gate',
-    loadComponent: () => import('./features/gate/gate.component').then((m) => m.GateComponent),
+    path: 'check-in',
+    loadComponent: () => import('./features/check-in/check-in.component').then((m) => m.CheckInComponent),
     canActivate: [gateGuard],
-    title: 'TicketHub · Portaria',
+    title: 'TicketHub · Checagem',
   },
+  { path: 'gate', redirectTo: 'check-in' },
   {
     path: 'partner',
     loadComponent: () =>
@@ -64,7 +65,7 @@ export const routes: Routes = [
   {
     path: 'admin/coupons',
     loadComponent: () =>
-      import('./features/coupons/admin-coupons.component').then((m) => m.AdminCouponsComponent),
+      import('./features/admin/admin-coupons.component').then((m) => m.AdminCouponsComponent),
     canActivate: [masterGuard],
     title: 'TicketHub · Cupons',
   },

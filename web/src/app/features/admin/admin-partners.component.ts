@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { I18nService } from '../../core/i18n/i18n.service';
-import { ConfirmService } from '../../core/confirm.service';
-import { PartnersService, PartnerProfile } from '../../core/partners.service';
+import { I18nService } from '../../shared/i18n/i18n.service';
+import { ConfirmService } from '../../shared/ui/confirm.service';
+import { PartnersService, PartnerProfile } from '../../admin/partners.service';
 import { parseApiError } from '../../core/api-error';
-import { IconComponent } from '../../core/icon.component';
+import { IconComponent } from '../../shared/ui/icon.component';
 
 @Component({
   selector: 'app-admin-partners',

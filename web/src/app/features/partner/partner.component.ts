@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../core/auth.service';
-import { I18nService } from '../../core/i18n/i18n.service';
-import { PartnersService, PartnerProfile } from '../../core/partners.service';
-import { ZipcodeService } from '../../core/zipcode.service';
+import { AuthService } from '../../auth/auth.service';
+import { I18nService } from '../../shared/i18n/i18n.service';
+import { PartnersService, PartnerProfile } from '../../admin/partners.service';
+import { ZipcodeService } from '../../shared/zipcode.service';
 import { Address } from '../../core/models';
 import { parseApiError } from '../../core/api-error';
-import { IconComponent } from '../../core/icon.component';
+import { IconComponent } from '../../shared/ui/icon.component';
 
 const EMPTY_ADDRESS: Address = {
   street: '',

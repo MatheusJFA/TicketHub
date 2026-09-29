@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { I18nService } from '../../core/i18n/i18n.service';
-import { ListErrorComponent } from '../../core/list-error.component';
-import { IconComponent } from '../../core/icon.component';
-import { OrdersService } from '../../core/orders.service';
-import { shareLink } from '../../core/share';
-import { ToastService } from '../../core/toast.service';
+import { I18nService } from '../../shared/i18n/i18n.service';
+import { ListErrorComponent } from '../../shared/ui/list-error.component';
+import { IconComponent } from '../../shared/ui/icon.component';
+import { OrdersService } from '../../orders/orders.service';
+import { shareLink } from '../../shared/share';
+import { ToastService } from '../../shared/ui/toast.service';
 import { parseApiError } from '../../core/api-error';
 import { OrderResponse } from '../../core/models';
 
